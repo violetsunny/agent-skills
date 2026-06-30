@@ -78,6 +78,85 @@ def _table(headers: list[str], rows: list[list[str]]) -> str:
     return "\n".join([header_line, sep_line, *body])
 
 
+def _collect_event_texts(bucket: dict | None) -> list[str]:
+    if not isinstance(bucket, dict):
+        return []
+
+    def _normalized_variants(text: str) -> set[str]:
+        value = text.strip()
+        variants = {value}
+        trimmed = value.rstrip("。；;:：")
+        if trimmed:
+            variants.add(trimmed)
+        prefix = "："
+        if prefix in trimmed:
+            variants.add(trimmed.split(prefix, 1)[1].strip())
+        ascii_prefix = ":"
+        if ascii_prefix in trimmed:
+            variants.add(trimmed.split(ascii_prefix, 1)[1].strip())
+        return {item for item in variants if item}
+
+    texts: list[str] = []
+    seen: set[str] = set()
+    for item in _ensure_list(bucket.get("summary")):
+        text = str(item).strip()
+        variants = _normalized_variants(text)
+        if text and not (variants & seen):
+            seen.update(variants)
+            texts.append(text)
+
+    for item in _ensure_list(bucket.get("evidence")):
+        if isinstance(item, dict):
+            for key in ("title", "名称", "证券简称"):
+                value = str(item.get(key, "")).strip()
+                variants = _normalized_variants(value)
+                if value and not (variants & seen):
+                    seen.update(variants)
+                    texts.append(value)
+                    break
+        else:
+            text = str(item).strip()
+            variants = _normalized_variants(text)
+            if text and not (variants & seen):
+                seen.update(variants)
+                texts.append(text)
+    return texts
+
+
+def _dedupe_event_texts(items: list[str]) -> list[str]:
+    def _normalized_variants(text: str) -> set[str]:
+        value = text.strip()
+        variants = {value}
+        trimmed = value.rstrip("。；;:：")
+        if trimmed:
+            variants.add(trimmed)
+        prefix = "："
+        if prefix in trimmed:
+            variants.add(trimmed.split(prefix, 1)[1].strip())
+        ascii_prefix = ":"
+        if ascii_prefix in trimmed:
+            variants.add(trimmed.split(ascii_prefix, 1)[1].strip())
+        return {item for item in variants if item}
+
+    deduped: list[str] = []
+    seen: set[str] = set()
+    for item in items:
+        text = str(item).strip()
+        variants = _normalized_variants(text)
+        if text and not (variants & seen):
+            seen.update(variants)
+            deduped.append(text)
+    return deduped
+
+
+def _format_security_label(name, symbol) -> str:
+    name_text = str(name or "").strip()
+    symbol_text = str(symbol or "").strip()
+    if name_text and symbol_text:
+        return f"{name_text}({symbol_text})"
+    return name_text or symbol_text or "-"
+
+
 def render_report(payload: dict) -> str:
     trade_date = payload.get("trade_date", "未知交易日")
     summary = payload.get("summary", "暂无总结")
@@ -185,7 +264,7 @@ def render_report(payload: dict) -> str:
             continue
         fundamental_rows.append(
             [
-                f"{item.get('name', '')}({item.get('symbol', '')})",
+                _format_security_label(item.get("name"), item.get("symbol")),
                 f"PE {_format_number(item.get('pe'))} / PB {_format_number(item.get('pb'))}",
                 f"ROE {_format_percent(item.get('roe'))} / 毛利率 {_format_percent(item.get('gross_margin'))}",
                 (
@@ -204,6 +283,40 @@ def render_report(payload: dict) -> str:
                 "",
             ]
         )
+
+    event_snapshots = payload.get("event_snapshots", {})
+    market_events = (
+        event_snapshots.get("market", {}) if isinstance(event_snapshots, dict) else {}
+    )
+    market_event_lines = []
+    for key in ("announcements", "news", "dragon_tiger", "margin_trading"):
+        market_event_lines.extend(_collect_event_texts(market_events.get(key)))
+    market_event_lines = _dedupe_event_texts(market_event_lines)
+    if market_event_lines:
+        lines.append("### 事件快照")
+        for item in market_event_lines:
+            lines.append(f"- {item}")
+        lines.append("")
+
+    focus_events = (
+        event_snapshots.get("focus", []) if isinstance(event_snapshots, dict) else []
+    )
+    focus_sections = []
+    for item in _ensure_list(focus_events):
+        if not isinstance(item, dict):
+            continue
+        focus_name = str(item.get("name") or item.get("symbol") or "重点股").strip()
+        focus_lines = []
+        for key in ("announcements", "news", "dragon_tiger", "margin_trading"):
+            focus_lines.extend(_collect_event_texts(item.get(key)))
+        focus_lines = _dedupe_event_texts(focus_lines)
+        if focus_lines:
+            focus_sections.append((focus_name, focus_lines))
+    if focus_sections:
+        lines.append("### 重点股事件催化")
+        for focus_name, focus_lines in focus_sections:
+            lines.append(f"- {focus_name}: {'；'.join(focus_lines)}")
+        lines.append("")
 
     cap = payload.get("capital_and_events", {})
     if cap:
@@ -227,6 +340,13 @@ def render_report(payload: dict) -> str:
     if risks:
         lines.append("### 风险提示")
         for item in risks:
+            lines.append(f"- {item}")
+        lines.append("")
+
+    disclaimers = _ensure_list(payload.get("disclaimers"))
+    if disclaimers:
+        lines.append("### 免责声明")
+        for item in disclaimers:
             lines.append(f"- {item}")
         lines.append("")
 

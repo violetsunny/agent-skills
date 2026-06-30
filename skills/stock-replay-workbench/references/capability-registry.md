@@ -33,7 +33,7 @@
 | 公告与催化 | `announcement`、`news` | 公告列表、新闻列表 |
 | 财务与估值 | `fundamental` | 市值、PE、PB、营收、净利、ROE、毛利率、资产负债率、净利率、每股净资产、现金流摘要 |
 | 衍生资产 | `bond` | 可转债实时、排行、历史 |
-| 盘后复盘产出 | `build-replay`、`render-replay` | 先组装复盘底稿 JSON，再渲染成 Markdown |
+| 盘后复盘产出 | `build-replay`、`render-replay` | 先组装复盘底稿 JSON，再渲染成 Markdown；底稿已包含市场层与重点股层的事件快照摘要 |
 
 ## 模块组合建议
 

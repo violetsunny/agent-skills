@@ -1,8 +1,12 @@
 from __future__ import annotations
 
 from datetime import date
+import threading
 
 from .common import clean_symbol, source, success
+
+
+_PUBLIC_SOURCE_TIMEOUT_SECONDS = 8.0
 
 
 def _records(frame) -> list[dict]:
@@ -20,6 +24,28 @@ def _filter_symbol(rows: list[dict], symbol: str | None) -> list[dict]:
         return rows
     code = clean_symbol(symbol)
     return [row for row in rows if code in str(row)]
+
+
+def _call_with_timeout(func, *args, timeout: float):
+    result: dict[str, object] = {}
+    error: dict[str, Exception] = {}
+
+    def runner() -> None:
+        try:
+            result["value"] = func(*args)
+        except Exception as exc:  # pragma: no cover - exercised through caller
+            error["value"] = exc
+
+    thread = threading.Thread(target=runner, daemon=True)
+    thread.start()
+    thread.join(timeout)
+    if thread.is_alive():
+        raise TimeoutError(
+            f"public source call timed out after {timeout:.2f}s: {getattr(func, '__name__', 'unknown')}"
+        )
+    if "value" in error:
+        raise error["value"]
+    return result.get("value")
 
 
 def announcement(
@@ -78,7 +104,9 @@ def news(symbol: str | None = None, limit: int = 20) -> dict:
         if symbol:
             frame = ak.stock_news_em(symbol=clean_symbol(symbol))
         else:
-            frame = ak.stock_info_global_cls()
+            frame = _call_with_timeout(
+                ak.stock_info_global_cls, timeout=_PUBLIC_SOURCE_TIMEOUT_SECONDS
+            )
         for _, row in frame.head(limit).iterrows():
             items.append(
                 {
@@ -96,6 +124,9 @@ def news(symbol: str | None = None, limit: int = 20) -> dict:
                 }
             )
         source_chain.append(source("akshare_news", True))
+    except TimeoutError as exc:
+        warnings.append(f"新闻公开源超时，已返回空列表: {exc}")
+        source_chain.append(source("akshare_news", False, str(exc)))
     except Exception as exc:
         warnings.append(f"新闻公开源暂不可用，已返回空列表: {exc}")
         source_chain.append(source("akshare_news", False, str(exc)))

@@ -168,11 +168,14 @@ python3 stock-replay-workbench/scripts/render_replay_markdown.py --help
 
 当前第二批增强的专项验收点还应包括：
 
-1. `money-flow --scope industry --limit 5` 返回非空 `items`
-2. `money-flow --scope concept --limit 5` 返回非空 `items`
+1. `money-flow --scope industry --limit 5` 返回结构化 payload；若公开源失败，可接受空 `items` + warning
+2. `money-flow --scope concept --limit 5` 返回结构化 payload；若公开源失败，可接受空 `items` + warning
 3. `fundamental --symbol 600519` 返回扩展字段键：`revenue`、`net_profit`、`asset_liability_ratio`、`net_margin`、`book_value_per_share`
 4. `limit-pool --pool up --limit 5` 在接口空池时可回退到最近可用交易日，并保留 warning
-5. `build-replay --limit 3` 返回可直接喂给 `render-replay` 的结构化 JSON
+5. `build-replay --limit 3` 返回可直接喂给 `render-replay` 的结构化 JSON，且在市场级新闻阻塞时能超时降级并正常退出
+6. `build-replay --limit 3` 的输出中，`event_snapshots.market` 包含 `announcements`、`news`、`dragon_tiger`、`margin_trading`
+7. `build-replay --limit 3` 的输出中，`event_snapshots.focus` 为重点股事件摘要列表
+8. `capital_and_events.special` / `catalysts` 已吸收事件域高层摘要
 
 ## 六、宿主无关的行为验收 (host-agnostic behavior review)
 
@@ -249,7 +252,7 @@ python3 stock-replay-workbench/scripts/render_replay_markdown.py --help
 1. `python3 stock-replay-workbench/scripts/validate_skill.py` 通过
 2. `stock_replay_cli.py --help` 可运行
 3. `render_replay_markdown.py --help` 可运行
-4. 关键命令可运行：`money-flow` 四个 scope、`fundamental`、`limit-pool`、`build-replay`
+4. 关键命令可运行：`money-flow` 四个 scope、`fundamental`、`limit-pool`、`build-replay`；其中 best-effort 命令允许空样本但必须保留 warning
 5. 三类手工提示词的验收清单明确，可在任一宿主平台复用
 6. 如需留痕，使用 `references/manual-review-template.md` 记录人工验收结果
 

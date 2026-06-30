@@ -20,15 +20,15 @@
 | `quote-realtime` 行情 | 单票或少量多票 | 实时 | 不适合超大批量 | stable | 适合快查价格和基础指标 |
 | `quote-history` 行情 | 单票为主 | 历史 | 时间跨度大时留意数据量 | stable | 适合日线/周线/月线/分钟线 |
 | `market-snapshot` 快照 | 全市场 | 实时快照 | 不需要分页 | stable | 适合指数、涨跌家数、市场宽度 |
-| `rank` 排行 | 全市场 | 当日排行 | 通常 limit 控制 | stable | 适合成交额、换手率、PE/PB 等榜单 |
+| `rank` 排行 | 全市场 | 当日排行 | 通常 limit 控制 | stable 到 best-effort 混合 | 适合成交额、换手率、PE/PB 等榜单；公网波动时允许返回空列表并保留 warning |
 | `limit-pool` 涨跌停池 | 全市场 | 当日情绪 | 通常 limit 控制 | stable | 适合涨停、跌停、炸板、强势股 |
 | `sector` 板块 | 板块或单票 | 当日或静态归属 | 视 action 而定 | stable | 板块排行和个股归属的主入口 |
 | `money-flow` 市场资金 | 全市场 | 当日或短周期 | limit 控制 | stable | 当前使用 `akshare.stock_market_fund_flow`，适合盘面资金总览 |
 | `money-flow` 个股资金 | 单票 | 当日或短周期 | 不适合高频批量 | best-effort | 当前优先东财明细，失败回退到东财排行快照或 `akshare` |
-| `money-flow` 行业/概念资金 | 多板块 | 当日 | limit 控制 | best-effort | 当前使用 `akshare.stock_sector_fund_flow_rank`，适合题材或行业资金强弱对比 |
+| `money-flow` 行业/概念资金 | 多板块 | 当日 | limit 控制 | best-effort | 当前使用 `akshare.stock_sector_fund_flow_rank`，适合题材或行业资金强弱对比；公开源失败时允许空样本 + warning |
 | `fundamental` 基础财务 | 单票为主 | 历史/静态 | 适合逐个查询 | stable 到 best-effort 混合 | 当前覆盖市值、PE、PB、营收、净利、ROE、毛利率、资产负债率、销售净利率、每股净资产、现金流摘要 |
 | `announcement` 公告 | 单票为主 | 历史/近期事件 | 关键词筛选 | stable | 适合公告列表和 PDF 入口 |
-| `news` 资讯 | 单票或主题 | 近期事件 | limit 控制 | best-effort | 新闻与研报字段可能变化 |
+| `news` 资讯 | 单票或主题 | 近期事件 | limit 控制 | best-effort | 新闻与研报字段可能变化；市场级新闻查询带超时保护，超时后返回空列表并保留 warning |
 | `dragon-tiger` 龙虎榜 | 单票或按日期 | 当日/历史事件 | 日期维度可批量 | stable | 适合龙虎榜明细和席位信息 |
 | `block-trade` 大宗 | 按日期或单票 | 历史事件 | 可能需要 limit | best-effort | 公开源稳定性中等 |
 | `margin-trading` 两融 | 按日期或单票 | 历史事件 | 可能需要 limit | best-effort | 适合两融趋势观察，不适合超复杂筛选 |
@@ -46,6 +46,7 @@
 - 优先使用大盘快照、涨跌停池、行业排行和市场资金总览。
 - 只对少数关键股补充单票接口。
 - 如果要比较主线承接强弱，可补 `money-flow --scope industry` 或 `money-flow --scope concept`，但仍按 best-effort 处理。
+- `build-replay` 的事件层默认使用全市场新闻、龙虎榜、两融做市场级摘要；公告仍只对重点股逐票补充，不扩展为全市场公告池。
 
 ### 批量筛选
 

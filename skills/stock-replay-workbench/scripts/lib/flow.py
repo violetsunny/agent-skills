@@ -303,7 +303,10 @@ def money_flow(
                     "symbol": None,
                     "limit": limit,
                     "items": [],
-                    "summary": None,
+                    "summary": {
+                        "status": "unavailable",
+                        "note": "市场资金流主源失败，当前返回空样本，请结合其他盘面指标交叉确认。",
+                    },
                 },
                 source_chain,
                 warnings,
@@ -383,7 +386,10 @@ def money_flow(
                 "symbol": cleaned_symbol,
                 "limit": limit,
                 "items": [],
-                "summary": None,
+                "summary": {
+                    "status": "unavailable",
+                    "note": "个股资金流公开源当前不可用，已返回空样本，请结合成交额、涨跌停和板块强度交叉确认。",
+                },
             },
             source_chain,
             warnings,
