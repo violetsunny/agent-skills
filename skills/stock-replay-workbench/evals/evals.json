@@ -1,0 +1,44 @@
+{
+  "skill_name": "stock-replay-workbench",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "帮我做 2026-06-26 的 A股盘后复盘。重点说三大指数、涨跌家数、涨停/炸板、今天主线题材、最强的几个板块和明日观察点。不要只贴原始数据，要给结构化结论。",
+      "expected_output": "输出一份结构化 A 股复盘，先识别为盘后复盘任务，再覆盖行情、板块、资金/情绪等关键数据域，形成市场总览、主线与情绪、关键板块、强势股/观察点，并明确来源、时间戳和风险提示。",
+      "files": [],
+      "expectations": [
+        "The output is structured as a replay report rather than a raw dump.",
+        "The output reflects replay-task routing and not a single-source answer.",
+        "The output includes market breadth or index overview details.",
+        "The output includes next-day watchpoints or risks.",
+        "The output mentions sources and timestamp/warnings."
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "分析一下宁德时代今天为什么强，别只看价格。请把行情强弱、资金面、题材归因、公告/新闻催化至少覆盖三类，并给我一个结构化结论，说明哪些是事实，哪些是你的判断。",
+      "expected_output": "输出单票多源分析，先识别为深度分析任务，再按数据域补齐行情、资金、题材/信息等至少三类内容，区分事实层、信号层、判断层和风险层。",
+      "files": [],
+      "expectations": [
+        "The output reflects deep-analysis routing instead of a simple quote explanation.",
+        "The output clearly separates facts from analysis.",
+        "The output covers at least three dimensions among price, capital flow, theme, announcements/news.",
+        "The output includes risks or pending confirmations.",
+        "The output avoids deterministic investment promises."
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "帮我筛一个短线观察池，偏好流通市值 150 亿以内、近 20 个交易日有涨停、不要 ST，最好能结合主线题材、资金流和龙虎榜做二次过滤。给我一个候选名单和每只票的入选理由、风险点。",
+      "expected_output": "输出一个可解释的短线候选池，先识别为筛选任务，再体现硬条件缩池与多源二次确认，不只是罗列股票，而是给出筛选依据、入选理由和风险点。",
+      "files": [],
+      "expectations": [
+        "The output reflects screening-task routing and watchlist framing.",
+        "The output reflects the short-term screening rules from the skill.",
+        "The output gives reasons and risks for each candidate or for the candidate set.",
+        "The output uses a watchlist framing instead of guaranteed picks.",
+        "The output references multi-source confirmation such as themes, capital flow, or dragon-tiger data."
+      ]
+    }
+  ]
+}

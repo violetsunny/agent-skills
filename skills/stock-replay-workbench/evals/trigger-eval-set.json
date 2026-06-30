@@ -1,0 +1,98 @@
+[
+  {
+    "query": "帮我复盘今天 A 股，别只说指数涨跌，我更关心主线题材、涨停和炸板、资金往哪边流，还有明天该盯什么。",
+    "should_trigger": true
+  },
+  {
+    "query": "宁德时代今天为什么这么强？把行情、题材、资金、公告一起看一下，帮我拆成事实和判断。",
+    "should_trigger": true
+  },
+  {
+    "query": "找几个短线强势股做明日观察池，最好过滤掉 ST 和大市值票，再结合主线和龙虎榜看一下。",
+    "should_trigger": true
+  },
+  {
+    "query": "我想看消费电子这条线今天的盘后总结，哪些板块最强、谁是龙头、分歧点在哪。",
+    "should_trigger": true
+  },
+  {
+    "query": "别只给我一个价格，帮我把立讯精密今天的强弱拆成量价、资金、催化三块讲清楚。",
+    "should_trigger": true
+  },
+  {
+    "query": "盘后帮我整理一下今天的市场情绪，涨跌家数、成交额、涨停跌停、炸板率和主线方向都带上。",
+    "should_trigger": true
+  },
+  {
+    "query": "帮我筛偏短线的票，条件是近 20 天有过涨停、流通盘别太大、最好还在当下热点里。",
+    "should_trigger": true
+  },
+  {
+    "query": "比较一下兆易创新和寒武纪，别只看 K 线，把题材位置、资金承接和公开消息放到一起。",
+    "should_trigger": true
+  },
+  {
+    "query": "我领导要一份今天大 A 的收盘简报，要能看出主线、板块、资金和明日风险点，你帮我整理成结构化内容。",
+    "should_trigger": true
+  },
+  {
+    "query": "有没有一个适合复盘 A 股的工作流？我想把榜单、题材、公告和龙虎榜都放到一份盘后笔记里。",
+    "should_trigger": true
+  },
+  {
+    "query": "先帮我看今天机器人板块强不强，如果值得再继续扩展成题材、资金和龙头股的复盘。",
+    "should_trigger": true
+  },
+  {
+    "query": "我先想看几只票的涨跌幅，但如果差异大，你要顺手帮我拆成题材、资金和公告三块比较。",
+    "should_trigger": true
+  },
+  {
+    "query": "贵州茅台最新价是多少？",
+    "should_trigger": false
+  },
+  {
+    "query": "查一下 600519 最近 30 天日线。",
+    "should_trigger": false
+  },
+  {
+    "query": "今天涨停池前 20 只给我列一下。",
+    "should_trigger": false
+  },
+  {
+    "query": "把今日龙虎榜明细原样列出来，不需要分析。",
+    "should_trigger": false
+  },
+  {
+    "query": "宁德时代的公告 PDF 帮我找一下。",
+    "should_trigger": false
+  },
+  {
+    "query": "A 股成交额前十有哪些股票？",
+    "should_trigger": false
+  },
+  {
+    "query": "上证指数现在涨还是跌？",
+    "should_trigger": false
+  },
+  {
+    "query": "白酒板块今天涨幅排行给我看一下。",
+    "should_trigger": false
+  },
+  {
+    "query": "给我一份沪深两市最新跌停名单，按跌幅排序即可。",
+    "should_trigger": false
+  },
+  {
+    "query": "帮我解释一下 MACD 金叉是什么意思，不需要查实时市场数据。",
+    "should_trigger": false
+  },
+  {
+    "query": "我有个 CSV，帮我算一下每只股票的五日均价。",
+    "should_trigger": false
+  },
+  {
+    "query": "写一个 Python 函数，把股票代码按上交所和深交所分类。",
+    "should_trigger": false
+  }
+]
