@@ -78,6 +78,9 @@ def parse_frontmatter(text: str) -> dict[str, str]:
 
     frontmatter = {}
     for line in match.group(1).splitlines():
+        # Skip blank lines and indented continuation lines (multi-line YAML values)
+        if not line or line[0] == " " or line[0] == "\t":
+            continue
         if ":" not in line:
             continue
         key, value = line.split(":", 1)
@@ -167,8 +170,14 @@ def check_evals() -> list[dict[str, str | bool]]:
 
     evals_path = ROOT / "evals" / "evals.json"
     trigger_path = ROOT / "evals" / "trigger-eval-set.json"
-    evals_data = json.loads(evals_path.read_text(encoding="utf-8"))
-    trigger_data = json.loads(trigger_path.read_text(encoding="utf-8"))
+    try:
+        evals_data = json.loads(evals_path.read_text(encoding="utf-8"))
+    except (json.JSONDecodeError, OSError) as exc:
+        return [fail(f"evals.json is unreadable or malformed: {exc}")]
+    try:
+        trigger_data = json.loads(trigger_path.read_text(encoding="utf-8"))
+    except (json.JSONDecodeError, OSError) as exc:
+        return [fail(f"trigger-eval-set.json is unreadable or malformed: {exc}")]
 
     if evals_data.get("skill_name") != "stock-replay-workbench":
         results.append(
@@ -253,6 +262,8 @@ def check_cli_structure() -> list[dict[str, str | bool]]:
 
 def check_cli_help() -> list[dict[str, str | bool]]:
     cli = ROOT / "scripts" / "stock_replay_cli.py"
+    if not cli.exists():
+        return [fail("stock_replay_cli.py is missing — skipping CLI help checks")]
     checks = [
         ([sys.executable, str(cli), "--help"], "stock_replay_cli.py --help works"),
         (

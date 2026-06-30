@@ -107,6 +107,8 @@ def news(symbol: str | None = None, limit: int = 20) -> dict:
             frame = _call_with_timeout(
                 ak.stock_info_global_cls, timeout=_PUBLIC_SOURCE_TIMEOUT_SECONDS
             )
+        if frame is None:
+            raise ValueError("新闻公开源返回空数据")
         for _, row in frame.head(limit).iterrows():
             items.append(
                 {

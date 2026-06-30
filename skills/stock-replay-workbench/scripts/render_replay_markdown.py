@@ -78,29 +78,40 @@ def _table(headers: list[str], rows: list[list[str]]) -> str:
     return "\n".join([header_line, sep_line, *body])
 
 
+def _normalized_event_text_variants(text: str) -> set[str]:
+    value = text.strip()
+    variants = {value}
+    trimmed = value.rstrip("。；;:：")
+    if trimmed:
+        variants.add(trimmed)
+    prefix = "："
+    if prefix in trimmed:
+        variants.add(trimmed.split(prefix, 1)[1].strip())
+    ascii_prefix = ":"
+    if ascii_prefix in trimmed:
+        variants.add(trimmed.split(ascii_prefix, 1)[1].strip())
+
+    expanded = set(variants)
+    for item in list(variants):
+        for separator in ("；", ";"):
+            if separator not in item:
+                continue
+            for part in item.split(separator):
+                piece = part.strip().rstrip("。；;:：")
+                if piece:
+                    expanded.add(piece)
+    return {item for item in expanded if item}
+
+
 def _collect_event_texts(bucket: dict | None) -> list[str]:
     if not isinstance(bucket, dict):
         return []
-
-    def _normalized_variants(text: str) -> set[str]:
-        value = text.strip()
-        variants = {value}
-        trimmed = value.rstrip("。；;:：")
-        if trimmed:
-            variants.add(trimmed)
-        prefix = "："
-        if prefix in trimmed:
-            variants.add(trimmed.split(prefix, 1)[1].strip())
-        ascii_prefix = ":"
-        if ascii_prefix in trimmed:
-            variants.add(trimmed.split(ascii_prefix, 1)[1].strip())
-        return {item for item in variants if item}
 
     texts: list[str] = []
     seen: set[str] = set()
     for item in _ensure_list(bucket.get("summary")):
         text = str(item).strip()
-        variants = _normalized_variants(text)
+        variants = _normalized_event_text_variants(text)
         if text and not (variants & seen):
             seen.update(variants)
             texts.append(text)
@@ -109,14 +120,14 @@ def _collect_event_texts(bucket: dict | None) -> list[str]:
         if isinstance(item, dict):
             for key in ("title", "名称", "证券简称"):
                 value = str(item.get(key, "")).strip()
-                variants = _normalized_variants(value)
+                variants = _normalized_event_text_variants(value)
                 if value and not (variants & seen):
                     seen.update(variants)
                     texts.append(value)
                     break
         else:
             text = str(item).strip()
-            variants = _normalized_variants(text)
+            variants = _normalized_event_text_variants(text)
             if text and not (variants & seen):
                 seen.update(variants)
                 texts.append(text)
@@ -124,25 +135,11 @@ def _collect_event_texts(bucket: dict | None) -> list[str]:
 
 
 def _dedupe_event_texts(items: list[str]) -> list[str]:
-    def _normalized_variants(text: str) -> set[str]:
-        value = text.strip()
-        variants = {value}
-        trimmed = value.rstrip("。；;:：")
-        if trimmed:
-            variants.add(trimmed)
-        prefix = "："
-        if prefix in trimmed:
-            variants.add(trimmed.split(prefix, 1)[1].strip())
-        ascii_prefix = ":"
-        if ascii_prefix in trimmed:
-            variants.add(trimmed.split(ascii_prefix, 1)[1].strip())
-        return {item for item in variants if item}
-
     deduped: list[str] = []
     seen: set[str] = set()
     for item in items:
         text = str(item).strip()
-        variants = _normalized_variants(text)
+        variants = _normalized_event_text_variants(text)
         if text and not (variants & seen):
             seen.update(variants)
             deduped.append(text)
@@ -155,6 +152,14 @@ def _format_security_label(name, symbol) -> str:
     if name_text and symbol_text:
         return f"{name_text}({symbol_text})"
     return name_text or symbol_text or "-"
+
+
+def _split_labelled_event_text(text: str) -> tuple[str, str]:
+    value = str(text or "").strip()
+    if "：" not in value:
+        return "", value
+    label, content = value.split("：", 1)
+    return label.strip(), content.strip()
 
 
 def render_report(payload: dict) -> str:
@@ -302,6 +307,7 @@ def render_report(payload: dict) -> str:
         event_snapshots.get("focus", []) if isinstance(event_snapshots, dict) else []
     )
     focus_sections = []
+    focus_catalyst_variants: set[str] = set()
     for item in _ensure_list(focus_events):
         if not isinstance(item, dict):
             continue
@@ -311,6 +317,10 @@ def render_report(payload: dict) -> str:
             focus_lines.extend(_collect_event_texts(item.get(key)))
         focus_lines = _dedupe_event_texts(focus_lines)
         if focus_lines:
+            for focus_line in focus_lines:
+                focus_catalyst_variants.update(
+                    _normalized_event_text_variants(focus_line)
+                )
             focus_sections.append((focus_name, focus_lines))
     if focus_sections:
         lines.append("### 重点股事件催化")
@@ -326,6 +336,9 @@ def render_report(payload: dict) -> str:
         for item in _ensure_list(cap.get("special")):
             lines.append(f"- 龙虎榜/大宗/两融: {item}")
         for item in _ensure_list(cap.get("catalysts")):
+            _, content = _split_labelled_event_text(item)
+            if _normalized_event_text_variants(content) & focus_catalyst_variants:
+                continue
             lines.append(f"- 公告/新闻/研报催化: {item}")
         lines.append("")
 

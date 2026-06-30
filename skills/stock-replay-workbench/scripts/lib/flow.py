@@ -19,6 +19,8 @@ def _market_flow_from_akshare(limit: int) -> tuple[dict, dict]:
     if not rows:
         raise ValueError("akshare market money flow returned empty rows")
     items = []
+    # reversed() puts the most-recent row first (items[0] = latest).
+    # Callers must use items[0] for the latest entry, not items[-1].
     for index, row in enumerate(reversed(rows[-max(1, min(limit, 20)) :]), start=1):
         trade_date = row.get("日期")
         items.append(
