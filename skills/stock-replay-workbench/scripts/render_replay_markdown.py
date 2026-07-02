@@ -195,6 +195,20 @@ def render_report(payload: dict) -> str:
             ]
         )
 
+    limit_sentiment = payload.get("limit_sentiment")
+    if isinstance(limit_sentiment, dict) and limit_sentiment:
+        lines.extend(
+            [
+                "### 打板情绪",
+                f"- 涨停家数: {_format_number(limit_sentiment.get('up_count'), 0)}",
+                f"- 炸板家数: {_format_number(limit_sentiment.get('break_count'), 0)}",
+                f"- 跌停家数: {_format_number(limit_sentiment.get('down_count'), 0)}",
+                f"- 炸板率: {_format_percent(limit_sentiment.get('break_rate'))}",
+                f"- 连板高度: {_format_number(limit_sentiment.get('max_height'), 0)}",
+                "",
+            ]
+        )
+
     sector_rows = []
     for item in payload.get("sectors", []):
         sector_rows.append(

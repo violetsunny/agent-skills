@@ -4,10 +4,18 @@ import json
 
 import requests
 
-from .common import clean_symbol, full_symbol, guess_name, source, success, tencent_code
+from .common import (
+    TENCENT_USER_AGENT,
+    clean_symbol,
+    full_symbol,
+    guess_name,
+    source,
+    success,
+    tencent_code,
+)
 
 
-HEADERS = {"User-Agent": "Mozilla/5.0 stock-replay-workbench/0.2"}
+HEADERS = {"User-Agent": TENCENT_USER_AGENT}
 
 
 def _safe_float(value: str | None) -> float | None:

@@ -7,7 +7,14 @@ from pathlib import Path
 
 from lib.bond import bond
 from lib.common import emit, failure, success
-from lib.events import announcement, block_trade, dragon_tiger, margin_trading, news
+from lib.events import (
+    announcement,
+    block_trade,
+    dragon_tiger,
+    margin_trading,
+    news,
+    sentiment_heat,
+)
 from lib.flow import money_flow
 from lib.fundamental import fundamental
 from lib.market import limit_pool, market_snapshot, rank
@@ -120,6 +127,11 @@ def build_parser() -> argparse.ArgumentParser:
     margin_parser.add_argument("--trade-date")
     margin_parser.add_argument("--limit", default=20, type=int)
 
+    sentiment_heat_parser = subparsers.add_parser(
+        "sentiment-heat", help="Fetch sentiment heat summary"
+    )
+    sentiment_heat_parser.add_argument("--limit", default=20, type=int)
+
     bond_parser = subparsers.add_parser("bond", help="Fetch bond data")
     bond_parser.add_argument(
         "--action", default="realtime", choices=["realtime", "rank", "history"]
@@ -170,6 +182,8 @@ def dispatch(args: argparse.Namespace) -> dict:
         return block_trade(args.symbol, args.trade_date, args.limit)
     if args.subcommand == "margin-trading":
         return margin_trading(args.symbol, args.trade_date, args.limit)
+    if args.subcommand == "sentiment-heat":
+        return sentiment_heat(args.limit)
     if args.subcommand == "bond":
         return bond(args.action, args.symbol, args.limit)
     if args.subcommand == "render-replay":

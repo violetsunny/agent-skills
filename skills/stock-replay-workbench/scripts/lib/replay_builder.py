@@ -3,7 +3,7 @@ from __future__ import annotations
 from datetime import date
 
 from .common import now_iso, success
-from .events import announcement, dragon_tiger, margin_trading, news
+from .events import announcement, dragon_tiger, margin_trading, news, sentiment_heat
 from .flow import money_flow
 from .fundamental import fundamental
 from .market import limit_pool, market_snapshot, rank
@@ -17,12 +17,52 @@ _STATIC_DISCLAIMER_WARNINGS = {
 _STATIC_DISCLAIMER_SUBSTRINGS = ("为公开源 best-effort 数据。",)
 
 
+def limit_sentiment(limit: int = 50) -> dict:
+    up_payload = limit_pool("up", limit)
+    break_payload = limit_pool("break", limit)
+    down_payload = limit_pool("down", limit)
+
+    warnings: list[str] = []
+    source_chain: list[dict] = []
+    for payload in (up_payload, break_payload, down_payload):
+        _extend_chain(source_chain, payload)
+        _extend_warnings(warnings, payload)
+
+    up_count = up_payload.get("data", {}).get("returned_count", 0)
+    break_count = break_payload.get("data", {}).get("returned_count", 0)
+
+    return success(
+        "limit_sentiment",
+        {
+            "limit": limit,
+            "up_count": up_count,
+            "break_count": break_count,
+            "down_count": down_payload.get("data", {}).get("returned_count", 0),
+            "break_rate": round(break_count / (up_count + break_count) * 100, 1)
+            if (up_count + break_count)
+            else 0.0,
+            "max_height": max(
+                [
+                    item.get("board_count") or 0
+                    for item in up_payload.get("data", {}).get("items", [])
+                ]
+                or [0]
+            ),
+        },
+        source_chain,
+        warnings,
+    )
+
+
 def _extend_chain(target: list[dict], payload: dict) -> None:
     target.extend(payload.get("source_chain", []))
 
 
 def _extend_warnings(target: list[str], payload: dict) -> None:
-    target.extend(payload.get("warnings", []))
+    for item in payload.get("warnings", []):
+        text = str(item).strip()
+        if text:
+            target.append(text)
 
 
 def _unique_strings(items: list[str], limit: int | None = None) -> list[str]:
@@ -473,7 +513,9 @@ def _build_risks(warnings: list[str], limit_up_payload: dict) -> list[str]:
         risks.append("部分公开源查询失败或已降级，复盘结论需结合次日盘口确认。")
     if limit_up_payload.get("warnings"):
         risks.append("涨停池存在交易日回退或空池风险，强势股样本可能不完整。")
-    return risks or ["当前复盘为规则化底稿，事件归因仍需人工补充确认。"]
+    return _unique_strings(risks) or [
+        "当前复盘为规则化底稿，事件归因仍需人工补充确认。"
+    ]
 
 
 def _build_capital_and_events(
@@ -562,6 +604,7 @@ def build_replay(trade_date: str | None = None, limit: int = 5) -> dict:
 
     snapshot_payload = market_snapshot()
     limit_up_payload = limit_pool("up", limit)
+    limit_sentiment_payload = limit_sentiment(max(limit, 20))
     amount_rank_payload = rank("amount", limit)
     industry_rank_payload = sector("industry-rank", None, limit)
     concept_rank_payload = sector("concept-rank", None, limit)
@@ -571,6 +614,7 @@ def build_replay(trade_date: str | None = None, limit: int = 5) -> dict:
     for payload in [
         snapshot_payload,
         limit_up_payload,
+        limit_sentiment_payload,
         amount_rank_payload,
         industry_rank_payload,
         concept_rank_payload,
@@ -605,6 +649,9 @@ def build_replay(trade_date: str | None = None, limit: int = 5) -> dict:
     )
     _extend_warnings(warnings, {"warnings": market_event_warnings})
     source_chain.extend(market_event_chain)
+
+    sentiment_heat_payload = sentiment_heat(max(limit, 10))
+    _extend_chain(source_chain, sentiment_heat_payload)
 
     focus_event_snapshots = []
     for snapshot in fundamental_snapshots:
@@ -653,6 +700,8 @@ def build_replay(trade_date: str | None = None, limit: int = 5) -> dict:
             "concept": concept_flow_payload.get("data", {}).get("items") or [],
         },
         "leaders": _build_leaders(limit_up_payload, amount_rank_payload, limit),
+        "limit_sentiment": limit_sentiment_payload.get("data", {}),
+        "sentiment_heat": sentiment_heat_payload.get("data", {}),
         "fundamental_snapshots": fundamental_snapshots,
         "event_snapshots": event_snapshots,
         "capital_and_events": _build_capital_and_events(

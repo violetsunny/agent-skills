@@ -1,8 +1,8 @@
 ---
 name: stock-replay-workbench
-description: Use when the user asks for A-share 盘后复盘、收盘简报、主线题材梳理、强势股/观察池、个股为何走强、题材与资金联动、龙虎榜/公告/研报/财务交叉分析, or when a stock query must expand from a simple quote into a structured workflow with task routing, source priority, timestamps, warnings, and layered conclusions.
+description: Use when the user asks for A-share 盘后复盘、收盘简报、主线题材梳理、强势股/观察池、个股为何走强、题材与资金联动、龙虎榜/公告/研报/财务交叉分析, or when a stock query must expand from a simple quote into a structured workflow with task routing, source priority, timestamps, warnings, and layered conclusions. Covers 打板情绪(涨停/炸板/跌停/昨涨停四池+连板分析+涨停揭秘)、ETF期权(T型报价+希腊字母+IV)、舆情互动(热榜/人气榜/互动易)等能力.
 metadata:
-  version: "0.2.0"
+  version: "0.3.0"
   origin: custom
 ---
 
@@ -20,7 +20,7 @@ metadata:
 ## 定位
 
 这个 skill 是一个**独立闭环的 A 股工作流控制台**。
-它当前通过仓库内置的 `scripts/stock_replay_cli.py` 和 `scripts/lib/` 模块落地，内部使用 `requests`、`akshare`、`efinance` 以及免费公开网页接口完成取数。
+它当前通过仓库内置的 `scripts/stock_replay_cli.py` 和 `scripts/lib/` 模块落地，内部使用 `requests`、`akshare`、`efinance`、`mootdx`以及免费公开网页接口（东财 push2/push2ex/datacenter、腾讯财经、新浪、巨潮、同花顺）完成取数。优先用 mootdx/腾讯（不封IP），东财仅用于独有字段并内置 `em_get()` 限流防封。
 
 注意：本 SKILL 独立运行，不依赖任何第三方付费 API Key（如 Wind、Choice、iFinD），且不依赖宿主环境下的其他兄弟项目。
 
@@ -59,14 +59,18 @@ python3 stock-replay-workbench/scripts/stock_replay_cli.py <subcommand> [...args
 - `quote-history`：单票历史行情
 - `market-snapshot`：指数快照 + 市场宽度
 - `rank`：全市场排行
-- `limit-pool`：涨停 / 跌停 / 炸板池
+- `limit-pool`：涨停 / 跌停 / 炸板 / 昨涨停 池（东财 push2ex 四池，price ÷1000，含连板数/封板资金/炸板次数/板型）
+- `limit-sentiment`：打板情绪温度计（炸板率/连板高度/连板梯队分布/晋级率/赚钱效应）
+- `sentiment-heat`：市场热度（同花顺热榜 `ths_hot_list` + 东财人气榜 `em_hot_rank` + 东财概念命中 `em_hot_concept`）
+- `irm-qa`：互动易问答（投资者提问+公司官方回复，巨潮 cninfo）
+- `option-codes / option-tquote / option-greeks`：ETF期权（合约清单/T型报价/希腊字母Delta/Gamma/Theta/Vega + 隐含波动率IV，新浪源交易所预算）
 - `sector`：行业排行、概念排行、个股板块归属
 - `money-flow`：市场、个股、行业、概念资金流
 - `fundamental`：估值、ROE、毛利率、现金流摘要
 - `announcement`、`news`、`dragon-tiger`、`block-trade`、`margin-trading`
 - `bond`：可转债实时、排行、历史
 - `build-replay`：组装复盘底稿 JSON
-- `render-replay`：把结构化底稿渲染成 Markdown
+- `render-replay`：把结构化底稿渲染成 Markdown，包含 `limit_sentiment` 等复盘信号
 
 ## 核心工作流
 
@@ -97,34 +101,39 @@ python3 stock-replay-workbench/scripts/stock_replay_cli.py <subcommand> [...args
 
 优先级：
 
-1. 腾讯财经、mootdx 等低风控稳定源
-2. AKShare、efinance、巨潮、同花顺、新浪等免费公开源
-3. 东方财富独有字段与 `datacenter` / `reportapi` / `push2` 系接口
+1. mootdx（通达信 TCP 7709，不封IP）：K线/盘口/逐笔/财务快照（37字段）/F10
+   - 走 `tdx_client()` helper 连内置服务器列表，防 BESTIP 空串崩溃
+   - K线参数名必须是 `frequency`（非 `category`，后者被静默吞掉退化为日线）
+   - mootdx K线返回不复权原始价，跨除权日做估值需自行复权
+2. 腾讯财经（HTTP，不封IP）：实时价、PE/PB/市值/换手率/涨跌停、指数/ETF（88字段）
+3. 新浪 / 巨潮 / 同花顺（HTTP，低风控）：财报三表、公告全文（orgId动态映射）、一致预期EPS、热点/热榜、涨停揭秘、ETF期权、互动易
+4. 东财独有字段（HTTP，有风控会封IP）：**仅用于别处拿不到的独有数据**，走 `em_get()` 统一限流（≥1s间隔+随机抖动+会话复用+正常UA+连接级重试）
 
-普通行情、K 线、榜单、板块、公告、龙虎榜等场景，优先使用现成代码片段获取。
+当前实现中，普通行情与估值快照优先 mootdx/腾讯等稳定公开源；东财继续只承担别处拿不到的独有字段补充。
 
 ### 4. 东财只用于独有字段 (Eastmoney for unique fields only)
 
-东财只承担“别处拿不到的字段”，例如：
+东财只承担"别处拿不到的字段"，例如：
 
-- 龙虎榜席位
+- 龙虎榜席位 + 全市场龙虎榜
 - 限售解禁
 - 融资融券
 - 大宗交易
 - 股东户数
 - 分红送转
-- 分钟级资金流
-- 研报列表
-- 全球资讯
+- 分钟级资金流（个股/行业/概念）+ 120日资金流
+- 研报列表（个股/行业） + PDF下载
+- 个股新闻 + 全球资讯
+- 打板池四类：涨停/炸板/跌停/昨涨停（push2ex，price ÷1000）
+- 人气榜 / 概念命中（emappdata）
 
 调用东财时必须：
 
 1. 串行，不并发。
-2. 请求间隔至少约 1 秒。
-3. 保留正常 UA 和会话复用。
-4. 批量任务主动降速。
-
-如果需要 helper、端点和字段细节，先读 `references/source-playbook.md`。
+2. 请求间隔至少约 1 秒 + 随机抖动（0.1~0.5s）。
+3. 保留正常 UA、Referer 和会话复用（Keep-Alive）。
+4. 批量任务进一步降速（≥1.5s间隔）。
+5. 连接级自动重试（HTTPAdapter + urllib3.Retry：total=3、指数退避、仅GET、429/500/502/503/504）。403 不重试（东财风控信号）。
 
 ### 5. 结论必须分层，不能把判断伪装成事实 (separate fact from judgment)
 
@@ -213,6 +222,10 @@ python3 stock-replay-workbench/scripts/stock_replay_cli.py <subcommand> [...args
 
 价格、涨跌幅、K 线、成交额、量比、换手、市场宽度。
 
+### 打板情绪域 (limit-up sentiment)
+
+涨停池/炸板池/跌停池/昨涨停表现、涨停原因揭秘、板型（一字/换手/T字）、封板强度、连板高度和梯队、炸板率、晋级率、赚钱效应。
+
 ### 资金域 (capital flow)
 
 主力资金、分档资金流、龙虎榜、大宗交易、融资融券、封板强度。
@@ -228,6 +241,14 @@ python3 stock-replay-workbench/scripts/stock_replay_cli.py <subcommand> [...args
 ### 财务域 (financials and valuation)
 
 PE、PB、ROE、毛利率、资产负债、现金流、股东户数、分红送转。
+
+### ETF期权域 (options)
+
+合约清单、T型报价（买卖五档/持仓量/行权价）、希腊字母（Delta/Gamma/Theta/Vega + 隐含波动率IV + 理论价值）。
+
+### 舆情互动域 (sentiment + IRM)
+
+人气榜/热榜、概念热度、互动易投资者问答。
 
 ### 衍生资产域 (derivatives and related assets)
 
@@ -287,35 +308,41 @@ python3 stock-replay-workbench/scripts/stock_replay_cli.py render-replay --input
 稳定支持 (stable support)：
 
 - A 股个股、指数、ETF、LOF、可转债的实时行情与历史走势
-- 涨跌停池、炸板池、强势股池、成交额/换手率/市值/PE/PB 榜
-- 行业/概念板块排行与个股归属
-- 市场资金流总览、公告、龙虎榜、大宗交易、融资融券、公开研报、新闻快讯、财务估值
+- 涨跌停/炸板/跌停/昨涨停四池、连板梯队、封板资金、涨停原因揭秘
+- 强势股池、成交额/换手率/市值/PE/PB 榜
+- 行业/概念板块排行与个股归属（个股归属走东财 slist）
+- 市场资金流总览、公告（巨潮 cninfo orgId动态映射）、龙虎榜、大宗交易、融资融券、公开研报、新闻快讯、财务估值
+- ETF期权合约清单/T型报价/希腊字母+IV（新浪源，交易所预算）
+- 互动易投资者问答（巨潮 irm）
 - 基础财务扩展字段：`market_cap`、`pe`、`pb`、`revenue`、`net_profit`、`roe`、`gross_margin`、`asset_liability_ratio`、`net_margin`、`book_value_per_share`、`cashflow_summary`
 - 多源交叉后的结构化分析、短线候选池和盘后复盘
 
 Best-effort (less stable / public-web dependent)：
 
-- 个股/行业资金流、筹码分布、股东户数、分钟级流向、研报与新闻字段完整性
-- 个股资金流优先走东方财富明细接口，失败时回退到东方财富排行快照或 `akshare`
+- 个股/行业/概念资金流、筹码分布、股东户数、分钟级流向、研报与新闻字段完整性
+- 个股资金流优先走东方财富 push2his 明细接口（price ÷1000），失败时回退到东财排行快照或 akshare
 - 依赖公开网页结构的字段
+- 市场热度（同花顺热榜/东财人气榜/概念命中）为 best-effort，允许空样本+warning
 
 不要假装能做 (out of scope)：
 
 - Level-2 逐笔与深度盘口队列
 - 需要登录或付费授权的数据
 - 保证收益、确定买点、确定涨停预测
+- ETF期权 BSM 模型计算（新浪源交易所已算好希腊字母）
 
 ## 仓库内参考
 
 - `references/capability-registry.md`：能力模块、对应用户意图
 - `references/query-contracts.md`：各能力的查询约束与稳定性边界
-- `references/source-playbook.md`：按数据域和任务选源
+- `references/source-playbook.md`：按数据域和任务选源（含数据源优先级、打板/ETF期权/舆情互动、已知坑表、防封机制）
 - `references/screening-playbook.md`：短线筛选框架
 - `references/replay-template.md`：复盘输出模板
 - `references/validation-playbook.md`：平台无关的验证清单
 - `references/manual-review-template.md`：人工验收记录模板
 - `scripts/validate_skill.py`：基于 `python3` 的通用验证脚本
 - `scripts/stock_replay_cli.py`：统一 CLI 入口
+- `scripts/render_replay_markdown.py`：复盘 Markdown 渲染脚本
 
 ## 失败处理 (failure handling)
 

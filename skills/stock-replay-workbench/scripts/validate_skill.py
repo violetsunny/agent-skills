@@ -276,6 +276,10 @@ def check_cli_help() -> list[dict[str, str | bool]]:
         ),
         ([sys.executable, str(cli), "news", "--help"], "news --help works"),
         (
+            [sys.executable, str(cli), "sentiment-heat", "--help"],
+            "sentiment-heat --help works",
+        ),
+        (
             [sys.executable, str(cli), "render-replay", "--help"],
             "render-replay --help works",
         ),

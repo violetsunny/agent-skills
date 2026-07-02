@@ -28,6 +28,10 @@ python3 stock-replay-workbench/scripts/stock_replay_cli.py money-flow --scope in
 python3 stock-replay-workbench/scripts/stock_replay_cli.py money-flow --scope concept --limit 5
 python3 stock-replay-workbench/scripts/stock_replay_cli.py fundamental --symbol 600519
 python3 stock-replay-workbench/scripts/stock_replay_cli.py limit-pool --pool up --limit 5
+python3 stock-replay-workbench/scripts/stock_replay_cli.py limit-sentiment --help
+python3 stock-replay-workbench/scripts/stock_replay_cli.py sentiment-heat --help
+python3 stock-replay-workbench/scripts/stock_replay_cli.py irm-qa --symbol 600519
+python3 stock-replay-workbench/scripts/stock_replay_cli.py option-codes --help
 python3 stock-replay-workbench/scripts/stock_replay_cli.py build-replay --limit 3
 ```
 
@@ -102,7 +106,7 @@ python3 -c "from pathlib import Path; print(Path('stock-replay-workbench/SKILL.m
 
 检查 `SKILL.md` 的正文是否仍与参考文件一致。内置脚本已覆盖这部分，也可人工复核：
 
-1. 数据域仍是：行情、资金、事件、板块、财务、衍生资产
+1. 数据域已扩展为：行情、资金、事件、板块、财务、打板情绪、ETF期权、舆情互动（v0.3.0 新增打板/ETF期权/舆情三层）
 2. 输出分层仍是：事实、信号、判断、风险
 3. 东财仍只作为独有字段补充源，而不是默认主源
 4. 不要求用户提供付费凭据
@@ -145,10 +149,15 @@ python3 stock-replay-workbench/scripts/stock_replay_cli.py --help
 python3 stock-replay-workbench/scripts/stock_replay_cli.py quote-realtime --help
 python3 stock-replay-workbench/scripts/stock_replay_cli.py market-snapshot --help
 python3 stock-replay-workbench/scripts/stock_replay_cli.py limit-pool --help
+python3 stock-replay-workbench/scripts/stock_replay_cli.py limit-sentiment --help
 python3 stock-replay-workbench/scripts/stock_replay_cli.py money-flow --help
 python3 stock-replay-workbench/scripts/stock_replay_cli.py fundamental --help
 python3 stock-replay-workbench/scripts/stock_replay_cli.py build-replay --help
 python3 stock-replay-workbench/scripts/stock_replay_cli.py news --help
+python3 stock-replay-workbench/scripts/stock_replay_cli.py sentiment-heat --help
+python3 stock-replay-workbench/scripts/stock_replay_cli.py irm-qa --help
+python3 stock-replay-workbench/scripts/stock_replay_cli.py option-codes --help
+python3 stock-replay-workbench/scripts/stock_replay_cli.py option-tquote --help
 python3 stock-replay-workbench/scripts/stock_replay_cli.py render-replay --help
 ```
 
@@ -176,6 +185,9 @@ python3 stock-replay-workbench/scripts/render_replay_markdown.py --help
 6. `build-replay --limit 3` 的输出中，`event_snapshots.market` 包含 `announcements`、`news`、`dragon_tiger`、`margin_trading`
 7. `build-replay --limit 3` 的输出中，`event_snapshots.focus` 为重点股事件摘要列表
 8. `capital_and_events.special` / `catalysts` 已吸收事件域高层摘要
+9. `build-replay --limit 3` 的输出中包含 `limit_sentiment`（打板情绪速算：涨停/炸板/回封率）和 `sentiment_heat`（同花顺热榜/东财人气榜，允许空样本结构）
+10. `build-replay --limit 3` 的输出中包含 `options_snapshot`（ETF期权标的快照，允许空样本结构）
+11. `irm-qa --symbol 600519` 返回互动易问答列表（best-effort，允许空列表 + warning）
 
 ## 六、宿主无关的行为验收 (host-agnostic behavior review)
 
@@ -252,7 +264,7 @@ python3 stock-replay-workbench/scripts/render_replay_markdown.py --help
 1. `python3 stock-replay-workbench/scripts/validate_skill.py` 通过
 2. `stock_replay_cli.py --help` 可运行
 3. `render_replay_markdown.py --help` 可运行
-4. 关键命令可运行：`money-flow` 四个 scope、`fundamental`、`limit-pool`、`build-replay`；其中 best-effort 命令允许空样本但必须保留 warning
+4. 关键命令可运行：`money-flow` 四个 scope、`fundamental`、`limit-pool`、`limit-sentiment`、`sentiment-heat`、`irm-qa`、`option-codes`/`option-tquote`、`build-replay`；其中 best-effort 命令允许空样本但必须保留 warning
 5. 三类手工提示词的验收清单明确，可在任一宿主平台复用
 6. 如需留痕，使用 `references/manual-review-template.md` 记录人工验收结果
 

@@ -24,6 +24,7 @@ EM_USER_AGENT = (
     "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) "
     "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36"
 )
+TENCENT_USER_AGENT = "Mozilla/5.0 stock-replay-workbench/0.2"
 EM_MIN_INTERVAL = 1.0
 EM_SESSION = requests.Session()
 EM_SESSION.headers.update(

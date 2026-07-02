@@ -1,7 +1,8 @@
 ---
-name: OPSX: Sync
-description: "Sync delta specs from a change to main specs"
-argument-hint: "[command arguments]"
+name: "OPSX: Sync"
+description: Sync delta specs from a change to main specs
+category: Workflow
+tags: [workflow, specs, experimental]
 ---
 
 Sync delta specs from a change to main specs.

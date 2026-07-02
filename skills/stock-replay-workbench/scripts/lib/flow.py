@@ -9,6 +9,7 @@ from .common import (
     source,
     success,
 )
+from .sector import sector
 
 
 def _market_flow_from_akshare(limit: int) -> tuple[dict, dict]:
@@ -281,6 +282,52 @@ def _sector_flow_from_akshare(scope: str, limit: int) -> tuple[dict, dict]:
     )
 
 
+def _sector_flow_from_sector_signal(
+    scope: str, limit: int
+) -> tuple[dict, list[dict], list[str]]:
+    action = "industry-rank" if scope == "industry" else "concept-rank"
+    payload = sector(action, None, limit)
+    rows = [
+        item
+        for item in (payload.get("data", {}).get("items") or [])
+        if isinstance(item, dict)
+    ]
+    items = []
+    for index, row in enumerate(rows[: max(1, min(limit, 20))], start=1):
+        items.append(
+            {
+                "rank": index,
+                "name": row.get("name") or row.get("板块名称"),
+                "change_percent": safe_float(
+                    row.get("change_percent")
+                    if row.get("change_percent") is not None
+                    else row.get("板块涨幅")
+                ),
+                "main_net_inflow": row.get("main_net_inflow"),
+                "main_net_inflow_percent": row.get("main_net_inflow_percent"),
+                "leader": row.get("leader") or row.get("领涨股票"),
+                "signal_type": "sector_rank_fallback",
+            }
+        )
+    if not items:
+        raise ValueError(f"sector signal fallback returned empty rows for {scope}")
+    latest = items[0]
+    data = {
+        "scope": scope,
+        "symbol": None,
+        "limit": limit,
+        "items": items,
+        "summary": {
+            "leader_sector": latest.get("name"),
+            "leader_stock": latest.get("leader"),
+            "change_percent": latest.get("change_percent"),
+            "source_note": f"{scope} 资金流主源失败后，已回退到板块排行信号。",
+        },
+        "source_note": f"{scope} 资金流当前为板块排行信号回退结果。",
+    }
+    return data, payload.get("source_chain", []), payload.get("warnings", [])
+
+
 def money_flow(
     scope: str = "market", symbol: str | None = None, limit: int = 20
 ) -> dict:
@@ -325,6 +372,16 @@ def money_flow(
             source_chain.append(
                 source(f"akshare_stock_sector_fund_flow_rank_{scope}", False, str(exc))
             )
+        try:
+            data, fallback_chain, fallback_warnings = _sector_flow_from_sector_signal(
+                scope, limit
+            )
+            source_chain.extend(fallback_chain)
+            warnings.extend(fallback_warnings)
+            warnings.append(f"{scope} 资金流已回退到板块排行信号。")
+            return success("money_flow", data, source_chain, warnings)
+        except Exception as exc:
+            warnings.append(f"{scope} 板块信号回退失败: {exc}")
             return success(
                 "money_flow",
                 {
