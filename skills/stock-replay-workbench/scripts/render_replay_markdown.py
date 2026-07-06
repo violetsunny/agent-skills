@@ -203,7 +203,10 @@ def render_report(payload: dict) -> str:
                 f"- 涨停家数: {_format_number(limit_sentiment.get('up_count'), 0)}",
                 f"- 炸板家数: {_format_number(limit_sentiment.get('break_count'), 0)}",
                 f"- 跌停家数: {_format_number(limit_sentiment.get('down_count'), 0)}",
+                f"- 昨涨停家数: {_format_number(limit_sentiment.get('yesterday_up_count'), 0)}",
                 f"- 炸板率: {_format_percent(limit_sentiment.get('break_rate'))}",
+                f"- 昨涨停晋级率: {_format_percent(limit_sentiment.get('advance_rate'))}",
+                f"- 昨涨停赚钱效应: {_format_percent(limit_sentiment.get('earning_rate'))}",
                 f"- 连板高度: {_format_number(limit_sentiment.get('max_height'), 0)}",
                 "",
             ]
@@ -393,14 +396,19 @@ def render_report(payload: dict) -> str:
 def main() -> int:
     parser = argparse.ArgumentParser(description="Render replay markdown from JSON")
     parser.add_argument("--input", required=True, help="Path to replay JSON payload")
-    parser.add_argument("--output", help="Optional output markdown path")
+    parser.add_argument(
+        "--output",
+        help="Optional output markdown path. Missing parent directories are created automatically",
+    )
     args = parser.parse_args()
 
     payload = json.loads(Path(args.input).read_text(encoding="utf-8"))
     markdown = render_report(payload)
 
     if args.output:
-        Path(args.output).write_text(markdown, encoding="utf-8")
+        output = Path(args.output)
+        output.parent.mkdir(parents=True, exist_ok=True)
+        output.write_text(markdown, encoding="utf-8")
     else:
         sys.stdout.write(markdown)
     return 0

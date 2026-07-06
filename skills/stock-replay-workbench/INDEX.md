@@ -1,6 +1,6 @@
 # stock-replay-workbench 索引
 
-> 盘后复盘工作台核心项目。9个lib模块+CLI入口，覆盖行情、打板情绪、资金流、事件、板块、财务、ETF期权、舆情互动、衍生资产九大数据域。
+> 盘后复盘工作台核心项目。10 个 lib 模块 + CLI 入口，覆盖行情、打板情绪、资金流、事件、板块、财务、ETF 期权、舆情互动、衍生资产九大数据域。
 
 ## 快速定位
 
@@ -8,7 +8,7 @@
 |------|------|------|
 | common | scripts/lib/common.py | 通用工具函数、em_get()东财限流、格式清洗 |
 | quote | scripts/lib/quote.py | K线/实时行情数据获取（优先腾讯/mootdx） |
-| market | scripts/lib/market.py | 市场整体数据：快照、排行、涨跌停/炸板/昨涨停池（东财 push2ex） |
+| market | scripts/lib/market.py | 市场整体数据：快照、排行、涨跌停/炸板/跌停池（东财 push2ex） |
 | events | scripts/lib/events.py | 事件数据：公告（巨潮 cninfo orgId动态映射）、新闻（东财 search-api）、龙虎榜、大宗交易、融资融券、市场热度 |
 | flow | scripts/lib/flow.py | 资金流：市场/个股/行业/概念资金流（东财 push2his/datacenter） |
 | fundamental | scripts/lib/fundamental.py | 基本面：估值、财务摘要（mootdx finance）、现金流（新浪三表） |
@@ -26,7 +26,7 @@
 | quote_realtime() | 单票实时行情（腾讯财经） |
 | quote_history() | 单票历史K线（腾讯日/周/月线 → mootdx分钟线） |
 | market_snapshot() | 指数快照（腾讯） + 市场宽度（东财 clist） |
-| limit_pool() | 涨跌停/炸板/昨涨停池（东财 push2ex，price ÷1000） |
+| limit_pool() | 涨停/炸板/跌停池（东财 push2ex，price ÷1000） |
 | limit_sentiment() | 打板情绪温度计（炸板率/连板高度/梯队/晋级率） |
 | money_flow() | 市场/个股/行业/概念资金流统一入口（东财 push2his/datacenter） |
 | fundamental() | 单票基本面扩展字段（moootdx finance + 新浪三表） |
@@ -72,7 +72,7 @@
 |------|------|------|--------|----------|
 | market_snapshot() | `() -> dict` | 指数快照（六大指数）+ 市场涨跌家数宽度 | 腾讯财经（指数）→ 东方财富 clist（宽度） | 部分指数无价时保留warning；宽度失败降级为0值占位 |
 | rank() | `(kind: str = "change_percent", limit: int = 20) -> dict` | 全市场排行（涨跌幅/成交额/成交量/换手率） | 东方财富 clist | 返回空列表 + warning |
-| limit_pool() | `(pool: str = "up", limit: int = 20) -> dict` | 涨跌停四池：up(涨停)/zbreak(炸板)/down(跌停)/yst(昨涨停，算晋级率) | 东方财富 push2ex | 自动回退到最近8个交易日内的可用数据；price ÷1000 |
+| limit_pool() | `(pool: str = "up", limit: int = 20) -> dict` | 涨跌停四池：up(涨停)/break(炸板)/down(跌停)/yesterday-up(昨涨停) | 东方财富 push2ex | 自动回退到最近8个交易日内的可用数据；price ÷1000 |
 
 ### events (scripts/lib/events.py)
 | 函数 | 签名 | 用途 | 数据源 | 回退关系 |
@@ -143,11 +143,11 @@
 ## CLI入口 (stock_replay_cli.py)
 | 函数 | 签名 | 用途 |
 |------|------|------|
-| build_parser() | `() -> argparse.ArgumentParser` | 构建CLI参数解析器（15+子命令） |
+| build_parser() | `() -> argparse.ArgumentParser` | 构建 CLI 参数解析器（19 个子命令） |
 | dispatch() | `(args: argparse.Namespace) -> dict` | 根据子命令路由到对应lib函数 |
 | main() | `() -> int` | CLI主入口，解析参数→分发→emit结果 |
-| _build_replay() | `(trade_date: str \| None, limit: int, output_path: str \| None) -> dict` | 调用build_replay()并可选落盘JSON |
-| _render_replay() | `(input_path: str, output_path: str \| None) -> dict` | 读取JSON底稿→render_report()→可选落盘Markdown |
+| _build_replay() | `(trade_date: str \| None, limit: int, output_path: str \| None) -> dict` | 调用 build_replay() 并可选落盘 JSON；输出目录不存在时自动创建 |
+| _render_replay() | `(input_path: str, output_path: str \| None) -> dict` | 读取 JSON 底稿 → render_report() → 可选落盘 Markdown；输出目录不存在时自动创建 |
 
 ## 数据源总览
 
@@ -158,7 +158,7 @@
 | 新浪财经 | 3（低风控） | fundamental, options | 财报三表（lrb/fzb/llb）、ETF期权合约清单/T型报价/希腊字母+IV |
 | 巨潮 cninfo | 3（低风控） | events, irm | 公告全文检索（_cninfo_orgid动态映射6198只股）、互动易问答（投资者提问+公司回复） |
 | 同花顺 | 3（低风控） | market, events | 涨停揭秘（ths_limit_up_pool）、热榜（ths_hot_list）、一致预期EPS（ths_eps_forecast） |
-| 东方财富 | 4（仅独有数据，有风控会封IP） | market, events, flow, fundamental, sector | push2ex（打板四池，price÷1000）、push2his（资金流分钟/120日）、datacenter（龙虎榜/大宗/两融/股东/分红）、clist（排行/宽度）、slist（板块归属）、search-api（个股新闻）、np-weblist（全球资讯）、emappdata（人气榜/概念命中）、reportapi（研报+PDF） |
+| 东方财富 | 4（仅独有数据，有风控会封IP） | market, events, flow, fundamental, sector | push2ex（当前 CLI 已接入涨停/炸板/跌停/昨涨停四池，price÷1000）、push2his（资金流分钟/120日）、datacenter（龙虎榜/大宗/两融/股东/分红）、clist（排行/宽度）、slist（板块归属）、search-api（个股新闻）、np-weblist（全球资讯）、emappdata（人气榜/概念命中）、reportapi（研报+PDF） |
 | akshare / efinance | 5（封装层不稳定） | events, flow, fundamental, sector, bond | 作为直连源的回退 fallback |
 
 ### 东财统一限流机制
@@ -179,7 +179,7 @@
 | 新浪财报三表永久返回空 | **HIGH** | report_list→{期次}→data |
 | 巨潮公告 orgId 硬编码 | **HIGH** | _cninfo_orgid()动态映射 |
 | 东财新闻 cmsArticleWebOld 解析 | **HIGH** | 直接就是list非嵌套 |
-| 东财四池 price ÷1000 | MEDIUM | 非 ÷10000 |
+| 东财打板池价格 ÷1000 | MEDIUM | 当前已接入四池，price 实为 ÷1000（非 ÷10000） |
 | 互动易第二步参数 | MEDIUM | 放query string |
 
 ## 参考文档索引
@@ -199,10 +199,23 @@
 ## 测试入口
 
 ```bash
-cd stock-replay-workbench
-uv run pytest tests/test_stock_replay_workbench.py -q
+python3 tests/test_stock_replay_workbench.py
 python3 scripts/validate_skill.py
 ```
+
+当前环境未内置 `pytest` 时，优先直接运行 `unittest` 入口 `python3 tests/test_stock_replay_workbench.py`。
+
+## 核心验收资产
+
+| 类型 | 路径 | 用途 |
+|------|------|------|
+| 结构化验收标准 | `evals/core-acceptance-stocks.json` | 固定 6 只代表性股票的分析金标准，校验数据链路完整、结构稳定、理性表达 |
+| 人工验收案例 | `.analysis/acceptance/*.md` | 与结构化标准配套的可读案例库，用于人工复核事实/信号/判断/风险四层输出 |
+| 运行时验收执行器 | `scripts/validate_skill.py` + `scripts/stock_replay_cli.py stock-diagnose` | 逐只运行核心股票诊断，并校验 `analysis`、`conclusion_tags`、`source_trace` 与必填字段 |
+
+当前核心验收股票：`紫金矿业`、`汇川技术`、`通富微电`、`宁德时代`、`德赛西威`、`兆易创新`。
+
+基本面估值链路在东财主源失败时，会继续尝试 `eastmoney_individual_info_em` 与 `baidu_stock_valuation` 补齐 `pe` / `pb`。若仍失败，只保留 warning 与 source trace，不填造字段。
 
 ## 版本
 

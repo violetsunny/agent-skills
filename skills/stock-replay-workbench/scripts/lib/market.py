@@ -190,8 +190,14 @@ def limit_pool(pool: str = "up", limit: int = 20) -> dict:
         "up": "getTopicZTPool",
         "down": "getTopicDTPool",
         "break": "getTopicZBPool",
+        "yesterday-up": "getYesterdayZTPool",
     }.get(pool, "getTopicZTPool")
-    sort = "fbt:asc" if pool in {"up", "down", "break"} else "zdp:desc"
+    sort = {
+        "up": "fbt:asc",
+        "break": "fbt:asc",
+        "down": "fbt:asc",
+        "yesterday-up": "zs:desc",
+    }.get(pool, "fbt:asc")
     warnings: list[str] = []
     source_chain: list[dict] = []
     try:

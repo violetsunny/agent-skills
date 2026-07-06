@@ -104,7 +104,7 @@ def _eastmoney_stock_membership(symbol: str, limit: int) -> list[dict]:
                 "股票代码": code,
                 "板块代码": row.get("f12"),
                 "板块名称": row.get("f14"),
-                "板块涨幅": row.get("f3"),
+                "板块rank": row.get("f3"),
                 "领涨股票": row.get("f128"),
             }
         )

@@ -21,8 +21,8 @@
 | `quote-history` 行情 | 单票为主 | 历史 | 时间跨度大时留意数据量 | stable | 适合日线/周线/月线/分钟线 |
 | `market-snapshot` 快照 | 全市场 | 实时快照 | 不需要分页 | stable | 适合指数、涨跌家数、市场宽度 |
 | `rank` 排行 | 全市场 | 当日排行 | 通常 limit 控制 | stable 到 best-effort 混合 | 适合成交额、换手率、PE/PB 等榜单；公网波动时允许返回空列表并保留 warning |
-| `limit-pool` 涨跌停池 | 全市场 | 当日情绪 | 通常 limit 控制 | stable | 适合涨停、跌停、炸板、强势股；走东财 push2ex（price ÷1000）；四池：up/zbreak/down/yst（昨涨停） |
-| `limit-sentiment` 打板情绪 | 全市场 | 当日打板情绪 | 聚合计 limit-pool 四池 + 同花顺涨停揭秘 | stable | 炸板率、连板高度、连板梯队分布、涨停原因题材、板型（一字/换手/T字）、晋级率、赚钱效应 |
+| `limit-pool` 涨跌停池 | 全市场 | 当日情绪 | 通常 limit 控制 | stable | 适合涨停、跌停、炸板、昨涨停表现、强势股；走东财 push2ex（price ÷1000）；当前 CLI 支持四池：up/break/down/yesterday-up |
+| `limit-sentiment` 打板情绪 | 全市场 | 当日打板情绪 | 聚合计当前 `limit-pool` 四池 + 同花顺涨停揭秘 | stable | 炸板率、连板高度、连板梯队分布、涨停原因题材、板型（一字/换手/T字）、晋级率、赚钱效应 |
 | `sentiment-heat` 市场热度 | 全市场 | 当日热度摘要 | limit 控制 | best-effort | 同花顺热榜 `ths_hot_list` + 东财人气榜 `em_hot_rank` + 东财概念命中 `em_hot_concept`；数据间隔≥1s；允许空样本+warning，不作为唯一结论依据 |
 | `irm-qa` 互动易 | 单票 | 历史问答 | 第二步参数放 query string（否则400） | best-effort | 巨潮 cninfo 互动易：投资者提问+公司官方回复，AI问答独家信源 |
 | `option-codes / option-tquote / option-greeks` ETF期权 | 按ETF | 实时+T型报价 | 50ETF/300ETF/科创50/500ETF | stable | 新浪源；希腊字母交易所预算好（Delta/Gamma/Theta/Vega+IV+理论价值），无需本地算BSM |

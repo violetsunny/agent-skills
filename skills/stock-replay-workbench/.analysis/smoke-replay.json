@@ -1,0 +1,451 @@
+{
+  "trade_date": "2026-07-03",
+  "summary": "上证指数 0.67%，涨停池样本 3 只，板块资金流主要集中在 行业前排 和 机器人执行器。",
+  "market_overview": [
+    {
+      "metric": "上证指数",
+      "value": "0.67%",
+      "comment": "最新价 4056.0"
+    },
+    {
+      "metric": "深证成指",
+      "value": "1.57%",
+      "comment": "最新价 15741.58"
+    },
+    {
+      "metric": "创业板指",
+      "value": "2.09%",
+      "comment": "最新价 4101.28"
+    },
+    {
+      "metric": "涨跌家数",
+      "value": "3706 / 2770 / 192",
+      "comment": "上涨 / 下跌 / 平盘"
+    },
+    {
+      "metric": "涨停池",
+      "value": "3",
+      "comment": "涨停池样本数"
+    }
+  ],
+  "themes": {
+    "main": [
+      "机器人执行器",
+      "减速器"
+    ],
+    "secondary": [
+      "黄金",
+      "贵金属"
+    ],
+    "sentiment": "涨停池和板块前排仍有活跃度",
+    "divergence": "部分公开源查询失败或已降级，分歧判断需结合次日盘面确认"
+  },
+  "sectors": [
+    {
+      "name": "黄金",
+      "performance": 8.79,
+      "leaders": "招金黄金",
+      "catalyst": "来自板块排行前排"
+    },
+    {
+      "name": "机器人执行器",
+      "performance": 5.15,
+      "leaders": "雷赛智能",
+      "catalyst": "来自板块排行前排"
+    }
+  ],
+  "sector_money_flow": {
+    "industry": [],
+    "concept": [
+      {
+        "rank": 1,
+        "name": "机器人执行器",
+        "change_percent": 5.15,
+        "main_net_inflow": null,
+        "main_net_inflow_percent": null,
+        "leader": "雷赛智能",
+        "signal_type": "sector_rank_fallback"
+      },
+      {
+        "rank": 2,
+        "name": "减速器",
+        "change_percent": 4.01,
+        "main_net_inflow": null,
+        "main_net_inflow_percent": null,
+        "leader": "日发精机",
+        "signal_type": "sector_rank_fallback"
+      },
+      {
+        "rank": 3,
+        "name": "轮毂电机",
+        "change_percent": 3.86,
+        "main_net_inflow": null,
+        "main_net_inflow_percent": null,
+        "leader": "圣龙股份",
+        "signal_type": "sector_rank_fallback"
+      }
+    ]
+  },
+  "leaders": [
+    {
+      "symbol": "000595",
+      "status": "涨停池前排",
+      "fact": "电力",
+      "role": "强势观察"
+    },
+    {
+      "symbol": "000656",
+      "status": "涨停池前排",
+      "fact": "房地产开",
+      "role": "强势观察"
+    },
+    {
+      "symbol": "002148",
+      "status": "涨停池前排",
+      "fact": "通信服务",
+      "role": "强势观察"
+    }
+  ],
+  "limit_sentiment": {
+    "limit": 20,
+    "up_count": 20,
+    "break_count": 17,
+    "down_count": 0,
+    "break_rate": 45.9,
+    "yesterday_up_count": 20,
+    "advance_count": 0,
+    "advance_rate": 0.0,
+    "earning_rate": 15.0,
+    "max_height": 4
+  },
+  "sentiment_heat": {
+    "limit": 10,
+    "items": []
+  },
+  "fundamental_snapshots": [
+    {
+      "symbol": "000595",
+      "full_symbol": "000595.SZ",
+      "name": "宝塔实业",
+      "pe": 901.42,
+      "pb": 14.68,
+      "market_cap": 7105215723.84,
+      "float_market_cap": 7105215723.84,
+      "revenue": 190634192.08,
+      "net_profit": 1970570.69,
+      "roe": 0.41,
+      "gross_margin": 28.985439,
+      "asset_liability_ratio": 89.505873,
+      "net_margin": -2.887192,
+      "book_value_per_share": 0.425094,
+      "cashflow_summary": {
+        "report_date": "20260331",
+        "operating_net_cashflow": 113177904.61,
+        "investing_net_cashflow": -312084558.95,
+        "financing_net_cashflow": 31665143.05,
+        "net_cash_increase": -167241511.29
+      },
+      "report_period": "20260331",
+      "change_percent": 1.31
+    },
+    {
+      "symbol": "000656",
+      "full_symbol": "000656.SZ",
+      "name": "金科股份",
+      "pe": -81.47,
+      "pb": 3.35,
+      "market_cap": 13765351121.6,
+      "float_market_cap": 9863553709.1,
+      "revenue": 239922999.74,
+      "net_profit": -42239807.17,
+      "roe": -1.02,
+      "gross_margin": 13.73506,
+      "asset_liability_ratio": 67.412126,
+      "net_margin": -26.971513,
+      "book_value_per_share": 0.386874,
+      "cashflow_summary": {
+        "report_date": "20260331",
+        "operating_net_cashflow": -148688880.72,
+        "investing_net_cashflow": -62185953.46,
+        "financing_net_cashflow": -2773734.45,
+        "net_cash_increase": -213649575.2
+      },
+      "report_period": "20260331",
+      "change_percent": 0.06
+    },
+    {
+      "symbol": "002148",
+      "full_symbol": "002148.SZ",
+      "name": "北纬科技",
+      "pe": 379.35,
+      "pb": 3.0,
+      "market_cap": 3665408724.7999997,
+      "float_market_cap": 2958006408.16,
+      "revenue": 97168882.72,
+      "net_profit": 2415602.75,
+      "roe": 0.2,
+      "gross_margin": 39.298599,
+      "asset_liability_ratio": 10.779182,
+      "net_margin": 3.671468,
+      "book_value_per_share": 2.182294,
+      "cashflow_summary": {
+        "report_date": "20260331",
+        "operating_net_cashflow": 25705323.71,
+        "investing_net_cashflow": -8920455.47,
+        "financing_net_cashflow": 973187.9,
+        "net_cash_increase": 17642404.19
+      },
+      "report_period": "20260331",
+      "change_percent": 1.37
+    }
+  ],
+  "event_snapshots": {
+    "market": {
+      "announcements": {
+        "summary": [],
+        "evidence": []
+      },
+      "news": {
+        "summary": [
+          "市场资讯前排聚焦：创业板指涨逾2% 算力硬件股反弹; 微博：6月拦截并清理“AI魔改”各类违规视频85条。"
+        ],
+        "evidence": [
+          {
+            "title": "创业板指涨逾2% 算力硬件股反弹",
+            "source": "Eastmoney Global",
+            "published_at": "2026-07-03 10:50:42"
+          },
+          {
+            "title": "微博：6月拦截并清理“AI魔改”各类违规视频85条",
+            "source": "Eastmoney Global",
+            "published_at": "2026-07-03 10:48:55"
+          },
+          {
+            "title": "欧克科技增资至约1.3亿 增幅40%",
+            "source": "Eastmoney Global",
+            "published_at": "2026-07-03 10:48:55"
+          }
+        ]
+      },
+      "dragon_tiger": {
+        "summary": [],
+        "evidence": []
+      },
+      "margin_trading": {
+        "summary": [],
+        "evidence": []
+      }
+    },
+    "focus": [
+      {
+        "symbol": "000595",
+        "name": "宝塔实业",
+        "announcements": {
+          "summary": [],
+          "evidence": []
+        },
+        "news": {
+          "summary": [
+            "个股新闻跟踪到：000595，脱星摘帽; 宝塔实业：撤销退市风险警示 股票简称变更为“宝塔实业”。"
+          ],
+          "evidence": [
+            {
+              "title": "000595，脱星摘帽",
+              "source": "上海证券报",
+              "published_at": "2026-07-01 20:32:00",
+              "url": "http://finance.eastmoney.com/a/202607013790484650.html"
+            },
+            {
+              "title": "宝塔实业：撤销退市风险警示 股票简称变更为“宝塔实业”",
+              "source": "财联社",
+              "published_at": "2026-06-30 20:56:04",
+              "url": "http://finance.eastmoney.com/a/202606303788605133.html"
+            },
+            {
+              "title": "*ST宝实：撤销退市风险警示 股票简称变更为“宝塔实业”",
+              "source": "每日经济新闻",
+              "published_at": "2026-06-30 20:59:13",
+              "url": "http://finance.eastmoney.com/a/202606303788592323.html"
+            }
+          ]
+        },
+        "dragon_tiger": {
+          "summary": [],
+          "evidence": []
+        },
+        "margin_trading": {
+          "summary": [],
+          "evidence": []
+        }
+      },
+      {
+        "symbol": "000656",
+        "name": "金科股份",
+        "announcements": {
+          "summary": [],
+          "evidence": []
+        },
+        "news": {
+          "summary": [
+            "个股新闻跟踪到：*ST金科：7月2日起撤销退市风险警示及其他风险警示 简称变更为“金科股份”; *ST金科：公司股票将于7月2日起撤销退市风险警示及其他风险警示。"
+          ],
+          "evidence": [
+            {
+              "title": "*ST金科：7月2日起撤销退市风险警示及其他风险警示 简称变更为“金科股份”",
+              "source": "财联社",
+              "published_at": "2026-06-30 21:06:00",
+              "url": "http://finance.eastmoney.com/a/202606303788598691.html"
+            },
+            {
+              "title": "*ST金科：公司股票将于7月2日起撤销退市风险警示及其他风险警示",
+              "source": "证券时报网",
+              "published_at": "2026-06-30 21:10:00",
+              "url": "http://finance.eastmoney.com/a/202606303788612812.html"
+            },
+            {
+              "title": "*ST金科：7月2日复牌变身“金科股份”",
+              "source": "财中社",
+              "published_at": "2026-07-01 08:45:00",
+              "url": "http://finance.eastmoney.com/a/202607013789131147.html"
+            }
+          ]
+        },
+        "dragon_tiger": {
+          "summary": [],
+          "evidence": []
+        },
+        "margin_trading": {
+          "summary": [],
+          "evidence": []
+        }
+      },
+      {
+        "symbol": "002148",
+        "name": "北纬科技",
+        "announcements": {
+          "summary": [],
+          "evidence": []
+        },
+        "news": {
+          "summary": [
+            "个股新闻跟踪到：北纬科技：预计2026年半年度净利润400万元-500万元 同比扭亏为盈; 北纬科技：预计上半年同比扭亏为盈 归母净利润400万元至500万元。"
+          ],
+          "evidence": [
+            {
+              "title": "北纬科技：预计2026年半年度净利润400万元-500万元 同比扭亏为盈",
+              "source": "财联社",
+              "published_at": "2026-07-02 18:26:13",
+              "url": "http://finance.eastmoney.com/a/202607023792050632.html"
+            },
+            {
+              "title": "北纬科技：预计上半年同比扭亏为盈 归母净利润400万元至500万元",
+              "source": "财中社",
+              "published_at": "2026-07-02 19:06:00",
+              "url": "http://finance.eastmoney.com/a/202607023792071373.html"
+            },
+            {
+              "title": "北纬科技：预计上半年净利润400万元—500万元 同比扭亏",
+              "source": "证券时报网",
+              "published_at": "2026-07-02 18:39:00",
+              "url": "http://finance.eastmoney.com/a/202607023792061462.html"
+            }
+          ]
+        },
+        "dragon_tiger": {
+          "summary": [],
+          "evidence": []
+        },
+        "margin_trading": {
+          "summary": [],
+          "evidence": []
+        }
+      }
+    ]
+  },
+  "capital_and_events": {
+    "capital": [
+      "机器人执行器 处于板块资金流前排。"
+    ],
+    "special": [
+      "龙虎榜 / 两融暂无有效摘要，继续保留为旁证层。"
+    ],
+    "catalysts": [
+      "市场资讯前排聚焦：创业板指涨逾2% 算力硬件股反弹; 微博：6月拦截并清理“AI魔改”各类违规视频85条。",
+      "宝塔实业：个股新闻跟踪到：000595，脱星摘帽; 宝塔实业：撤销退市风险警示 股票简称变更为“宝塔实业”。",
+      "金科股份：个股新闻跟踪到：*ST金科：7月2日起撤销退市风险警示及其他风险警示 简称变更为“金科股份”; *ST金科：公司股票将于7月2日起撤销退市风险警示及其他风险警示。"
+    ]
+  },
+  "watchlist": [
+    "观察 000595 是否继续带动 电力 方向强度延续。",
+    "观察 000656 是否继续带动 房地产开 方向强度延续。",
+    "观察 雷赛智能 能否继续维持 机器人执行器 的资金承接。"
+  ],
+  "risks": [
+    "部分公开源查询失败或已降级，复盘结论需结合次日盘口确认。",
+    "涨停池存在交易日回退或空池风险，强势股样本可能不完整。"
+  ],
+  "disclaimers": [
+    "融资融券为交易所公开源 best-effort 数据，深沪字段可能不完全一致。"
+  ],
+  "source_chain": [
+    "tencent_quote",
+    "tencent_quote",
+    "tencent_quote",
+    "tencent_quote",
+    "tencent_quote",
+    "tencent_quote",
+    "eastmoney_market_breadth",
+    "eastmoney_getTopicZTPool",
+    "eastmoney_getTopicZTPool",
+    "eastmoney_getTopicZBPool",
+    "eastmoney_getTopicDTPool",
+    "eastmoney_getYesterdayZTPool",
+    "eastmoney_clist",
+    "akshare_industry_rank",
+    "akshare_concept_rank",
+    "eastmoney_concept_rank",
+    "akshare_stock_sector_fund_flow_rank_industry",
+    "akshare_stock_sector_fund_flow_rank_concept",
+    "akshare_concept_rank",
+    "eastmoney_concept_rank",
+    "eastmoney_quote_valuation",
+    "akshare_stock_financial_abstract",
+    "akshare_stock_financial_report_sina_cashflow",
+    "eastmoney_quote_valuation",
+    "akshare_stock_financial_abstract",
+    "akshare_stock_financial_report_sina_cashflow",
+    "eastmoney_quote_valuation",
+    "akshare_stock_financial_abstract",
+    "akshare_stock_financial_report_sina_cashflow",
+    "akshare_news",
+    "eastmoney_global_news",
+    "akshare_dragon_tiger",
+    "eastmoney_dragon_tiger",
+    "akshare_margin_sse",
+    "akshare_margin_szse",
+    "sentiment_heat_placeholder",
+    "akshare_announcement",
+    "akshare_news",
+    "akshare_announcement",
+    "akshare_news",
+    "akshare_announcement",
+    "akshare_news"
+  ],
+  "timestamp": "2026-07-03 02:53:27",
+  "warnings": [
+    "涨跌停池回退到最近可用交易日 20260703。",
+    "涨跌停池公开源返回空列表，可能是非交易日。",
+    "concept-rank 主源失败，尝试东财回退: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))",
+    "industry 资金流主源失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))",
+    "industry 板块信号回退失败: sector signal fallback returned empty rows for industry",
+    "concept 资金流主源失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))",
+    "concept 资金流已回退到板块排行信号。",
+    "新闻公开源超时，尝试回退公开源: public source call timed out after 8.00s: stock_info_global_cls",
+    "龙虎榜公开源暂不可用，尝试东财回退: 'NoneType' object is not subscriptable",
+    "龙虎榜公开源返回空列表，已保留结构化空样本。",
+    "公告公开源暂不可用，已返回空列表: '000595'",
+    "公告公开源暂不可用，已返回空列表: '000656'",
+    "公告公开源暂不可用，已返回空列表: '002148'"
+  ],
+  "confidence": "低"
+}

@@ -11,6 +11,71 @@ from .common import (
 )
 
 
+def _find_value_in_rows(rows: list[dict], keywords: tuple[str, ...]) -> float | None:
+    for row in rows:
+        label = str(row.get("item") or row.get("指标") or row.get("项目") or "").strip()
+        if not label:
+            continue
+        if any(keyword in label for keyword in keywords):
+            value = (
+                row.get("value")
+                or row.get("值")
+                or row.get("最新值")
+                or row.get("data")
+            )
+            number = safe_float(value)
+            if number is not None:
+                return number
+    return None
+
+
+def _find_individual_info_metrics(symbol: str) -> tuple[dict, dict]:
+    import akshare as ak  # type: ignore
+
+    frame = ak.stock_individual_info_em(symbol=clean_symbol(symbol))
+    if frame is None or frame.empty:
+        raise ValueError("eastmoney individual info returned empty rows")
+    rows = frame.to_dict("records")
+    pe = _find_value_in_rows(rows, ("市盈率", "PE"))
+    pb = _find_value_in_rows(rows, ("市净率", "PB"))
+    if pe is None and pb is None:
+        raise ValueError("eastmoney individual info missing PE/PB fields")
+    return (
+        {"pe": pe, "pb": pb},
+        source("eastmoney_individual_info_em", True),
+    )
+
+
+def _find_baidu_valuation_metrics(symbol: str) -> tuple[dict, dict]:
+    import akshare as ak  # type: ignore
+
+    pe_frame = ak.stock_zh_valuation_baidu(
+        symbol=clean_symbol(symbol), indicator="市盈率(TTM)", period="近一年"
+    )
+    pb_frame = ak.stock_zh_valuation_baidu(
+        symbol=clean_symbol(symbol), indicator="市净率", period="近一年"
+    )
+    pe_rows = (
+        pe_frame.to_dict("records")
+        if pe_frame is not None and not pe_frame.empty
+        else []
+    )
+    pb_rows = (
+        pb_frame.to_dict("records")
+        if pb_frame is not None and not pb_frame.empty
+        else []
+    )
+    pe = _find_value_in_rows(pe_rows, ("市盈率", "PE"))
+    if pe is None and pe_rows:
+        pe = safe_float(pe_rows[-1].get("value") or pe_rows[-1].get("市盈率(TTM)"))
+    pb = _find_value_in_rows(pb_rows, ("市净率", "PB"))
+    if pb is None and pb_rows:
+        pb = safe_float(pb_rows[-1].get("value") or pb_rows[-1].get("市净率"))
+    if pe is None and pb is None:
+        raise ValueError("baidu valuation missing PE/PB fields")
+    return ({"pe": pe, "pb": pb}, source("baidu_stock_valuation", True))
+
+
 def _latest_period_column(columns: list[str]) -> str | None:
     for column in columns:
         if isinstance(column, str) and column.isdigit() and len(column) == 8:
@@ -152,6 +217,28 @@ def fundamental(symbol: str) -> dict:
     except Exception as exc:
         warnings.append(f"估值快照暂不可用: {exc}")
         source_chain.append(source("eastmoney_quote_valuation", False, str(exc)))
+
+    if data.get("pe") is None and data.get("pb") is None:
+        try:
+            info_data, chain_item = _find_individual_info_metrics(code)
+            data.update(
+                {key: value for key, value in info_data.items() if value is not None}
+            )
+            source_chain.append(chain_item)
+        except Exception as exc:
+            warnings.append(f"估值补充字段暂不可用: {exc}")
+            source_chain.append(source("eastmoney_individual_info_em", False, str(exc)))
+
+    if data.get("pe") is None and data.get("pb") is None:
+        try:
+            baidu_data, chain_item = _find_baidu_valuation_metrics(code)
+            data.update(
+                {key: value for key, value in baidu_data.items() if value is not None}
+            )
+            source_chain.append(chain_item)
+        except Exception as exc:
+            warnings.append(f"百度估值补充字段暂不可用: {exc}")
+            source_chain.append(source("baidu_stock_valuation", False, str(exc)))
 
     try:
         abstract_data, chain_item = _find_financial_abstract(code)

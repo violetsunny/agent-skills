@@ -117,7 +117,8 @@ def quote_history(
         response.raise_for_status()
         payload = response.json()
         body = payload.get("data", {}).get(tencent_code(symbol), {})
-        raw_items = body.get("qfq" if adjust == "qfq" else period, body.get(period, []))
+        api_key = "qfqday" if adjust == "qfq" else period
+        raw_items = body.get(api_key, body.get(period, []))
         candles = []
         for item in raw_items:
             if len(item) < 6:

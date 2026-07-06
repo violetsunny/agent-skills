@@ -21,15 +21,24 @@ def limit_sentiment(limit: int = 50) -> dict:
     up_payload = limit_pool("up", limit)
     break_payload = limit_pool("break", limit)
     down_payload = limit_pool("down", limit)
+    yesterday_up_payload = limit_pool("yesterday-up", limit)
 
     warnings: list[str] = []
     source_chain: list[dict] = []
-    for payload in (up_payload, break_payload, down_payload):
+    for payload in (up_payload, break_payload, down_payload, yesterday_up_payload):
         _extend_chain(source_chain, payload)
         _extend_warnings(warnings, payload)
 
     up_count = up_payload.get("data", {}).get("returned_count", 0)
     break_count = break_payload.get("data", {}).get("returned_count", 0)
+    yesterday_up_items = yesterday_up_payload.get("data", {}).get("items", [])
+    advance_count = sum(
+        1 for item in yesterday_up_items if (item.get("change_ratio") or 0) >= 9.8
+    )
+    earning_count = sum(
+        1 for item in yesterday_up_items if (item.get("change_ratio") or 0) > 0
+    )
+    yesterday_up_count = yesterday_up_payload.get("data", {}).get("returned_count", 0)
 
     return success(
         "limit_sentiment",
@@ -40,6 +49,14 @@ def limit_sentiment(limit: int = 50) -> dict:
             "down_count": down_payload.get("data", {}).get("returned_count", 0),
             "break_rate": round(break_count / (up_count + break_count) * 100, 1)
             if (up_count + break_count)
+            else 0.0,
+            "yesterday_up_count": yesterday_up_count,
+            "advance_count": advance_count,
+            "advance_rate": round(advance_count / yesterday_up_count * 100, 1)
+            if yesterday_up_count
+            else 0.0,
+            "earning_rate": round(earning_count / yesterday_up_count * 100, 1)
+            if yesterday_up_count
             else 0.0,
             "max_height": max(
                 [

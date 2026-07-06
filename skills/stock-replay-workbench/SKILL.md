@@ -40,7 +40,7 @@ metadata:
 当接收到自然语言提问时，优先调用本项目内建 CLI：
 
 ```bash
-python3 stock-replay-workbench/scripts/stock_replay_cli.py --help
+python3 scripts/stock_replay_cli.py --help
 ```
 
 如果需要补充一段一次性脚本，也应只使用当前目录内已经实现的数据源逻辑，不要依赖兄弟项目运行时代码。
@@ -50,7 +50,7 @@ python3 stock-replay-workbench/scripts/stock_replay_cli.py --help
 当前统一入口为：
 
 ```bash
-python3 stock-replay-workbench/scripts/stock_replay_cli.py <subcommand> [...args]
+python3 scripts/stock_replay_cli.py <subcommand> [...args]
 ```
 
 已落地的核心子命令包括：
@@ -59,7 +59,7 @@ python3 stock-replay-workbench/scripts/stock_replay_cli.py <subcommand> [...args
 - `quote-history`：单票历史行情
 - `market-snapshot`：指数快照 + 市场宽度
 - `rank`：全市场排行
-- `limit-pool`：涨停 / 跌停 / 炸板 / 昨涨停 池（东财 push2ex 四池，price ÷1000，含连板数/封板资金/炸板次数/板型）
+- `limit-pool`：涨停 / 跌停 / 炸板 / 昨涨停 四池（东财 push2ex，price ÷1000，含连板数/封板资金/炸板次数/板型）
 - `limit-sentiment`：打板情绪温度计（炸板率/连板高度/连板梯队分布/晋级率/赚钱效应）
 - `sentiment-heat`：市场热度（同花顺热榜 `ths_hot_list` + 东财人气榜 `em_hot_rank` + 东财概念命中 `em_hot_concept`）
 - `irm-qa`：互动易问答（投资者提问+公司官方回复，巨潮 cninfo）
@@ -70,7 +70,7 @@ python3 stock-replay-workbench/scripts/stock_replay_cli.py <subcommand> [...args
 - `announcement`、`news`、`dragon-tiger`、`block-trade`、`margin-trading`
 - `bond`：可转债实时、排行、历史
 - `build-replay`：组装复盘底稿 JSON
-- `render-replay`：把结构化底稿渲染成 Markdown，包含 `limit_sentiment` 等复盘信号
+- `render-replay`：把结构化底稿渲染成 Markdown，默认支持写入 `./.analysis/`，目录不存在时自动创建，包含 `limit_sentiment` 等复盘信号
 
 ## 核心工作流
 
@@ -124,7 +124,7 @@ python3 stock-replay-workbench/scripts/stock_replay_cli.py <subcommand> [...args
 - 分钟级资金流（个股/行业/概念）+ 120日资金流
 - 研报列表（个股/行业） + PDF下载
 - 个股新闻 + 全球资讯
-- 打板池四类：涨停/炸板/跌停/昨涨停（push2ex，price ÷1000）
+- 当前已接入的打板池四类：涨停/炸板/跌停/昨涨停（push2ex，price ÷1000）
 - 人气榜 / 概念命中（emappdata）
 
 调用东财时必须：
@@ -280,27 +280,29 @@ PE、PB、ROE、毛利率、资产负债、现金流、股东户数、分红送�
 ### 报告落盘 (persistence)
 
 对于生成的深度分析、短线筛选或盘后复盘报告，应默认将其保存为本地 Markdown 文件：
-1. 目录：保存到当前工作区相对目录 `./analysis/` 下。如果该目录不存在，先创建它。
+1. 目录：保存到当前工作区相对目录 `./.analysis/` 下。如果该目录不存在，先创建它。
 2. 文件名：使用 `YYYY-MM-DD-主题.md` 的格式（例如：`2026-06-26-A股复盘.md` 或 `2026-06-26-宁德时代分析.md`）。
 3. 如果用户明确只要快速问答，则跳过落盘。
 
 如果只需要把结构化底稿稳定渲染为复盘 Markdown 并落盘，可运行：
 
 ```bash
-python3 stock-replay-workbench/scripts/stock_replay_cli.py render-replay --input /path/to/replay.json --output analysis/2026-06-29-A股复盘.md
+python3 scripts/stock_replay_cli.py render-replay --input /path/to/replay.json --output .analysis/2026-06-29-A股复盘.md
 ```
 
 或者直接调用底层脚本：
 
 ```bash
-python3 stock-replay-workbench/scripts/render_replay_markdown.py --input /path/to/replay.json
+python3 scripts/render_replay_markdown.py --input /path/to/replay.json
 ```
+
+如果给底层脚本传入 `--output .analysis/...`，也会自动创建缺失目录后再写入。
 
 如果要先生成最小复盘底稿 JSON，再交给渲染层，可运行：
 
 ```bash
-python3 stock-replay-workbench/scripts/stock_replay_cli.py build-replay --limit 3 --output analysis/2026-06-29-A股复盘.json
-python3 stock-replay-workbench/scripts/stock_replay_cli.py render-replay --input analysis/2026-06-29-A股复盘.json --output analysis/2026-06-29-A股复盘.md
+python3 scripts/stock_replay_cli.py build-replay --limit 3 --output .analysis/2026-06-29-A股复盘.json
+python3 scripts/stock_replay_cli.py render-replay --input .analysis/2026-06-29-A股复盘.json --output .analysis/2026-06-29-A股复盘.md
 ```
 
 ## 能力边界
@@ -308,7 +310,7 @@ python3 stock-replay-workbench/scripts/stock_replay_cli.py render-replay --input
 稳定支持 (stable support)：
 
 - A 股个股、指数、ETF、LOF、可转债的实时行情与历史走势
-- 涨跌停/炸板/跌停/昨涨停四池、连板梯队、封板资金、涨停原因揭秘
+- 涨停/炸板/跌停/昨涨停四池、连板梯队、封板资金、涨停原因揭秘
 - 强势股池、成交额/换手率/市值/PE/PB 榜
 - 行业/概念板块排行与个股归属（个股归属走东财 slist）
 - 市场资金流总览、公告（巨潮 cninfo orgId动态映射）、龙虎榜、大宗交易、融资融券、公开研报、新闻快讯、财务估值

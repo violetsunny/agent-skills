@@ -1,0 +1,228 @@
+{
+  "stocks": [
+    {
+      "symbol": "601899",
+      "name": "紫金矿业",
+      "thesis": "资源周期与铜金价格联动样本，用于验证周期股分析是否保持事实与价格链路一致。",
+      "required_layers": ["facts", "signals", "judgment", "risks"],
+      "required_data_domains": ["market", "sector", "fundamental"],
+      "required_fields": [
+        "realtime.latest_price",
+        "fundamental.pe",
+        "fundamental.pb",
+        "sector_membership"
+      ],
+      "layer_expectations": {
+        "facts": ["最新价", "PE", "PB"],
+        "signals": ["铜金", "资源", "周期"],
+        "judgment": ["资源", "周期", "铜金"],
+        "risks": ["数据链路风险", "关键字段"]
+      },
+      "domain_expectations": {
+        "market": ["realtime.latest_price"],
+        "sector": ["sector_membership"],
+        "fundamental": ["fundamental.pe", "fundamental.pb"]
+      },
+      "required_source_trace": true,
+      "expected_conclusion_tags": ["资源", "周期", "铜金"],
+      "forbidden_behaviors": [
+        "fabricated_fields",
+        "fabricated_values",
+        "undefined_sections",
+        "emotional_recommendation"
+      ],
+      "tone_constraints": {
+        "must_be_rational": true,
+        "forbid_words": ["强烈推荐", "闭眼买", "必须上车", "确定会上涨"]
+      },
+      "markdown_case": ".analysis/acceptance/601899-紫金矿业.md"
+    },
+    {
+      "symbol": "300124",
+      "name": "汇川技术",
+      "thesis": "高端制造与自动化龙头样本，用于验证制造业龙头分析是否保持产业定位稳定。",
+      "required_layers": ["facts", "signals", "judgment", "risks"],
+      "required_data_domains": ["market", "sector", "fundamental"],
+      "required_fields": [
+        "realtime.latest_price",
+        "fundamental.pb",
+        "fundamental.roe",
+        "sector_membership"
+      ],
+      "layer_expectations": {
+        "facts": ["最新价", "PB", "所属板块"],
+        "signals": ["自动化", "工控", "高端制造"],
+        "judgment": ["自动化", "高端制造", "工控"],
+        "risks": ["数据链路风险", "关键字段"]
+      },
+      "domain_expectations": {
+        "market": ["realtime.latest_price"],
+        "sector": ["sector_membership"],
+        "fundamental": ["fundamental.pb", "fundamental.roe"]
+      },
+      "required_source_trace": true,
+      "expected_conclusion_tags": ["自动化", "高端制造", "工控"],
+      "forbidden_behaviors": [
+        "fabricated_fields",
+        "fabricated_values",
+        "undefined_sections",
+        "emotional_recommendation"
+      ],
+      "tone_constraints": {
+        "must_be_rational": true,
+        "forbid_words": ["必须买", "无脑", "冲就完了", "确定会涨"]
+      },
+      "markdown_case": ".analysis/acceptance/300124-汇川技术.md"
+    },
+    {
+      "symbol": "002156",
+      "name": "通富微电",
+      "thesis": "先进封装与封测弹性样本，用于验证高弹性科技股分析不把题材判断伪装成事实。",
+      "required_layers": ["facts", "signals", "judgment", "risks"],
+      "required_data_domains": ["market", "sector", "fundamental", "flow"],
+      "required_fields": [
+        "realtime.latest_price",
+        "sector_membership",
+        "fundamental.pb",
+        "money_flow.summary"
+      ],
+      "layer_expectations": {
+        "facts": ["最新价", "PB", "所属板块"],
+        "signals": ["资金流"],
+        "judgment": ["封测", "弹性", "先进封装"],
+        "risks": ["数据链路风险", "关键字段", "资金流"]
+      },
+      "domain_expectations": {
+        "market": ["realtime.latest_price"],
+        "sector": ["sector_membership"],
+        "fundamental": ["fundamental.pb"],
+        "flow": ["money_flow.summary"]
+      },
+      "required_source_trace": true,
+      "expected_conclusion_tags": ["先进封装", "封测", "弹性"],
+      "forbidden_behaviors": [
+        "fabricated_fields",
+        "fabricated_values",
+        "undefined_sections",
+        "emotional_recommendation"
+      ],
+      "tone_constraints": {
+        "must_be_rational": true,
+        "forbid_words": ["闭眼买", "必须上车", "稳了", "必涨"]
+      },
+      "markdown_case": ".analysis/acceptance/002156-通富微电.md"
+    },
+    {
+      "symbol": "300750",
+      "name": "宁德时代",
+      "thesis": "动力电池与景气链样本，用于验证龙头股深度分析必须覆盖多数据域而非单一叙事。",
+      "required_layers": ["facts", "signals", "judgment", "risks"],
+      "required_data_domains": ["market", "sector", "fundamental", "events"],
+      "required_fields": [
+        "realtime.latest_price",
+        "fundamental.roe",
+        "fundamental.gross_margin",
+        "news_titles"
+      ],
+      "layer_expectations": {
+        "facts": ["最新价", "新闻样本"],
+        "signals": ["新闻样本", "景气", "动力电池"],
+        "judgment": ["动力电池", "景气", "龙头"],
+        "risks": ["数据链路风险", "关键字段"]
+      },
+      "domain_expectations": {
+        "market": ["realtime.latest_price"],
+        "fundamental": ["fundamental.roe", "fundamental.gross_margin"],
+        "events": ["news_titles"]
+      },
+      "required_source_trace": true,
+      "expected_conclusion_tags": ["动力电池", "景气", "龙头"],
+      "forbidden_behaviors": [
+        "fabricated_fields",
+        "fabricated_values",
+        "undefined_sections",
+        "emotional_recommendation"
+      ],
+      "tone_constraints": {
+        "must_be_rational": true,
+        "forbid_words": ["强烈推荐", "确定上涨", "一定新高", "无脑"]
+      },
+      "markdown_case": ".analysis/acceptance/300750-宁德时代.md"
+    },
+    {
+      "symbol": "002920",
+      "name": "德赛西威",
+      "thesis": "智能驾驶与汽车电子样本，用于验证成长股分析的行业归因与财务字段稳定性。",
+      "required_layers": ["facts", "signals", "judgment", "risks"],
+      "required_data_domains": ["market", "sector", "fundamental"],
+      "required_fields": [
+        "realtime.latest_price",
+        "fundamental.gross_margin",
+        "fundamental.net_profit",
+        "sector_membership"
+      ],
+      "layer_expectations": {
+        "facts": ["最新价", "所属板块"],
+        "signals": ["智能驾驶", "汽车电子", "成长"],
+        "judgment": ["智能驾驶", "汽车电子", "成长"],
+        "risks": ["数据链路风险", "关键字段"]
+      },
+      "domain_expectations": {
+        "market": ["realtime.latest_price"],
+        "sector": ["sector_membership"],
+        "fundamental": ["fundamental.gross_margin", "fundamental.net_profit"]
+      },
+      "required_source_trace": true,
+      "expected_conclusion_tags": ["智能驾驶", "汽车电子", "成长"],
+      "forbidden_behaviors": [
+        "fabricated_fields",
+        "fabricated_values",
+        "undefined_sections",
+        "emotional_recommendation"
+      ],
+      "tone_constraints": {
+        "must_be_rational": true,
+        "forbid_words": ["必须买", "闭眼买", "一把梭", "确定会涨"]
+      },
+      "markdown_case": ".analysis/acceptance/002920-德赛西威.md"
+    },
+    {
+      "symbol": "603986",
+      "name": "兆易创新",
+      "thesis": "存储与数字芯片设计样本，用于验证科技成长股分析对资金与估值分歧的处理是否克制。",
+      "required_layers": ["facts", "signals", "judgment", "risks"],
+      "required_data_domains": ["market", "sector", "fundamental", "flow"],
+      "required_fields": [
+        "realtime.latest_price",
+        "fundamental.pe",
+        "fundamental.pb",
+        "money_flow.summary"
+      ],
+      "layer_expectations": {
+        "facts": ["最新价", "PE", "PB"],
+        "signals": ["资金流"],
+        "judgment": ["芯片设计", "成长", "存储"],
+        "risks": ["数据链路风险", "关键字段", "估值"]
+      },
+      "domain_expectations": {
+        "market": ["realtime.latest_price"],
+        "fundamental": ["fundamental.pe", "fundamental.pb"],
+        "flow": ["money_flow.summary"],
+        "sector": ["sector_membership"]
+      },
+      "required_source_trace": true,
+      "expected_conclusion_tags": ["存储", "芯片设计", "成长"],
+      "forbidden_behaviors": [
+        "fabricated_fields",
+        "fabricated_values",
+        "undefined_sections",
+        "emotional_recommendation"
+      ],
+      "tone_constraints": {
+        "must_be_rational": true,
+        "forbid_words": ["闭眼买", "必须买", "稳赚", "确定上涨"]
+      },
+      "markdown_case": ".analysis/acceptance/603986-兆易创新.md"
+    }
+  ]
+}

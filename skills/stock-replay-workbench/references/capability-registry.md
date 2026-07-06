@@ -12,7 +12,7 @@
 |---|---|---|---|
 | 实时与历史行情 | 最新价、涨跌幅、近 30 天走势、分钟线 | 适合快查与单票底稿；优先腾讯财经（不封IP），分钟线走 mootdx |
 | 市场宽度与情绪 | 三大指数、涨跌家数、涨停炸板、市场强弱、市场人气 | 适合盘后复盘的总览层；已整合打板情绪+市场热度 |
-| 打板情绪 | 涨停池、炸板池、跌停池、昨涨停表现、涨停原因揭秘、连板分析 | 东财 push2ex 四池 + 同花顺涨停揭秘 + 情绪速算（炸板率/连板高度/梯队分布） |
+| 打板情绪 | 涨停池、炸板池、跌停池、昨涨停表现、涨停原因揭秘、连板分析 | 当前统一 CLI 已接入东财 push2ex 四池 + 同花顺涨停揭秘 + 情绪速算（炸板率/连板高度/梯队分布/晋级率/赚钱效应） |
 | 市场热度 | 人气榜、热榜排名、概念热度、投资者互动 | 同花顺热榜 + 东财人气榜 + 概念命中 + 巨潮互动易问答 |
 | 榜单与活跃度 | 成交额前十、换手率排行、强势股池 | 适合找活跃票和情绪核心 |
 | 板块与题材 | 行业排行、概念板块、个股属于什么板块 | 适合主线归因和题材梳理；个股板块归属走东财 slist |
@@ -29,8 +29,8 @@
 | 能力模块 | 当前命令 | 当前最小输出 |
 |---|---|---|---|
 | 实时与历史行情 | `quote-realtime`、`quote-history` | 单票行情 envelope；分钟线走 mootdx `frequency=8/0` |
-| 市场宽度与情绪 | `market-snapshot`、`limit-pool`、`limit-sentiment`、`sentiment-heat` | 指数快照、涨跌家数、涨停/炸板/跌停/昨涨停四池、打板情绪温度计（炸板率/连板高度/梯队）、同花顺热榜/东财人气榜/概念命中 |
-| 打板情绪 | `limit-pool --pool up/zbreak/down/yst`、`limit-sentiment` | 连板数/N天M板/封板资金/炸板次数/涨停原因/板型/晋级率 |
+| 市场宽度与情绪 | `market-snapshot`、`limit-pool`、`limit-sentiment`、`sentiment-heat` | 指数快照、涨跌家数、涨停/炸板/跌停/昨涨停四池、打板情绪温度计（炸板率/连板高度/梯队/晋级率/赚钱效应）、同花顺热榜/东财人气榜/概念命中 |
+| 打板情绪 | `limit-pool --pool up/break/down/yesterday-up`、`limit-sentiment` | 连板数/N天M板/封板资金/炸板次数/涨停原因/板型/晋级率/赚钱效应 |
 | 榜单与活跃度 | `rank` | 成交额 / 涨跌幅等排行 |
 | 板块与题材 | `sector --action industry-rank\|concept-rank\|stock-membership` | 行业排行、概念排行、个股归属（东财 slist） |
 | 资金与博弈 | `money-flow`、`dragon-tiger`、`block-trade`、`margin-trading` | 市场 / 个股 / 行业 / 概念资金流（东财 push2his/datacenter）、龙虎榜、大宗、两融 |
@@ -38,7 +38,7 @@
 | 财务与估值 | `fundamental` | 市值、PE、PB、营收、净利、ROE、毛利率、资产负债率、净利率、每股净资产、现金流摘要（moootdx finance + 新浪三表） |
 | ETF期权 | `option-codes`、`option-tquote`、`option-greeks` | 合约清单、T型报价（买卖五档/持仓量/行权价）、希腊字母+IV（交易所预算） |
 | 衍生资产 | `bond` | 可转债实时、排行、历史 |
-| 舆情互动 | `irm-qa`、`hot-rank`、`sentiment-heat` | 互动易问答（投资者提问+公司回复）、人气榜/热榜/概念命中 |
+| 舆情互动 | `irm-qa`、`sentiment-heat` | 互动易问答（投资者提问+公司回复）、人气榜/热榜/概念命中 |
 | 盘后复盘产出 | `build-replay`、`render-replay` | 先组装复盘底稿 JSON，再渲染成 Markdown；底稿已包含市场层与重点股层的事件快照摘要、`limit_sentiment` 与 `sentiment_heat` 摘要入口 |
 
 ## 模块组合建议

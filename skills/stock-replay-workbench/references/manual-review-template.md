@@ -4,7 +4,7 @@
 
 使用方式：
 
-1. 先运行 `python3 stock-replay-workbench/scripts/validate_skill.py`
+1. 先运行 `python3 scripts/validate_skill.py`
 2. 在目标宿主里分别执行三类提示词
 3. 按下面模板记录输出质量
 
