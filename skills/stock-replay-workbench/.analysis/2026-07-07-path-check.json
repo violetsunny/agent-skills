@@ -1,0 +1,262 @@
+{
+  "trade_date": "2026-07-07",
+  "summary": "上证指数 -1.26%，涨停池样本 1 只，板块资金流主要集中在 行业前排 和 阿尔茨海默概念。",
+  "market_overview": [
+    {
+      "metric": "上证指数",
+      "value": "-1.26%",
+      "comment": "最新价 3990.24"
+    },
+    {
+      "metric": "深证成指",
+      "value": "-1.24%",
+      "comment": "最新价 15225.11"
+    },
+    {
+      "metric": "创业板指",
+      "value": "-0.94%",
+      "comment": "最新价 3911.91"
+    },
+    {
+      "metric": "涨跌家数",
+      "value": "0 / 0 / 0",
+      "comment": "上涨 / 下跌 / 平盘"
+    },
+    {
+      "metric": "涨停池",
+      "value": "1",
+      "comment": "涨停池样本数"
+    }
+  ],
+  "themes": {
+    "main": [
+      "阿尔茨海默概念"
+    ],
+    "secondary": [],
+    "sentiment": "涨停池和板块前排仍有活跃度",
+    "divergence": "部分公开源查询失败或已降级，分歧判断需结合次日盘面确认"
+  },
+  "sectors": [
+    {
+      "name": "阿尔茨海默概念",
+      "performance": null,
+      "leaders": null,
+      "catalyst": "来自板块排行前排"
+    }
+  ],
+  "sector_money_flow": {
+    "industry": [],
+    "concept": [
+      {
+        "rank": 1,
+        "name": "阿尔茨海默概念",
+        "change_percent": null,
+        "main_net_inflow": null,
+        "main_net_inflow_percent": null,
+        "leader": null,
+        "signal_type": "sector_rank_fallback"
+      }
+    ]
+  },
+  "leaders": [
+    {
+      "symbol": "002497",
+      "status": "涨停池前排",
+      "fact": "化学制品",
+      "role": "强势观察"
+    }
+  ],
+  "limit_sentiment": {
+    "limit": 20,
+    "up_count": 20,
+    "break_count": 20,
+    "down_count": 0,
+    "break_rate": 50.0,
+    "yesterday_up_count": 20,
+    "advance_count": 0,
+    "advance_rate": 0.0,
+    "earning_rate": 30.0,
+    "max_height": 6
+  },
+  "sentiment_heat": {
+    "limit": 10,
+    "items": []
+  },
+  "fundamental_snapshots": [
+    {
+      "symbol": "002497",
+      "full_symbol": "002497.SZ",
+      "name": null,
+      "pe": 31.97,
+      "pb": 2.58,
+      "market_cap": null,
+      "float_market_cap": null,
+      "revenue": 2830218496.2,
+      "net_profit": 338821317.99,
+      "roe": 3.11,
+      "gross_margin": 24.586018,
+      "asset_liability_ratio": 24.972522,
+      "net_margin": 12.151793,
+      "book_value_per_share": 9.572426,
+      "cashflow_summary": {
+        "report_date": "20260331",
+        "operating_net_cashflow": -430615777.34,
+        "investing_net_cashflow": 519706935.6,
+        "financing_net_cashflow": 186762726.64,
+        "net_cash_increase": 271594604.48
+      },
+      "report_period": "20260331"
+    }
+  ],
+  "event_snapshots": {
+    "market": {
+      "announcements": {
+        "summary": [],
+        "evidence": []
+      },
+      "news": {
+        "summary": [
+          "市场资讯前排聚焦：华人健康：子公司磷酸奥司他韦胶囊药品注册上市许可申请获受理。"
+        ],
+        "evidence": [
+          {
+            "title": "华人健康：子公司磷酸奥司他韦胶囊药品注册上市许可申请获受理",
+            "source": "Eastmoney Global",
+            "published_at": "2026-07-07 19:06:35"
+          }
+        ]
+      },
+      "dragon_tiger": {
+        "summary": [
+          "当日龙虎榜样本 1 条，活跃资金仍在前排强势股中博弈。",
+          "龙虎榜前排样本包括 国华退。"
+        ],
+        "evidence": [
+          {
+            "代码": "000004",
+            "名称": "国华退",
+            "解读": "卖一主卖，成功率58.95%",
+            "收盘价": 0.4,
+            "涨跌幅": -2.439
+          }
+        ]
+      },
+      "margin_trading": {
+        "summary": [],
+        "evidence": []
+      }
+    },
+    "focus": [
+      {
+        "symbol": "002497",
+        "name": null,
+        "announcements": {
+          "summary": [],
+          "evidence": []
+        },
+        "news": {
+          "summary": [
+            "个股新闻跟踪到：业绩大幅预增！002497，涨停。"
+          ],
+          "evidence": [
+            {
+              "title": "业绩大幅预增！002497，涨停",
+              "source": "中国基金报",
+              "published_at": "2026-07-07 10:30:00",
+              "url": "http://finance.eastmoney.com/a/202607073796375514.html"
+            }
+          ]
+        },
+        "dragon_tiger": {
+          "summary": [],
+          "evidence": []
+        },
+        "margin_trading": {
+          "summary": [],
+          "evidence": []
+        }
+      }
+    ]
+  },
+  "capital_and_events": {
+    "capital": [
+      "阿尔茨海默概念 处于板块资金流前排。"
+    ],
+    "special": [
+      "当日龙虎榜样本 1 条，活跃资金仍在前排强势股中博弈。",
+      "龙虎榜前排样本包括 国华退。"
+    ],
+    "catalysts": [
+      "市场资讯前排聚焦：华人健康：子公司磷酸奥司他韦胶囊药品注册上市许可申请获受理。",
+      "002497：个股新闻跟踪到：业绩大幅预增！002497，涨停。"
+    ]
+  },
+  "watchlist": [
+    "观察 002497 是否继续带动 化学制品 方向强度延续。"
+  ],
+  "risks": [
+    "部分公开源查询失败或已降级，复盘结论需结合次日盘口确认。",
+    "涨停池存在交易日回退或空池风险，强势股样本可能不完整。"
+  ],
+  "disclaimers": [
+    "融资融券为交易所公开源 best-effort 数据，深沪字段可能不完全一致。"
+  ],
+  "source_chain": [
+    "tencent_quote",
+    "tencent_quote",
+    "tencent_quote",
+    "tencent_quote",
+    "tencent_quote",
+    "tencent_quote",
+    "eastmoney_market_breadth",
+    "eastmoney_getTopicZTPool",
+    "eastmoney_getTopicZTPool",
+    "eastmoney_getTopicZBPool",
+    "eastmoney_getTopicDTPool",
+    "eastmoney_getYesterdayZTPool",
+    "eastmoney_clist",
+    "akshare_industry_rank",
+    "eastmoney_industry_rank",
+    "akshare_concept_rank",
+    "eastmoney_concept_rank",
+    "akshare_concept_rank_ths",
+    "akshare_stock_sector_fund_flow_rank_industry",
+    "akshare_stock_sector_fund_flow_rank_concept",
+    "akshare_concept_rank",
+    "eastmoney_concept_rank",
+    "akshare_concept_rank_ths",
+    "eastmoney_quote_valuation",
+    "eastmoney_individual_info_em",
+    "baidu_stock_valuation",
+    "akshare_stock_financial_abstract",
+    "akshare_stock_financial_report_sina_cashflow",
+    "akshare_news",
+    "eastmoney_global_news",
+    "akshare_dragon_tiger",
+    "akshare_margin_sse",
+    "akshare_margin_szse",
+    "sentiment_heat_placeholder",
+    "akshare_announcement",
+    "akshare_news"
+  ],
+  "timestamp": "2026-07-07 11:10:34",
+  "warnings": [
+    "市场宽度公开源失败，已降级到 0 值占位: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))",
+    "涨跌停池回退到最近可用交易日 20260707。",
+    "涨跌停池公开源返回空列表，可能是非交易日。",
+    "榜单公开源失败，已返回空列表: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))",
+    "industry-rank 主源失败，尝试东财回退: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))",
+    "industry-rank 东财回退失败，尝试同花顺回退: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))",
+    "concept-rank 主源失败，尝试东财回退: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))",
+    "concept-rank 东财回退失败，尝试同花顺回退: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))",
+    "industry 资金流主源失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))",
+    "industry 板块信号回退失败: sector signal fallback returned empty rows for industry",
+    "concept 资金流主源失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))",
+    "concept 资金流已回退到板块排行信号。",
+    "估值快照暂不可用: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))",
+    "估值补充字段暂不可用: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))",
+    "新闻公开源超时，尝试回退公开源: public source call timed out after 8.00s: stock_info_global_cls",
+    "公告公开源暂不可用，已返回空列表: '002497'"
+  ],
+  "confidence": "低"
+}

@@ -37,11 +37,9 @@ def _resolve_output_path(output_path: str) -> Path:
     output = Path(output_path)
     if output.is_absolute():
         return output
-    return (
-        DEFAULT_OUTPUT_DIR / output.name
-        if output.parent == Path(".")
-        else DEFAULT_OUTPUT_DIR / output
-    )
+    if output.parent == Path("."):
+        return DEFAULT_OUTPUT_DIR / output.name
+    return output
 
 
 def _render_replay(input_path: str, output_path: str | None) -> dict:

@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import importlib.util
 import json
+import os
 import sys
 import tempfile
 import unittest
@@ -834,6 +835,13 @@ class ReplayOutputPathTests(unittest.TestCase):
 
         self.assertEqual(resolved, cli.DEFAULT_OUTPUT_DIR / "2026-07-03.json")
 
+    def test_resolve_output_path_preserves_explicit_relative_directories(self):
+        cli = load_cli_module()
+
+        resolved = cli._resolve_output_path(".analysis/2026-07-03.json")
+
+        self.assertEqual(resolved, Path(".analysis/2026-07-03.json"))
+
     def test_build_replay_creates_missing_parent_directory(self):
         cli = load_cli_module()
 
@@ -875,6 +883,33 @@ class ReplayOutputPathTests(unittest.TestCase):
             saved = json.loads(output_path.read_text(encoding="utf-8"))
             self.assertEqual(saved["trade_date"], "2026-07-03")
 
+    def test_build_replay_preserves_explicit_relative_output_directory(self):
+        cli = load_cli_module()
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            root = Path(tmpdir)
+            hidden_analysis = root / ".analysis"
+            cwd = os.getcwd()
+            try:
+                os.chdir(root)
+                with (
+                    mock.patch.object(
+                        cli,
+                        "build_replay",
+                        return_value={"data": {"trade_date": "2026-07-03"}, "ok": True},
+                    ),
+                    mock.patch.object(cli, "DEFAULT_OUTPUT_DIR", hidden_analysis),
+                ):
+                    cli._build_replay(None, 3, ".analysis/2026-07-03.json")
+            finally:
+                os.chdir(cwd)
+
+            output_path = hidden_analysis / "2026-07-03.json"
+            self.assertTrue(output_path.exists())
+            self.assertFalse(
+                (hidden_analysis / ".analysis" / "2026-07-03.json").exists()
+            )
+
     def test_render_replay_creates_missing_parent_directory(self):
         cli = load_cli_module()
 
@@ -894,6 +929,31 @@ class ReplayOutputPathTests(unittest.TestCase):
 
             self.assertTrue(output_path.exists())
             self.assertEqual(output_path.read_text(encoding="utf-8"), "# report")
+
+    def test_render_replay_preserves_explicit_relative_output_directory(self):
+        cli = load_cli_module()
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            root = Path(tmpdir)
+            input_path = root / "input.json"
+            input_path.write_text(
+                json.dumps({"trade_date": "2026-07-03"}), encoding="utf-8"
+            )
+            hidden_analysis = root / ".analysis"
+            cwd = os.getcwd()
+            try:
+                os.chdir(root)
+                with (
+                    mock.patch.object(cli, "render_report", return_value="# report"),
+                    mock.patch.object(cli, "DEFAULT_OUTPUT_DIR", hidden_analysis),
+                ):
+                    cli._render_replay(str(input_path), ".analysis/2026-07-03.md")
+            finally:
+                os.chdir(cwd)
+
+            output_path = hidden_analysis / "2026-07-03.md"
+            self.assertTrue(output_path.exists())
+            self.assertFalse((hidden_analysis / ".analysis" / "2026-07-03.md").exists())
 
 
 class LimitPoolLibTests(unittest.TestCase):
