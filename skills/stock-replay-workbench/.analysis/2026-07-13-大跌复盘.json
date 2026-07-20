@@ -1,0 +1,546 @@
+{
+  "trade_date": "2026-07-13",
+  "summary": "上证指数 -2.06%，涨停池样本 5 只，板块资金流主要集中在 中药Ⅲ 和 阿尔茨海默概念。",
+  "market_overview": [
+    {
+      "metric": "上证指数",
+      "value": "-2.06%",
+      "comment": "最新价 3913.79"
+    },
+    {
+      "metric": "深证成指",
+      "value": "-3.48%",
+      "comment": "最新价 14522.85"
+    },
+    {
+      "metric": "创业板指",
+      "value": "-3.10%",
+      "comment": "最新价 3723.52"
+    },
+    {
+      "metric": "涨跌家数",
+      "value": "911 / 5710 / 51",
+      "comment": "上涨 / 下跌 / 平盘"
+    },
+    {
+      "metric": "涨停池",
+      "value": "5",
+      "comment": "涨停池样本数"
+    }
+  ],
+  "themes": {
+    "main": [
+      "中药Ⅲ",
+      "中药Ⅱ"
+    ],
+    "secondary": [
+      "昨日打二板以上表现",
+      "特色药"
+    ],
+    "sentiment": "涨停池和板块前排仍有活跃度",
+    "divergence": "部分公开源查询失败或已降级，分歧判断需结合次日盘面确认"
+  },
+  "sectors": [
+    {
+      "name": "中药Ⅲ",
+      "performance": 2.96,
+      "leaders": "陇神戎发",
+      "catalyst": "来自板块排行前排"
+    },
+    {
+      "name": "中药Ⅱ",
+      "performance": 2.96,
+      "leaders": "陇神戎发",
+      "catalyst": "来自板块排行前排"
+    },
+    {
+      "name": "昨日打二板以上表现",
+      "performance": 10.02,
+      "leaders": "恒尚节能",
+      "catalyst": "来自板块排行前排"
+    },
+    {
+      "name": "特色药",
+      "performance": 2.85,
+      "leaders": "立方制药",
+      "catalyst": "来自板块排行前排"
+    }
+  ],
+  "sector_money_flow": {
+    "industry": [
+      {
+        "rank": 1,
+        "name": "中药Ⅲ",
+        "change_percent": 2.96,
+        "main_net_inflow": null,
+        "main_net_inflow_percent": null,
+        "leader": "陇神戎发",
+        "signal_type": "sector_rank_fallback"
+      },
+      {
+        "rank": 2,
+        "name": "中药Ⅱ",
+        "change_percent": 2.96,
+        "main_net_inflow": null,
+        "main_net_inflow_percent": null,
+        "leader": "陇神戎发",
+        "signal_type": "sector_rank_fallback"
+      },
+      {
+        "rank": 3,
+        "name": "油气开采Ⅲ",
+        "change_percent": 2.81,
+        "main_net_inflow": null,
+        "main_net_inflow_percent": null,
+        "leader": "ST洲际",
+        "signal_type": "sector_rank_fallback"
+      },
+      {
+        "rank": 4,
+        "name": "油气开采Ⅱ",
+        "change_percent": 2.81,
+        "main_net_inflow": null,
+        "main_net_inflow_percent": null,
+        "leader": "ST洲际",
+        "signal_type": "sector_rank_fallback"
+      },
+      {
+        "rank": 5,
+        "name": "国有大型银行Ⅲ",
+        "change_percent": 2.57,
+        "main_net_inflow": null,
+        "main_net_inflow_percent": null,
+        "leader": "XD建设银",
+        "signal_type": "sector_rank_fallback"
+      }
+    ],
+    "concept": [
+      {
+        "rank": 1,
+        "name": "阿尔茨海默概念",
+        "change_percent": null,
+        "main_net_inflow": null,
+        "main_net_inflow_percent": null,
+        "leader": null,
+        "signal_type": "sector_rank_fallback"
+      },
+      {
+        "rank": 2,
+        "name": "AI PC",
+        "change_percent": null,
+        "main_net_inflow": null,
+        "main_net_inflow_percent": null,
+        "leader": null,
+        "signal_type": "sector_rank_fallback"
+      },
+      {
+        "rank": 3,
+        "name": "AI手机",
+        "change_percent": null,
+        "main_net_inflow": null,
+        "main_net_inflow_percent": null,
+        "leader": null,
+        "signal_type": "sector_rank_fallback"
+      },
+      {
+        "rank": 4,
+        "name": "AI语料",
+        "change_percent": null,
+        "main_net_inflow": null,
+        "main_net_inflow_percent": null,
+        "leader": null,
+        "signal_type": "sector_rank_fallback"
+      },
+      {
+        "rank": 5,
+        "name": "阿里巴巴概念",
+        "change_percent": null,
+        "main_net_inflow": null,
+        "main_net_inflow_percent": null,
+        "leader": null,
+        "signal_type": "sector_rank_fallback"
+      }
+    ]
+  },
+  "leaders": [
+    {
+      "symbol": "000004",
+      "status": "涨停池前排",
+      "fact": "软件开发",
+      "role": "强势观察"
+    },
+    {
+      "symbol": "300214",
+      "status": "涨停池前排",
+      "fact": "化学制品",
+      "role": "强势观察"
+    },
+    {
+      "symbol": "600992",
+      "status": "涨停池前排",
+      "fact": "通用设备",
+      "role": "强势观察"
+    },
+    {
+      "symbol": "601608",
+      "status": "涨停池前排",
+      "fact": "专用设备",
+      "role": "强势观察"
+    },
+    {
+      "symbol": "603318",
+      "status": "涨停池前排",
+      "fact": "燃气Ⅱ",
+      "role": "强势观察"
+    }
+  ],
+  "limit_sentiment": {
+    "limit": 20,
+    "up_count": 20,
+    "break_count": 14,
+    "down_count": 0,
+    "break_rate": 41.2,
+    "yesterday_up_count": 20,
+    "advance_count": 3,
+    "advance_rate": 15.0,
+    "earning_rate": 35.0,
+    "max_height": 3
+  },
+  "sentiment_heat": {
+    "limit": 10,
+    "items": []
+  },
+  "fundamental_snapshots": [
+    {
+      "symbol": "000004",
+      "full_symbol": "000004.SZ",
+      "name": "国华退",
+      "pe": -2.64,
+      "pb": 0.78,
+      "market_cap": 67513943.82000001,
+      "float_market_cap": 64407424.68,
+      "revenue": 16622745.12,
+      "net_profit": -6388269.49,
+      "roe": -7.05,
+      "gross_margin": 79.995442,
+      "asset_liability_ratio": 66.568624,
+      "net_margin": -23.847425,
+      "book_value_per_share": 0.655861,
+      "cashflow_summary": {
+        "report_date": "20260331",
+        "operating_net_cashflow": -27987206.99,
+        "investing_net_cashflow": -587378.06,
+        "financing_net_cashflow": 9078161.51,
+        "net_cash_increase": -19496423.54
+      },
+      "report_period": "20260331",
+      "change_percent": 2.76
+    },
+    {
+      "symbol": "300214",
+      "full_symbol": "300214.SZ",
+      "name": "日科化学",
+      "pe": 688.06,
+      "pb": 2.39,
+      "market_cap": 5718302152.200001,
+      "float_market_cap": 5718302152.200001,
+      "revenue": 912958078.53,
+      "net_profit": 2077680.19,
+      "roe": 0.09,
+      "gross_margin": 7.227676,
+      "asset_liability_ratio": 50.329847,
+      "net_margin": 0.446926,
+      "book_value_per_share": 5.150511,
+      "cashflow_summary": {
+        "report_date": "20260331",
+        "operating_net_cashflow": 4826577.17,
+        "investing_net_cashflow": -19337959.75,
+        "financing_net_cashflow": 67333210.44,
+        "net_cash_increase": 51532156.35
+      },
+      "report_period": "20260331",
+      "change_percent": 1.37
+    },
+    {
+      "symbol": "600992",
+      "full_symbol": "600992.SH",
+      "name": "贵绳股份",
+      "pe": -13.15,
+      "pb": 2.01,
+      "market_cap": 2872454800.0,
+      "float_market_cap": 2872454800.0,
+      "revenue": 395097036.7,
+      "net_profit": -54617374.04,
+      "roe": -3.7479,
+      "gross_margin": 0.989847,
+      "asset_liability_ratio": 67.577132,
+      "net_margin": -13.823787,
+      "book_value_per_share": 5.832021,
+      "cashflow_summary": {
+        "report_date": "20260331",
+        "operating_net_cashflow": -73813418.98,
+        "investing_net_cashflow": -59549210.33,
+        "financing_net_cashflow": 193048597.49,
+        "net_cash_increase": 59110690.83
+      },
+      "report_period": "20260331",
+      "change_percent": 2.22
+    }
+  ],
+  "event_snapshots": {
+    "market": {
+      "announcements": {
+        "summary": [],
+        "evidence": []
+      },
+      "news": {
+        "summary": [
+          "市场资讯前排聚焦：新里程增资至33.9亿; 国家医保局、国家药监局开展跨部门联合检查。"
+        ],
+        "evidence": [
+          {
+            "title": "新里程增资至33.9亿",
+            "source": "Eastmoney Global",
+            "published_at": "2026-07-13 16:15:39"
+          },
+          {
+            "title": "国家医保局、国家药监局开展跨部门联合检查",
+            "source": "Eastmoney Global",
+            "published_at": "2026-07-13 16:15:39"
+          },
+          {
+            "title": "瑞银下调SAP目标价",
+            "source": "Eastmoney Global",
+            "published_at": "2026-07-13 16:14:29"
+          }
+        ]
+      },
+      "dragon_tiger": {
+        "summary": [],
+        "evidence": []
+      },
+      "margin_trading": {
+        "summary": [],
+        "evidence": []
+      }
+    },
+    "focus": [
+      {
+        "symbol": "000004",
+        "name": "国华退",
+        "announcements": {
+          "summary": [],
+          "evidence": []
+        },
+        "news": {
+          "summary": [
+            "个股新闻跟踪到：国华退000004龙虎榜数据07-10; 国华退000004龙虎榜数据07-09)。"
+          ],
+          "evidence": [
+            {
+              "title": "国华退000004龙虎榜数据07-10",
+              "source": "东方财富Choice数据",
+              "published_at": "2026-07-10 16:27:18",
+              "url": "http://finance.eastmoney.com/a/202607103801823623.html"
+            },
+            {
+              "title": "国华退000004龙虎榜数据07-09)",
+              "source": "东方财富Choice数据",
+              "published_at": "2026-07-09 16:26:32",
+              "url": "http://finance.eastmoney.com/a/202607093800044210.html"
+            },
+            {
+              "title": "国华退000004龙虎榜数据07-08)",
+              "source": "东方财富Choice数据",
+              "published_at": "2026-07-08 16:26:29",
+              "url": "http://finance.eastmoney.com/a/202607083798383227.html"
+            }
+          ]
+        },
+        "dragon_tiger": {
+          "summary": [],
+          "evidence": []
+        },
+        "margin_trading": {
+          "summary": [],
+          "evidence": []
+        }
+      },
+      {
+        "symbol": "300214",
+        "name": "日科化学",
+        "announcements": {
+          "summary": [],
+          "evidence": []
+        },
+        "news": {
+          "summary": [
+            "个股新闻跟踪到：300214，重大资产重组！周一复牌; 拟重大资产重组，300214，“20cm”涨停。"
+          ],
+          "evidence": [
+            {
+              "title": "300214，重大资产重组！周一复牌",
+              "source": "上海证券报",
+              "published_at": "2026-07-12 17:10:00",
+              "url": "http://finance.eastmoney.com/a/202607123802640110.html"
+            },
+            {
+              "title": "拟重大资产重组，300214，“20cm”涨停",
+              "source": "数据宝",
+              "published_at": "2026-07-13 10:49:00",
+              "url": "http://finance.eastmoney.com/a/202607133803337753.html"
+            },
+            {
+              "title": "300214，重大资产重组",
+              "source": "中国基金报",
+              "published_at": "2026-07-11 15:48:00",
+              "url": "http://finance.eastmoney.com/a/202607113802507726.html"
+            }
+          ]
+        },
+        "dragon_tiger": {
+          "summary": [],
+          "evidence": []
+        },
+        "margin_trading": {
+          "summary": [],
+          "evidence": []
+        }
+      },
+      {
+        "symbol": "600992",
+        "name": "贵绳股份",
+        "announcements": {
+          "summary": [],
+          "evidence": []
+        },
+        "news": {
+          "summary": [
+            "个股新闻跟踪到：600992将补税逾2200万元！此前连涨三日; 贵绳股份600992龙虎榜数据07-10。"
+          ],
+          "evidence": [
+            {
+              "title": "600992将补税逾2200万元！此前连涨三日",
+              "source": "上海证券报",
+              "published_at": "2026-07-11 08:41:00",
+              "url": "http://finance.eastmoney.com/a/202607113802435490.html"
+            },
+            {
+              "title": "贵绳股份600992龙虎榜数据07-10",
+              "source": "东方财富Choice数据",
+              "published_at": "2026-07-10 17:14:05",
+              "url": "http://finance.eastmoney.com/a/202607103801892628.html"
+            },
+            {
+              "title": "28只股上午收盘涨停(附股)",
+              "source": "证券时报网",
+              "published_at": "2026-07-13 13:00:00",
+              "url": "http://finance.eastmoney.com/a/202607133803477237.html"
+            }
+          ]
+        },
+        "dragon_tiger": {
+          "summary": [],
+          "evidence": []
+        },
+        "margin_trading": {
+          "summary": [],
+          "evidence": []
+        }
+      }
+    ]
+  },
+  "capital_and_events": {
+    "capital": [
+      "中药Ⅲ 处于板块资金流前排。",
+      "阿尔茨海默概念 处于板块资金流前排。"
+    ],
+    "special": [
+      "龙虎榜 / 两融暂无有效摘要，继续保留为旁证层。"
+    ],
+    "catalysts": [
+      "市场资讯前排聚焦：新里程增资至33.9亿; 国家医保局、国家药监局开展跨部门联合检查。",
+      "国华退：个股新闻跟踪到：国华退000004龙虎榜数据07-10; 国华退000004龙虎榜数据07-09)。",
+      "日科化学：个股新闻跟踪到：300214，重大资产重组！周一复牌; 拟重大资产重组，300214，“20cm”涨停。"
+    ]
+  },
+  "watchlist": [
+    "观察 000004 是否继续带动 软件开发 方向强度延续。",
+    "观察 300214 是否继续带动 化学制品 方向强度延续。",
+    "观察 陇神戎发 能否继续维持 中药Ⅲ 的资金承接。"
+  ],
+  "risks": [
+    "部分公开源查询失败或已降级，复盘结论需结合次日盘口确认。",
+    "涨停池存在交易日回退或空池风险，强势股样本可能不完整。"
+  ],
+  "disclaimers": [
+    "融资融券为交易所公开源 best-effort 数据，深沪字段可能不完全一致。"
+  ],
+  "source_chain": [
+    "tencent_quote",
+    "tencent_quote",
+    "tencent_quote",
+    "tencent_quote",
+    "tencent_quote",
+    "tencent_quote",
+    "eastmoney_market_breadth",
+    "eastmoney_getTopicZTPool",
+    "eastmoney_getTopicZTPool",
+    "eastmoney_getTopicZBPool",
+    "eastmoney_getTopicDTPool",
+    "eastmoney_getYesterdayZTPool",
+    "eastmoney_clist",
+    "akshare_industry_rank",
+    "eastmoney_industry_rank",
+    "akshare_concept_rank",
+    "eastmoney_concept_rank",
+    "akshare_stock_sector_fund_flow_rank_industry",
+    "akshare_industry_rank",
+    "eastmoney_industry_rank",
+    "akshare_stock_sector_fund_flow_rank_concept",
+    "akshare_concept_rank",
+    "eastmoney_concept_rank",
+    "akshare_concept_rank_ths",
+    "eastmoney_quote_valuation",
+    "akshare_stock_financial_abstract",
+    "akshare_stock_financial_report_sina_cashflow",
+    "eastmoney_quote_valuation",
+    "akshare_stock_financial_abstract",
+    "akshare_stock_financial_report_sina_cashflow",
+    "eastmoney_quote_valuation",
+    "akshare_stock_financial_abstract",
+    "akshare_stock_financial_report_sina_cashflow",
+    "akshare_news",
+    "eastmoney_global_news",
+    "akshare_dragon_tiger",
+    "eastmoney_dragon_tiger",
+    "akshare_margin_sse",
+    "akshare_margin_szse",
+    "sentiment_heat_placeholder",
+    "akshare_announcement",
+    "akshare_news",
+    "akshare_announcement",
+    "akshare_news",
+    "akshare_announcement",
+    "akshare_news"
+  ],
+  "timestamp": "2026-07-13 08:19:40",
+  "warnings": [
+    "涨跌停池回退到最近可用交易日 20260713。",
+    "涨跌停池公开源返回空列表，可能是非交易日。",
+    "industry-rank 主源失败，尝试东财回退: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))",
+    "concept-rank 主源失败，尝试东财回退: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))",
+    "industry 资金流主源失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))",
+    "industry 资金流已回退到板块排行信号。",
+    "concept 资金流主源失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))",
+    "concept-rank 东财回退失败，尝试同花顺回退: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))",
+    "concept 资金流已回退到板块排行信号。",
+    "新闻公开源超时，尝试回退公开源: public source call timed out after 8.00s: stock_info_global_cls",
+    "龙虎榜公开源暂不可用，尝试东财回退: 'NoneType' object is not subscriptable",
+    "龙虎榜公开源返回空列表，已保留结构化空样本。",
+    "公告公开源暂不可用，已返回空列表: '000004'",
+    "公告公开源暂不可用，已返回空列表: '300214'",
+    "公告公开源暂不可用，已返回空列表: '600992'"
+  ],
+  "confidence": "低"
+}

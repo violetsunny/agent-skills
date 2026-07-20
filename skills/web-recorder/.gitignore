@@ -1,0 +1,12 @@
+# 依赖目录（分享时排除，接收者运行 npm install 安装）
+node_modules/
+
+# 日志
+*.log
+
+# 临时文件
+.tmp/
+.cache/
+
+# 录制数据（每个任务单独存储）
+tasks/
