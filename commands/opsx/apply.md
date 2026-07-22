@@ -153,3 +153,9 @@ This skill supports the "actions on a change" model:
 
 - **Can be invoked anytime**: Before all artifacts are done (if tasks exist), after partial implementation, interleaved with other actions
 - **Allows artifact updates**: If implementation reveals design issues, suggest updating artifacts - not phase-locked, work fluidly
+
+**Post-completion hook**
+
+When all tasks are done (`state: "all_done"`), use the **Skill tool** to invoke the `opsx-workflow-hooks` skill (Hook B). Do this automatically — do not wait for the user to ask.
+
+If apply is paused mid-way, do NOT invoke the hook. Wait for the user to resume.

@@ -11,7 +11,7 @@
  * 
  * Copyright (c) 2026 徐柏雄 (xubx4)
  * 反馈/交流：xubx4@midea.com | 13824820932
- */
+ *
  * 
  * Manual fallback:
  *   If auto-login fails or no credentials stored, opens headed browser
