@@ -36,8 +36,10 @@ iteration loop so the proposal converges before any implementation starts.
    Use the **AskUserQuestion tool** (open-ended, no preset options) to ask:
 
    > "Proposal complete. Do you have any new ideas, changes, or concerns you'd
-   > like to incorporate before moving to implementation? (Enter your thoughts,
-   > or say 'looks good' / 'no' to proceed.)"
+   > like to incorporate before moving to implementation? If helpful, here are
+   > one or two optional proposal prompts to react to: (1) add a missing edge
+   > case or acceptance condition, (2) simplify one implementation step or split
+   > an oversized task. Enter your thoughts, or say 'looks good' / 'no' to proceed."
 
 2. **Evaluate the response**
 
@@ -48,6 +50,31 @@ iteration loop so the proposal converges before any implementation starts.
 
    - **If the user provides new ideas or concerns:**
      - Acknowledge the input briefly (one sentence).
+     - First classify the request:
+       - **Tiny implementation change** — can be completed with a very small,
+         local code edit (`<= 5` changed lines), in one file, with no new
+         function, API, schema, task breakdown, or design change.
+       - **Artifact-level change** — anything that changes scope, design,
+         acceptance criteria, task structure, cross-file behavior, or needs more
+         than the tiny-edit threshold above.
+
+   - **If it is a tiny implementation change:**
+     - Make the small code change directly.
+     - Do NOT run `/opsx:apply` for this case.
+     - First try the agent's built-in `/review` capability for the touched
+       file(s).
+     - If `/review` cannot be used from the current execution context, fall back
+       to `java-code-review` for the touched file(s).
+     - Stop after review completes. Do NOT archive and do NOT mark apply tasks
+       complete.
+     - Report the result clearly:
+       ```
+       Applied tiny change directly — updated <file>
+       Review complete — no major issues found
+       ```
+     - Return to Step 1 and ask if the user has any other ideas.
+
+   - **If it is an artifact-level change:**
      - Identify which artifacts are affected:
        - Scope/goal changes → `proposal.md`
        - Architecture/approach changes → `design.md`
@@ -73,10 +100,13 @@ iteration loop so the proposal converges before any implementation starts.
 
 ### Guardrails
 
-- Never start implementation during this hook — that is `/opsx/apply`'s job.
+- Default to artifact iteration during this hook; only bypass `/opsx:apply` for
+  a tiny implementation change that meets the strict threshold above.
 - If the user's input is ambiguous (could be a question or a change request),
   treat it as a change request and propose an update, then ask for confirmation.
 - Surgical edits only: change exactly what the user asked for, nothing more.
+- The optional proposal prompts are aids only; they must stay within the current
+  proposal's scope and must not invent new product requirements.
 - If the user's request contradicts an existing artifact constraint, surface the
   conflict and ask which takes priority — do NOT silently average them.
 
@@ -105,23 +135,31 @@ final check.
    the review inline — this is the only reliable way to trigger review
    automatically from within a skill.
 
-   **Skill selection priority:**
+   **Review selection priority:**
 
-   1. **`gstack-review`** — the standard code review skill, covers logic,
-      security, and structural issues.
-   2. **`java-code-review`** — use IN ADDITION to `gstack-review` for
-      Java/Spring projects (load both, run `java-code-review` first per
-      project convention).
-   3. **Other review skills** — if neither above is available, use the most
+   1. **Agent built-in `/review` capability** — try this first whenever the
+      current runtime can invoke it successfully.
+   2. **`code-review`** — primary fallback for completed `/opsx:apply` work.
+      Use it when you can identify a fixed point for the implementation diff.
+      Review along both axes: repo standards and spec alignment.
+   3. **`java-code-review`** — preferred Java/Spring fallback when `/review`
+      cannot be used cleanly, when `code-review` cannot run cleanly, or when you
+      need an extra Java-focused pass on null safety, exceptions, concurrency,
+      and performance.
+   4. **Other review skills** — if none of the above is available, use the most
       specific review skill present in the workspace.
-   4. **Manual inspection** — if no review skill exists at all, read every
-      file modified during apply, cross-check each against `proposal.md` and
+   5. **Manual inspection** — if no review skill exists at all, read every file
+      modified during apply, cross-check each against `proposal.md` and
       `design.md`, and document what was checked.
 
-   **Why not `/review` slash command?** Slash commands require user input to
-   trigger; a skill cannot invoke another slash command programmatically.
-   Using the Skill tool achieves the same result without interrupting the
-   automated flow.
+   If the built-in `/review` capability is not reachable from this execution
+   path, do not block the workflow on it; fall through to the skill-based review
+   options immediately.
+
+   When using `code-review`, choose a fixed point that isolates the apply
+   implementation cleanly (for example the pre-apply HEAD, the change branch
+   base, or another resolved merge-base). If no trustworthy fixed point is
+   available, fall back to `java-code-review`.
 
    The review must cover:
 
@@ -158,8 +196,9 @@ final check.
      - Report each critical issue with its location (`file_path:line_number`
        where applicable).
       - Fix them now (minimal code change only — no scope creep).
-      - After fixing, re-run the same review method (built-in, skill, or manual)
-        scoped to the affected files only.
+      - After fixing, re-run the same review method (`/review`, `code-review`,
+        `java-code-review`, other skill, or manual) scoped to the affected files
+        only.
      - Once no CRITICAL issues remain, continue to Step 3.
 
 3. **Archive**
