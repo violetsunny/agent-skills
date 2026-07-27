@@ -17,6 +17,55 @@ description: |
 
 Post-completion behavior injected after `/opsx/propose` and `/opsx/apply`.
 
+## Bootstrap
+
+When this skill is invoked directly, first verify that the global OPSX command
+files still contain the callback hooks that re-enter this skill after OpenSpec
+commands complete. OpenSpec updates may overwrite those command files.
+
+### Bootstrap Steps
+
+1. Read these files:
+   - `~/.agents/commands/opsx/propose.md`
+   - `~/.agents/commands/opsx/apply.md`
+2. Check whether `propose.md` contains all of:
+   - `**Post-completion hook**`
+   - `opsx-workflow-hooks`
+   - `Hook A`
+3. Check whether `apply.md` contains all of:
+   - `**Post-completion hook**`
+   - `opsx-workflow-hooks`
+   - `Hook B`
+4. If either hook block is missing, initialize it immediately before doing
+   anything else.
+
+### Initialization Payload
+
+If `propose.md` is missing Hook A, append this block exactly once:
+
+```md
+**Post-completion hook**
+
+After all artifacts are created and the final status is shown, use the **Skill tool** to invoke the `opsx-workflow-hooks` skill (Hook A). Do this automatically — do not wait for the user to ask.
+```
+
+If `apply.md` is missing Hook B, append this block exactly once:
+
+```md
+**Post-completion hook**
+
+When all tasks are done (`state: "all_done"`), use the **Skill tool** to invoke the `opsx-workflow-hooks` skill (Hook B). Do this automatically — do not wait for the user to ask.
+
+If apply is paused mid-way, do NOT invoke the hook. Wait for the user to resume.
+```
+
+### Bootstrap Guardrails
+
+- This initialization is idempotent: never add the same hook block twice.
+- Prefer patching only the missing block; do not rewrite unrelated command text.
+- After patching, re-read both files and confirm the hook markers are present.
+- Only after bootstrap succeeds should the skill continue into Hook A or Hook B.
+
 ---
 
 ## Hook A — After `/opsx/propose`
@@ -50,6 +99,13 @@ iteration loop so the proposal converges before any implementation starts.
 
    - **If the user provides new ideas or concerns:**
      - Acknowledge the input briefly (one sentence).
+     - If the new input changes intent, constraints, acceptance criteria, or
+       reveals unclear assumptions, use `grill-me` first to sharpen requirement
+       understanding before deciding how to update the proposal.
+     - If the new input exposes multiple possible solution paths, unresolved
+       product tradeoffs, or a design direction that still feels under-specified,
+       use `brainstorming` to refine the proposal collaboratively before editing
+       the artifacts.
      - First classify the request:
        - **Tiny implementation change** — can be completed with a very small,
          local code edit (`<= 5` changed lines), in one file, with no new
@@ -79,6 +135,9 @@ iteration loop so the proposal converges before any implementation starts.
        - Scope/goal changes → `proposal.md`
        - Architecture/approach changes → `design.md`
        - Task breakdown changes → `tasks.md`
+     - If the proposal is conceptually stable but `tasks.md` is still too coarse
+       to execute confidently, use `writing-plans` to sharpen the implementation
+       breakdown before finalizing the updated tasks.
      - Update only the affected artifact files. Do NOT rewrite unaffected files.
      - After writing, verify the artifact is recognized by running:
        ```bash
@@ -102,6 +161,12 @@ iteration loop so the proposal converges before any implementation starts.
 
 - Default to artifact iteration during this hook; only bypass `/opsx:apply` for
   a tiny implementation change that meets the strict threshold above.
+- Use `grill-me` only when requirement understanding is materially incomplete;
+  do not turn every minor wording tweak into a long clarification session.
+- Use `brainstorming` only for genuine design or tradeoff ambiguity; once the
+  direction is already clear, update the artifacts directly.
+- Use `writing-plans` only when task granularity is the real gap; do not force
+  a full planning pass for a small artifact edit.
 - If the user's input is ambiguous (could be a question or a change request),
   treat it as a change request and propose an update, then ask for confirmation.
 - Surgical edits only: change exactly what the user asked for, nothing more.
@@ -130,10 +195,7 @@ final check.
 
    Announce: "Implementation complete. Running review before archiving…"
 
-   Use the **Skill tool** to load and execute a review skill. The Skill tool
-   loads the skill's instructions into the current context so you can perform
-   the review inline — this is the only reliable way to trigger review
-   automatically from within a skill.
+   Review in this order, stopping when the current layer is sufficient:
 
    **Review selection priority:**
 
@@ -142,10 +204,10 @@ final check.
    2. **`code-review`** — primary fallback for completed `/opsx:apply` work.
       Use it when you can identify a fixed point for the implementation diff.
       Review along both axes: repo standards and spec alignment.
-   3. **`java-code-review`** — preferred Java/Spring fallback when `/review`
-      cannot be used cleanly, when `code-review` cannot run cleanly, or when you
-      need an extra Java-focused pass on null safety, exceptions, concurrency,
-      and performance.
+   3. **`java-code-review`** — for Java/Spring projects, run this after
+      `code-review` when you need an additional Java-focused pass on null
+      safety, exceptions, concurrency, and performance. Also use it as the
+      direct fallback when `/review` or `code-review` cannot run cleanly.
    4. **Other review skills** — if none of the above is available, use the most
       specific review skill present in the workspace.
    5. **Manual inspection** — if no review skill exists at all, read every file
@@ -160,6 +222,11 @@ final check.
    implementation cleanly (for example the pre-apply HEAD, the change branch
    base, or another resolved merge-base). If no trustworthy fixed point is
    available, fall back to `java-code-review`.
+
+   For Java/Spring projects, prefer a chained review when feasible:
+   `/review` → `code-review` → `java-code-review`.
+   If the earlier layer already finds blocking issues, fix them first before
+   running the next layer.
 
    The review must cover:
 
