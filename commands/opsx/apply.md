@@ -43,7 +43,7 @@ Implement tasks from an OpenSpec change.
 
    **Handle states:**
    - If `state: "blocked"` (missing artifacts): show message, suggest using `/opsx:continue`
-   - If `state: "all_done"`: congratulate, suggest archive
+   - If `state: "all_done"`: immediately invoke Hook B; do not suggest manual archive
    - Otherwise: proceed to implementation
 
    **Workspace guard:** If status JSON reports `actionContext.mode: "workspace-planning"` and `allowedEditRoots` is empty, explain that full workspace apply is not supported in this slice. Treat linked repos and folders as read-only context, ask the user to select an affected area through an explicit implementation workflow, and STOP before editing files.
@@ -80,10 +80,24 @@ Implement tasks from an OpenSpec change.
 
 7. **On completion or pause, show status**
 
+   Before showing the final status, always re-run:
+   ```bash
+   openspec instructions apply --change "<name>" --json
+   ```
+
+   Use the returned `state` as the only completion signal. Do not infer
+   completion from the checkbox count or from `N/M tasks complete`.
+
+   - If `state: "all_done"`, immediately use the **Skill tool** to invoke
+     `opsx-workflow-hooks` (Hook B). Do not end the response after suggesting
+     `/opsx:archive`.
+   - If the state is not `all_done`, report the actual state and stop. This is
+     a paused or blocked apply; do not invoke Hook B.
+
    Display:
    - Tasks completed this session
    - Overall progress: "N/M tasks complete"
-   - If all done: suggest archive
+   - If `state: "all_done"`: run Hook B before displaying the archive summary
    - If paused: explain why and wait for guidance
 
 **Output During Implementation**
@@ -114,7 +128,8 @@ Working on task 4/7: <task description>
 - [x] Task 2
 ...
 
-All tasks complete! You can archive this change with `/opsx:archive`.
+All tasks complete! The completion state was re-checked as `all_done`; Hook B
+is running review, verification, and archive now.
 ```
 
 **Output On Pause (Issue Encountered)**
@@ -156,6 +171,11 @@ This skill supports the "actions on a change" model:
 
 **Post-completion hook**
 
-When all tasks are done (`state: "all_done"`), use the **Skill tool** to invoke the `opsx-workflow-hooks` skill (Hook B). Do this automatically — do not wait for the user to ask.
+After the final task is marked complete, re-run `openspec instructions apply
+--change "<name>" --json`. Only when that command returns
+`state: "all_done"`, immediately use the **Skill tool** to invoke the
+`opsx-workflow-hooks` skill (Hook B). The hook invocation is part of the apply
+command; do not finish with a suggestion to archive manually.
 
-If apply is paused mid-way, do NOT invoke the hook. Wait for the user to resume.
+If the re-check returns any other state, do not invoke the hook. Report the
+state and wait for the user to resume or resolve the blocker.

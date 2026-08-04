@@ -54,7 +54,11 @@ If `apply.md` is missing Hook B, append this block exactly once:
 ```md
 **Post-completion hook**
 
-When all tasks are done (`state: "all_done"`), use the **Skill tool** to invoke the `opsx-workflow-hooks` skill (Hook B). Do this automatically — do not wait for the user to ask.
+After the final task is marked complete, re-run `openspec instructions apply
+--change "<name>" --json`. Only when that command returns
+`state: "all_done"`, immediately use the **Skill tool** to invoke the
+`opsx-workflow-hooks` skill (Hook B). Do not finish with a suggestion to archive
+manually.
 
 If apply is paused mid-way, do NOT invoke the hook. Wait for the user to resume.
 ```
@@ -65,6 +69,19 @@ If apply is paused mid-way, do NOT invoke the hook. Wait for the user to resume.
 - Prefer patching only the missing block; do not rewrite unrelated command text.
 - After patching, re-read both files and confirm the hook markers are present.
 - Only after bootstrap succeeds should the skill continue into Hook A or Hook B.
+
+### Bootstrap Reliability Enhancement
+
+Hook injection presence does not guarantee hook execution after a long apply
+session. In addition to the end-of-file hook block, ensure `apply.md` contains
+an inline reminder at the `state: "all_done"` handling point:
+
+```md
+   - If `state: "all_done"`: immediately invoke Hook B; do not suggest manual archive
+```
+
+This places the invocation where the model is actively processing completion,
+instead of relying only on a footer it may not revisit.
 
 ---
 
@@ -214,9 +231,13 @@ implementation starts.
 
 ## Hook B — After `/opsx/apply`
 
-**Trigger:** `/opsx/apply` has finished AND `state: "all_done"` — every task is
-checked off. **Do NOT trigger if apply paused mid-way** (`state: "paused"` or
-partial progress); in that case, wait for the user to resume and complete apply.
+**Trigger:** The apply command has re-run
+`openspec instructions apply --change "<name>" --json` after the final task and
+the result contains `state: "all_done"`. The apply command must invoke this
+skill immediately after that confirmation. A checkbox count or a
+`N/M tasks complete` message is not sufficient evidence. **Do NOT trigger if
+the re-check returns any other state**; wait for the user to resume or resolve
+the blocker.
 
 ### Purpose
 
@@ -235,7 +256,9 @@ then archival.
    **Review selection priority:**
 
    1. **Agent built-in `/review` capability** — try this first whenever the
-      current runtime can invoke it successfully.
+      current runtime can invoke it successfully. If it is exposed as a slash
+      command, use the **Task tool** with `/review` as the complete prompt;
+      do not merely print `/review` as text.
    2. **`code-review`** — primary fallback for completed `/opsx:apply` work.
       Use it when you can identify a fixed point for the implementation diff.
       Review along both axes: repo standards and spec alignment.
@@ -322,8 +345,9 @@ then archival.
 
    Announce: "Review passed. Verifying change before archive…"
 
-   Run `/opsx:verify` for the same change. Verification must confirm the change
-   artifacts and implementation still line up before archival.
+    Use the **Task tool** to execute `/opsx:verify <name>` for the same change.
+    Do not merely print the command as text. Verification must confirm the
+    change artifacts and implementation still line up before archival.
 
    If verification reports drift, missing spec updates, or incomplete task
    closure, stop, fix the issue, and re-run verification before continuing.
@@ -332,8 +356,9 @@ then archival.
 
    Announce: "Review passed. Archiving change…"
 
-   Execute `/opsx/archive` for the same change name already known from the
-   apply session. Do NOT ask the user for the change name again.
+    Use the **Task tool** to execute `/opsx:archive <name>` for the same change
+    name already known from the apply session. Do NOT ask the user for the
+    change name again or merely print the command as a suggestion.
 
    The archive command will handle: delta-spec sync check, task completion
    check, directory move, and summary output. Let it run to completion.
@@ -348,7 +373,11 @@ Workflow complete: propose → apply → review → verify → archive
 
 ### Guardrails
 
-- Only trigger when `state: "all_done"`. If apply is paused, do nothing.
+- Trust only the post-task CLI re-check supplied by `/opsx/apply`; never infer
+  `all_done` from task checkboxes or the final progress text.
+- Only proceed when that re-check explicitly contains `state: "all_done"`.
+- If the re-check is missing or contains another state, stop and report that
+  Hook B was not run; do not review or archive.
 - Never skip the review step, even if the implementation looks clean.
 - Never skip verification before archive.
 - Never archive with unresolved CRITICAL issues.
