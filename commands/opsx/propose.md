@@ -106,6 +106,8 @@ After completing all artifacts, summarize:
 - If a change with that name already exists, ask if user wants to continue it or create a new one
 - Verify each artifact file exists after writing before proceeding to next
 
+<!-- OPSX IMMUTABLE BOUNDARY: original command content above this line must not be modified -->
+
 **Post-completion hook**
 
 After all artifacts are created and the final status is shown, use the **Skill tool** to invoke the `opsx-workflow-hooks` skill (Hook A). Do this automatically — do not wait for the user to ask.
