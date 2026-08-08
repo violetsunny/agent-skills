@@ -427,47 +427,75 @@ Enforce layered review, explicit verification, and only then archival.
 
    - **No CRITICAL issues:**
      - If there are WARNINGs, list them and ask the user whether to fix them
-       now or proceed.
-     - Once the user decides, continue to Step 3.
+       now or keep them as known risk before self-test.
+     - Then stop and hand control to the user for self-test.
 
    - **One or more CRITICAL issues:**
-     - Do NOT proceed to archive.
+     - Do NOT proceed to self-test or archive.
      - Report each critical issue with its location (`file_path:line_number`
        where applicable).
      - Fix them now (minimal code change only — no scope creep).
      - After fixing, re-run the same review method (`/review`, `code-review`,
        `java-code-review`, other skill, or manual) scoped to the affected files
        only.
-     - Once no CRITICAL issues remain, continue to Step 3.
+     - Once no CRITICAL issues remain, stop and hand control to the user for
+       self-test.
 
-3. **Verify the change**
+3. **Hand off for self-test**
 
-    Announce: "Review passed. Verifying change before archive…"
+   Announce: "Review complete. Please self-test this change. After you confirm
+   self-test passes, I will run verify and archive."
 
-    Use the **Task tool** to execute `/opsx:verify <name>` for the same change.
-    Do not merely print the command as text. Verification must confirm the
-    change artifacts and implementation still line up before archival.
+   Use this exact structure:
+
+   ```
+   ## Review Complete: <change-name>
+
+   ### Need To Fix
+   - <critical fixes applied, or `None`>
+
+   ### Current Problem
+   - <remaining warning or known risk, or `None`>
+
+   ### Fix Logic
+   - <final reviewed logic>
+
+   ### Still Need Confirmation
+   - Self-test result from the user
+   ```
+
+   Stop here. Do NOT run `/opsx:verify` or `/opsx:archive` until the user says
+   self-test passed.
+
+4. **After user confirms self-test passed, verify the change**
+
+   Announce: "Self-test passed. Verifying change before archive…"
+
+   Use the **Task tool** to execute `/opsx:verify <name>` for the same change.
+   Do not merely print the command as text. Verification must confirm the
+   change artifacts and implementation still line up before archival.
 
    If verification reports drift, missing spec updates, or incomplete task
-   closure, stop, fix the issue, and re-run verification before continuing.
+   closure, stop, fix the issue, and ask the user to self-test again before
+   continuing.
 
-4. **Archive**
+5. **Archive**
 
-    Announce: "Review passed. Archiving change…"
+   Announce: "Verification passed. Archiving change…"
 
-    Use the **Task tool** to execute `/opsx:archive <name>` for the same change
-    name already known from the apply session. Do NOT ask the user for the
-    change name again or merely print the command as a suggestion.
+   Use the **Task tool** to execute `/opsx:archive <name>` for the same change
+   name already known from the apply session. Do NOT ask the user for the
+   change name again or merely print the command as a suggestion.
 
    The archive command will handle: delta-spec sync check, task completion
    check, directory move, and summary output. Let it run to completion.
 
-5. **Confirm completion**
+6. **Confirm completion**
 
    Print the archive summary from `/opsx/archive`, then append:
 
    ```
-Workflow complete: propose → apply → review → verify → archive
+Workflow complete: propose → apply → review → self-test → verify → archive
    ```
 
 ### Guardrails
@@ -478,9 +506,13 @@ Workflow complete: propose → apply → review → verify → archive
 - If the re-check is missing or contains another state, stop and report that
   Hook B was not run; do not review or archive.
 - Never skip the review step, even if the implementation looks clean.
+- After review passes, stop for user self-test. Do not auto-run verify or
+  archive before the user confirms self-test passed.
 - Never skip verification before archive.
 - Never archive with unresolved CRITICAL issues.
 - WARNING-level issues require a user decision — do not silently ignore or
   silently fix them.
+- If verification or post-review fixes change runtime behavior, require another
+  user self-test confirmation before archive.
 - If `/opsx/archive` fails (e.g., archive already exists), surface the error
   and options to the user; do not force-proceed.
