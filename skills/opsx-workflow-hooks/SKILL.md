@@ -19,11 +19,41 @@ Post-completion behavior injected after `/opsx/propose` and `/opsx/apply`.
 
 ## Bootstrap
 
-When invoked directly, first verify that the OPSX command files still contain
-the callback hooks that re-enter this skill after OpenSpec commands complete.
-OpenSpec updates may overwrite those command files.
+The OPSX command files (`propose.md`, `apply.md`) carry callback hooks that
+re-enter this skill after OpenSpec commands complete. OpenSpec updates may
+overwrite those command files. To avoid re-checking on every use, bootstrap
+verification is gated by a fingerprint cache: it runs only on initial setup or
+when this skill file changes — not on every invocation.
+
+### When to verify
+
+- **Initial setup** — no fingerprint on record → run full verification.
+- **SKILL.md changed** — stored fingerprint differs → run full verification.
+- **Normal use** — stored fingerprint matches → skip verification, proceed
+  directly to Hook A or Hook B.
+
+### Fingerprint Cache
+
+The fingerprint is a SHA-256 of the runtime copy of this skill file
+(`~/.agents/skills/opsx-workflow-hooks/SKILL.md`). The marker is stored at
+`~/.agents/commands/opsx/.hooks-bootstrap-fp` alongside the runtime command
+copies.
 
 ### Bootstrap Steps
+
+1. Compute the current fingerprint:
+   ```bash
+   shasum -a 256 ~/.agents/skills/opsx-workflow-hooks/SKILL.md | cut -d' ' -f1
+   ```
+2. Read the stored fingerprint from
+   `~/.agents/commands/opsx/.hooks-bootstrap-fp` (empty/absent if first run).
+3. If the stored fingerprint **exists and matches** the current one, bootstrap
+   is satisfied — skip to Hook A or Hook B. Do not re-read, re-diff, or modify
+   the command files during normal use.
+4. If the marker is **missing or the fingerprint differs**, run the Full
+   Verification below, then write the new fingerprint to the marker file.
+
+### Full Verification (initial setup or skill-file change)
 
 1. Read these files as two synchronized pairs:
    - Project source: `agent-skills/commands/opsx/propose.md`
@@ -51,6 +81,10 @@ OpenSpec updates may overwrite those command files.
    is not byte-identical, treat that as a stale-copy problem and sync the stale
    side by restoring the matching Hook tail. Do not continue until both pairs
    match.
+6. After verification succeeds, write the current fingerprint to
+   `~/.agents/commands/opsx/.hooks-bootstrap-fp` so subsequent normal-use
+   invocations can skip this step. Only cache a fully successful pass — never
+   write the marker after a failed or partial verification.
 
 ### Initialization Payload
 
@@ -101,6 +135,12 @@ If apply is paused mid-way, do NOT invoke the hook. Wait for the user to resume.
 - Never assume runtime is canonical. A stale project-source copy is equally
   dangerous because a later sync can overwrite a healthy runtime file.
 - Only after bootstrap succeeds should the skill continue into Hook A or Hook B.
+- During normal use (fingerprint cache hit), do not read, diff, or modify the
+  command files — the hooks are assumed intact.
+- Never write the fingerprint marker unless a Full Verification just completed
+  successfully.
+- If the marker file is deleted manually, the next invocation treats it as
+  initial setup and re-runs Full Verification.
 
 ### Bootstrap Reliability Enhancement
 
