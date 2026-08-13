@@ -6,9 +6,13 @@ description: |
     artifacts — runs requirement clarification and proposal refinement across
     grill-me, brainstorming, and writing-plans before locking the change.
   - Trigger B: immediately after /opsx/apply completes ALL tasks (state:
-    all_done) — runs /review first, then code-review and java-code-review as
-    needed, verifies the change, and archives it. Does NOT trigger when apply
-    is paused mid-way.
+    all_done) — first classify whether the completed diff contains code changes
+    or only docs/comments/proposal-style edits. Only code changes run `tdd`
+    and `test-quality` to validate changed methods and interfaces. Then run
+    /review first, then code-review and java-code-review as needed, fix
+    blocking issues, hand off for user self-test, and only after the user
+    confirms self-test passes, verify and archive the change. Does NOT trigger
+    when apply is paused mid-way.
   Use when "/opsx/propose is done", "proposal artifacts created", "all tasks
   complete after apply", "apply finished", or "implementation complete".
 ---
@@ -153,7 +157,7 @@ without changing the original state handling or output template above it.
 
 ## Phase Map
 
-Use this skill as the orchestration layer across a seven-stage workflow:
+Use this skill as the orchestration layer across an eight-stage workflow:
 
 | Phase | Goal | Primary tools | Exit standard |
 | --- | --- | --- | --- |
@@ -161,12 +165,15 @@ Use this skill as the orchestration layer across a seven-stage workflow:
 | 1 | Spec solidification and change creation | `to-spec`, OpenSpec propose artifacts | `proposal` / `design` / `tasks` / schema-required spec artifacts are aligned |
 | 2 | Architecture decisions and task atomization | `brainstorming`, `writing-plans` | Tasks fully cover specs with no gaps or speculative extras |
 | 3 | Implementation execution and process control | `/opsx:apply`, Superpowers execution patterns | Code and tests implemented task by task |
-| 4 | Boundary strengthening via tests | TDD + Java-specific edge-case checks | Extreme-path and failure-path tests are present where needed |
+| 4 | Boundary strengthening via tests | `tdd` + `test-quality` for code changes only | Changed methods/interfaces and edge paths are verified when executable code changed |
 | 5 | Layered code review | `/review`, `code-review`, `java-code-review` | Design and code-quality issues are separated and resolved |
-| 6 | Verification and archive handoff | `/opsx:verify`, `/opsx:archive` | Change is verified, archived, and traceable |
+| 6 | User self-test checkpoint | User manual testing | User confirms the implementation passes their own testing |
+| 7 | Verification and archive handoff | `/opsx:verify`, `/opsx:archive` | Change is verified, archived, and traceable |
 
-Hook A primarily governs phases 0-2. Hook B primarily governs phases 5-6 after
-phase 3-4 implementation is complete.
+Hook A primarily governs phases 0-2. Hook B primarily governs phases 5-7 after
+phase 3-4 implementation is complete. Between phase 5 (review) and phase 7
+(verify + archive), the user performs manual self-testing; Hook B must stop and
+wait for the user to confirm self-test passed before proceeding.
 
 ---
 
@@ -391,11 +398,45 @@ the blocker.
 
 ### Purpose
 
-Enforce layered review, explicit verification, and only then archival.
+Enforce change-type-aware validation, layered review, explicit verification,
+and only then archival.
 
 ### Steps
 
-1. **Run the review**
+1. **Classify the completed change**
+
+   Inspect the `/opsx:apply` diff before choosing validation depth.
+
+   Use these categories:
+
+   - **Code-level change** — executable source code, tests, schemas, API
+     contracts, controller/service/repository logic, method signatures,
+     interface definitions, request/response models, SQL, or configuration that
+     changes runtime behavior.
+   - **Non-code change** — only `proposal.md`, `design.md`, `tasks.md`, spec
+     wording, Markdown docs, knowledge notes, or comment-only edits that do not
+     change executable statements, signatures, contracts, or runtime behavior.
+   - **Mixed change** — if both appear, classify the whole change as
+     **code-level**.
+
+   Do not classify by file extension alone. For example, edits inside a `.java`
+   file are still **non-code** if they change comments only and do not affect
+   method bodies, signatures, interfaces, schemas, or behavior.
+
+2. **Run targeted validation before review**
+
+   - **If the change is code-level:**
+     - Run `tdd` to verify the changed methods, interfaces, and important
+       failure or edge paths have test coverage.
+     - For Java code, also run `test-quality` to strengthen JUnit 5 and AssertJ
+       tests around the touched methods and interfaces.
+     - Execute the relevant project test command if one exists.
+   - **If the change is non-code:**
+     - Skip `tdd` and `test-quality`.
+     - Validate that the updated docs/comments/proposal text stay consistent
+       with the implemented behavior and current `proposal.md` / `design.md`.
+
+3. **Run the review**
 
    Announce: "Implementation complete. Running review before archiving…"
 
@@ -445,9 +486,10 @@ Enforce layered review, explicit verification, and only then archival.
    - **Logic correctness** — does the implementation match the intent in
      `proposal.md` and `design.md`?
    - **Edge cases** — are obvious failure paths handled?
-   - **Task completeness** — does every checked-off task have corresponding code?
-   - **No regressions** — do existing tests still pass (run the project's test
-     command if one is available)?
+    - **Task completeness** — does every checked-off task have corresponding code?
+    - **No regressions** — for code-level changes, do existing tests still pass
+      (run the project's test command if one is available)? For non-code
+      changes, confirm no executable behavior was altered implicitly.
 
    Present findings in this format:
 
@@ -463,7 +505,7 @@ Enforce layered review, explicit verification, and only then archival.
    <overall assessment — one or two sentences>
    ```
 
-2. **Act on findings**
+4. **Act on findings**
 
    - **No CRITICAL issues:**
      - If there are WARNINGs, list them and ask the user whether to fix them
@@ -481,7 +523,7 @@ Enforce layered review, explicit verification, and only then archival.
      - Once no CRITICAL issues remain, stop and hand control to the user for
        self-test.
 
-3. **Hand off for self-test**
+5. **Hand off for self-test**
 
    Announce: "Review complete. Please self-test this change. After you confirm
    self-test passes, I will run verify and archive."
@@ -507,7 +549,7 @@ Enforce layered review, explicit verification, and only then archival.
    Stop here. Do NOT run `/opsx:verify` or `/opsx:archive` until the user says
    self-test passed.
 
-4. **After user confirms self-test passed, verify the change**
+6. **After user confirms self-test passed, verify the change**
 
    Announce: "Self-test passed. Verifying change before archive…"
 
@@ -519,7 +561,7 @@ Enforce layered review, explicit verification, and only then archival.
    closure, stop, fix the issue, and ask the user to self-test again before
    continuing.
 
-5. **Archive**
+7. **Archive**
 
    Announce: "Verification passed. Archiving change…"
 
@@ -530,7 +572,7 @@ Enforce layered review, explicit verification, and only then archival.
    The archive command will handle: delta-spec sync check, task completion
    check, directory move, and summary output. Let it run to completion.
 
-6. **Confirm completion**
+8. **Confirm completion**
 
    Print the archive summary from `/opsx/archive`, then append:
 
@@ -545,6 +587,14 @@ Workflow complete: propose → apply → review → self-test → verify → arc
 - Only proceed when that re-check explicitly contains `state: "all_done"`.
 - If the re-check is missing or contains another state, stop and report that
   Hook B was not run; do not review or archive.
+- Only invoke `tdd` and `test-quality` when the diff contains a code-level
+  change. Never force them for pure knowledge notes, proposal/design/task docs,
+  Markdown updates, or comment-only edits.
+- Comment-only edits inside source files are still non-code changes unless a
+  method body, signature, interface contract, schema, or runtime config also
+  changed.
+- If the diff mixes code and non-code edits, classify the whole change as
+  code-level and use the code validation branch.
 - Never skip the review step, even if the implementation looks clean.
 - After review passes, stop for user self-test. Do not auto-run verify or
   archive before the user confirms self-test passed.

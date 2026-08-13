@@ -41,10 +41,10 @@ Implement tasks from an OpenSpec change.
    - Task list with status
    - Dynamic instruction based on current state
 
-   **Handle states:**
-   - If `state: "blocked"` (missing artifacts): show message, suggest using `/opsx:continue`
-   - If `state: "all_done"`: immediately invoke Hook B; do not suggest manual archive
-   - Otherwise: proceed to implementation
+    **Handle states:**
+    - If `state: "blocked"` (missing artifacts): show message, suggest using `/opsx:continue`
+    - If `state: "all_done"`: immediately invoke Hook B; do not suggest manual archive
+    - Otherwise: proceed to implementation
 
    **Workspace guard:** If status JSON reports `actionContext.mode: "workspace-planning"` and `allowedEditRoots` is empty, explain that full workspace apply is not supported in this slice. Treat linked repos and folders as read-only context, ask the user to select an affected area through an explicit implementation workflow, and STOP before editing files.
 
@@ -94,11 +94,11 @@ Implement tasks from an OpenSpec change.
    - If the state is not `all_done`, report the actual state and stop. This is
      a paused or blocked apply; do not invoke Hook B.
 
-   Display:
-   - Tasks completed this session
-   - Overall progress: "N/M tasks complete"
-   - If `state: "all_done"`: run Hook B before displaying the archive summary
-   - If paused: explain why and wait for guidance
+    Display:
+    - Tasks completed this session
+    - Overall progress: "N/M tasks complete"
+    - If `state: "all_done"`: run Hook B before displaying the archive summary
+    - If paused: explain why and wait for guidance
 
 **Output During Implementation**
 
@@ -129,7 +129,9 @@ Working on task 4/7: <task description>
 ...
 
 All tasks complete! The completion state was re-checked as `all_done`; Hook B
-is running review, verification, and archive now.
+is now classifying the diff, running `tdd` and `test-quality` only if code
+changed, then continuing through review, self-test handoff, verification, and
+archive.
 ```
 
 **Output On Pause (Issue Encountered)**
@@ -176,8 +178,11 @@ This skill supports the "actions on a change" model:
 After the final task is marked complete, re-run `openspec instructions apply
 --change "<name>" --json`. Only when that command returns
 `state: "all_done"`, immediately use the **Skill tool** to invoke the
-`opsx-workflow-hooks` skill (Hook B). The hook invocation is part of the apply
-command; do not finish with a suggestion to archive manually.
+`opsx-workflow-hooks` skill (Hook B). Hook B will first classify whether the
+completed diff contains code changes or only docs/comments/proposal-style
+edits. Only code changes run `tdd` and `test-quality` to validate changed
+methods and interfaces before the review flow continues. The hook invocation is
+part of the apply command; do not finish with a suggestion to archive manually.
 
 If the re-check returns any other state, do not invoke the hook. Report the
 state and wait for the user to resume or resolve the blocker.
