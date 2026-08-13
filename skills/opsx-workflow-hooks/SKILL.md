@@ -112,10 +112,14 @@ If `apply.md` is missing Hook B, append this block exactly once:
 After the final task is marked complete, re-run `openspec instructions apply
 --change "<name>" --json`. Only when that command returns
 `state: "all_done"`, immediately use the **Skill tool** to invoke the
-`opsx-workflow-hooks` skill (Hook B). Do not finish with a suggestion to archive
-manually.
+`opsx-workflow-hooks` skill (Hook B). Hook B will first classify whether the
+completed diff contains code changes or only docs/comments/proposal-style
+edits. Only code changes run `tdd` and `test-quality` to validate changed
+methods and interfaces before the review flow continues. Do not finish with a
+suggestion to archive manually.
 
-If apply is paused mid-way, do NOT invoke the hook. Wait for the user to resume.
+If the re-check returns any other state, do not invoke the hook. Report the
+state and wait for the user to resume or resolve the blocker.
 ```
 
 ### Bootstrap Guardrails
