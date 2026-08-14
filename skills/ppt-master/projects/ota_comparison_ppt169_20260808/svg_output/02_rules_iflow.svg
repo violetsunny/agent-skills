@@ -1,0 +1,114 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 720" data-pptx-page-role="content" font-family="Microsoft YaHei, Arial, sans-serif">
+
+  <g id="page-title" data-pptx-bounds="60 50 1160 70">
+    <text x="60" y="92" font-size="42" font-weight="bold" fill="#1A5F7A">OTA 升级规则与 IFLOW 审批要点</text>
+    <line x1="60" y1="112" x2="1220" y2="112" stroke="#1A5F7A" stroke-width="2"/>
+  </g>
+
+  <line id="column-divider" data-pptx-role="decoration" x1="605" y1="150" x2="605" y2="660" stroke="#E0E0E0" stroke-width="1"/>
+
+  <g id="rules-section" data-pptx-bounds="60 140 530 520">
+    <rect x="60" y="155" width="4" height="28" fill="#1A5F7A"/>
+    <text x="80" y="178" font-size="32" font-weight="bold" fill="#1A5F7A">升级规则</text>
+    <line x1="60" y1="195" x2="590" y2="195" stroke="#E0E0E0" stroke-width="1"/>
+
+    <g id="rule-1">
+      <use data-icon="tabler-outline/x" x="70" y="220" width="24" height="24" fill="#E8723C" stroke-width="2"/>
+      <text x="105" y="238" font-size="20" fill="#2D3436">整包不能升分包，分包不能升整包</text>
+    </g>
+
+    <g id="rule-2">
+      <use data-icon="tabler-outline/database" x="70" y="270" width="24" height="24" fill="#1A5F7A" stroke-width="2"/>
+      <text x="105" y="288" font-size="20" fill="#2D3436">获取升级包做黑白名单和限流</text>
+    </g>
+
+    <g id="rule-3">
+      <use data-icon="tabler-outline/check" x="70" y="320" width="24" height="24" fill="#1A5F7A" stroke-width="2"/>
+      <text x="105" y="338" font-size="20" fill="#2D3436">版本校验条件</text>
+    </g>
+
+    <g id="formula-box">
+      <rect x="90" y="358" width="480" height="80" fill="#F5F7FA" stroke="#E0E0E0" stroke-width="1"/>
+      <text x="110" y="390" font-size="20" fill="#2D3436">currentVersion ≥ minVersion</text>
+      <text x="110" y="420" font-size="20" fill="#2D3436">&amp;&amp; currentVersion &lt; upgradeVersion</text>
+    </g>
+
+    <g id="ota1-version-check">
+      <rect x="60" y="465" width="4" height="28" fill="#1A5F7A"/>
+      <text x="80" y="488" font-size="22" font-weight="bold" fill="#1A5F7A">OTA1 版本校验</text>
+      <line x1="60" y1="503" x2="590" y2="503" stroke="#E0E0E0" stroke-width="1"/>
+      <rect x="90" y="518" width="480" height="80" fill="#F5F7FA" stroke="#E0E0E0" stroke-width="1"/>
+      <text x="110" y="550" font-size="20" fill="#2D3436">currentVersion ≥ avail_version</text>
+      <text x="110" y="580" font-size="20" fill="#2D3436">AND currentVersion &gt; version</text>
+    </g>
+  </g>
+
+  <g id="status-flow-section" data-pptx-bounds="620 140 600 180">
+    <rect x="620" y="155" width="4" height="28" fill="#1A5F7A"/>
+    <text x="640" y="178" font-size="32" font-weight="bold" fill="#1A5F7A">升级状态流转</text>
+    <line x1="620" y1="195" x2="1220" y2="195" stroke="#E0E0E0" stroke-width="1"/>
+
+    <g id="state-5">
+      <rect x="628" y="220" width="95" height="55" fill="#1A5F7A"/>
+      <text x="675" y="245" font-size="22" font-weight="bold" fill="#FFFFFF" text-anchor="middle">5</text>
+      <text x="675" y="265" font-size="18" fill="#FFFFFF" text-anchor="middle">下载中</text>
+    </g>
+    <use data-icon="tabler-outline/arrow-right" x="730" y="237" width="22" height="22" fill="#2D3436" stroke-width="2"/>
+
+    <g id="state-1">
+      <rect x="758" y="220" width="95" height="55" fill="#FFFFFF" stroke="#1A5F7A" stroke-width="2"/>
+      <text x="805" y="245" font-size="22" font-weight="bold" fill="#1A5F7A" text-anchor="middle">1</text>
+      <text x="805" y="265" font-size="18" fill="#2D3436" text-anchor="middle">下载完成</text>
+    </g>
+    <use data-icon="tabler-outline/arrow-right" x="860" y="237" width="22" height="22" fill="#2D3436" stroke-width="2"/>
+
+    <g id="state-4">
+      <rect x="888" y="220" width="95" height="55" fill="#FFFFFF" stroke="#1A5F7A" stroke-width="2"/>
+      <text x="935" y="245" font-size="22" font-weight="bold" fill="#1A5F7A" text-anchor="middle">4</text>
+      <text x="935" y="265" font-size="18" fill="#2D3436" text-anchor="middle">升级中</text>
+    </g>
+    <use data-icon="tabler-outline/arrow-right" x="990" y="237" width="22" height="22" fill="#2D3436" stroke-width="2"/>
+
+    <g id="state-2">
+      <rect x="1018" y="220" width="95" height="55" fill="#2D6A4F"/>
+      <text x="1065" y="245" font-size="22" font-weight="bold" fill="#FFFFFF" text-anchor="middle">2</text>
+      <text x="1065" y="265" font-size="18" fill="#FFFFFF" text-anchor="middle">升级完成</text>
+    </g>
+    <use data-icon="tabler-outline/arrow-right" x="1120" y="237" width="22" height="22" fill="#2D3436" stroke-width="2"/>
+
+    <g id="state-0">
+      <rect x="1148" y="220" width="65" height="55" fill="#FFFFFF" stroke="#2D6A4F" stroke-width="2"/>
+      <text x="1180" y="245" font-size="22" font-weight="bold" fill="#2D6A4F" text-anchor="middle">0</text>
+      <text x="1180" y="265" font-size="18" fill="#2D3436" text-anchor="middle">无更新</text>
+    </g>
+  </g>
+
+  <g id="iflow-section" data-pptx-bounds="620 320 600 350">
+    <rect x="620" y="325" width="4" height="28" fill="#E8723C"/>
+    <text x="640" y="348" font-size="32" font-weight="bold" fill="#E8723C">IFLOW 审批注意</text>
+    <line x1="620" y1="365" x2="1220" y2="365" stroke="#E0E0E0" stroke-width="1"/>
+
+    <g id="iflow-point-1">
+      <use data-icon="tabler-outline/file-check" x="630" y="390" width="24" height="24" fill="#1A5F7A" stroke-width="2"/>
+      <text x="665" y="408" font-size="20" fill="#2D3436">核对固件信息，有异常则驳回</text>
+    </g>
+
+    <g id="iflow-point-2">
+      <use data-icon="tabler-outline/alert-triangle" x="630" y="440" width="24" height="24" fill="#E8723C" stroke-width="2"/>
+      <text x="665" y="458" font-size="20" fill="#2D3436">审批通过后关注美信群机器人消息</text>
+      <g id="status-legend">
+        <rect x="665" y="472" width="14" height="14" fill="#2D6A4F"/>
+        <text x="685" y="485" font-size="18" fill="#2D3436">绿色 = 正常</text>
+        <rect x="800" y="472" width="14" height="14" fill="#E8723C"/>
+        <text x="820" y="485" font-size="18" fill="#2D3436">紫红色 = 异常</text>
+      </g>
+    </g>
+
+    <g id="iflow-point-3">
+      <use data-icon="tabler-outline/refresh" x="630" y="515" width="24" height="24" fill="#1A5F7A" stroke-width="2"/>
+      <text x="665" y="533" font-size="20" fill="#2D3436">非首次灰度需先在控制台下线</text>
+      <text x="665" y="558" font-size="20" fill="#2D3436">已有灰度发版</text>
+    </g>
+  </g>
+
+</svg>

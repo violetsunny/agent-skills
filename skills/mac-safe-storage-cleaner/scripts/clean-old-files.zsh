@@ -78,19 +78,29 @@ delete_temp_files() {
 
   age_days=$(temp_age_days "$dir") || return 1
 
+  # 管道执行时 stdin 已 EOF，sudo 无法交互读密码。先检测 NOPASSWD 是否可用。
+  local use_sudo=""
+  if sudo -n true 2>/dev/null; then
+    use_sudo="sudo"
+  fi
+
   case "$dir" in
     "/private/tmp")
-      sudo find "$dir" -mindepth 1 \
+      $use_sudo find "$dir" -mindepth 1 \
         \( -path "$dir/com.apple.launchd.*" -o -path "$dir/com.apple.launchd.*/*" \
         -o -path "$dir/TemporaryItems" -o -path "$dir/TemporaryItems/*" \) -prune \
-        -o -type f -mtime +"$age_days" -delete
+        -o -type f -mtime +"$age_days" -delete 2>/dev/null
       ;;
     "/private/var/tmp")
-      sudo find "$dir" -mindepth 1 \
+      $use_sudo find "$dir" -mindepth 1 \
         \( -path "$dir/com.apple.launchd.*" -o -path "$dir/com.apple.launchd.*/*" \) -prune \
-        -o -type f -mtime +"$age_days" -delete
+        -o -type f -mtime +"$age_days" -delete 2>/dev/null
       ;;
   esac
+
+  if [[ -z "$use_sudo" ]]; then
+    echo "  [提示] $dir：未配置 NOPASSWD sudo，仅清理了当前用户可访问的文件。root 拥有的旧文件需手动执行 sudo 清理。"
+  fi
 }
 
 is_allowed_under_protected() {

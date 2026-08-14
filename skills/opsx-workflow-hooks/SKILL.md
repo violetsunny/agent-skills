@@ -23,41 +23,11 @@ Post-completion behavior injected after `/opsx/propose` and `/opsx/apply`.
 
 ## Bootstrap
 
-The OPSX command files (`propose.md`, `apply.md`) carry callback hooks that
-re-enter this skill after OpenSpec commands complete. OpenSpec updates may
-overwrite those command files. To avoid re-checking on every use, bootstrap
-verification is gated by a fingerprint cache: it runs only on initial setup or
-when this skill file changes — not on every invocation.
-
-### When to verify
-
-- **Initial setup** — no fingerprint on record → run full verification.
-- **SKILL.md changed** — stored fingerprint differs → run full verification.
-- **Normal use** — stored fingerprint matches → skip verification, proceed
-  directly to Hook A or Hook B.
-
-### Fingerprint Cache
-
-The fingerprint is a SHA-256 of the runtime copy of this skill file
-(`~/.agents/skills/opsx-workflow-hooks/SKILL.md`). The marker is stored at
-`~/.agents/commands/opsx/.hooks-bootstrap-fp` alongside the runtime command
-copies.
+When invoked directly, first verify that the OPSX command files still contain
+the callback hooks that re-enter this skill after OpenSpec commands complete.
+OpenSpec updates may overwrite those command files.
 
 ### Bootstrap Steps
-
-1. Compute the current fingerprint:
-   ```bash
-   shasum -a 256 ~/.agents/skills/opsx-workflow-hooks/SKILL.md | cut -d' ' -f1
-   ```
-2. Read the stored fingerprint from
-   `~/.agents/commands/opsx/.hooks-bootstrap-fp` (empty/absent if first run).
-3. If the stored fingerprint **exists and matches** the current one, bootstrap
-   is satisfied — skip to Hook A or Hook B. Do not re-read, re-diff, or modify
-   the command files during normal use.
-4. If the marker is **missing or the fingerprint differs**, run the Full
-   Verification below, then write the new fingerprint to the marker file.
-
-### Full Verification (initial setup or skill-file change)
 
 1. Read these files as two synchronized pairs:
    - Project source: `agent-skills/commands/opsx/propose.md`
@@ -65,30 +35,22 @@ copies.
    - Project source: `agent-skills/commands/opsx/apply.md`
    - Runtime copy: `~/.agents/commands/opsx/apply.md`
 2. Check whether both `propose.md` copies contain all of:
-   - `OPSX IMMUTABLE BOUNDARY`
    - `**Post-completion hook**`
    - `opsx-workflow-hooks`
    - `Hook A`
 3. Check whether both `apply.md` copies contain all of:
-   - `OPSX IMMUTABLE BOUNDARY`
    - `**Post-completion hook**`
    - `opsx-workflow-hooks`
    - `Hook B`
-4. If a copy is missing the full tail marker set, repair only the Hook tail:
-   - No hook yet: append the full Hook A / Hook B tail.
-   - Hook exists but boundary is missing: rewrite the existing Hook tail so the
-     boundary marker appears immediately before `**Post-completion hook**`.
-   The original command body is immutable; only the appended Hook A / Hook B
-   tail section may be created, extended, or revised. The boundary marker
-   belongs inside the two command files only, never inside this skill file.
+4. If either copy is missing its hook block, append it to the end of that copy
+   immediately before doing anything else. The original command body is
+   immutable; only the appended Hook A / Hook B tail section may be created,
+   extended, or revised. The immutable-boundary marker belongs inside the two
+   command files only, never inside this skill file.
 5. After hook presence is confirmed, diff each source/runtime pair. If the pair
    is not byte-identical, treat that as a stale-copy problem and sync the stale
-   side by restoring the matching Hook tail. Do not continue until both pairs
-   match.
-6. After verification succeeds, write the current fingerprint to
-   `~/.agents/commands/opsx/.hooks-bootstrap-fp` so subsequent normal-use
-   invocations can skip this step. Only cache a fully successful pass — never
-   write the marker after a failed or partial verification.
+   side by re-appending the missing hook block or restoring the matching append-
+   only footer. Do not continue until both pairs match.
 
 ### Initialization Payload
 
@@ -124,38 +86,23 @@ state and wait for the user to resume or resolve the blocker.
 
 ### Bootstrap Guardrails
 
-- This initialization is idempotent: never add the same hook block twice.
-- Only the Hook tail may be rewritten. Never rewrite, replace, reorder, or
+- Idempotent: never add the same hook block twice.
+- Append-only: only the Hook tail may be rewritten. Never rewrite, replace, reorder, or
   insert into the original command body above the boundary marker.
-- The immutable area is the original command content that appears before the
-  appended boundary marker.
-- The mutable area is only the appended Hook A / Hook B tail section that comes
-  after the boundary marker.
-- Future fixes may revise Hook A / Hook B content, but must not change any text
-  above the boundary marker.
-- After patching, re-read both source/runtime pairs and confirm the hook
-  markers are present in all four files.
-- **Full sync verification**: hook-marker presence alone is insufficient. Diff
-  the project-source copy (`agent-skills/`) and runtime copy (`~/.agents/`) for
-  both `propose.md` and `apply.md`, and require them to be byte-identical
-  before continuing. If they diverge, treat the older side as stale and repair
-  it by restoring the matching Hook tail.
-- Never assume runtime is canonical. A stale project-source copy is equally
-  dangerous because a later sync can overwrite a healthy runtime file.
-- Only after bootstrap succeeds should the skill continue into Hook A or Hook B.
-- During normal use (fingerprint cache hit), do not read, diff, or modify the
-  command files — the hooks are assumed intact.
-- Never write the fingerprint marker unless a Full Verification just completed
-  successfully.
-- If the marker file is deleted manually, the next invocation treats it as
-  initial setup and re-runs Full Verification.
+- Boundary: text above the immutable-boundary marker is frozen; text below it
+  (Hook A / Hook B tail) may be extended or revised in future fixes.
+- After patching, confirm hook markers are present in all four files, then diff
+  each source/runtime pair byte-by-byte. If they diverge, treat the older side
+  as stale and repair by restoring the matching Hook tail.
+- Never assume runtime is canonical — a stale project-source copy can later
+  overwrite a healthy runtime file.
+- After bootstrap succeeds, continue into Hook A or Hook B.
 
 ### Bootstrap Reliability Enhancement
 
-Hook injection presence does not guarantee hook execution after a long apply
-session. The reliability fix must also stay inside the mutable Hook B tail
-section: add or revise reminder text only below the immutable boundary marker,
-without changing the original state handling or output template above it.
+Hook presence does not guarantee hook execution after a long apply session. Any
+reliability reminder must also stay inside the mutable Hook B tail section below
+the boundary marker.
 
 ---
 
@@ -359,10 +306,9 @@ they are already certain and materially help the user understand scope.
 
 ### Guardrails
 
-- Default to artifact iteration during this hook; only bypass `/opsx:apply` for
-  a tiny implementation change that meets the strict threshold above.
-- Even when Hook A allows a tiny change to be executed directly, it must still
-  go through the `/review`-first review path before the hook can continue.
+- Default to artifact iteration; only bypass `/opsx:apply` for a tiny change
+  that meets the strict threshold above, and even then go through `/review`
+  first before the hook can continue.
 - Use `grill-me` only when requirement understanding is materially incomplete;
   do not turn every minor wording tweak into a long clarification session.
 - Use `to-spec` only to sharpen rough requirement language into spec-ready form;
@@ -529,7 +475,7 @@ and only then archival.
 
 5. **Hand off for self-test**
 
-   Announce: "Review complete. Please self-test this change. After you confirm
+    Announce: "Review complete. Please self-test this change. After you confirm
    self-test passes, I will run verify and archive."
 
    Use this exact structure:
@@ -557,9 +503,9 @@ and only then archival.
 
    Announce: "Self-test passed. Verifying change before archive…"
 
-   Use the **Task tool** to execute `/opsx:verify <name>` for the same change.
-   Do not merely print the command as text. Verification must confirm the
-   change artifacts and implementation still line up before archival.
+    Use the **Task tool** to execute `/opsx:verify <name>` for the same change.
+    Do not merely print the command as text. Verification must confirm the
+    change artifacts and implementation still line up before archival.
 
    If verification reports drift, missing spec updates, or incomplete task
    closure, stop, fix the issue, and ask the user to self-test again before
@@ -567,11 +513,11 @@ and only then archival.
 
 7. **Archive**
 
-   Announce: "Verification passed. Archiving change…"
+    Announce: "Verification passed. Archiving change…"
 
-   Use the **Task tool** to execute `/opsx:archive <name>` for the same change
-   name already known from the apply session. Do NOT ask the user for the
-   change name again or merely print the command as a suggestion.
+    Use the **Task tool** to execute `/opsx:archive <name>` for the same change
+    name already known from the apply session. Do NOT ask the user for the
+    change name again or merely print the command as a suggestion.
 
    The archive command will handle: delta-spec sync check, task completion
    check, directory move, and summary output. Let it run to completion.
@@ -586,11 +532,10 @@ Workflow complete: propose → apply → review → self-test → verify → arc
 
 ### Guardrails
 
-- Trust only the post-task CLI re-check supplied by `/opsx/apply`; never infer
-  `all_done` from task checkboxes or the final progress text.
-- Only proceed when that re-check explicitly contains `state: "all_done"`.
-- If the re-check is missing or contains another state, stop and report that
-  Hook B was not run; do not review or archive.
+- Trust only the post-task CLI re-check: proceed only when it explicitly
+  returns `state: "all_done"`. Never infer completion from task checkboxes or
+  final progress text. If the re-check is missing or returns another state,
+  stop and report that Hook B was not run — do not review or archive.
 - Only invoke `tdd` and `test-quality` when the diff contains a code-level
   change. Never force them for pure knowledge notes, proposal/design/task docs,
   Markdown updates, or comment-only edits.

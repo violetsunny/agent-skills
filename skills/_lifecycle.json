@@ -1,0 +1,436 @@
+{
+  "skills": {
+    "spring-boot-patterns": {
+      "name": "spring-boot-patterns",
+      "created_by": "user",
+      "state": "active",
+      "use_count": 26,
+      "view_count": 0,
+      "patch_count": 9,
+      "last_activity_at": "2026-08-07T02:55:50.785Z",
+      "created_at": "2026-07-30T01:38:31.183Z",
+      "pinned": false
+    },
+    "concurrency-review": {
+      "name": "concurrency-review",
+      "created_by": "user",
+      "state": "active",
+      "use_count": 4,
+      "view_count": 0,
+      "patch_count": 0,
+      "last_activity_at": "2026-07-31T01:23:10.159Z",
+      "created_at": "2026-07-30T01:42:15.862Z",
+      "pinned": false
+    },
+    "opsx-workflow-hooks": {
+      "name": "opsx-workflow-hooks",
+      "created_by": "user",
+      "state": "active",
+      "use_count": 62,
+      "view_count": 0,
+      "patch_count": 34,
+      "last_activity_at": "2026-08-14T07:46:10.119Z",
+      "created_at": "2026-07-30T05:46:51.790Z",
+      "pinned": false
+    },
+    "java-migration": {
+      "name": "java-migration",
+      "created_by": "user",
+      "state": "active",
+      "use_count": 2,
+      "view_count": 0,
+      "patch_count": 0,
+      "last_activity_at": "2026-07-30T12:03:12.572Z",
+      "created_at": "2026-07-30T05:55:07.715Z",
+      "pinned": false
+    },
+    "security-audit": {
+      "name": "security-audit",
+      "created_by": "user",
+      "state": "active",
+      "use_count": 1,
+      "view_count": 0,
+      "patch_count": 0,
+      "last_activity_at": "2026-07-30T05:56:00.716Z",
+      "created_at": "2026-07-30T05:56:00.716Z",
+      "pinned": false
+    },
+    "architecture-review": {
+      "name": "architecture-review",
+      "created_by": "user",
+      "state": "active",
+      "use_count": 2,
+      "view_count": 0,
+      "patch_count": 0,
+      "last_activity_at": "2026-08-05T01:06:33.456Z",
+      "created_at": "2026-07-30T06:40:15.549Z",
+      "pinned": false
+    },
+    "infra-dependency-scan": {
+      "name": "infra-dependency-scan",
+      "created_by": "agent",
+      "state": "active",
+      "use_count": 48,
+      "view_count": 0,
+      "patch_count": 50,
+      "last_activity_at": "2026-08-05T06:01:04.019Z",
+      "created_at": "2026-07-30T07:00:05.475Z",
+      "pinned": false
+    },
+    "frontend-design": {
+      "name": "frontend-design",
+      "created_by": "user",
+      "state": "active",
+      "use_count": 1,
+      "view_count": 0,
+      "patch_count": 0,
+      "last_activity_at": "2026-07-30T07:26:59.848Z",
+      "created_at": "2026-07-30T07:26:59.848Z",
+      "pinned": false
+    },
+    "chinese-documentation": {
+      "name": "chinese-documentation",
+      "created_by": "user",
+      "state": "active",
+      "use_count": 5,
+      "view_count": 0,
+      "patch_count": 0,
+      "last_activity_at": "2026-08-13T02:35:54.928Z",
+      "created_at": "2026-07-30T08:39:06.364Z",
+      "pinned": false
+    },
+    "stock-replay-workbench": {
+      "name": "stock-replay-workbench",
+      "created_by": "user",
+      "state": "active",
+      "use_count": 7,
+      "view_count": 0,
+      "patch_count": 0,
+      "last_activity_at": "2026-08-13T06:53:53.086Z",
+      "created_at": "2026-07-30T09:21:26.551Z",
+      "pinned": false
+    },
+    "freestocklineskill": {
+      "name": "freestocklineskill",
+      "created_by": "user",
+      "state": "active",
+      "use_count": 2,
+      "view_count": 0,
+      "patch_count": 0,
+      "last_activity_at": "2026-08-04T01:37:33.930Z",
+      "created_at": "2026-07-30T09:52:40.295Z",
+      "pinned": false
+    },
+    "research": {
+      "name": "research",
+      "created_by": "user",
+      "state": "active",
+      "use_count": 1,
+      "view_count": 0,
+      "patch_count": 0,
+      "last_activity_at": "2026-07-30T10:03:20.349Z",
+      "created_at": "2026-07-30T10:03:20.349Z",
+      "pinned": false
+    },
+    "java-code-review": {
+      "name": "java-code-review",
+      "created_by": "user",
+      "state": "active",
+      "use_count": 31,
+      "view_count": 0,
+      "patch_count": 0,
+      "last_activity_at": "2026-08-13T03:37:43.497Z",
+      "created_at": "2026-07-31T00:27:17.837Z",
+      "pinned": false
+    },
+    "dispatching-parallel-agents": {
+      "name": "dispatching-parallel-agents",
+      "created_by": "user",
+      "state": "active",
+      "use_count": 1,
+      "view_count": 0,
+      "patch_count": 0,
+      "last_activity_at": "2026-07-31T00:28:33.801Z",
+      "created_at": "2026-07-31T00:28:33.801Z",
+      "pinned": false
+    },
+    "test-quality": {
+      "name": "test-quality",
+      "created_by": "user",
+      "state": "active",
+      "use_count": 2,
+      "view_count": 0,
+      "patch_count": 0,
+      "last_activity_at": "2026-07-31T01:23:14.601Z",
+      "created_at": "2026-07-31T00:42:52.186Z",
+      "pinned": false
+    },
+    "diagnosing-bugs": {
+      "name": "diagnosing-bugs",
+      "created_by": "user",
+      "state": "active",
+      "use_count": 3,
+      "view_count": 0,
+      "patch_count": 0,
+      "last_activity_at": "2026-08-11T03:20:27.369Z",
+      "created_at": "2026-07-31T08:38:16.985Z",
+      "pinned": false
+    },
+    "db-whisperer": {
+      "name": "db-whisperer",
+      "created_by": "user",
+      "state": "active",
+      "use_count": 1,
+      "view_count": 0,
+      "patch_count": 0,
+      "last_activity_at": "2026-08-03T00:14:43.555Z",
+      "created_at": "2026-08-03T00:14:43.555Z",
+      "pinned": false
+    },
+    "jpa-patterns": {
+      "name": "jpa-patterns",
+      "created_by": "user",
+      "state": "active",
+      "use_count": 1,
+      "view_count": 0,
+      "patch_count": 0,
+      "last_activity_at": "2026-08-03T01:46:32.562Z",
+      "created_at": "2026-08-03T01:46:32.562Z",
+      "pinned": false
+    },
+    "ws-skill-creator": {
+      "name": "ws-skill-creator",
+      "created_by": "user",
+      "state": "active",
+      "use_count": 13,
+      "view_count": 0,
+      "patch_count": 0,
+      "last_activity_at": "2026-08-14T05:41:52.692Z",
+      "created_at": "2026-08-04T02:42:09.635Z",
+      "pinned": false
+    },
+    "writing-skills": {
+      "name": "writing-skills",
+      "created_by": "user",
+      "state": "active",
+      "use_count": 2,
+      "view_count": 0,
+      "patch_count": 0,
+      "last_activity_at": "2026-08-08T03:14:26.746Z",
+      "created_at": "2026-08-04T02:42:09.657Z",
+      "pinned": false
+    },
+    "termy-obsidian-context": {
+      "name": "termy-obsidian-context",
+      "created_by": "user",
+      "state": "active",
+      "use_count": 1,
+      "view_count": 0,
+      "patch_count": 0,
+      "last_activity_at": "2026-08-04T09:26:09.478Z",
+      "created_at": "2026-08-04T09:26:09.478Z",
+      "pinned": false
+    },
+    "robot-aiot-knowledge-expert": {
+      "name": "robot-aiot-knowledge-expert",
+      "created_by": "agent",
+      "state": "active",
+      "use_count": 18,
+      "view_count": 0,
+      "patch_count": 17,
+      "last_activity_at": "2026-08-13T02:43:56.923Z",
+      "created_at": "2026-08-04T10:42:52.271Z",
+      "pinned": false
+    },
+    "openspec-propose": {
+      "name": "openspec-propose",
+      "created_by": "user",
+      "state": "active",
+      "use_count": 1,
+      "view_count": 0,
+      "patch_count": 0,
+      "last_activity_at": "2026-08-04T11:48:43.504Z",
+      "created_at": "2026-08-04T11:48:43.504Z",
+      "pinned": false
+    },
+    "openspec-verify-change": {
+      "name": "openspec-verify-change",
+      "created_by": "user",
+      "state": "active",
+      "use_count": 10,
+      "view_count": 0,
+      "patch_count": 0,
+      "last_activity_at": "2026-08-14T07:49:27.877Z",
+      "created_at": "2026-08-05T01:12:43.681Z",
+      "pinned": false
+    },
+    "openspec-archive-change": {
+      "name": "openspec-archive-change",
+      "created_by": "user",
+      "state": "active",
+      "use_count": 13,
+      "view_count": 0,
+      "patch_count": 0,
+      "last_activity_at": "2026-08-14T06:40:52.472Z",
+      "created_at": "2026-08-05T01:16:07.090Z",
+      "pinned": false
+    },
+    "api-sculptor": {
+      "name": "api-sculptor",
+      "created_by": "user",
+      "state": "active",
+      "use_count": 1,
+      "view_count": 0,
+      "patch_count": 0,
+      "last_activity_at": "2026-08-05T01:47:02.282Z",
+      "created_at": "2026-08-05T01:47:02.282Z",
+      "pinned": false
+    },
+    "chinese-code-review": {
+      "name": "chinese-code-review",
+      "created_by": "user",
+      "state": "active",
+      "use_count": 1,
+      "view_count": 0,
+      "patch_count": 0,
+      "last_activity_at": "2026-08-05T10:41:06.473Z",
+      "created_at": "2026-08-05T10:41:06.473Z",
+      "pinned": false
+    },
+    "code-review": {
+      "name": "code-review",
+      "created_by": "user",
+      "state": "active",
+      "use_count": 5,
+      "view_count": 0,
+      "patch_count": 0,
+      "last_activity_at": "2026-08-11T01:25:00.806Z",
+      "created_at": "2026-08-05T11:30:29.912Z",
+      "pinned": false
+    },
+    "openspec-sync-specs": {
+      "name": "openspec-sync-specs",
+      "created_by": "user",
+      "state": "active",
+      "use_count": 2,
+      "view_count": 0,
+      "patch_count": 0,
+      "last_activity_at": "2026-08-14T06:41:52.006Z",
+      "created_at": "2026-08-06T09:30:56.384Z",
+      "pinned": false
+    },
+    "ppt-master": {
+      "name": "ppt-master",
+      "created_by": "user",
+      "state": "active",
+      "use_count": 12,
+      "view_count": 0,
+      "patch_count": 0,
+      "last_activity_at": "2026-08-14T03:46:09.919Z",
+      "created_at": "2026-08-08T09:24:21.367Z",
+      "pinned": false
+    },
+    "git-self-update": {
+      "name": "git-self-update",
+      "created_by": "user",
+      "state": "active",
+      "use_count": 2,
+      "view_count": 0,
+      "patch_count": 0,
+      "last_activity_at": "2026-08-10T06:16:24.370Z",
+      "created_at": "2026-08-10T06:02:05.637Z",
+      "pinned": false
+    },
+    "ws-command-creator": {
+      "name": "ws-command-creator",
+      "created_by": "user",
+      "state": "active",
+      "use_count": 1,
+      "view_count": 0,
+      "patch_count": 0,
+      "last_activity_at": "2026-08-10T10:31:27.160Z",
+      "created_at": "2026-08-10T10:31:27.160Z",
+      "pinned": false
+    },
+    "mac-safe-storage-cleaner": {
+      "name": "mac-safe-storage-cleaner",
+      "created_by": "user",
+      "state": "active",
+      "use_count": 2,
+      "view_count": 0,
+      "patch_count": 0,
+      "last_activity_at": "2026-08-11T01:14:27.849Z",
+      "created_at": "2026-08-11T01:13:16.108Z",
+      "pinned": false
+    },
+    "adr-generator": {
+      "name": "adr-generator",
+      "created_by": "user",
+      "state": "active",
+      "use_count": 1,
+      "view_count": 0,
+      "patch_count": 0,
+      "last_activity_at": "2026-08-11T08:59:22.597Z",
+      "created_at": "2026-08-11T08:59:22.597Z",
+      "pinned": false
+    },
+    "grill-with-docs": {
+      "name": "grill-with-docs",
+      "created_by": "user",
+      "state": "active",
+      "use_count": 1,
+      "view_count": 0,
+      "patch_count": 0,
+      "last_activity_at": "2026-08-11T08:59:22.994Z",
+      "created_at": "2026-08-11T08:59:22.994Z",
+      "pinned": false
+    },
+    "confluence-cli": {
+      "name": "confluence-cli",
+      "created_by": "user",
+      "state": "active",
+      "use_count": 1,
+      "view_count": 0,
+      "patch_count": 0,
+      "last_activity_at": "2026-08-11T08:59:23.143Z",
+      "created_at": "2026-08-11T08:59:23.143Z",
+      "pinned": false
+    },
+    "grilling": {
+      "name": "grilling",
+      "created_by": "user",
+      "state": "active",
+      "use_count": 1,
+      "view_count": 0,
+      "patch_count": 0,
+      "last_activity_at": "2026-08-11T08:59:35.775Z",
+      "created_at": "2026-08-11T08:59:35.775Z",
+      "pinned": false
+    },
+    "tdd": {
+      "name": "tdd",
+      "created_by": "user",
+      "state": "active",
+      "use_count": 1,
+      "view_count": 0,
+      "patch_count": 0,
+      "last_activity_at": "2026-08-14T07:46:46.573Z",
+      "created_at": "2026-08-14T07:46:46.573Z",
+      "pinned": false
+    }
+  },
+  "pending_hints": [
+    {
+      "skill_name": "infra-dependency-scan",
+      "action": "rewrite_body",
+      "reason": "Skill \"infra-dependency-scan\" has a high patch-to-use ratio (50 patches / 48 uses = 1.04). The skill is useful but keeps needing corrections. Rewrite the body content to be more accurate and complete."
+    },
+    {
+      "skill_name": "robot-aiot-knowledge-expert",
+      "action": "rewrite_body",
+      "reason": "Skill \"robot-aiot-knowledge-expert\" has a high patch-to-use ratio (17 patches / 10 uses = 1.70). The skill is useful but keeps needing corrections. Rewrite the body content to be more accurate and complete."
+    }
+  ],
+  "pending_review_skills": [],
+  "background_review_count": 0
+}

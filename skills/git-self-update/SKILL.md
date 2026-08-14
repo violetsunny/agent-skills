@@ -1,15 +1,17 @@
 ---
 name: git-self-update
 description: >
-  批量更新 self 目录下所有 git 项目；同步 superpowers / claude-code-java / matt-skills / anthropics-skills / ui-ux-pro-max-skill / ppt-master 的 skill 文件到 ~/.agents/skills/；先升级并运行 openspec update，再将 OpenSpec 更新后的 ~/.claude/commands/opsx 和 ~/.claude/skills/openspec-* 按保护规则同步到 ~/.agents。递归三层扫描所有嵌套 git 仓库；处理网络重试并报告冲突；仅在 ~/.agents/skills/ 中已存在的普通 skill 才会被同步（OpenSpec 管理的 skill 按专门流程同步）。
+  批量更新 self 目录下所有 git 项目；同步 superpowers / claude-code-java / matt-skills / anthropics-skills / ui-ux-pro-max-skill / ppt-master 的 skill 文件到 ~/.agents/skills/；先升级并运行 openspec update，再将 OpenSpec 更新后的 ~/.claude/commands/opsx 和 ~/.claude/skills/openspec-* 按保护规则同步到 ~/.agents。递归三层扫描所有嵌套 git 仓库；处理网络重试并报告冲突；  仅在 ~/.agents/skills/ 中已存在的普通 skill 才会被同步（OpenSpec 管理的 skill 按专门流程同步）。
+  模块 4 在模块 2-3 完成后，将 ~/.agents/skills/ 全量同步到个人知识库 /Users/kangll13/aiot/java-code/self/gggggggood/agent-skills/skills/（不加 --delete，只覆盖已有 + 新增）。
   其中 /Users/kangll13/aiot/java-code/self/gggggggood/ 下的代码由用户维护，禁止任何回滚、清理、覆盖或自动冲突处理；发现异常或冲突必须直接提示用户并跳过。
+  模块 4 的 skill 文件同步是用户明确要求的例外：允许将 ~/.agents/skills/ 的 skill 文件覆盖到 agent-skills/skills/，但仍禁止 --delete、禁止 git commit/push 等写操作，同步后仅报告变更清单由用户自行审查和提交。
   触发词包括：更新self、更新self代码、更新self仓库、拉取self、更新/拉取/刷新 /Users/kangll13/aiot/java-code/self 下的代码/仓库/项目、更新self下所有git项目、同步skills、更新skills。
   当用户说"更新代码"、"拉取最新代码"、"更新所有项目"且上下文指向 self 目录时触发。
 ---
 
 # Git Self Update — 批量更新 self 项目 + 同步 skill 文件
 
-包含3个模块：模块1 批量 git pull、模块2 openspec update、模块3 skill 文件同步（涉及6个项目）。
+包含4个模块：模块1 批量 git pull、模块2 openspec update、模块3 skill 文件同步（涉及6个项目）、模块4 全量同步到个人知识库 agent-skills。
 
 ## 前置条件
 
@@ -235,11 +237,62 @@ for each project:
 
 ---
 
+## 模块 4：同步到个人知识库（agent-skills）
+
+**目的**：将 `~/.agents/skills/` 中经过模块 2-3 更新后的 skill 全量同步到个人知识库 `/Users/kangll13/aiot/java-code/self/gggggggood/agent-skills/skills/`，作为个人理想知识库和总结的汇聚地。
+
+### 保护规则例外
+
+`agent-skills/` 位于保护目录 `ggggggood/` 下，但模块 4 是用户明确要求的同步操作，适用以下例外规则：
+
+- **允许**：将 `~/.agents/skills/` 的 skill 文件覆盖到 `agent-skills/skills/`（rsync 不加 `--delete`）
+- **禁止删除 skill**：本技能在任何模块中都不允许删除 skill 目录或文件，只能新增或更新。skill 的删除只能由用户手动执行。这是为了防止误删用户精心积累的知识库内容。
+- **禁止**：使用 `--delete` 删除 `agent-skills/skills/` 中源端没有的 skill 目录（用户可能在知识库中有额外 skill）
+- **禁止**：对 `agent-skills/` 仓库执行 `git add`、`git commit`、`git push` 等写操作
+- **禁止**：执行 `git reset`、`git checkout --`、`git clean` 等破坏性操作
+- **同步后**：仅报告变更清单（新增 N 个、更新 N 个、未变 N 个），由用户自行审查和提交
+
+### 步骤 4.1：全量同步
+
+```bash
+# 全量同步，不加 --delete，保留知识库中独有的 skill
+rsync -r ~/.agents/skills/ /Users/kangll13/aiot/java-code/self/gggggggood/agent-skills/skills/
+```
+
+### 步骤 4.2：同步 commands/opsx（如模块 2 有更新）
+
+如果模块 2 中 `~/.agents/commands/opsx/` 发生了更新，也同步到知识库：
+
+```bash
+rsync -r ~/.agents/commands/ /Users/kangll13/aiot/java-code/self/gggggggood/agent-skills/commands/
+```
+
+### 步骤 4.3：变更报告
+
+同步后，通过 `git status` 检测 `agent-skills/` 仓库的变更情况并报告：
+
+```bash
+/usr/bin/git -C /Users/kangll13/aiot/java-code/self/gggggggood/agent-skills status --short
+```
+
+报告格式：
+
+| 状态 | 数量 | 说明 |
+|------|------|------|
+| 新增 (??) | N | 源端有但知识库中没有的 skill |
+| 更新 (M) | N | 源端有更新，覆盖了知识库中的旧版本 |
+| 未变 | N | 源端和知识库一致，无变化 |
+
+**不执行 `git add` 或 `git commit`**，仅报告变更清单，由用户自行决定是否提交。
+
+---
+
 ## 执行顺序
 
 1. **模块 1** — 批量 git pull（递归三层）所有 self 项目（包括6个 skill 项目）
 2. **模块 2** — 在用户 Terminal 中先执行 `npm install -g @fission-ai/openspec@latest`，确认版本后从用户主目录运行 `openspec update`；先同步 `.claude` 到 `.agents`，再立即运行 `/opsx-workflow-hooks` 恢复 hook，最后按当前 profile 校验 `commands/opsx` 文件集合及 workflow hooks，按输出区分成功、可选提示和真实失败
 3. **模块 3** — Skill 同步（模块 1 已完成 git pull，直接 rsync 匹配的 skill）
+4. **模块 4** — 全量同步 `~/.agents/skills/` 到个人知识库 `agent-skills/skills/`（不加 `--delete`），同步 `commands/` 如有更新，报告变更清单供用户审查
 
 ---
 
@@ -273,6 +326,16 @@ for each project:
 | ppt-master | N | N |
 
 同步数 = 源中有且 `~/.agents/skills/` 中也有匹配的 skill 数（交集），新增数 = 源中有但 `~/.agents/skills/` 中无匹配的 skill 数（拒绝同步）。
+
+### 知识库同步汇总（模块 4）
+
+| 状态 | 数量 |
+|------|------|
+| 新增 (??) | N |
+| 更新 (M) | N |
+| 未变 | N |
+
+列出变更的 skill 名称清单（新增和更新），未变的不逐个列出。提示用户审查后自行 `git add` + `git commit`。
 
 ---
 

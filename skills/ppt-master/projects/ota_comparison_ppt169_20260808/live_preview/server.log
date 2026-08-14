@@ -1,0 +1,7 @@
+[17:34:20] [INFO] svg_editor: running at http://127.0.0.1:5050 (live preview (auto-startup))
+[17:34:20] [INFO] svg_editor: project: /Users/kangll13/.agents/skills/ppt-master/projects/ota_comparison_ppt169_20260808
+[17:34:20] [INFO] svg_editor: svg_output: /Users/kangll13/.agents/skills/ppt-master/projects/ota_comparison_ppt169_20260808/svg_output (0 slides)
+[17:34:20] [INFO] svg_editor: idle timeout: 7200s (0 = disabled)
+ * Serving Flask app 'server'
+ * Debug mode: off
+[17:34:55] [INFO] svg_editor: received signal 15, exiting

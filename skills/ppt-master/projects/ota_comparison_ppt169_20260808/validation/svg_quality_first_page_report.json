@@ -1,0 +1,91 @@
+{
+  "schema": "ppt-master.svg-quality-report.v1",
+  "stage": "first-page",
+  "target": "/Users/kangll13/.agents/skills/ppt-master/projects/ota_comparison_ppt169_20260808",
+  "source_fingerprint": {
+    "algorithm": "sha256",
+    "digest": "62750beaf8305d8795804be6d02b58a713cfbb896477a6bbe735465269105051",
+    "file_count": 1,
+    "files": [
+      {
+        "file": "01_ota_comparison.svg",
+        "sha256": "a14c6e0229133d56ad5ac3ff98feb418da1de1123d789c84dd59145f700029d5"
+      }
+    ]
+  },
+  "summary": {
+    "total": 1,
+    "passed": 0,
+    "warnings": 1,
+    "errors": 0
+  },
+  "issue_types": {},
+  "categories": {
+    "blocking": {
+      "count": 0,
+      "issues": []
+    },
+    "introduced": {
+      "count": 1,
+      "issues": [
+        {
+          "file": "01_ota_comparison.svg",
+          "message": "Cannot verify root viewBox bounds for visible text with unsupported or unresolved geometry: <text> (x=260, y=424; text='TUserOtaVersion→ TFi…'), <text> (x=750, y=424; text='TDeviceRelease（发版记录）…'); use supported explicit text positioning when page fit matters"
+        }
+      ]
+    },
+    "inherited": {
+      "count": 0,
+      "issues": []
+    },
+    "source-import": {
+      "count": 0,
+      "summary": {
+        "warning_count": 0,
+        "by_code": {}
+      }
+    }
+  },
+  "drift": {
+    "colors": {
+      "#E0E0E0": [
+        "01_ota_comparison.svg"
+      ]
+    },
+    "fonts": {},
+    "sizes": {}
+  },
+  "project_issues": {
+    "template": [],
+    "animation": [],
+    "illustration": [],
+    "communication_trace": [],
+    "pptx_structure": []
+  },
+  "files": [
+    {
+      "file": "01_ota_comparison.svg",
+      "path": "projects/ota_comparison_ppt169_20260808/svg_output/01_ota_comparison.svg",
+      "exists": true,
+      "errors": [],
+      "warnings": [
+        "Cannot verify root viewBox bounds for visible text with unsupported or unresolved geometry: <text> (x=260, y=424; text='TUserOtaVersion→ TFi…'), <text> (x=750, y=424; text='TDeviceRelease（发版记录）…'); use supported explicit text positioning when page fit matters"
+      ],
+      "info": {
+        "viewbox": "0 0 1280 720",
+        "fonts": [
+          "Microsoft YaHei, Arial, sans-serif"
+        ],
+        "text_elements": 26,
+        "tspan_elements": 2,
+        "contextual_values": {
+          "colors": [
+            "#E0E0E0"
+          ]
+        }
+      },
+      "passed": true,
+      "source_sha256": "a14c6e0229133d56ad5ac3ff98feb418da1de1123d789c84dd59145f700029d5"
+    }
+  ]
+}

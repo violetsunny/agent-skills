@@ -1,0 +1,83 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 720" data-pptx-page-role="content" font-family="Microsoft YaHei, Arial, sans-serif">
+
+  <g id="page-title" data-pptx-bounds="60 50 1160 70">
+    <text x="60" y="92" font-size="42" font-weight="bold" fill="#1A5F7A">OTA1 vs OTA2 核心特性对比</text>
+    <line x1="60" y1="112" x2="1220" y2="112" stroke="#1A5F7A" stroke-width="2"/>
+  </g>
+
+  <g id="comparison-table" data-pptx-bounds="60 140 1160 390">
+    <rect x="60" y="140" width="180" height="50" fill="#2D3436"/>
+    <rect x="240" y="140" width="490" height="50" fill="#1A5F7A"/>
+    <rect x="730" y="140" width="490" height="50" fill="#2D6A4F"/>
+    <text x="150" y="172" font-size="22" font-weight="bold" fill="#FFFFFF" text-anchor="middle">特性</text>
+    <text x="485" y="172" font-size="22" font-weight="bold" fill="#FFFFFF" text-anchor="middle">OTA1</text>
+    <text x="975" y="172" font-size="22" font-weight="bold" fill="#FFFFFF" text-anchor="middle">OTA2</text>
+
+    <rect x="60" y="190" width="1160" height="68" fill="#FFFFFF"/>
+    <line x1="60" y1="258" x2="1220" y2="258" stroke="#E0E0E0" stroke-width="1"/>
+    <text x="80" y="231" font-size="20" font-weight="bold" fill="#2D3436">升级维度</text>
+    <text x="260" y="231" font-size="20" fill="#2D3436">按 SN8 升级</text>
+    <text x="750" y="231" font-size="20" fill="#2D3436">按 release 发版记录升级</text>
+
+    <rect x="60" y="258" width="1160" height="68" fill="#F5F7FA"/>
+    <line x1="60" y1="326" x2="1220" y2="326" stroke="#E0E0E0" stroke-width="1"/>
+    <text x="80" y="299" font-size="20" font-weight="bold" fill="#2D3436">定推</text>
+    <g id="row2-ota1">
+      <use data-icon="tabler-outline/x" x="260" y="282" width="22" height="22" fill="#E8723C" stroke-width="2"/>
+      <text x="290" y="299" font-size="20" fill="#2D3436">不支持</text>
+    </g>
+    <g id="row2-ota2">
+      <use data-icon="tabler-outline/check" x="750" y="282" width="22" height="22" fill="#2D6A4F" stroke-width="2"/>
+      <text x="780" y="299" font-size="20" fill="#2D3436">支持（可往低版本升级）</text>
+    </g>
+
+    <rect x="60" y="326" width="1160" height="68" fill="#FFFFFF"/>
+    <line x1="60" y1="394" x2="1220" y2="394" stroke="#E0E0E0" stroke-width="1"/>
+    <text x="80" y="367" font-size="20" font-weight="bold" fill="#2D3436">入口角色</text>
+    <text x="260" y="367" font-size="20" fill="#2D3436">作为入口，根据 transSn8 转发到 OTA2</text>
+    <text x="750" y="367" font-size="20" fill="#2D3436">独立升级系统</text>
+
+    <rect x="60" y="394" width="1160" height="68" fill="#F5F7FA"/>
+    <line x1="60" y1="462" x2="1220" y2="462" stroke="#E0E0E0" stroke-width="1"/>
+    <text x="80" y="435" font-size="20" font-weight="bold" fill="#2D3436">核心表</text>
+    <text x="260" y="424" font-size="20" fill="#2D3436">TUserOtaVersion<tspan x="260" dy="28">→ TFirmwareStatus / TModuleSnStatus</tspan></text>
+    <text x="750" y="424" font-size="20" fill="#2D3436">TDeviceRelease（发版记录）<tspan x="750" dy="28">TDeviceFileVersion（固件信息）</tspan></text>
+
+    <rect x="60" y="462" width="1160" height="68" fill="#FFFFFF"/>
+    <line x1="60" y1="530" x2="1220" y2="530" stroke="#E0E0E0" stroke-width="1"/>
+    <text x="80" y="503" font-size="20" font-weight="bold" fill="#2D3436">代码仓库</text>
+    <text x="260" y="503" font-size="20" fill="#1A5F7A">ota-system-server</text>
+    <text x="750" y="503" font-size="20" fill="#2D6A4F">ota2-system-server</text>
+
+    <line x1="60" y1="140" x2="60" y2="530" stroke="#E0E0E0" stroke-width="1"/>
+    <line x1="240" y1="140" x2="240" y2="530" stroke="#E0E0E0" stroke-width="1"/>
+    <line x1="730" y1="140" x2="730" y2="530" stroke="#E0E0E0" stroke-width="1"/>
+    <line x1="1220" y1="140" x2="1220" y2="530" stroke="#E0E0E0" stroke-width="1"/>
+  </g>
+
+  <g id="data-flow" data-pptx-bounds="60 550 1160 130">
+    <text x="60" y="575" font-size="18" font-weight="bold" fill="#1A5F7A">OTA1 数据流转</text>
+    <g id="flow-box-1">
+      <rect x="170" y="590" width="280" height="72" fill="#FFFFFF" stroke="#1A5F7A" stroke-width="2"/>
+      <text x="310" y="622" font-size="20" font-weight="bold" fill="#1A5F7A" text-anchor="middle">TUserOtaVersion</text>
+      <text x="310" y="648" font-size="18" fill="#2D3436" text-anchor="middle">SN8 维度</text>
+    </g>
+    <g id="flow-arrow-1">
+      <use data-icon="tabler-outline/arrow-right" x="460" y="614" width="28" height="28" fill="#1A5F7A" stroke-width="2"/>
+    </g>
+    <g id="flow-box-2">
+      <rect x="500" y="590" width="280" height="72" fill="#FFFFFF" stroke="#1A5F7A" stroke-width="2"/>
+      <text x="640" y="622" font-size="20" font-weight="bold" fill="#1A5F7A" text-anchor="middle">TFirmwareStatus</text>
+      <text x="640" y="648" font-size="18" fill="#2D3436" text-anchor="middle">底板升级信息</text>
+    </g>
+    <g id="flow-arrow-2">
+      <use data-icon="tabler-outline/arrow-right" x="790" y="614" width="28" height="28" fill="#1A5F7A" stroke-width="2"/>
+    </g>
+    <g id="flow-box-3">
+      <rect x="830" y="590" width="280" height="72" fill="#FFFFFF" stroke="#1A5F7A" stroke-width="2"/>
+      <text x="970" y="622" font-size="20" font-weight="bold" fill="#1A5F7A" text-anchor="middle">TModuleSnStatus</text>
+      <text x="970" y="648" font-size="18" fill="#2D3436" text-anchor="middle">导航板升级信息</text>
+    </g>
+  </g>
+
+</svg>
