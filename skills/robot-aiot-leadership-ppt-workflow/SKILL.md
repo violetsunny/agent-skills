@@ -18,12 +18,12 @@ description: >
 本技能覆盖从原始数据到最终 PPTX 的全链路，涉及三个外部技能调用：
 - **robot-aiot-draw-flowchart** — 在文档分层完成后，生成分层架构图/流程图 XML
 - **robot-aiot-xml-html-bridge** — 在 XML 生成后，稳定转换为 HTML 预览稿，作为 PPT 前的主约束
-- **ppt-master** — 在母稿逐页 HTML 化后，agent 依据每页 HTML 手工编写 SVG 页面，由 ppt-master 生成最终 PPTX 文件
+- **ppt-master** — 在母稿逐页 HTML 化后，读取逐页 HTML/MD 生成最终 PPTX 文件
 
 强制中间层原则：
 - **XML 先转 HTML**：凡是由 `robot-aiot-draw-flowchart` 生成的图表 XML，在进入 PPT 阶段前必须先通过 `robot-aiot-xml-html-bridge` 转成 HTML 预览文件
 - **母稿逐页转 HTML**：在调用 `ppt-master` 之前，必须把 PPT 母稿的每一页都落成单页 HTML
-- **按 HTML 转 PPT**：agent 依据每一页 HTML 的结构、样式、层级手工编写 ppt-master 支持的 SVG 页面，不是 ppt-master 直接读 HTML
+- **按 HTML 转 PPT**：ppt-master 读取逐页 HTML/MD 生成 PPTX，HTML 是 ppt-master 的直接输入格式
 - **没有 HTML 不得生成 PPT**：只要图表 HTML 或页面 HTML 未完成，PPT 生成阶段不得开始
 
 ---
@@ -54,7 +54,7 @@ Phase 2: 受众分层     → 技术明细版MD + 领导汇报版MD（同一数�
 Phase 3: 图表生成     → 调用 robot-aiot-draw-flowchart 生成分层架构图/流程图 XML
 Phase 3.5: 桥接转换  → 调用 robot-aiot-xml-html-bridge 将 XML 稳定转 HTML 并保留原样式
 Phase 4: PPT母稿     → 按页结构化：标题→结论→数据→话术，并将每页落成 HTML 页面样式
-Phase 5: PPT生成     → 调用 ppt-master，agent 依据每页 HTML 手工编写 SVG，生成最终 PPTX
+Phase 5: PPT生成     → 调用 ppt-master，读取逐页 HTML/MD 生成最终 PPTX
 ```
 
 每个阶段产出是下一阶段的输入，逐级收敛。
@@ -178,7 +178,7 @@ Phase 5: PPT生成     → 调用 ppt-master，agent 依据每页 HTML 手工编
    - **后续页面多样式**：首页架构图风格简洁庄重，但后续页面应采用多种数据可视化样式（看板卡片、漏斗图、对比表、闭环链路图、数据带等），充分展示系统业务能力，不要全部沿用首页的简洁风格
    - 数据值、品牌名称等必须与 Phase 1 数据池一致
 
-4. **产出文件**：保存 `.xml` 文件，放在 `doc-ppt/` 目录下，作为图表真源，供 Phase 3.5 转换使用。
+4. **产出文件**：由 robot-aiot-draw-flowchart 输出至 `doc-ppt/` 目录（见 draw-flowchart SKILL.md 步骤 5），作为图表真源，供 Phase 3.5 转换使用。
 
 ### 图表引用方式
 
@@ -204,7 +204,7 @@ Phase 5: PPT生成     → 调用 ppt-master，agent 依据每页 HTML 手工编
 ### 怎么做
 
 1. 使用 `skill` 工具加载 `robot-aiot-xml-html-bridge`
-2. 把 `doc-ppt/<图表文件名>.xml` 作为输入，生成 `doc-ppt/<图表文件名>.html`
+2. 把 `doc-ppt/<图表文件名>.xml` 作为输入，生成 `doc-ppt/<图表文件名>.html`；**若 PPT 含多张图表，对每个 .xml 文件依次调用 robot-aiot-xml-html-bridge，产出对应 HTML 文件**
 3. 校验 HTML 是否保留 XML 的原有样式、布局层级、尺寸比例和关键标签关系
 4. 只有当 HTML 校验通过后，才允许进入 Phase 4
 
@@ -224,6 +224,8 @@ Phase 5: PPT生成     → 调用 ppt-master，agent 依据每页 HTML 手工编
 ---
 
 ## Phase 4: PPT母稿 — 按页结构化
+
+> **⚠️ 强制规范：所有逐页 HTML 生成必须通过 `ui-ux-pro-max` 驱动，并严格符合 Material Design 3 规范（间距、配色、字体梯度）。不得绕过此步骤直接生成 HTML。**
 
 将汇报内容结构化为**母稿**（Markdown 文档），定义每页内容。母稿是数据分析和
 最终 PPTX 之间的桥梁；但真正进入 PPT 生成前，还必须补齐一层**逐页 HTML 页面稿**。
@@ -308,7 +310,7 @@ Phase 5: PPT生成     → 调用 ppt-master，agent 依据每页 HTML 手工编
 
 在母稿内容定稿后、逐页 HTML 化之前，先生成与汇报主题匹配的设计系统：
 
-1. **调用 `ui-ux-pro-max --design-system`**：执行 `ui-ux-pro-max --design-system "<项目描述> <行业> <风格关键词>"`（如 `"物联网平台运维 科技蓝 企业级"`），获取设计系统输出，包含：
+1. **调用 `ui-ux-pro-max --design-system`**：使用 **Skill 工具**加载 `ui-ux-pro-max` skill，触发其 `--design-system` 模式，执行 `ui-ux-pro-max --design-system "<项目描述> <行业> <风格关键词>"`（如 `"物联网平台运维 科技蓝 企业级"`），获取设计系统输出，包含：
    - 配色方案（primary color、accent color、辅助色）
    - 字体配对（标题字体 + 正文字体）
    - 间距系统（spacing scale）
@@ -355,15 +357,14 @@ Phase 5: PPT生成     → 调用 ppt-master，agent 依据每页 HTML 手工编
 每页 HTML 生成后，必须执行以下两项检查：
 
 1. **布局审查清单（10 项）**：从 `references/page-html-template.md` 第 5 节加载布局审查清单，逐项检查画布尺寸、蓝条间距、元素不重叠、分栏均衡、padding、字号下限、箭头可见性、徽章对齐、内容溢出、水平居中。不通过的项需修复后重新检查。
-2. **技术表名不外露**：grep 检查 HTML 中是否残留数据库表名（如 `t_device_file_version`、`t_specify_push_record`）或查询口径描述，替换为业务可理解的描述。
+2. **技术表名不外露**：在 agent 环境中执行 grep 或正则匹配，检查 HTML 中是否残留技术命名（如数据库表名、Java 类名、内部 API 路径等），替换为业务可理解的描述。
 
 ---
 
 ## Phase 5: PPT生成 — 调用 ppt-master
 
 母稿定稿并通过交叉校验后，**调用 `ppt-master` 技能**生成最终 PPTX 文件。
-agent 依据逐页 HTML 的布局、配色、内容层级，手工编写 ppt-master 支持的 SVG 页面设计，
-然后由 ppt-master 生成可编辑的 PPTX。
+ppt-master 读取逐页 HTML/MD，依据每页 HTML 的布局、配色、内容层级生成可编辑的 PPTX。
 
 ### 移交前校验清单
 
@@ -390,13 +391,13 @@ agent 依据逐页 HTML 的布局、配色、内容层级，手工编写 ppt-mas
 1. **母稿文件路径**（`doc-ppt/<项目>_PPT母稿.md`）— 输入文件必须是 Markdown 格式，ppt-master 对 MD 的解析最稳定
 2. **图表 XML 文件路径**（`doc-ppt/<图表名>.xml`）— 作为图表样式追溯源
 3. **图表 HTML 文件路径**（`doc-ppt/<图表名>.html`）— 由 `robot-aiot-xml-html-bridge` 生成，作为图表视觉还原参照，要求与 XML 保持一致
-4. **逐页 HTML 文件路径**（`doc-ppt/pages/*.html`）— 作为 agent 编写 SVG 的视觉参照，不作为 ppt-master 的直接输入格式；agent 依据每页 HTML 的布局、配色、内容层级手工编写 ppt-master 支持的 SVG 页面
+4. **逐页 HTML 文件路径**（`doc-ppt/pages/*.html`）— 作为 ppt-master 生成 PPTX 的直接输入；ppt-master 读取每页 HTML 的布局、配色、内容层级，还原为幻灯片页面
 5. **页数和结构**（共 N 页，每页主题）
 6. **风格参照说明**：PPTX 的配色方案应参照首页架构图 XML/HTML 确立的视觉基调，保持色彩体系统一；但页面布局和数据展示样式应多样化（看板卡片、漏斗图、对比表、闭环链路、数据带等），充分展示业务能力，不要全部沿用首页的简洁风格
 
-将母稿 MD、图表 XML、图表 HTML、逐页 HTML 一并作为参照材料。
-其中**逐页 HTML 是 agent 编写 SVG 页面的视觉参照**，XML 是图表样式追溯源，MD 是内容语义源。三者职责不能混淆。
-agent 依据逐页 HTML 的布局、配色、内容层级，手工编写 ppt-master 支持的 SVG 页面设计，然后由 ppt-master 根据自身工作流生成可编辑的 PPTX 文件。
+将母稿 MD、图表 XML、图表 HTML、逐页 HTML 一并作为输入材料。
+其中**逐页 HTML 是 ppt-master 生成幻灯片页面的直接输入**，XML 是图表样式追溯源，MD 是内容语义源。三者职责不能混淆。
+ppt-master 读取逐页 HTML 的布局、配色、内容层级，生成可编辑的 PPTX 文件。
 具体渲染能力（图表嵌入、表格格式化、备注填充等）取决于 ppt-master 的路由选择，
 本技能不做假设，只确保移交的母稿、图表文件和逐页 HTML 内容完整、格式正确。
 
@@ -410,7 +411,7 @@ agent 依据逐页 HTML 的布局、配色、内容层级，手工编写 ppt-mas
 PPTX 生成后，检查：
 - [ ] 页数与母稿一致
 - [ ] 每页标题与母稿一致
-- [ ] 每页 PPT 布局与对应 HTML 基本一致（这是 agent 手工映射后的验证，不是 ppt-master 自动还原）
+  - [ ] 每页 PPT 布局与对应 HTML 基本一致（ppt-master 依据 HTML 还原的结果）
 - [ ] 图表正确渲染，且与图表 HTML/原始 XML 视觉一致
 - [ ] 数据表数值与母稿一致
 - [ ] 无乱码或格式错位
@@ -453,7 +454,7 @@ PPTX 生成后，检查：
 ### 重生链
 
 ```
-数据池 MD 改动 → 母稿 MD 更新 → 图表 XML 重生 → 图表 HTML 重生 → 页面 HTML 重生
+数据池 MD 改动 → 母稿 MD 更新 → 图表 XML 重生（再次调用 robot-aiot-draw-flowchart，以更新后的技术/领导版 MD 内容为输入重新生成） → 图表 HTML 重生 → 页面 HTML 重生
 ```
 
 - 每一级产物的上游变了，本级必须重生
@@ -497,7 +498,7 @@ PPTX 生成后，检查：
 ├── Phase 4: 自行完成（PPT 母稿结构化 + 逐页 HTML 化）
 │   ├── → 调用 ui-ux-pro-max --design-system（生成设计系统：配色/字体/间距）
 │   └── → 参考 material-3/references/（MD3 配色角色 + 字体梯度 + 8dp 间距 token）
-└── Phase 5: → 调用 ppt-master（agent 依据每页 HTML 手工编写 SVG，生成最终 PPTX）
+└── Phase 5: → 调用 ppt-master（读取逐页 HTML/MD 生成最终 PPTX）
 ```
 
 调用外部技能时，使用 `skill` 工具按名称加载，传入本技能产出的文件路径作为输入。
@@ -516,7 +517,7 @@ PPTX 生成后，检查：
 6. 按页结构化母稿：标题→结论→数据→话术
 7. 逐页 HTML 化前，调用 `ui-ux-pro-max --design-system` 生成配色/字体/间距设计系统，参考 `material-3` MD3 规范，首页架构图主色优先
 8. 母稿定稿后，每一页必须先转成单页 HTML，固定样式和布局
-9. 调用 ppt-master 时，agent 依据每页 HTML 手工编写 SVG 页面，以 XML 为图表样式追溯源
+9. 调用 ppt-master 时，ppt-master 读取逐页 HTML/MD 生成幻灯片页面，以 XML 为图表样式追溯源
 10. 交叉校验数据一致性和页面一致性，每改一处全文校验
 11. 定稿后调用 ppt-master 生成最终 PPTX
 

@@ -44,6 +44,8 @@
 | `verticalAlign=middle` | `display:flex; align-items` | `center` |
 | `verticalAlign=bottom` | `display:flex; align-items` | `flex-end` |
 
+**fontStyle 位运算组合值说明**：`fontStyle` 为位标志，1=bold，2=italic，4=underline。组合值示例：`fontStyle=3`（1+2）→ `font-weight:bold; font-style:italic`；`fontStyle=6`（2+4）→ `font-style:italic; text-decoration:underline`；`fontStyle=7`（1+2+4）→ 三者均生效。脚本处理时应对值做 bitwise AND 判断（`fontStyle & 1`、`fontStyle & 2`、`fontStyle & 4`），而非直接等值比较。
+
 ## 形状映射
 
 draw.io 的 `shape=` 属性决定节点的基本渲染形态：
@@ -58,6 +60,8 @@ draw.io 的 `shape=` 属性决定节点的基本渲染形态：
 | `swimlane` | `<div>` 泳道容器 | 带标题栏的容器 |
 | `hexagon` | `<div>` 六边形 | `clip-path: polygon(...)` |
 | `triangle` | `<div>` 三角形 | `clip-path: polygon(...)` |
+
+> ⚠️ `mxgraph.flowchart.*` 命名空间形状（如 `merge_or_storage`）目前无映射规则，转换时触发未映射属性警告。已知缺口，待后续 change 补充。
 
 ## 连线样式映射（edge 元素）
 

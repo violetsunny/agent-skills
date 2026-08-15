@@ -1,0 +1,1 @@
+源 skill 项目已移到 self/skills/ 子目录下（如 self/skills/superpowers/、self/skills/matt-skills/、self/skills/claude-code-java/ 等）。OpenSpec CLI 已升级到 1.9.0，openspec init 新增 Gemini CLI，核心 profile 只保留 6 个 opsx 命令。matt-skills 新增 skill 需通过 `npx skills@latest add mattpocock/skills` 交互式安装。

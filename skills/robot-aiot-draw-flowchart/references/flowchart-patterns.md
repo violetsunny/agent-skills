@@ -162,6 +162,8 @@
 - 并行任务垂直排列，间距 20px
 - 所有并行任务完成后才能继续
 
+> ⚠️ `mxgraph.flowchart.merge_or_storage` 等 `mxgraph.flowchart.*` 命名空间形状目前在 robot-aiot-xml-html-bridge 的映射表中无对应 CSS，转换时会触发未映射属性警告。已知缺口，待后续 change 补充映射。
+
 ---
 
 ## 5. 子流程图 (Subprocess)

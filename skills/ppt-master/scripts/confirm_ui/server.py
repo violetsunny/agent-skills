@@ -130,9 +130,9 @@ _ICON_PREVIEW_SAMPLES = {
     'phosphor-duotone': ('house', 'chart-line', 'users', 'target'),
 }
 
-# Prefer the same memorable entry port as live preview. Normal single-project
-# execution releases it between Step 4 and Step 6; concurrent projects advance
-# from this base while explicit ``--port`` remains exact.
+# Keep the long-standing Confirm UI entry port. Live preview uses a separate
+# base range so stale preview tabs cannot address a later Confirm UI process.
+# Concurrent Confirm UI sessions advance while explicit ``--port`` remains exact.
 DEFAULT_PORT = 5050
 PUBLIC_HOST = '127.0.0.1'
 STARTUP_TIMEOUT = 10
@@ -1258,7 +1258,7 @@ def _localized_text_present(candidate: dict, field: str) -> bool:
     """Return whether a candidate carries non-empty localized prose."""
     return any(
         isinstance(candidate.get(key), str) and bool(candidate[key].strip())
-        for key in (field, f'{field}_zh', f'{field}_en', f'{field}_ja')
+        for key in (field, f'{field}_zh', f'{field}_zh_tw', f'{field}_en', f'{field}_ja')
     )
 
 
@@ -1286,13 +1286,12 @@ def _stage2_production_recommendations_error(
     recommend = recommendations.get('recommend')
     if not isinstance(recommend, dict):
         recommend = {}
-    for field in ('formula_policy', 'generation_mode'):
-        value = recommend.get(field)
-        if not isinstance(value, str) or not value.strip():
-            return (
-                'Stage 2 recommendations must include non-empty '
-                f'recommend.{field}'
-            )
+    generation_mode = recommend.get('generation_mode')
+    if not isinstance(generation_mode, str) or not generation_mode.strip():
+        return (
+            'Stage 2 recommendations must include non-empty '
+            'recommend.generation_mode'
+        )
     refine_spec = recommendations.get('refine_spec')
     if (
         not isinstance(refine_spec, dict)
@@ -1311,10 +1310,9 @@ def _stage2_production_recommendations_error(
 
 def _stage2_production_result_error(result: dict) -> Optional[str]:
     """Require every user-confirmed production control in the final payload."""
-    for field in ('formula_policy', 'generation_mode'):
-        value = result.get(field)
-        if not isinstance(value, str) or not value.strip():
-            return f'final Stage 2 payload must include non-empty {field}'
+    generation_mode = result.get('generation_mode')
+    if not isinstance(generation_mode, str) or not generation_mode.strip():
+        return 'final Stage 2 payload must include non-empty generation_mode'
     if not isinstance(result.get('refine_spec'), bool):
         return 'final Stage 2 payload must include refine_spec as a boolean'
     if _uses_ai_images(result):
@@ -2270,8 +2268,8 @@ def _build_catalogs() -> dict:
     """Return the static catalog set with the canvas list synced live from
     ``config.CANVAS_FORMATS`` — the single source of truth for canvas formats —
     so the confirm page can never drift from the pipeline's real formats. The
-    set of formats and their dimensions come from config; trilingual labels and
-    use text are kept from catalogs.json (with a plain fallback for any new id).
+    set of formats and their dimensions come from config; four-language labels
+    and use text are kept from catalogs.json (with a plain fallback for new ids).
     """
     data = json.loads(_CATALOGS_PATH.read_text(encoding='utf-8'))
     try:
@@ -2765,6 +2763,10 @@ def create_app(
             result_file,
             carry_previous=rec_stage_number > 1,
         )
+        # Formula realization is Executor-owned. Accept the retired field from
+        # older recommendations/clients, but never persist it in a new receipt.
+        result.pop('formula_policy', None)
+        locked_values.pop('formula_policy', None)
         if rec_stage_number == 1 or not template_required:
             result.pop('template_application', None)
             locked_values.pop('template_application', None)

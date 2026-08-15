@@ -76,8 +76,11 @@ description: >
 
 优先级如下：
 
-1. **确定性渲染路径**：使用 `scripts/xml_to_html.py` 脚本执行转换，配合 `references/xml-html-mapping.md` 中的样式映射表。这是默认首选路径——脚本用标准库 `xml.etree.ElementTree` 解析 XML，按映射表确定性生成坐标驱动 HTML，不依赖 AI 即兴发挥
-2. **手工映射降级路径**：若目标环境无 Python，agent 可按 `references/xml-html-mapping.md` 中的映射规则手工将 mxCell 样式翻译为 CSS，但必须逐项对照映射表，不可跳过或自创规则
+1. **确定性渲染路径**：使用 `scripts/xml_to_html.py` 脚本执行转换，配合 `references/xml-html-mapping.md` 中的样式映射表。这是默认首选路径——脚本用标准库 `xml.etree.ElementTree` 解析 XML，按映射表确定性生成坐标驱动 HTML，不依赖 AI 即兴发挥。
+
+   **脚本位置**：`scripts/xml_to_html.py` 位于 `~/.agents/skills/robot-aiot-xml-html-bridge/scripts/` 目录下。在执行前，先确认脚本文件是否存在；若该文件不存在（非 Python 环境缺失），这属于环境配置问题，应提示用户检查 skill 安装完整性，而非直接降级为手工映射。
+
+2. **手工映射降级路径**：若目标环境无 Python（已确认 Python 环境缺失），agent 可按 `references/xml-html-mapping.md` 中的映射规则手工将 mxCell 样式翻译为 CSS，但必须逐项对照映射表，不可跳过或自创规则
 3. **人工近似路径禁止直接放行**：如果只能"肉眼照着重画"，该结果不能作为 PPT 主约束输入
 
 调用脚本示例：
@@ -94,13 +97,15 @@ python3 scripts/xml_to_html.py doc-ppt/<图表名>.xml -o doc-ppt/<图表名>.ht
 
 #### 步骤 0: 加载 UI 设计参考
 
+**必须加载 `ui-ux-pro-max` 和 Material Design 3 参考规范，不得跳过。** 若参考文件路径不可用，应提示用户修复 skill 安装，不得在未加载规范的情况下继续生成 HTML。
+
 在执行样式映射前，先加载以下 UI 设计规范作为补充参考：
 
 1. **加载 `ui-ux-pro-max` 准则**：读取 `ui-ux-pro-max` 的 `references/quick-reference.md` 中 §6（Typography & Color）和 §10（Charts & Data）准则，作为配色对比度和图表可读性的补充约束
 2. **加载 `material-3` MD3 配色角色**：读取 `material-3/references/color-system.md`，参考 MD3 的 primary/secondary/tertiary 配色角色定义来理解图表中的色彩层级关系
 3. **加载 `material-3` MD3 字体梯度**：读取 `material-3/references/typography-and-shape.md`，参考 MD3 Type Scale（Display/Headline/Title/Body/Label 五类）来理解字体层级梯度标准
 
-这些参考不改变 `xml-html-mapping.md` 中的确定性映射规则，仅作为 Phase 4 保真校验中 UI 规范补充检查的依据。如参考文件路径不可用，agent 可跳过此步骤，不影响确定性转换流程。
+这些参考不改变 `xml-html-mapping.md` 中的确定性映射规则，仅作为 Phase 4 保真校验中 UI 规范补充检查的依据。
 
 #### 步骤 1: 生成 HTML 结构
 
@@ -131,17 +136,24 @@ HTML 桥接稿推荐具备以下结构：
 3. 颜色、边框、字体、间距均来自 XML 样式映射，不自行换皮
 4. 如原图存在分层区块、泳道、数据卡片、图例，必须逐项落地
 
+> ⚠️ `mxgraph.flowchart.*` 命名空间形状（如 `merge_or_storage`）目前无映射规则，转换时触发未映射属性警告。已知缺口，待后续 change 补充。
+
 ### Phase 4: 保真校验
 
 生成 HTML 后，必须做最少一轮保真校验。`scripts/xml_to_html.py` 的 `verify_fidelity()` 会自动执行以下校验并输出结构化报告：
+
+**脚本自动校验覆盖：**
 
 1. **Vertex 数量校验**：HTML 中定位元素数量与 XML vertex 数量一致，不一致时非零退出
 2. **Edge 数量校验**：HTML 中 SVG `<line>` 元素数量与 XML edge 数量一致，不一致时非零退出
 3. **文本内容校验**：对每个 vertex 的 value 做 HTML 转义后检查是否出现在 HTML 输出中，缺失时标记 vertex ID 和预期文本
 4. **未映射样式属性报告**：列出所有映射表未定义的 style 属性名和值，不阻塞转换但标记为需人工确认
-5. 核对主要容器/泳道/层级数量是否一致
-6. 核对主视觉配色是否一致
-7. 核对整体相对布局是否一致
+
+**脚本 PASS 后 agent 还须手工校验（脚本不覆盖视觉感知项）：**
+
+5. **容器/泳道/层级嵌套结构**：检查容器、泳道、层级嵌套结构是否正确（脚本不校验层级嵌套关系）
+6. **配色对应**：核对主视觉配色是否与原 XML 色板对应
+7. **整体布局视觉密度**：核对整体相对布局是否一致、视觉密度是否合理（脚本不校验视觉感知项）
 
 校验报告输出格式：
 ```
@@ -213,6 +225,9 @@ agent 看到 `[UI-WARN]` 警告后可自行决定是否调整，不影响 HTML �
 
 ## 验证清单
 
+**阻塞项**（任一不满足则不得进入下一阶段）：
+
+- [ ] HTML 生成前已加载 ui-ux-pro-max 设计系统和 Material Design 3 规范
 - [ ] 输入 XML 为支持的 draw.io / mxGraph 结构
 - [ ] 输出 HTML 与 XML 一一对应
 - [ ] Vertex 数量一致
@@ -223,10 +238,13 @@ agent 看到 `[UI-WARN]` 警告后可自行决定是否调整，不影响 HTML �
 - [ ] 主色、边框色、字体层级未漂移
 - [ ] 画布比例和相对布局未漂移
 - [ ] 未映射样式属性已人工确认
-- [ ] 配色对比度达标（文字与背景对比度 ≥ 4.5:1，不达标项已标记 `[UI-WARN]`）
-- [ ] 字体层级梯度清晰（相邻层级 font-size 差值 ≥ 2px，参考 MD3 Type Scale 五类）
-- [ ] 图表可读性达标（表格行高 ≥ 32px，卡片内边距 ≥ 12px，不达标项已标记 `[UI-WARN]`）
 - [ ] 已声明 XML 为真源，HTML 为桥接约束层
 - [ ] 若 XML 变更，HTML 需整稿重生的规则已声明
 
-若以上任一关键项不满足，不要宣称"已可进入 PPT 阶段"。
+**非阻塞项 [UI-WARN]**（不满足时记录警告但不阻塞）：
+
+- [ ] 配色对比度达标（文字与背景对比度 ≥ 4.5:1，不达标项已标记 `[UI-WARN]`）
+- [ ] 字体层级梯度清晰（相邻层级 font-size 差值 ≥ 2px，参考 MD3 Type Scale 五类）
+- [ ] 图表可读性达标（表格行高 ≥ 32px，卡片内边距 ≥ 12px，不达标项已标记 `[UI-WARN]`）
+
+若以上任一**阻塞项**不满足，不要宣称"已可进入 PPT 阶段"。

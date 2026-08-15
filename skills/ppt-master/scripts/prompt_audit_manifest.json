@@ -13,12 +13,12 @@
       "skills/ppt-master/templates/schemas/*.json"
     ],
     "exclude": [],
-    "max_tokens": 500000
+    "max_tokens": 555000
   },
   "file_budgets": {
     "AGENTS.md": 2750,
     "skills/ppt-master/SKILL.md": 1250,
-    "skills/ppt-master/references/executor-base.md": 9250,
+    "skills/ppt-master/references/executor-base.md": 10000,
     "skills/ppt-master/references/executor-structured.md": 5500,
     "skills/ppt-master/references/executor-chart.md": 3500,
     "skills/ppt-master/references/executor-visualization.md": 1250,
@@ -37,7 +37,7 @@
     "skills/ppt-master/references/strategist-template.md": 3000,
     "skills/ppt-master/templates/design_spec_reference.md": 3750,
     "skills/ppt-master/templates/spec_lock_reference.md": 2750,
-    "skills/ppt-master/workflows/generate-pptx.md": 16000,
+    "skills/ppt-master/workflows/generate-pptx.md": 18000,
     "skills/ppt-master/workflows/stages/apply-template-workspace.md": 3500
   },
   "load_sets": {
@@ -49,7 +49,7 @@
         "skills/ppt-master/SKILL.md",
         "skills/ppt-master/workflows/routing.md"
       ],
-      "max_tokens": 6750
+      "max_tokens": 7750
     },
     "support.sponsor-recommendation.en": {
       "description": "English sponsor context for explicit user requests for model, AI image model, API/provider, or hosted-service recommendations.",
@@ -140,7 +140,7 @@
       "files": [
         "skills/ppt-master/workflows/native-enhance-pptx.md"
       ],
-      "max_tokens": 11000
+      "max_tokens": 13000
     },
     "route.fill-native-pptx": {
       "description": "Raw-PPTX native fill route.",
@@ -258,6 +258,32 @@
       "files": [],
       "max_tokens": 100000
     },
+    "route.generate.quick-generate.image-to-pptx": {
+      "description": "Codex-supported Quick-only Image to PPTX with registered reference-image layers and shared plates.",
+      "scope": "cumulative",
+      "include": [
+        "route.generate.quick-generate.in-hand-image",
+        "profile.generate.image-to-pptx"
+      ],
+      "files": [
+        "skills/ppt-master/references/image-base.md",
+        "skills/ppt-master/references/image-generator.md"
+      ],
+      "max_tokens": 130000
+    },
+    "route.generate.quick-generate.video-design": {
+      "description": "Quick Generate with conditional video-delivery design, frozen-script notes, custom animation, and narration/audio delivery.",
+      "scope": "cumulative",
+      "include": [
+        "route.generate.quick-generate",
+        "stage.generate.video-design",
+        "stage.generate.executor.notes",
+        "stage.generate.customize-animations",
+        "stage.shared.generate-audio"
+      ],
+      "files": [],
+      "max_tokens": 140000
+    },
     "route.generate.quick-generate.template-fusion": {
       "description": "Quick Generate with the maximum Brand, Style, Layout, and Deck exact-root fusion loaded for flat authoring.",
       "scope": "cumulative",
@@ -300,15 +326,23 @@
       "max_tokens": 110000
     },
     "route.generate.quick-generate.formula": {
-      "description": "Quick Generate with manifest-driven formula rendering and formula-image realization.",
+      "description": "Quick Generate with direct PowerPoint-native formula marker authoring.",
       "scope": "cumulative",
       "include": [
         "route.generate.quick-generate",
-        "stage.generate.executor.image"
+        "stage.generate.executor.formula"
       ],
-      "files": [
-        "skills/ppt-master/scripts/docs/image.md"
+      "files": [],
+      "max_tokens": 110000
+    },
+    "route.generate.quick-generate.hyperlink": {
+      "description": "Quick Generate with direct PowerPoint-native external and same-deck hyperlink authoring.",
+      "scope": "cumulative",
+      "include": [
+        "route.generate.quick-generate",
+        "stage.generate.executor.hyperlink"
       ],
+      "files": [],
       "max_tokens": 110000
     },
     "route.generate.quick-generate.ai-two-types": {
@@ -347,7 +381,7 @@
       "files": [
         "skills/ppt-master/scripts/docs/visualization-recall.md"
       ],
-      "max_tokens": 105000
+      "max_tokens": 120000
     },
     "route.generate.planning-image": {
       "description": "Generate-PPTX planning context after a non-none image source is proposed or confirmed, including the compact layout math and vocabulary.",
@@ -360,14 +394,13 @@
       "max_tokens": 115000
     },
     "route.generate.planning-formula": {
-      "description": "Formula-only planning context, including the shared image/formula layout math and vocabulary.",
+      "description": "Formula-bearing planning context; Strategist records exact mathematics without loading image-layout or formula-rendering resources.",
       "scope": "cumulative",
       "include": [
-        "route.generate.planning",
-        "stage.generate.strategist.image"
+        "route.generate.planning"
       ],
       "files": [],
-      "max_tokens": 115000
+      "max_tokens": 110000
     },
     "route.generate.planning-ai": {
       "description": "Generate-PPTX planning after AI imagery is confirmed, adding image-layout and resource-planning authorities to the rendering index and already-selected rendering bases.",
@@ -512,6 +545,30 @@
       "files": [],
       "max_tokens": 165000
     },
+    "route.generate.flat-formula": {
+      "description": "Default flat Generate-PPTX context with direct PowerPoint-native formula marker authoring and no image branch.",
+      "scope": "cumulative",
+      "include": [
+        "route.generate.planning-formula",
+        "stage.generate.executor.flat",
+        "stage.generate.executor.formula",
+        "stage.generate.executor.notes"
+      ],
+      "files": [],
+      "max_tokens": 170000
+    },
+    "route.generate.flat-hyperlink": {
+      "description": "Default flat Generate-PPTX context with PowerPoint-native external and same-deck hyperlink authoring.",
+      "scope": "cumulative",
+      "include": [
+        "route.generate.planning",
+        "stage.generate.executor.flat",
+        "stage.generate.executor.hyperlink",
+        "stage.generate.executor.notes"
+      ],
+      "files": [],
+      "max_tokens": 170000
+    },
     "route.generate.flat-ai-two-types": {
       "description": "Generate-PPTX context with AI images, the selected preset or exact custom rendering bases, and two local types.",
       "scope": "cumulative",
@@ -526,7 +583,7 @@
       "max_tokens": 205000
     },
     "route.generate.flat-in-hand-image": {
-      "description": "Generate-PPTX context with provided, placeholder, or formula images and no acquisition role.",
+      "description": "Generate-PPTX context with provided or placeholder images and no acquisition role.",
       "scope": "cumulative",
       "include": [
         "route.generate.planning-image",
@@ -558,7 +615,7 @@
         "stage.shared.generate-audio"
       ],
       "files": [],
-      "max_tokens": 17000
+      "max_tokens": 19000
     },
     "route.generate.beautify-flat-no-image": {
       "description": "Generate-PPTX 1:1 beautify profile on the flat no-image path.",
@@ -569,6 +626,18 @@
       ],
       "files": [],
       "max_tokens": 175000
+    },
+    "route.generate.flat-no-image.video-design": {
+      "description": "Default flat Generate-PPTX path with conditional video-delivery design, custom animation, and narration/audio delivery.",
+      "scope": "cumulative",
+      "include": [
+        "route.generate.flat-no-image",
+        "stage.generate.video-design",
+        "stage.generate.customize-animations",
+        "stage.shared.generate-audio"
+      ],
+      "files": [],
+      "max_tokens": 215000
     },
     "route.generate.flat-no-image-visualization": {
       "description": "Default flat Generate-PPTX path with visualization-reference consumption, all three information-model branches, optional native-data replacement, and chart verification.",
@@ -773,6 +842,22 @@
       ],
       "max_tokens": 7750
     },
+    "profile.generate.image-to-pptx": {
+      "description": "Codex-supported, Quick-only profile for reconstructing raster page frames as layered editable PPTX.",
+      "scope": "incremental",
+      "files": [
+        "skills/ppt-master/workflows/profiles/image-to-pptx.md"
+      ],
+      "max_tokens": 4000
+    },
+    "stage.generate.video-design": {
+      "description": "Conditional recorded/self-running delivery design and prepared final-script handling shared by Default and Quick.",
+      "scope": "incremental",
+      "files": [
+        "skills/ppt-master/references/video-design.md"
+      ],
+      "max_tokens": 3250
+    },
     "stage.generate.refine-spec": {
       "description": "Explicit post-confirmation spec refinement runbook.",
       "scope": "incremental",
@@ -842,7 +927,7 @@
       "files": [
         "skills/ppt-master/references/animations.md"
       ],
-      "max_tokens": 9000
+      "max_tokens": 11000
     },
     "stage.shared.generate-audio": {
       "description": "Shared narration-audio stage.",
@@ -850,7 +935,7 @@
       "files": [
         "skills/ppt-master/workflows/stages/generate-audio.md"
       ],
-      "max_tokens": 6000
+      "max_tokens": 8000
     },
     "governance.failure-recovery": {
       "description": "Global stop, retry, and resume policy.",
@@ -937,7 +1022,7 @@
       "max_tokens": 1000
     },
     "stage.generate.strategist.image": {
-      "description": "Conditional Strategist image/formula layout math and compact composition vocabulary; the rendering decision core is already in base planning.",
+      "description": "Conditional Strategist image layout math and compact composition vocabulary; the rendering decision core is already in base planning.",
       "scope": "incremental",
       "files": [
         "skills/ppt-master/references/image-layout-spec.md",
@@ -960,6 +1045,22 @@
         "skills/ppt-master/references/native-data-interface.md"
       ],
       "max_tokens": 6750
+    },
+    "stage.generate.executor.formula": {
+      "description": "Conditional direct authoring contract for PowerPoint-native inline and block formulas.",
+      "scope": "incremental",
+      "files": [
+        "skills/ppt-master/references/native-formula.md"
+      ],
+      "max_tokens": 2000
+    },
+    "stage.generate.executor.hyperlink": {
+      "description": "Conditional direct authoring contract for PowerPoint-native external and same-deck click hyperlinks.",
+      "scope": "incremental",
+      "files": [
+        "skills/ppt-master/references/native-hyperlinks.md"
+      ],
+      "max_tokens": 1250
     },
     "stage.generate.executor.image": {
       "description": "Conditional image embedding and execution rules with the always-read layout math and compact composition vocabulary.",
@@ -1129,48 +1230,12 @@
       },
       {
         "kind": "exact",
-        "fingerprint": "da38ec6c641e",
-        "paths": [
-          "skills/ppt-master/SPONSORS.md",
-          "skills/ppt-master/SPONSORS_CN.md"
-        ],
-        "reason": "English and Chinese sponsor pages intentionally reuse the same sponsor badge markup."
-      },
-      {
-        "kind": "exact",
-        "fingerprint": "fcc902f6644a",
-        "paths": [
-          "skills/ppt-master/SPONSORS.md",
-          "skills/ppt-master/SPONSORS_CN.md"
-        ],
-        "reason": "English and Chinese sponsor pages intentionally reuse the same sponsor badge markup."
-      },
-      {
-        "kind": "exact",
-        "fingerprint": "092a8a1f88e9",
-        "paths": [
-          "skills/ppt-master/SPONSORS.md",
-          "skills/ppt-master/SPONSORS_CN.md"
-        ],
-        "reason": "English and Chinese sponsor pages intentionally reuse the same sponsor badge markup."
-      },
-      {
-        "kind": "exact",
         "fingerprint": "6a432b0cc1df",
         "paths": [
           "skills/ppt-master/templates/decks/README.md",
           "skills/ppt-master/templates/layouts/README.md"
         ],
         "reason": "Sibling Deck and Layout docs keep the shared replication-mode explanation in lockstep."
-      },
-      {
-        "kind": "exact",
-        "fingerprint": "aa6e1929dd49",
-        "paths": [
-          "skills/ppt-master/SPONSORS.md",
-          "skills/ppt-master/SPONSORS_CN.md"
-        ],
-        "reason": "English and Chinese sponsor pages intentionally reuse the same sponsor badge markup."
       },
       {
         "kind": "exact",
@@ -2004,6 +2069,10 @@
         "reason": "Maintainer-only documentation for this audit tool."
       },
       {
+        "glob": "skills/ppt-master/scripts/docs/image.md",
+        "reason": "Standalone image-tool command reference; generation roles load the owning image contracts directly, and its formula renderer section is legacy-only."
+      },
+      {
         "glob": "skills/ppt-master/scripts/docs/mask-gradient-smoke.md",
         "reason": "Maintainer-only executable smoke; never loaded by generation roles."
       },
@@ -2030,6 +2099,14 @@
       {
         "glob": "skills/ppt-master/templates/icons/THIRD_PARTY_NOTICES.md",
         "reason": "Third-party icon license and provenance notice; distributed for compliance, never loaded as prompt context."
+      },
+      {
+        "glob": "skills/ppt-master/templates/sounds/README.md",
+        "reason": "Bundled sound-library usage and metadata reference; not loaded as runtime prompt context."
+      },
+      {
+        "glob": "skills/ppt-master/templates/sounds/THIRD_PARTY_NOTICES.md",
+        "reason": "Third-party sound license and provenance notice; distributed for compliance, never loaded as prompt context."
       },
       {
         "glob": "skills/ppt-master/references/shared-standards.md",

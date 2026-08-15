@@ -8,7 +8,7 @@ tags: ["workflow", "artifacts", "experimental"]
 
 Implement tasks from an OpenSpec change.
 
-**Store selection:** If the user names a store (a store is a standalone OpenSpec repo registered on this machine) or the work lives in one, run `openspec store list --json` to discover registered store ids, then pass `--store <id>` on the commands that read or write specs and changes (`new change`, `status`, `instructions`, `list`, `show`, `validate`, `archive`, `doctor`, `context`, `view`). Once selected, treat `--store <id>` as sticky for the rest of the workflow. Every unscoped example of those commands below is shorthand: before running it, append the flag. For example, run `openspec status --change "<name>" --json --store "<id>"`, not the unscoped form shown below. Other commands do not take the flag. Hints printed by commands already carry the flag; keep it on follow-ups. Without a store, commands act on the nearest local `openspec/` root.
+**Store selection:** If the user names a store (a store is a standalone OpenSpec repo registered on this machine) or the work lives in one, run `openspec store list --json` to discover registered store ids, then pass `--store <id>` on the commands that read or write specs and changes (`new change`, `status`, `instructions`, `list`, `show`, `validate`, `archive`, `doctor`, `context`, `schemas`, `view`). Once selected, treat `--store <id>` as sticky for the rest of the workflow. Every unscoped example of those commands below is shorthand: before running it, append the flag. For example, run `openspec status --change "<name>" --json --store "<id>"`, not the unscoped form shown below. Other commands do not take the flag. Hints printed by commands already carry the flag; keep it on follow-ups. Without a store, commands act on the nearest local `openspec/` root.
 
 **Input**: Optionally specify a change name (e.g., `/opsx:apply add-auth`). If omitted, check if it can be inferred from conversation context. If vague or ambiguous you MUST prompt for available changes.
 
@@ -46,10 +46,10 @@ Implement tasks from an OpenSpec change.
    - Optional `context`: current required project instruction input from the selected root
    - Optional `operationGuidance`: current advisory guidance for apply
 
-    **Handle states:**
-    - If `state: "blocked"` (missing artifacts): show message, suggest using `/opsx:continue` (if it is not installed, run `openspec status --change "<name>" --json` to see the next artifact and `openspec instructions <artifact-id> --change "<name>" --json` for how to create it)
-    - If `state: "all_done"`: immediately invoke Hook B; do not suggest manual archive
-    - Otherwise: proceed to implementation
+   **Handle states:**
+   - If `state: "blocked"` (missing artifacts): show message, suggest using `/opsx:continue` (if it is not installed, run `openspec status --change "<name>" --json` to see the next artifact and `openspec instructions <artifact-id> --change "<name>" --json` for how to create it)
+   - If `state: "all_done"`: congratulate, suggest archive
+   - Otherwise: proceed to implementation
 
    Treat `context` as a required prompt-level input. Read and consider it, and
    apply relevant project facts, conventions, and constraints while implementing.
@@ -96,29 +96,16 @@ Implement tasks from an OpenSpec change.
    **Pause if:**
    - Task is unclear → ask for clarification
    - Implementation reveals a design issue → suggest updating artifacts
+   - A task needs work beyond what the spec and tasks describe, or you are tempted to drop, narrow, defer, or accept exceptions to specified behavior to make it fit → surface the added scope and ask; do not absorb it silently
    - Error or blocker encountered → report and wait for guidance
    - User interrupts
 
 7. **On completion or pause, show status**
 
-   Before showing the final status, always re-run:
-   ```bash
-   openspec instructions apply --change "<name>" --json
-   ```
-
-   Use the returned `state` as the only completion signal. Do not infer
-   completion from the checkbox count or from `N/M tasks complete`.
-
-   - If `state: "all_done"`, immediately use the **Skill tool** to invoke
-     `opsx-workflow-hooks` (Hook B). Do not end the response after suggesting
-     `/opsx:archive`.
-   - If the state is not `all_done`, report the actual state and stop. This is
-     a paused or blocked apply; do not invoke Hook B.
-
    Display:
    - Tasks completed this session
    - Overall progress: "N/M tasks complete"
-   - If `state: "all_done"`: run Hook B before displaying the archive summary
+   - If all done: suggest archive
    - If paused: explain why and wait for guidance
 
 **Output During Implementation**
@@ -149,10 +136,7 @@ Working on task 4/7: <task description>
 - [x] Task 2
 ...
 
-All tasks complete! The completion state was re-checked as `all_done`; Hook B
-is now classifying the diff, running `tdd` and `test-quality` only if code
-changed, then continuing through review, self-test handoff, verification, and
-archive.
+All tasks complete! You can archive this change with `/opsx:archive`.
 ```
 
 **Output On Pause (Issue Encountered)**
@@ -183,6 +167,8 @@ What would you like to do?
 - Keep code changes minimal and scoped to each task
 - Update task checkbox immediately after completing each task
 - Pause on errors, blockers, or unclear requirements - don't guess
+- When a task needs work beyond what the spec describes, surface the added scope and pause - never silently narrow, defer, or simplify away specified behavior
+- Only mark a task `- [x]` when its specified behavior is fully implemented, not when it is partially done or deferred
 - Use contextFiles from CLI output, don't assume specific file names
 - Do not use context or operation guidance as proof that a task is complete
 - Apply relevant project context; report conflicts with controlling workflow inputs
@@ -196,11 +182,18 @@ This skill supports the "actions on a change" model:
 
 - **Can be invoked anytime**: Before all artifacts are done (if tasks exist), after partial implementation, interleaved with other actions
 - **Allows artifact updates**: If implementation reveals design issues, suggest updating artifacts - not phase-locked, work fluidly
-
 <!-- OPSX IMMUTABLE BOUNDARY: original command content above this line must not be modified -->
 
 **Post-completion hook**
 
-After the final task is marked complete, re-run `openspec instructions apply --change "<name>" --json`. Only when that command returns `state: "all_done"`, immediately use the **Skill tool** to invoke the `opsx-workflow-hooks` skill (Hook B). Hook B will first classify whether the completed diff contains code changes or only docs/comments/proposal-style edits. Only code changes run `tdd` and `test-quality` to validate changed methods and interfaces before the review flow continues. Do not finish with a suggestion to archive manually.
+After the final task is marked complete, re-run `openspec instructions apply
+--change "<name>" --json`. Only when that command returns
+`state: "all_done"`, immediately use the **Skill tool** to invoke the
+`opsx-workflow-hooks` skill (Hook B). Hook B will first classify whether the
+completed diff contains code changes or only docs/comments/proposal-style
+edits. Only code changes run `tdd` and `test-quality` to validate changed
+methods and interfaces before the review flow continues. Do not finish with a
+suggestion to archive manually.
 
-If apply is paused mid-way, do NOT invoke the hook. Wait for the user to resume.
+If the re-check returns any other state, do not invoke the hook. Report the
+state and wait for the user to resume or resolve the blocker.

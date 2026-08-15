@@ -1,7 +1,7 @@
 ---
 name: git-self-update
 description: >
-  批量更新 self 目录下所有 git 项目；同步 superpowers / claude-code-java / matt-skills / anthropics-skills / ui-ux-pro-max-skill / ppt-master 的 skill 文件到 ~/.agents/skills/；先升级并运行 openspec update，再将 OpenSpec 更新后的 ~/.claude/commands/opsx 和 ~/.claude/skills/openspec-* 按保护规则同步到 ~/.agents。递归三层扫描所有嵌套 git 仓库；处理网络重试并报告冲突；  仅在 ~/.agents/skills/ 中已存在的普通 skill 才会被同步（OpenSpec 管理的 skill 按专门流程同步）。
+  批量更新 self 目录下所有 git 项目；同步 superpowers / claude-code-java / matt-skills / anthropics-skills / ui-ux-pro-max-skill / ppt-master 的 skill 文件到 ~/.agents/skills/；先切换到更完整的 OpenSpec profile、升级并运行 openspec init/update，再将 OpenSpec 在 ~/.claude 下实际生成的完整 commands 和 skills 集合按保护规则同步到 ~/.agents。递归三层扫描所有嵌套 git 仓库；处理网络重试并报告冲突；仅在 ~/.agents/skills/ 中已存在的普通 skill 才会被同步（OpenSpec 生成物按专门流程同步）。
   模块 4 在模块 2-3 完成后，将 ~/.agents/skills/ 全量同步到个人知识库 /Users/kangll13/aiot/java-code/self/gggggggood/agent-skills/skills/（不加 --delete，只覆盖已有 + 新增）。
   其中 /Users/kangll13/aiot/java-code/self/gggggggood/ 下的代码由用户维护，禁止任何回滚、清理、覆盖或自动冲突处理；发现异常或冲突必须直接提示用户并跳过。
   模块 4 的 skill 文件同步是用户明确要求的例外：允许将 ~/.agents/skills/ 的 skill 文件覆盖到 agent-skills/skills/，但仍禁止 --delete、禁止 git commit/push 等写操作，同步后仅报告变更清单由用户自行审查和提交。
@@ -18,7 +18,7 @@ description: >
 - 目标根目录：`/Users/kangll13/aiot/java-code/self`
 - Skill 目标目录：`/Users/kangll13/.agents/skills/`
 - 必须使用 `/usr/bin/git` 绝对路径（zsh 的 `for` 循环子 shell 中 PATH 可能不包含 git）
-- `openspec` CLI 应通过 `@fission-ai/openspec@latest` 全局安装；执行前必须确认 `openspec --version`
+- `openspec` CLI 应通过 `@fission-ai/openspec@latest` 全局安装；如环境尚未初始化或刚切换 profile，先按模块 2 完成 `openspec init` / profile 切换，再确认 `openspec --version`
 
 ---
 
@@ -36,6 +36,14 @@ description: >
 - 任何不确定是否会修改、删除或覆盖保护目录内容的命令都不得执行，先提示用户确认。
 
 保护规则优先级高于本技能其他章节。结果汇总必须单独列出保护目录中跳过的仓库及原因，不得报告为成功。
+
+### `[SKIP-DIRTY]` 的含义
+
+执行批量更新时，如果仓库存在未提交改动、未跟踪文件或其他本地工作区变化，应输出类似 `[SKIP-DIRTY] <repo-path>` 的状态。该状态表示：
+
+- 仓库因本地改动触发保护规则，**未执行** `git pull`
+- 这是保护性跳过，不是网络失败、认证失败或命令报错
+- 需要与 `[AUTH]`、`[NETWORK]`、`[FAILED]` 分开统计和解释，避免用户误解
 
 ### 步骤 1.1：递归三层扫描 git 仓库
 
@@ -71,14 +79,34 @@ export GIT=/usr/bin/git
 
 ---
 
-## 模块 2：升级并更新 OpenSpec（使用用户终端环境）
+## 模块 2：切换完整 Profile 并更新 OpenSpec（使用用户终端环境）
 
-OpenSpec 旧版本的 `openspec update` 只能更新已有工具文件，不能完成 CLI 本身升级。必须先在用户自己的 macOS Terminal 中升级 `@fission-ai/openspec`，再执行 `openspec update`。优先从用户主目录运行，而不是由批处理子 shell 或项目目录代执行。
+OpenSpec 旧版本的 `openspec update` 只能更新已有工具文件，不能完成 CLI 本身升级。并且如果当前 profile 仍是基础/核心最小集合，即使执行了 init/update，生成出来的 commands / skills 也不会是用户要的“最全”集合。必须先确认并在需要时切换到更完整的 profile，再在用户自己的 macOS Terminal 中执行 `openspec init`、升级 CLI、运行 `openspec update`。优先从用户主目录运行，而不是由批处理子 shell 或项目目录代执行。
+
+### “最全”的判定
+
+本技能中“最全”的含义不是某个固定 profile 名称，也不是只看 `opsx` 是否存在，而是：**当前启用 profile 在 `~/.claude/commands/` 与 `~/.claude/skills/` 下实际生成的 commands / skills 集合，是否已经覆盖用户需要的完整内容**。判断时以运行后的实际目录内容为准，不写死文件名名单。
 
 **操作步骤**：
 
 1. 打开 macOS Terminal，确认 shell 初始化完成；若出现 `compinit` insecure files 提示，按终端提示选择继续即可，该提示与 OpenSpec 无关。
-2. 从用户主目录升级 CLI 并确认版本：
+2. 先检查当前 OpenSpec profile 是否已经是目标完整 profile；如果当前 profile 只能生成基础 commands / skills，则先执行：
+
+```bash
+cd ~
+openspec config profile
+```
+
+在交互式列表中选择能生成更完整 commands / skills 集合的 profile。**“最全”的判定方式**不是固定名字，而是看该 profile 在 `~/.claude/commands/` 与 `~/.claude/skills/` 下实际生成的内容是否满足用户需要。
+
+3. 如当前环境尚未初始化 OpenSpec，或刚切换了 profile，或 `openspec update` 提示需要初始化 / 新增工具，再在用户主目录执行：
+
+```bash
+cd ~
+openspec init
+```
+
+4. 从用户主目录升级 CLI 并确认版本：
 
 ```bash
 cd ~
@@ -88,71 +116,67 @@ openspec --version
 
 版本必须是当前 latest 版本；如果仍是旧版本，停止并提示用户，不要继续执行旧版更新。
 
-3. 执行升级式更新：
+5. 执行升级式更新：
 
 ```bash
 cd ~
 openspec update
 ```
 
-4. 根据输出判定结果：
+6. 根据输出判定结果：
    - `Upgrading to the new OpenSpec` 且随后出现 `Updated: ... (vX.Y.Z)`：CLI 和工具升级成功。
    - `All N tool(s) up to date (vX.Y.Z)`：工具更新成功，但不代表 CLI 已升级；必须结合 `openspec --version` 判断。
    - `Use --force to refresh files anyway.`：提示信息，不是错误；只有明确要求刷新时才使用 `--force`。
    - `Detected new tool: Gemini CLI. Run 'openspec init' to add it.`：已有工具更新成功，只是提示 Gemini CLI 尚未加入；需要时再执行 `openspec init`。
    - `No configured tools found. Run "openspec init" to set up tools.`：当前用户环境没有 OpenSpec 工具配置，再执行 `openspec init`；不能仅因存在旧的 `openspec/AGENTS.md` 就判定更新失败。
-   - `custom profile is missing ... update`：更新成功但 profile 不完整；执行 `openspec config profile`，需要完整核心流程时执行 `openspec config profile core`。
-5. 运行完成后，通过 skill 工具加载并运行 `/opsx-workflow-hooks` skill，完成 OPSX 工作流初始化。
+   - `custom profile is missing ... update`：更新成功但 profile 不完整；执行 `openspec config profile`，重新选择能生成所需完整 commands / skills 集合的 profile。
+7. 运行完成后，通过 skill 工具加载并运行 `/opsx-workflow-hooks` skill，完成 OPSX 工作流初始化。
 
 OpenSpec 升级可能清理旧版命令文件，并将 OPSX 迁移到 Agent Skills。出现 `No user content to preserve` 时可按提示清理；出现 `differ from the copy in .agents` 时不得覆盖用户自定义副本，必须提示并人工比对。不得使用 `--force` 覆盖 `/Users/kangll13/aiot/java-code/self/gggggggood/` 下用户代码或用户自行维护的文件。
 
-### OPSX 命令补充与校验
+### OpenSpec commands / skills 补充与校验
 
-OpenSpec 1.8.0 可能按 profile 生成不同数量的 OPSX 命令文件。`openspec update` 的权威输出目录是 `~/.claude/commands/opsx/`，不能假设它会直接更新 `~/.agents/commands/opsx/`。
+OpenSpec 可能按 profile 生成不同数量的 commands / skills，且文件集合随 profile、版本和工具配置变化。`openspec init` / `openspec update` 的权威输出目录是 `~/.claude/commands/` 与 `~/.claude/skills/`，不能假设它只会更新 `commands/opsx/` 或只生成 `openspec-*` skills。
 
 更新 OpenSpec 后，必须按以下固定顺序执行：
 
 ```bash
-rsync -r --delete ~/.claude/commands/opsx/ ~/.agents/commands/opsx/
+rsync -r --delete ~/.claude/commands/ ~/.agents/commands/
 ```
 
-然后同步 OpenSpec 生成的 Agent Skills，但不得直接覆盖 `.agents` 中已有差异：
+然后同步当前 profile 在 `~/.claude/skills/` 下实际生成的完整 Agent Skills。`.claude` 是 OpenSpec 更新后的权威源，无论本地是否有差异，均直接覆盖：
 
 ```bash
-for skill_dir in ~/.claude/skills/openspec-*; do
+for skill_dir in ~/.claude/skills/*; do
   [ -d "$skill_dir" ] || continue
   skill_name=$(basename "$skill_dir")
   target_dir="$HOME/.agents/skills/$skill_name"
-
-  if [ ! -d "$target_dir" ]; then
-    rsync -r --delete "$skill_dir/" "$target_dir/"
-    continue
-  fi
 
   if diff -rq "$skill_dir" "$target_dir" >/dev/null 2>&1; then
     continue
   fi
 
-  printf '[DIFF] %s\n' "$skill_name"
+  rsync -r --delete "$skill_dir/" "$target_dir/"
+  printf '[OVERWRITE] %s\n' "$skill_name"
 done
 ```
 
-出现 `[DIFF] <skill_name>` 说明 `~/.agents/skills/<skill_name>/` 已有本地差异，必须提示用户人工比对并跳过该 skill；不得执行 `rsync --delete` 覆盖目标目录。只有目标不存在或与源完全一致时，才允许同步或跳过。
+`.claude` 是权威源，当前 profile 实际生成的 skills 遇到差异时直接用 `rsync -r --delete` 覆盖 `.agents` 副本，并在汇总中报告已覆盖的 skill 名称（`[OVERWRITE]`）。两者一致时静默跳过。
 
-完成上述同步后，必须立即通过 skill 工具运行 `/opsx-workflow-hooks`，恢复并校验 `propose.md` / `apply.md` 的 Hook A / Hook B。因为 `rsync -r --delete ~/.claude/commands/opsx/ ~/.agents/commands/opsx/` 会先覆盖 `.agents` 运行时副本，若不立即恢复 hook，下一次 `/opsx` 流程将失去自动回调。
+完成上述同步后，必须立即通过 skill 工具运行 `/opsx-workflow-hooks`，恢复并校验 `propose.md` / `apply.md` 的 Hook A / Hook B。因为 `rsync -r --delete ~/.claude/commands/ ~/.agents/commands/` 会先覆盖 `.agents` 运行时副本，若不立即恢复 hook，下一次 `/opsx` 流程将失去自动回调。
 
-不要从旧的 `~/.agents/commands/opsx/` 反向覆盖新版 `.claude` 文件；`.claude` 是 OpenSpec 更新后的权威源。
+不要从旧的 `~/.agents/commands/` 或 `~/.agents/skills/` 反向覆盖新版 `.claude` 文件；`.claude` 是 OpenSpec 更新后的权威源。
 
-OpenSpec 1.8.0 当前核心 profile 使用以下 6 个 OPSX 命令文件：
-
-`apply.md`、`archive.md`、`explore.md`、`propose.md`、`sync.md`、`update.md`
+OpenSpec 升级后，完整 commands / skills 的实际文件集合以 `~/.claude/commands/` 与 `~/.claude/skills/` 目录内容为准，不应假定固定的文件名列表或仅同步某个子目录。
 
 升级后必须检查以下两处目录：
 
-- OpenSpec 权威源：`/Users/kangll13/.claude/commands/opsx/`
-- 运行时目标：`/Users/kangll13/.agents/commands/opsx/`
+- OpenSpec 权威源 commands：`/Users/kangll13/.claude/commands/`
+- 运行时目标 commands：`/Users/kangll13/.agents/commands/`
+- OpenSpec 权威源 skills：`/Users/kangll13/.claude/skills/`
+- 运行时目标 skills：`/Users/kangll13/.agents/skills/`
 
-两处应包含相同的命令文件集合。随后仅允许 `.agents` 中的 `propose.md` 和 `apply.md` 比 `.claude` 多出 append-only 的 Hook A / Hook B 尾部；如果新版 OpenSpec 源文件没有 hook，只能在 `.agents` 运行时副本末尾按 append-only 规则补回，不得修改 `.claude` 原命令正文，也不得改动 `/self/gggggggood/` 下用户维护的源文件。
+commands 校验应满足：`~/.claude/commands/` 与 `~/.agents/commands/` 包含相同的实际文件集合。skills 校验应满足：当前 profile 在 `~/.claude/skills/` 下实际生成的每个 skill，都已同步到 `~/.agents/skills/` 且内容一致；`.agents/skills/` 中保留的其他非 OpenSpec skills 不视为异常。随后仅允许 `.agents/commands/opsx/` 中的 `propose.md` 和 `apply.md` 比 `.claude/commands/opsx/` 多出 append-only 的 Hook A / Hook B 尾部；如果新版 OpenSpec 源文件没有 hook，只能在 `.agents` 运行时副本末尾按 append-only 规则补回，不得修改 `.claude` 原命令正文，也不得改动 `/self/gggggggood/` 下用户维护的源文件。
 
 ---
 
@@ -162,7 +186,7 @@ OpenSpec 1.8.0 当前核心 profile 使用以下 6 个 OPSX 命令文件：
 
 ### 同步流程
 
-对于以下 6 个项目，模块 1 已完成 git pull，直接同步普通 skill；不包含 OpenSpec 生成的 `openspec-*` skills，后者只走模块 2 的专门同步流程：
+对于以下 6 个项目，模块 1 已完成 git pull，直接同步普通 skill；OpenSpec 在 `~/.claude/skills/` 下生成的完整 skills 集合只走模块 2 的专门同步流程：
 
 ```
 for each project:
@@ -175,61 +199,61 @@ for each project:
 
 工具：`rsync -r --delete`（删除目标中源没有的文件，确保完全同步）、`cp -r` 作为备选。
 
-### 3.1 superpowers（`self/superpowers/`）
+### 3.1 superpowers（`self/skills/superpowers/`）
 
 | 字段 | 值 |
 |---|---|
-| 路径 | `/Users/kangll13/aiot/java-code/self/superpowers/` |
+| 路径 | `/Users/kangll13/aiot/java-code/self/skills/superpowers/` |
 | 远端 | `https://github.com/obra/superpowers.git` |
 | 源 skill 目录 | `skills/`（直接子目录即为 skill 名） |
 
 同步前遍历 `skills/` 下所有子目录，与 `~/.agents/skills/` 做交集匹配，仅同步匹配的。
 
-### 3.2 claude-code-java（`self/claude-code-java/`）
+### 3.2 claude-code-java（`self/skills/claude-code-java/`）
 
 | 字段 | 值 |
 |---|---|
-| 路径 | `/Users/kangll13/aiot/java-code/self/claude-code-java/` |
+| 路径 | `/Users/kangll13/aiot/java-code/self/skills/claude-code-java/` |
 | 远端 | `https://github.com/decebals/claude-code-java.git` |
 | 源 skill 目录 | `.claude/skills/`（直接子目录即为 skill 名，忽略 README.md） |
 
 同步前遍历 `.claude/skills/` 下所有子目录，与 `~/.agents/skills/` 做交集匹配，仅同步匹配的。
 
-### 3.3 matt-skills（`self/matt-skills/`）
+### 3.3 matt-skills（`self/skills/matt-skills/`）
 
 | 字段 | 值 |
 |---|---|
-| 路径 | `/Users/kangll13/aiot/java-code/self/matt-skills/` |
+| 路径 | `/Users/kangll13/aiot/java-code/self/skills/matt-skills/` |
 | 远端 | `https://github.com/mattpocock/skills.git` |
 | 源 skill 目录 | `skills/{category}/{skill_name}/`（嵌套在 category 子目录下） |
 
 遍历 `skills/*/` 下所有子目录，与 `~/.agents/skills/` 做交集匹配，仅同步匹配的。源路径为 `skills/{category}/{skill_name}/`，目标路径为 `~/.agents/skills/{skill_name}/`（去掉 category 层级）。
 
-### 3.4 anthropics-skills（`self/anthropics-skills/`）
+### 3.4 anthropics-skills（`self/skills/anthropics-skills/`）
 
 | 字段 | 值 |
 |---|---|
-| 路径 | `/Users/kangll13/aiot/java-code/self/anthropics-skills/` |
+| 路径 | `/Users/kangll13/aiot/java-code/self/skills/anthropics-skills/` |
 | 远端 | `https://github.com/anthropics/skills.git` |
 | 源 skill 目录 | `skills/`（直接子目录即为 skill 名） |
 
 同步前遍历 `skills/` 下所有子目录，与 `~/.agents/skills/` 做交集匹配，仅同步匹配的。
 
-### 3.5 ui-ux-pro-max-skill（`self/ui-ux-pro-max-skill/`）
+### 3.5 ui-ux-pro-max-skill（`self/skills/ui-ux-pro-max-skill/`）
 
 | 字段 | 值 |
 |---|---|
-| 路径 | `/Users/kangll13/aiot/java-code/self/ui-ux-pro-max-skill/` |
+| 路径 | `/Users/kangll13/aiot/java-code/self/skills/ui-ux-pro-max-skill/` |
 | 远端 | `https://github.com/nextlevelbuilder/ui-ux-pro-max-skill.git` |
 | 源 skill 目录 | `.claude/skills/ui-ux-pro-max/` |
 
 仅同步 `ui-ux-pro-max` 到 `~/.agents/skills/ui-ux-pro-max/`，且目标目录必须已存在。该仓库本地改动不作为用户代码保留；更新前允许清理未提交改动，再拉取远端并同步技能。
 
-### 3.6 ppt-master（`self/ppt-master/`）
+### 3.6 ppt-master（`self/skills/ppt-master/`）
 
 | 字段 | 值 |
 |---|---|
-| 路径 | `/Users/kangll13/aiot/java-code/self/ppt-master/` |
+| 路径 | `/Users/kangll13/aiot/java-code/self/skills/ppt-master/` |
 | 远端 | `https://github.com/hugohe3/ppt-master.git` |
 | 源 skill 目录 | `skills/ppt-master/` |
 
@@ -259,13 +283,57 @@ for each project:
 rsync -r ~/.agents/skills/ /Users/kangll13/aiot/java-code/self/gggggggood/agent-skills/skills/
 ```
 
-### 步骤 4.2：同步 commands/opsx（如模块 2 有更新）
+### 步骤 4.1A：同步 `self/skills/` 下更新后的 skill 项目内容到当前项目
 
-如果模块 2 中 `~/.agents/commands/opsx/` 发生了更新，也同步到知识库：
+除 `~/.agents/skills/` 外，还需要把 `self/skills/` 下更新后的 skill 源项目内容同步到当前项目 `agent-skills/skills/`。同步时必须兼容两类目录结构：
+
+- **直接目录结构**：项目根目录本身就是一个 skill 目录
+- **二级 `skills/` 结构**：项目根目录下存在 `skills/<skill_name>/`
+
+执行规则：
+
+- 若 `self/skills/<project>/SKILL.md` 存在，则按单 skill 项目处理，同步到 `agent-skills/skills/<project>/`
+- 若 `self/skills/<project>/skills/` 存在，则遍历其下每个子目录，分别同步到 `agent-skills/skills/<skill_name>/`
+- 同步到当前项目时仍然**不加 `--delete`**，只覆盖已有文件与新增文件
+- 只同步当前项目里已经存在或明确需要保留的 skill 目录；不要删除知识库中的额外 skill
+
+示意：
+
+```bash
+for project in /Users/kangll13/aiot/java-code/self/skills/*; do
+  [ -d "$project" ] || continue
+
+  if [ -f "$project/SKILL.md" ]; then
+    rsync -r "$project/" "/Users/kangll13/aiot/java-code/self/gggggggood/agent-skills/skills/$(basename "$project")/"
+    continue
+  fi
+
+  if [ -d "$project/skills" ]; then
+    for skill_dir in "$project"/skills/*; do
+      [ -d "$skill_dir" ] || continue
+      rsync -r "$skill_dir/" "/Users/kangll13/aiot/java-code/self/gggggggood/agent-skills/skills/$(basename "$skill_dir")/"
+    done
+  fi
+done
+```
+
+### 步骤 4.2：同步完整 commands（如模块 2 有更新）
+
+如果模块 2 中 `~/.agents/commands/` 发生了更新，也同步到知识库：
 
 ```bash
 rsync -r ~/.agents/commands/ /Users/kangll13/aiot/java-code/self/gggggggood/agent-skills/commands/
 ```
+
+### 步骤 4.2A：同步 `.agents/skills/` 的完整集合同步到知识库
+
+模块 2 扩展为同步 `~/.claude/skills/` 的完整集合后，模块 4 也必须把更新后的 `~/.agents/skills/` 完整集合同步到当前项目知识库：
+
+```bash
+rsync -r ~/.agents/skills/ /Users/kangll13/aiot/java-code/self/gggggggood/agent-skills/skills/
+```
+
+该步骤仍然**不加 `--delete`**，只覆盖已有和新增内容，不删除知识库中额外保留的 skill。
 
 ### 步骤 4.3：变更报告
 
@@ -289,10 +357,10 @@ rsync -r ~/.agents/commands/ /Users/kangll13/aiot/java-code/self/gggggggood/agen
 
 ## 执行顺序
 
-1. **模块 1** — 批量 git pull（递归三层）所有 self 项目（包括6个 skill 项目）
-2. **模块 2** — 在用户 Terminal 中先执行 `npm install -g @fission-ai/openspec@latest`，确认版本后从用户主目录运行 `openspec update`；先同步 `.claude` 到 `.agents`，再立即运行 `/opsx-workflow-hooks` 恢复 hook，最后按当前 profile 校验 `commands/opsx` 文件集合及 workflow hooks，按输出区分成功、可选提示和真实失败
+1. **模块 1** — 批量 git pull（递归三层）所有 self 项目（包括 skill 项目）；遇本地改动时用 `[SKIP-DIRTY]` 标记保护性跳过
+2. **模块 2** — 在用户 Terminal 中先确认当前 OpenSpec profile 是否已切到足够完整的集合；如有需要先执行 `openspec config profile` 与 `openspec init`，再执行 `npm install -g @fission-ai/openspec@latest`，通过 `openspec --version` 确认当前版本后，从用户主目录运行 `openspec update`；先同步 `.claude` 实际生成的完整 commands / skills 到 `.agents`，再立即运行 `/opsx-workflow-hooks` 恢复 hook，最后校验完整文件集合与 workflow hooks，按输出区分成功、可选提示和真实失败
 3. **模块 3** — Skill 同步（模块 1 已完成 git pull，直接 rsync 匹配的 skill）
-4. **模块 4** — 全量同步 `~/.agents/skills/` 到个人知识库 `agent-skills/skills/`（不加 `--delete`），同步 `commands/` 如有更新，报告变更清单供用户审查
+4. **模块 4** — 先将 `self/skills/` 下更新后的 skill 项目内容同步到当前项目 `agent-skills/skills/`，再全量同步 `~/.agents/skills/` 到 `agent-skills/skills/`、同步 `~/.agents/commands/` 到 `agent-skills/commands/`（均不加 `--delete`），报告变更清单供用户审查
 
 ---
 
@@ -312,7 +380,7 @@ rsync -r ~/.agents/commands/ /Users/kangll13/aiot/java-code/self/gggggggood/agen
 
 ### openspec update 汇总
 
-显示 CLI 升级前后版本、`openspec update` 结果、清理/保留的旧文件、`.claude → .agents` 同步结果、被 `[DIFF]` 保护跳过的 `openspec-*` skills、当前 profile 对应的 `commands/opsx` 文件集合校验结果，以及是否需要执行 `openspec config profile core`。
+显示 CLI 升级前后版本、当前 profile、`openspec init` / `openspec update` 结果、清理/保留的旧文件、`.claude → .agents` 完整 commands / skills 同步结果、被 `[OVERWRITE]` 覆盖的 skills、当前 profile 对应的完整 commands / skills 文件集合校验结果，以及是否仍需调整 profile。
 
 ### Skill 同步汇总
 
