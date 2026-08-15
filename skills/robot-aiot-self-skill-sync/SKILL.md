@@ -1,5 +1,5 @@
 ---
-name: git-self-update
+name: robot-aiot-self-skill-sync
 description: >
   批量更新 self 目录下所有 git 项目；同步 superpowers / claude-code-java / matt-skills / anthropics-skills / ui-ux-pro-max-skill / ppt-master 的 skill 文件到 ~/.agents/skills/；先切换到更完整的 OpenSpec profile、升级并运行 openspec init/update，再将 OpenSpec 在 ~/.claude 下实际生成的完整 commands 和 skills 集合按保护规则同步到 ~/.agents。递归三层扫描所有嵌套 git 仓库；处理网络重试并报告冲突；仅在 ~/.agents/skills/ 中已存在的普通 skill 才会被同步（OpenSpec 生成物按专门流程同步）。
   模块 4 在模块 2-3 完成后，将 ~/.agents/skills/ 全量同步到个人知识库 /Users/kangll13/aiot/java-code/self/gggggggood/agent-skills/skills/（不加 --delete，只覆盖已有 + 新增）。

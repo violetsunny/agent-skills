@@ -330,8 +330,8 @@
       "created_at": "2026-08-08T09:24:21.367Z",
       "pinned": false
     },
-    "git-self-update": {
-      "name": "git-self-update",
+    "robot-aiot-self-skill-sync": {
+      "name": "robot-aiot-self-skill-sync",
       "created_by": "user",
       "state": "active",
       "use_count": 7,

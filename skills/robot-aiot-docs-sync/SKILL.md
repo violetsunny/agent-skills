@@ -1,5 +1,5 @@
 ---
-name: project-docs-sync
+name: robot-aiot-docs-sync
 description: |
   扫描当前项目并创建或更新完整文档套件：AGENTS.md（AI 助手项目索引）、README.md（中文开发者友好的项目首页）、CHANGELOG.md（从 Git 历史自动生成的版本记录）以及 docs/ 目录下的技术文档（架构图、API 参考、FAQ）。同时生成带注释的项目结构地图。
   适用于：「更新项目文档」、「同步文档」、「update AGENTS.md」、「update README」、「refresh project index」、「document this project」、「生成 changelog」、「生成项目地图」、「写技术文档」、「项目文档更新」。
@@ -155,7 +155,7 @@ IS_MONOREPO:     [yes / no]
 ````markdown
 # AGENTS.md — 项目索引
 
-> 由 project-docs-sync 自动生成。项目专属规则请手动维护。
+> 由 robot-aiot-docs-sync 自动生成。项目专属规则请手动维护。
 
 ## 项目概览
 
@@ -437,7 +437,7 @@ fi
 ````markdown
 # 📂 项目结构地图
 
-> 由 project-docs-sync 自动生成。
+> 由 robot-aiot-docs-sync 自动生成。
 
 ## 🔧 项目信息
 
@@ -482,7 +482,7 @@ fi
 ````markdown
 # 架构说明
 
-> 由 project-docs-sync 自动生成。
+> 由 robot-aiot-docs-sync 自动生成。
 
 ## 系统概览
 
@@ -539,7 +539,7 @@ A: <解答>
 打印执行摘要：
 
 ```
-=== project-docs-sync 完成 ===
+=== robot-aiot-docs-sync 完成 ===
 
 文件状态：
   AGENTS.md       [created|updated|bootstrapped-then-updated]  (<N> 章节)

@@ -1,5 +1,5 @@
 ---
-name: adr-confluence-flow
+name: robot-aiot-adr-confluence
 description: >
   技术方案端到端工作流：需求收敛 → 深度追问澄清 → 方案发散/权衡 → 生成结构化文档 →
   架构评审 → 合规校验 → 发布到 Confluence。支持三种模板：ADR标准格式、技术提案格式、

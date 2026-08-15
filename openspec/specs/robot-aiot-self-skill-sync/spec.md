@@ -1,7 +1,7 @@
-# git-self-update Specification
+# robot-aiot-self-skill-sync Specification
 
 ## Purpose
-规范 git-self-update 技能模块 2 在执行 OpenSpec init/update 后对多工具目录同步、拋留文件处理、profile 完整性检查、deselect 文件跟踪和 Codex 特殊行为处理的要求。
+规范 robot-aiot-self-skill-sync 技能模块 2 在执行 OpenSpec init/update 后对多工具目录同步、拋留文件处理、profile 完整性检查、deselect 文件跟踪和 Codex 特殊行为处理的要求。
 
 ## Requirements
 
