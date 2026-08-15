@@ -29,12 +29,20 @@ rsync -r ~/.agents/skills/ /Users/kangll13/aiot/java-code/self/gggggggood/agent-
 - **直接目录结构**：项目根目录本身就是一个 skill 目录
 - **二级 `skills/` 结构**：项目根目录下存在 `skills/<skill_name>/`
 
-执行规则：
+**排除 matt-skills**：matt-skills 的 skill 通过 `npx skills@latest add` 安装到 `~/.agents/skills/`，不走 4.1A。模块 4.1 全量 rsync `~/.agents/skills/ → agent-skills/skills/` 已自动同步到知识库，4.1A 对 matt-skills 不做任何处理。
 
-- 若 `self/skills/<project>/SKILL.md` 存在，则按单 skill 项目处理，同步到 `agent-skills/skills/<project>/`
-- 若 `self/skills/<project>/skills/` 存在，则遍历其下每个子目录，分别同步到 `agent-skills/skills/<skill_name>/`
+执行规则（按优先级依次判断）：
+
+1. 若 `self/skills/<project>/.agents/skills/` 存在，则遍历其下每个子目录（`<project>/.agents/skills/<skill_name>/`），分别同步到 `agent-skills/skills/<skill_name>/`。**这是 gstack 等项目的结构：skill 定义在项目内嵌的 `.agents/skills/` 目录下，而非项目根目录或 `skills/` 子目录。**
+2. 若 `self/skills/<project>/skills/` 存在，则遍历其下每个子目录，分别同步到 `agent-skills/skills/<skill_name>/`
+3. 若 `self/skills/<project>/SKILL.md` 存在（且不存在 `.agents/skills/` 和 `skills/` 子目录），则按单 skill 项目处理，同步到 `agent-skills/skills/<project>/`
 - 同步到当前项目时仍然**不加 `--delete`**，只覆盖已有文件与新增文件
 - 只同步当前项目里已经存在或明确需要保留的 skill 目录；不要删除知识库中的额外 skill
+
+**路径示例**：
+- `self/skills/gstack/.agents/skills/gstack/` → `agent-skills/skills/gstack/`（gstack 的 skill 在项目内嵌 `.agents/skills/` 下，共 54 个 skill）
+- `self/skills/superpowers/skills/brainstorming/` → `agent-skills/skills/brainstorming/`（`skills/` 子目录结构）
+- `self/skills/a-stock-data/` → `agent-skills/skills/a-stock-data/`（根目录 `SKILL.md`，单 skill 项目）
 
 示意：
 
@@ -42,16 +50,34 @@ rsync -r ~/.agents/skills/ /Users/kangll13/aiot/java-code/self/gggggggood/agent-
 for project in /Users/kangll13/aiot/java-code/self/skills/*; do
   [ -d "$project" ] || continue
 
-  if [ -f "$project/SKILL.md" ]; then
-    rsync -r "$project/" "/Users/kangll13/aiot/java-code/self/gggggggood/agent-skills/skills/$(basename "$project")/"
+  # 排除 matt-skills：通过 npx 安装到 ~/.agents/skills/，走 4.1 全量同步
+  project_name=$(basename "$project")
+  case "$project_name" in
+    matt-skills) continue;;
+  esac
+
+  # 优先级 1：.agents/skills/ 嵌套结构（如 gstack）
+  if [ -d "$project/.agents/skills" ]; then
+    for skill_dir in "$project"/.agents/skills/*; do
+      [ -d "$skill_dir" ] || continue
+      rsync -r "$skill_dir/" "/Users/kangll13/aiot/java-code/self/gggggggood/agent-skills/skills/$(basename "$skill_dir")/"
+    done
     continue
   fi
 
+  # 优先级 2：skills/ 子目录结构
   if [ -d "$project/skills" ]; then
     for skill_dir in "$project"/skills/*; do
       [ -d "$skill_dir" ] || continue
       rsync -r "$skill_dir/" "/Users/kangll13/aiot/java-code/self/gggggggood/agent-skills/skills/$(basename "$skill_dir")/"
     done
+    continue
+  fi
+
+  # 优先级 3：根目录 SKILL.md（单 skill 项目）
+  if [ -f "$project/SKILL.md" ]; then
+    rsync -r "$project/" "/Users/kangll13/aiot/java-code/self/gggggggood/agent-skills/skills/$(basename "$project")/"
+    continue
   fi
 done
 ```

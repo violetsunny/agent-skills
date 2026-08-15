@@ -52,7 +52,7 @@
 - 分批执行，每批不超过 15 个项目，每批超时 **180s**
 - 扫描深度为 **3 层**（`self/` 下第一层子目录，再往下两层）
 - Skill 同步（模块 3）使用 `rsync -r --delete`，确保 `~/.agents/skills/` 与源完全一致；模块 3.5 和模块 4 同步到 `free-stock-line-skills/` 和 `agent-skills/skills/` 时使用 `rsync -r`（**不加 `--delete`**），保留用户自定义文件
-- matt-skills 的 skill 在 `skills/{category}/{skill_name}/` 嵌套结构下，同步时去掉 category 层级
+- matt-skills 的 skill 通过 `npx skills@latest add mattpocock/skills` 交互式安装到 `~/.agents/skills/`，不走 rsync 直同步；模块 4.1A 排除 matt-skills
 - claude-code-java 的 skill 在 `.claude/skills/` 下（而非 `skills/`）
 - `/Users/kangll13/aiot/java-code/self/gggggggood/` 下任何异常、冲突或本地改动都必须单独列出并提示用户，不得自动处理
 - **`stock-replay-workbench` 是重点保护项目**，在模块 3.5 中禁止任何修改、同步或覆盖

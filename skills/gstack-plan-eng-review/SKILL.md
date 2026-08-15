@@ -1,5 +1,5 @@
 ---
-name: gstack-plan-eng-review
+name: plan-eng-review
 description: |
   Eng manager-mode plan review. Lock in the execution plan — architecture,
   data flow, diagrams, edge cases, test coverage, performance. Walks through

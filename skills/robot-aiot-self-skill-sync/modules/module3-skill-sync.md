@@ -45,9 +45,18 @@ for each project:
 |---|---|
 | 路径 | `/Users/kangll13/aiot/java-code/self/skills/matt-skills/` |
 | 远端 | `https://github.com/mattpocock/skills.git` |
-| 源 skill 目录 | `skills/{category}/{skill_name}/`（嵌套在 category 子目录下） |
+| 安装方式 | `npx skills@latest add mattpocock/skills`（交互式，手动执行） |
+| 目标目录 | `~/.agents/skills/{skill_name}/`（npx 安装后自动生成） |
 
-遍历 `skills/*/` 下所有子目录，与 `~/.agents/skills/` 做交集匹配，仅同步匹配的。源路径为 `skills/{category}/{skill_name}/`，目标路径为 `~/.agents/skills/{skill_name}/`（去掉 category 层级）。
+matt-skills 的 skill 不在 git 仓库代码中直接可用，**不走 rsync 同步**。需通过 `npx skills@latest add mattpocock/skills` 交互式安装到 `~/.agents/skills/`。
+
+执行时输出提示信息，由用户手动运行 npx 命令，并在汇总中标记为 `[NPX-MANUAL]`：
+
+```
+echo "[NPX-MANUAL] matt-skills 需要通过 npx skills@latest add mattpocock/skills 交互式安装，请手动执行该命令"
+```
+
+安装完成后，skill 自动出现在 `~/.agents/skills/` 中，模块 4.1 全量 rsync 会将其同步到知识库，无需额外处理。
 
 ### 3.4 anthropics-skills（`self/skills/anthropics-skills/`）
 
@@ -78,3 +87,5 @@ for each project:
 | 源 skill 目录 | `skills/ppt-master/` |
 
 仅同步 `ppt-master` 到 `~/.agents/skills/ppt-master/`，且目标目录必须已存在。
+
+

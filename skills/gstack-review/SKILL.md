@@ -1,5 +1,5 @@
 ---
-name: gstack-review
+name: review
 description: |
   Pre-landing PR review. Analyzes diff against the base branch for SQL safety, LLM trust
   boundary violations, conditional side effects, and other structural issues. Use when
