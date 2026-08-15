@@ -3,16 +3,12 @@ name: opsx-workflow-hooks
 description: |
   Post-command hooks for the opsx workflow.
   - Trigger A: immediately after /opsx/propose finishes generating all
-    artifacts — runs requirement clarification and proposal refinement across
-    grill-me, brainstorming, and writing-plans before locking the change.
+    artifacts — enters an iterative refinement loop, asking the user if they
+    have new ideas and updating proposal artifacts until the user is satisfied.
   - Trigger B: immediately after /opsx/apply completes ALL tasks (state:
-    all_done) — first classify whether the completed diff contains code changes
-    or only docs/comments/proposal-style edits. Only code changes run `tdd`
-    and `test-quality` to validate changed methods and interfaces. Then run
-    /review first, then code-review and java-code-review as needed, fix
-    blocking issues, hand off for user self-test, and only after the user
-    confirms self-test passes, verify and archive the change. Does NOT trigger
-    when apply is paused mid-way.
+    all_done) — runs code review to check code and logic for issues, fixes
+    any critical problems found, then runs /opsx/archive to archive the change.
+    Does NOT trigger when apply is paused mid-way.
   Use when "/opsx/propose is done", "proposal artifacts created", "all tasks
   complete after apply", "apply finished", or "implementation complete".
 ---
@@ -20,111 +16,6 @@ description: |
 # OPSX Workflow Hooks
 
 Post-completion behavior injected after `/opsx/propose` and `/opsx/apply`.
-
-## Bootstrap
-
-When invoked directly, first verify that the OPSX command files still contain
-the callback hooks that re-enter this skill after OpenSpec commands complete.
-OpenSpec updates may overwrite those command files.
-
-### Bootstrap Steps
-
-1. Read these files as two synchronized pairs:
-   - Project source: `agent-skills/commands/opsx/propose.md`
-   - Runtime copy: `~/.agents/commands/opsx/propose.md`
-   - Project source: `agent-skills/commands/opsx/apply.md`
-   - Runtime copy: `~/.agents/commands/opsx/apply.md`
-2. Check whether both `propose.md` copies contain all of:
-   - `**Post-completion hook**`
-   - `opsx-workflow-hooks`
-   - `Hook A`
-3. Check whether both `apply.md` copies contain all of:
-   - `**Post-completion hook**`
-   - `opsx-workflow-hooks`
-   - `Hook B`
-4. If either copy is missing its hook block, append it to the end of that copy
-   immediately before doing anything else. The original command body is
-   immutable; only the appended Hook A / Hook B tail section may be created,
-   extended, or revised. The immutable-boundary marker belongs inside the two
-   command files only, never inside this skill file.
-5. After hook presence is confirmed, diff each source/runtime pair. If the pair
-   is not byte-identical, treat that as a stale-copy problem and sync the stale
-   side by re-appending the missing hook block or restoring the matching append-
-   only footer. Do not continue until both pairs match.
-
-### Initialization Payload
-
-If `propose.md` is missing Hook A, append this block exactly once:
-
-```md
-<!-- OPSX IMMUTABLE BOUNDARY: original command content above this line must not be modified -->
-
-**Post-completion hook**
-
-After all artifacts are created and the final status is shown, use the **Skill tool** to invoke the `opsx-workflow-hooks` skill (Hook A). Do this automatically — do not wait for the user to ask.
-```
-
-If `apply.md` is missing Hook B, append this block exactly once:
-
-```md
-<!-- OPSX IMMUTABLE BOUNDARY: original command content above this line must not be modified -->
-
-**Post-completion hook**
-
-After the final task is marked complete, re-run `openspec instructions apply
---change "<name>" --json`. Only when that command returns
-`state: "all_done"`, immediately use the **Skill tool** to invoke the
-`opsx-workflow-hooks` skill (Hook B). Hook B will first classify whether the
-completed diff contains code changes or only docs/comments/proposal-style
-edits. Only code changes run `tdd` and `test-quality` to validate changed
-methods and interfaces before the review flow continues. Do not finish with a
-suggestion to archive manually.
-
-If the re-check returns any other state, do not invoke the hook. Report the
-state and wait for the user to resume or resolve the blocker.
-```
-
-### Bootstrap Guardrails
-
-- Idempotent: never add the same hook block twice.
-- Append-only: only the Hook tail may be rewritten. Never rewrite, replace, reorder, or
-  insert into the original command body above the boundary marker.
-- Boundary: text above the immutable-boundary marker is frozen; text below it
-  (Hook A / Hook B tail) may be extended or revised in future fixes.
-- After patching, confirm hook markers are present in all four files, then diff
-  each source/runtime pair byte-by-byte. If they diverge, treat the older side
-  as stale and repair by restoring the matching Hook tail.
-- Never assume runtime is canonical — a stale project-source copy can later
-  overwrite a healthy runtime file.
-- After bootstrap succeeds, continue into Hook A or Hook B.
-
-### Bootstrap Reliability Enhancement
-
-Hook presence does not guarantee hook execution after a long apply session. Any
-reliability reminder must also stay inside the mutable Hook B tail section below
-the boundary marker.
-
----
-
-## Phase Map
-
-Use this skill as the orchestration layer across an eight-stage workflow:
-
-| Phase | Goal | Primary tools | Exit standard |
-| --- | --- | --- | --- |
-| 0 | Requirement clarification and boundary alignment | `grill-me` | Clear scope, non-scope, and acceptance criteria |
-| 1 | Spec solidification and change creation | `to-spec`, OpenSpec propose artifacts | `proposal` / `design` / `tasks` / schema-required spec artifacts are aligned |
-| 2 | Architecture decisions and task atomization | `brainstorming`, `writing-plans` | Tasks fully cover specs with no gaps or speculative extras |
-| 3 | Implementation execution and process control | `/opsx:apply`, Superpowers execution patterns | Code and tests implemented task by task |
-| 4 | Boundary strengthening via tests | `tdd` + `test-quality` for code changes only | Changed methods/interfaces and edge paths are verified when executable code changed |
-| 5 | Layered code review | `/review`, `code-review`, `java-code-review` | Design and code-quality issues are separated and resolved |
-| 6 | User self-test checkpoint | User manual testing | User confirms the implementation passes their own testing |
-| 7 | Verification and archive handoff | `/opsx:verify`, `/opsx:archive` | Change is verified, archived, and traceable |
-
-Hook A primarily governs phases 0-2. Hook B primarily governs phases 5-7 after
-phase 3-4 implementation is complete. Between phase 5 (review) and phase 7
-(verify + archive), the user performs manual self-testing; Hook B must stop and
-wait for the user to confirm self-test passed before proceeding.
 
 ---
 
@@ -135,60 +26,14 @@ written to disk.
 
 ### Purpose
 
-Sharpen requirements, lock boundaries, and refine task granularity before
-implementation starts.
-
-### Summary Format
-
-Use this exact structure whenever Hook A asks the user for feedback or reprints
-the updated proposal summary:
-
-```
-## Proposal Change Summary: <change-name>
-
-### Need To Fix
-- <this round needs to add/change/remove what>
-
-### Current Problem
-- <what is unclear, missing, conflicting, or risky in the current proposal>
-
-### Fix Logic
-- <how the proposal/design/tasks should be adjusted conceptually>
-
-### Affected Scope
-- <artifact/module/API/data-flow/behavior scope that will be affected>
-
-### Still Need Confirmation
-- <open question or dependency>; write `None` when there is no blocker
-
-### Acceptance Checks
-- [ ] <observable behavior or completion condition>
-```
-
-Keep the summary at proposal/design/task level. Do not dump code blocks, long
-file inventories, or method-by-method logic. Mention concrete files only when
-they are already certain and materially help the user understand scope.
+The first proposal is rarely final. This hook keeps the user in a fast
+iteration loop so the proposal converges before any implementation starts.
 
 ### Steps
 
-1. **Produce a Proposal Change Summary, then ask for feedback**
+1. **Ask for feedback**
 
-   `/opsx/propose` usually generates a long context. Before asking the user for
-   feedback, first summarize the proposal in a compact form that highlights the
-   change itself, the current problem, the fix logic, and any remaining open
-   questions.
-
-   Read these files for the current change:
-   - `<change-dir>/proposal.md`
-   - `<change-dir>/design.md`
-   - `<change-dir>/tasks.md`
-
-   Print the **Proposal Change Summary** using the format above.
-
-   - If the artifacts are still too vague to summarize the problem and fix
-     logic, ask a focused clarification question before asking for feedback.
-
-   Then use the **AskUserQuestion tool** (open-ended, no preset options) to ask:
+   Use the **AskUserQuestion tool** (open-ended, no preset options) to ask:
 
    > "Proposal complete. Do you have any new ideas, changes, or concerns you'd
    > like to incorporate before moving to implementation? If helpful, here are
@@ -203,42 +48,21 @@ they are already certain and materially help the user understand scope.
      - Print: "Proposal locked. Run `/opsx:apply` when ready to implement."
      - **Stop. Do not loop.**
 
-    - **If the user provides new ideas or concerns:**
-      - Acknowledge the input briefly (one sentence).
-      - Before using any other skill or editing any artifact, update and reprint
-        the **Proposal Change Summary** using the format above. Treat it as the
-        working contract for the rest of Hook A; do not rely on the preceding
-        conversation as the source of truth.
-      - If the user request is still too ambiguous to identify even the affected
-        scope or the intended fix logic, stop and ask a focused clarification
-        question before editing.
-      - If the new input changes intent, constraints, acceptance criteria, or
-        reveals unclear assumptions, use `grill-me` first to sharpen requirement
-        understanding before deciding how to update the proposal. This is the
-        default phase 0 tool.
-      - If the new input exposes multiple possible solution paths, unresolved
-        product tradeoffs, or a design direction that still feels under-specified,
-        use `brainstorming` to refine the proposal collaboratively before editing
-        the artifacts. This is the default phase 2 tool for architectural
-        ambiguity.
-      - First classify the request:
-        - **Tiny implementation change** — can be completed with a very small,
-          local code edit (`<= 5` changed lines), in one file, with no new
-          function, API, schema, task breakdown, or design change.
-        - **Artifact-level change** — anything that changes scope, design,
-          acceptance criteria, task structure, cross-file behavior, or needs more
-          than the tiny-edit threshold above.
+   - **If the user provides new ideas or concerns:**
+     - Acknowledge the input briefly (one sentence).
+     - First classify the request:
+       - **Tiny implementation change** — can be completed with a very small,
+         local code edit (`<= 5` changed lines), in one file, with no new
+         function, API, schema, task breakdown, or design change.
+       - **Artifact-level change** — anything that changes scope, design,
+         acceptance criteria, task structure, cross-file behavior, or needs more
+         than the tiny-edit threshold above.
 
    - **If it is a tiny implementation change:**
      - Make the small code change directly.
      - Do NOT run `/opsx:apply` for this case.
-     - Immediately enter the review flow even for this direct-execution path.
-     - First try the agent's built-in `/review` capability for the touched
-       file(s).
-     - If `/review` cannot be used from the current execution context, fall back
-       to `java-code-review` for the touched file(s).
-     - Stop after review completes. Do NOT archive and do NOT mark apply tasks
-       complete.
+     - Immediately run the review flow from Hook B's review step, but stop after
+       review completes. Do NOT archive and do NOT mark apply tasks complete.
      - Report the result clearly:
        ```
        Applied tiny change directly — updated <file>
@@ -246,58 +70,24 @@ they are already certain and materially help the user understand scope.
        ```
      - Return to Step 1 and ask if the user has any other ideas.
 
-    - **If it is an artifact-level change:**
-      - Reprint the final **Proposal Change Summary** immediately before editing
-        artifacts. It must reflect any conclusions from `grill-me`, `to-spec`,
-        `brainstorming`, or `writing-plans`.
-      - If the updated idea is still rough and not yet concrete enough for
-        OpenSpec artifact edits, use `to-spec` first to turn it into a crisp
-        requirement statement before touching the artifacts. This is the phase 1
-        bridge into OpenSpec.
-      - Identify which artifacts are affected:
-        - Scope/goal changes → `proposal.md`
-        - Architecture/approach changes → `design.md`
-        - Task breakdown changes → `tasks.md`
-        - Requirement/spec wording changes → schema-required spec artifacts
-      - If the proposal is conceptually stable but `tasks.md` is still too coarse
-        to execute confidently, use `writing-plans` to sharpen the implementation
-        breakdown before finalizing the updated tasks. This is the default phase
-        2 tool for task atomization.
-      - Update only the affected artifact files. Do NOT rewrite unaffected files.
-      - **Artifact edit strategy**: if one artifact needs multiple dependent
-        edits, prefer reading the full file and doing one comprehensive `write`
-        rather than several surgical `edit` calls. This matters most for
-        `tasks.md`, where renumbering and task reshaping make later `old_string`
-        matches stale. For localized `proposal.md` or `design.md` edits,
-        surgical `edit` is usually fine.
-      - After writing, verify the artifact is recognized by running:
-        ```bash
-        openspec status --change "<name>" --json
-        ```
-        Confirm the updated artifact still shows `status: "done"`. If it does
-        not (e.g., template validation fails), fix the file and re-check.
-      - After confirming, print a brief diff summary:
-        ```
-        Updated proposal.md — added X, revised Y
-        Updated tasks.md   — split task 3 into two steps
-        ```
-      - Append a **Post-Edit Summary** using this exact structure:
-        ```
-        ## Post-Edit Summary: <change-name>
-
-        ### Fixed This Round
-        - <what was changed in proposal/design/tasks/specs>
-
-        ### Problem Resolved
-        - <what ambiguity, gap, or conflict was resolved>
-
-        ### Final Fix Logic
-        - <the final agreed solution logic>
-
-        ### Still Open
-        - <remaining question or follow-up>; write `None` when nothing remains
-        ```
-      - **Return to Step 1** (ask again).
+   - **If it is an artifact-level change:**
+     - Identify which artifacts are affected:
+       - Scope/goal changes → `proposal.md`
+       - Architecture/approach changes → `design.md`
+       - Task breakdown changes → `tasks.md`
+     - Update only the affected artifact files. Do NOT rewrite unaffected files.
+     - After writing, verify the artifact is recognized by running:
+       ```bash
+       openspec status --change "<name>" --json
+       ```
+       Confirm the updated artifact still shows `status: "done"`. If it does
+       not (e.g., template validation fails), fix the file and re-check.
+     - After confirming, print a brief diff summary:
+       ```
+       Updated proposal.md — added X, revised Y
+       Updated tasks.md   — split task 3 into two steps
+       ```
+     - **Return to Step 1** (ask again).
 
 3. **Loop until the user is satisfied.**
 
@@ -306,26 +96,8 @@ they are already certain and materially help the user understand scope.
 
 ### Guardrails
 
-- Default to artifact iteration; only bypass `/opsx:apply` for a tiny change
-  that meets the strict threshold above, and even then go through `/review`
-  first before the hook can continue.
-- Use `grill-me` only when requirement understanding is materially incomplete;
-  do not turn every minor wording tweak into a long clarification session.
-- Use `to-spec` only to sharpen rough requirement language into spec-ready form;
-  once the requirement is already precise, edit the OpenSpec artifacts directly.
-- Use `brainstorming` only for genuine design or tradeoff ambiguity; once the
-  direction is already clear, update the artifacts directly.
-- Use `writing-plans` only when task granularity is the real gap; do not force
-  a full planning pass for a small artifact edit.
-- Before leaving Hook A, the intended implementation scope, non-scope, and
-  acceptance criteria must be explainable without hand-waving.
-- Never edit an artifact before printing the complete Proposal Change Summary.
-- The summary should explain the fix in terms of problem, scope, and logic, not
-  code dump or exhaustive file inventory.
-- Mention concrete files only when they are already certain and necessary for
-  understanding; otherwise stay at artifact/module/API/behavior level.
-- After every artifact edit, report the final resolved problem, final fix logic,
-  and any remaining open questions.
+- Default to artifact iteration during this hook; only bypass `/opsx:apply` for
+  a tiny implementation change that meets the strict threshold above.
 - If the user's input is ambiguous (could be a question or a change request),
   treat it as a change request and propose an update, then ask for confirmation.
 - Surgical edits only: change exactly what the user asked for, nothing more.
@@ -338,108 +110,53 @@ they are already certain and materially help the user understand scope.
 
 ## Hook B — After `/opsx/apply`
 
-**Trigger:** The apply command has re-run
-`openspec instructions apply --change "<name>" --json` after the final task and
-the result contains `state: "all_done"`. The apply command must invoke this
-skill immediately after that confirmation. A checkbox count or a
-`N/M tasks complete` message is not sufficient evidence. **Do NOT trigger if
-the re-check returns any other state**; wait for the user to resume or resolve
-the blocker.
+**Trigger:** `/opsx/apply` has finished AND `state: "all_done"` — every task is
+checked off. **Do NOT trigger if apply paused mid-way** (`state: "paused"` or
+partial progress); in that case, wait for the user to resume and complete apply.
 
 ### Purpose
 
-Enforce change-type-aware validation, layered review, explicit verification,
-and only then archival.
+Implementation can introduce subtle logic errors or missed edge cases. This hook
+enforces a mandatory review-then-archive sequence so nothing lands without a
+final check.
 
 ### Steps
 
-1. **Classify the completed change**
-
-   Inspect the `/opsx:apply` diff before choosing validation depth.
-
-   Use these categories:
-
-   - **Code-level change** — executable source code, tests, schemas, API
-     contracts, controller/service/repository logic, method signatures,
-     interface definitions, request/response models, SQL, or configuration that
-     changes runtime behavior.
-   - **Non-code change** — only `proposal.md`, `design.md`, `tasks.md`, spec
-     wording, Markdown docs, knowledge notes, or comment-only edits that do not
-     change executable statements, signatures, contracts, or runtime behavior.
-   - **Mixed change** — if both appear, classify the whole change as
-     **code-level**.
-
-   Do not classify by file extension alone. For example, edits inside a `.java`
-   file are still **non-code** if they change comments only and do not affect
-   method bodies, signatures, interfaces, schemas, or behavior.
-
-2. **Run targeted validation before review**
-
-   - **If the change is code-level:**
-     - Run `tdd` to verify the changed methods, interfaces, and important
-       failure or edge paths have test coverage.
-     - For Java code, also run `test-quality` to strengthen JUnit 5 and AssertJ
-       tests around the touched methods and interfaces.
-     - Execute the relevant project test command if one exists.
-   - **If the change is non-code:**
-     - Skip `tdd` and `test-quality`.
-     - Validate that the updated docs/comments/proposal text stay consistent
-       with the implemented behavior and current `proposal.md` / `design.md`.
-
-3. **Run the review**
+1. **Run the review**
 
    Announce: "Implementation complete. Running review before archiving…"
 
-    Review in this order, stopping when the current layer is sufficient:
+   Use the **Skill tool** to load and execute a review skill. The Skill tool
+   loads the skill's instructions into the current context so you can perform
+   the review inline — this is the only reliable way to trigger review
+   automatically from within a skill.
 
-   1. **Agent built-in `/review` capability** — try this first whenever the
-      current runtime can invoke it successfully. If it is exposed as a slash
-      command, use the **Task tool** with `/review` as the complete prompt;
-      do not merely print `/review` as text.
-   2. **`code-review`** — primary fallback for completed `/opsx:apply` work.
-      Use it when you can identify a fixed point for the implementation diff.
-      Review along both axes: repo standards and spec alignment.
-   3. **`java-code-review`** — for Java/Spring projects, run this after
-      `code-review` when you need an additional Java-focused pass on null
-      safety, exceptions, concurrency, and performance. Also use it as the
-      direct fallback when `/review` or `code-review` cannot run cleanly.
-   4. **`security-audit`** — for security-sensitive Java/Spring work such as
-      authentication, authorization, input handling, external callbacks, file
-      upload, or any internet-facing endpoint, run this after the general review
-      layers to catch OWASP and secure-coding issues.
-   5. **Other review skills** — if none of the above is available, use the most
+   **Skill selection priority:**
+
+   1. **`code-review`** — the standard code review skill, covers logic,
+      security, and structural issues.
+   2. **`java-code-review`** — use IN ADDITION to `code-review` for
+      Java/Spring projects (load both, run `java-code-review` first per
+      project convention).
+   3. **Other review skills** — if neither above is available, use the most
       specific review skill present in the workspace.
-   6. **Manual inspection** — if no review skill exists at all, read every file
-      modified during apply, cross-check each against `proposal.md` and
+   4. **Manual inspection** — if no review skill exists at all, read every
+      file modified during apply, cross-check each against `proposal.md` and
       `design.md`, and document what was checked.
 
-   If the built-in `/review` capability is not reachable from this execution
-   path, do not block the workflow on it; fall through to the skill-based review
-   options immediately.
+   **Why not `/review` slash command?** Slash commands require user input to
+   trigger; a skill cannot invoke another slash command programmatically.
+   Using the Skill tool achieves the same result without interrupting the
+   automated flow.
 
-   When using `code-review`, choose a fixed point that isolates the apply
-   implementation cleanly (for example the pre-apply HEAD, the change branch
-   base, or another resolved merge-base). If no trustworthy fixed point is
-   available, fall back to `java-code-review`.
-
-   For Java/Spring projects, prefer a chained review when feasible:
-   `/review` → `code-review` → `java-code-review`.
-   If the earlier layer already finds blocking issues, fix them first before
-   running the next layer.
-
-   For Java/Spring projects that touch security-sensitive flows, extend the
-   chain to:
-   `/review` → `code-review` → `java-code-review` → `security-audit`.
-
-    The review must cover:
+   The review must cover:
 
    - **Logic correctness** — does the implementation match the intent in
      `proposal.md` and `design.md`?
    - **Edge cases** — are obvious failure paths handled?
-    - **Task completeness** — does every checked-off task have corresponding code?
-    - **No regressions** — for code-level changes, do existing tests still pass
-      (run the project's test command if one is available)? For non-code
-      changes, confirm no executable behavior was altered implicitly.
+   - **Task completeness** — does every checked-off task have corresponding code?
+   - **No regressions** — do existing tests still pass (run the project's test
+     command if one is available)?
 
    Present findings in this format:
 
@@ -455,103 +172,46 @@ and only then archival.
    <overall assessment — one or two sentences>
    ```
 
-4. **Act on findings**
+2. **Act on findings**
 
    - **No CRITICAL issues:**
      - If there are WARNINGs, list them and ask the user whether to fix them
-       now or keep them as known risk before self-test.
-     - Then stop and hand control to the user for self-test.
+       now or proceed.
+     - Once the user decides, continue to Step 3.
 
    - **One or more CRITICAL issues:**
-     - Do NOT proceed to self-test or archive.
+     - Do NOT proceed to archive.
      - Report each critical issue with its location (`file_path:line_number`
        where applicable).
-     - Fix them now (minimal code change only — no scope creep).
-     - After fixing, re-run the same review method (`/review`, `code-review`,
-       `java-code-review`, other skill, or manual) scoped to the affected files
-       only.
-     - Once no CRITICAL issues remain, stop and hand control to the user for
-       self-test.
+      - Fix them now (minimal code change only — no scope creep).
+      - After fixing, re-run the same review method (built-in, skill, or manual)
+        scoped to the affected files only.
+     - Once no CRITICAL issues remain, continue to Step 3.
 
-5. **Hand off for self-test**
+3. **Archive**
 
-    Announce: "Review complete. Please self-test this change. After you confirm
-   self-test passes, I will run verify and archive."
+   Announce: "Review passed. Archiving change…"
 
-   Use this exact structure:
-
-   ```
-   ## Review Complete: <change-name>
-
-   ### Need To Fix
-   - <critical fixes applied, or `None`>
-
-   ### Current Problem
-   - <remaining warning or known risk, or `None`>
-
-   ### Fix Logic
-   - <final reviewed logic>
-
-   ### Still Need Confirmation
-   - Self-test result from the user
-   ```
-
-   Stop here. Do NOT run `/opsx:verify` or `/opsx:archive` until the user says
-   self-test passed.
-
-6. **After user confirms self-test passed, verify the change**
-
-   Announce: "Self-test passed. Verifying change before archive…"
-
-    Use the **Task tool** to execute `/opsx:verify <name>` for the same change.
-    Do not merely print the command as text. Verification must confirm the
-    change artifacts and implementation still line up before archival.
-
-   If verification reports drift, missing spec updates, or incomplete task
-   closure, stop, fix the issue, and ask the user to self-test again before
-   continuing.
-
-7. **Archive**
-
-    Announce: "Verification passed. Archiving change…"
-
-    Use the **Task tool** to execute `/opsx:archive <name>` for the same change
-    name already known from the apply session. Do NOT ask the user for the
-    change name again or merely print the command as a suggestion.
+   Execute `/opsx/archive` for the same change name already known from the
+   apply session. Do NOT ask the user for the change name again.
 
    The archive command will handle: delta-spec sync check, task completion
    check, directory move, and summary output. Let it run to completion.
 
-8. **Confirm completion**
+4. **Confirm completion**
 
    Print the archive summary from `/opsx/archive`, then append:
 
    ```
-Workflow complete: propose → apply → review → self-test → verify → archive
+   Workflow complete: propose → apply → review → archive
    ```
 
 ### Guardrails
 
-- Trust only the post-task CLI re-check: proceed only when it explicitly
-  returns `state: "all_done"`. Never infer completion from task checkboxes or
-  final progress text. If the re-check is missing or returns another state,
-  stop and report that Hook B was not run — do not review or archive.
-- Only invoke `tdd` and `test-quality` when the diff contains a code-level
-  change. Never force them for pure knowledge notes, proposal/design/task docs,
-  Markdown updates, or comment-only edits.
-- Comment-only edits inside source files are still non-code changes unless a
-  method body, signature, interface contract, schema, or runtime config also
-  changed.
-- If the diff mixes code and non-code edits, classify the whole change as
-  code-level and use the code validation branch.
+- Only trigger when `state: "all_done"`. If apply is paused, do nothing.
 - Never skip the review step, even if the implementation looks clean.
-- After review passes, stop for user self-test. Do not auto-run verify or
-  archive before the user confirms self-test passed.
-- Never skip verification before archive.
 - Never archive with unresolved CRITICAL issues.
 - WARNING-level issues require a user decision — do not silently ignore or
   silently fix them.
-- If verification or post-review fixes change runtime behavior, require another
-  user self-test confirmation before archive.
 - If `/opsx/archive` fails (e.g., archive already exists), surface the error
   and options to the user; do not force-proceed.

@@ -2,7 +2,6 @@
 name: freestocklineskill
 description: Free no-API-key A-share ecosystem data query skill for OpenClaw and Hermes. Use when users ask for A股、沪深京股票、指数、ETF/LOF、可转债、行业/概念板块、实时行情、K线、涨跌排行、涨停/跌停/炸板、资金流、财务估值、公告、龙虎榜、大宗交易、融资融券、新闻快讯、筹码等公开数据查询，并且不希望填写 API Key、Token、Cookie 或付费账号。
 version: "0.1.1"
-homepage: https://github.com/Etherstrings/freeStockLIneskill
 metadata:
   openclaw:
     requires:

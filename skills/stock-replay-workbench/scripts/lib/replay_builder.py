@@ -15,16 +15,6 @@ _STATIC_DISCLAIMER_WARNINGS = {
 }
 
 _STATIC_DISCLAIMER_SUBSTRINGS = ("为公开源 best-effort 数据。",)
-_FLOW_SOURCE_MARKERS = (
-    "money_flow",
-    "fund_flow",
-    "_flow",
-)
-_SECTOR_SOURCE_MARKERS = (
-    "industry_rank",
-    "concept_rank",
-    "stock_membership",
-)
 
 
 def limit_sentiment(limit: int = 50) -> dict:
@@ -99,111 +89,6 @@ def _unique_strings(items: list[str], limit: int | None = None) -> list[str]:
         if text and text not in unique:
             unique.append(text)
     return unique if limit is None else unique[:limit]
-
-
-def classify_market_regime(market_context: dict | None) -> dict:
-    context = market_context or {}
-    indexes = context.get("indexes") or []
-    breadth = context.get("breadth") or {}
-    sentiment = context.get("limit_sentiment") or {}
-    sector_context = context.get("sector_context") or {}
-    changes = [
-        float(item.get("change_percent"))
-        for item in indexes
-        if isinstance(item, dict)
-        and isinstance(item.get("change_percent"), (int, float))
-    ]
-    if not changes:
-        return {
-            "label": "stable_to_constructive",
-            "summary": "宽基结构信号不足，先按中性偏稳处理。",
-            "signals": [],
-        }
-
-    average_change = sum(changes) / len(changes)
-    min_change = min(changes)
-    breadth_up = breadth.get("up") or 0
-    breadth_down = breadth.get("down") or 0
-    break_rate = sentiment.get("break_rate") or 0
-    advance_rate = sentiment.get("advance_rate") or 0
-    laggards = sector_context.get("laggards") or []
-
-    signals: list[str] = []
-    if min_change <= -3.0:
-        signals.append("高弹性指数显著走弱。")
-    if breadth_down > breadth_up:
-        signals.append(f"下跌家数占优（{breadth_down}:{breadth_up}）。")
-    if break_rate:
-        signals.append(f"炸板率 {float(break_rate):.1f}% 。")
-    if laggards:
-        signals.append(f"弱势方向集中在：{' '.join(str(item) for item in laggards)}。")
-
-    if average_change <= -1.5 or (breadth_down > breadth_up * 2 and advance_rate <= 10):
-        return {
-            "label": "systemic_weakness",
-            "summary": "指数、宽度和情绪同步走弱，更接近系统性下压。",
-            "signals": signals,
-        }
-    if min_change <= -3.0 and average_change > -1.5:
-        return {
-            "label": "structural_rotation",
-            "summary": "高弹性方向回撤更深，当前更像结构性分化。",
-            "signals": signals,
-        }
-    return {
-        "label": "stable_to_constructive",
-        "summary": "宽基未出现系统性破位，按稳定到偏建设性处理。",
-        "signals": signals,
-    }
-
-
-def _classify_market_regime(
-    snapshot_payload: dict, limit_sentiment_payload: dict
-) -> dict:
-    return classify_market_regime(
-        {
-            "indexes": snapshot_payload.get("data", {}).get("indexes") or [],
-            "breadth": snapshot_payload.get("data", {}).get("breadth") or {},
-            "limit_sentiment": limit_sentiment_payload.get("data", {}) or {},
-            "sector_context": {},
-        }
-    )
-
-
-def _analysis_provenance(source_chain: list[dict]) -> dict:
-    primary = _unique_strings(
-        [
-            str(item.get("source"))
-            for item in source_chain
-            if isinstance(item, dict) and item.get("ok") is True and item.get("source")
-        ]
-    )
-    fallback = _unique_strings(
-        [
-            str(item.get("source"))
-            for item in source_chain
-            if isinstance(item, dict) and item.get("ok") is False and item.get("source")
-        ]
-    )
-    if primary and fallback:
-        mode = "mixed"
-    elif fallback:
-        mode = "fallback"
-    else:
-        mode = "primary"
-    degradation_flags = []
-    if any(any(marker in item for marker in _FLOW_SOURCE_MARKERS) for item in fallback):
-        degradation_flags.append("flow")
-    if any(
-        any(marker in item for marker in _SECTOR_SOURCE_MARKERS) for item in fallback
-    ):
-        degradation_flags.append("sector")
-    return {
-        "mode": mode,
-        "primary_sources": primary,
-        "fallback_sources": fallback,
-        "degradation_flags": _unique_strings(degradation_flags),
-    }
 
 
 def _split_disclaimers(items: list[str]) -> tuple[list[str], list[str]]:
@@ -727,11 +612,7 @@ def _build_summary(
 
 
 def _confidence(warnings: list[str]) -> str:
-    if len(_unique_strings(warnings)) >= 3:
-        return "low"
-    if warnings:
-        return "medium"
-    return "high"
+    return "低" if len(_unique_strings(warnings)) >= 4 else "中"
 
 
 def build_replay(trade_date: str | None = None, limit: int = 5) -> dict:
@@ -806,8 +687,6 @@ def build_replay(trade_date: str | None = None, limit: int = 5) -> dict:
         _extend_warnings(warnings, {"warnings": focus_warnings})
 
     warnings, disclaimers = _split_disclaimers(warnings)
-    market_regime = _classify_market_regime(snapshot_payload, limit_sentiment_payload)
-    provenance = _analysis_provenance(source_chain)
 
     themes = _build_themes(
         industry_rank_payload,
@@ -848,9 +727,6 @@ def build_replay(trade_date: str | None = None, limit: int = 5) -> dict:
         "watchlist": _build_watchlist(
             limit_up_payload, industry_flow_payload, concept_flow_payload
         ),
-        "regime_watchpoints": [f"{market_regime['label']}: {market_regime['summary']}"],
-        "market_regime": market_regime,
-        "analysis_provenance": provenance,
         "risks": _build_risks(warnings, limit_up_payload),
         "disclaimers": disclaimers,
         "source_chain": [

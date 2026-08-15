@@ -1,0 +1,117 @@
+# 模块 2：切换完整 Profile 并更新 OpenSpec（使用用户终端环境）
+
+> 共享规则见 `modules/shared.md`
+
+OpenSpec 旧版本的 `openspec update` 只能更新已有工具文件，不能完成 CLI 本身升级。并且如果当前 profile 仍是基础/核心最小集合，即使执行了 init/update，生成出来的 commands / skills 也不会是用户要的"最全"集合。必须先确认并在需要时切换到更完整的 profile，再在用户自己的 macOS Terminal 中执行 `openspec init`、升级 CLI、运行 `openspec update`。优先从用户主目录运行，而不是由批处理子 shell 或项目目录代执行。
+
+### "最全"的判定
+
+本技能中"最全"的含义不是某个固定 profile 名称，也不是只看 `opsx` 是否存在，而是：**当前启用 profile 在 `~/.claude/commands/` 与 `~/.claude/skills/` 下实际生成的 commands / skills 集合，是否已经覆盖用户需要的完整内容**。判断时以运行后的实际目录内容为准，不写死文件名名单。
+
+**操作步骤**：
+
+1. 打开 macOS Terminal，确认 shell 初始化完成；若出现 `compinit` insecure files 提示，按终端提示选择继续即可，该提示与 OpenSpec 无关。
+2. 先检查当前 OpenSpec profile 是否已经是目标完整 profile；如果当前 profile 只能生成基础 commands / skills，则先执行：
+
+```bash
+cd ~
+openspec config profile
+```
+
+在交互式列表中选择能生成更完整 commands / skills 集合的 profile。**"最全"的判定方式**不是固定名字，而是看该 profile 在 `~/.claude/commands/` 与 `~/.claude/skills/` 下实际生成的内容是否满足用户需要。
+
+3. 如当前环境尚未初始化 OpenSpec，或刚切换了 profile，或 `openspec update` 提示需要初始化 / 新增工具，再在用户主目录执行：
+
+```bash
+cd ~
+openspec init
+```
+
+4. 从用户主目录升级 CLI 并确认版本：
+
+```bash
+cd ~
+npm install -g @fission-ai/openspec@latest
+openspec --version
+```
+
+版本必须是当前 latest 版本；如果仍是旧版本，停止并提示用户，不要继续执行旧版更新。
+
+5. 执行升级式更新：
+
+```bash
+cd ~
+openspec update
+```
+
+6. 根据输出判定结果：
+   - `Upgrading to the new OpenSpec` 且随后出现 `Updated: ... (vX.Y.Z)`：CLI 和工具升级成功。
+   - `All N tool(s) up to date (vX.Y.Z)`：工具更新成功，但不代表 CLI 已升级；必须结合 `openspec --version` 判断。
+   - `Use --force to refresh files anyway.`：提示信息，不是错误；只有明确要求刷新时才使用 `--force`。
+   - `Detected new tool: Gemini CLI. Run 'openspec init' to add it.`：已有工具更新成功，只是提示 Gemini CLI 尚未加入；需要时再执行 `openspec init`。
+   - `No configured tools found. Run "openspec init" to set up tools.`：当前用户环境没有 OpenSpec 工具配置，再执行 `openspec init`；不能仅因存在旧的 `openspec/AGENTS.md` 就判定更新失败。
+   - `custom profile is missing N core workflow(s): <workflow-name>`：更新成功但 profile 不完整；执行 `openspec config profile core` 切换到 core profile，然后重新执行 `openspec update` 确保所有 core workflows 的文件已生成。在汇总中报告 profile 切换前后状态。若 `openspec config profile core` 不可用，回退到 `openspec config profile` 交互式选择。
+   - `Left N files in .codex/ that differ from the copy in .agents/`：OpenSpec 检测到 `.codex/` 中有拋留文件。标记 `[CODEX-LEFTOVER]`，在汇总中提示用户：「检测到 .codex/ 中有 N 个文件与 .agents/ 不同，请比对后删除 .codex/ 副本」。**不自动删除 `.codex/` 中的文件。**
+   - `Commands skipped for: codex (uses skills)`：Codex 工具使用 skills 而非 commands，这是正常行为。在汇总中将 Codex 的 commands 状态标记为 `SKIPPED (uses skills)`，不视为错误。
+   - `Removed: N command files (deselected workflows)`：OpenSpec 主动删除了被 deselect 的 command 文件。在汇总中记录被删除的 command 文件数量，并提示用户这些文件因 workflow 被 deselect 而被删除。
+   - `Removed: N skill directories (deselected workflows)`：OpenSpec 主动删除了被 deselect 的 skill 目录。在汇总中记录被删除的 skill 目录数量，并提示用户这些目录因 workflow 被 deselect 而被删除。
+   - `Setup complete for <tool>` / `Updated <tool>`：从 init/update 输出中提取所有已配置工具名称及状态（成功/跳过/失败），在汇总中列出完整工具列表。
+7. 运行完成后，通过 skill 工具加载并运行 `/opsx-workflow-hooks` skill，完成 OPSX 工作流初始化。
+
+OpenSpec 升级可能清理旧版命令文件，并将 OPSX 迁移到 Agent Skills。出现 `No user content to preserve` 时可按提示清理；出现 `differ from the copy in .agents` 时不得覆盖用户自定义副本，必须提示并人工比对。不得使用 `--force` 覆盖 `/Users/kangll13/aiot/java-code/self/gggggggood/` 下用户代码或用户自行维护的文件。
+
+### 多工具目录生成状态
+
+OpenSpec v1.9.0 为多个工具生成文件，包括但不限于：`.claude/`、`.agents/`、`.codebuddy/`、`.cursor/`、`.gemini/`、`.github/`、`.lingma/`、`.trae/`。`openspec init` / `openspec update` 的输出会列出所有已配置工具的 `Setup complete for <tool>` 或 `Updated <tool>` 状态。
+
+**关键规则**：
+- `.claude` 是 OpenSpec 更新后的权威源，模块 2 只从 `.claude` 同步到 `.agents`。
+- 其他工具目录（`.codebuddy/`、`.cursor/`、`.gemini/`、`.github/`、`.lingma/`、`.trae/`）由 OpenSpec 直接管理，**不同步到 `.agents`**——这些目录中的文件格式是各工具特有的，混合同步会冲突。
+- 模块 2 在汇总中报告所有已配置工具的生成状态，但不自动操作其他工具目录。
+- **Codex 特殊行为**：Codex 工具使用 skills 而非 commands。`openspec init` / `openspec update` 输出 `Commands skipped for: codex (uses skills)` 是正常行为，不视为错误。Codex 的 commands 状态在汇总中标记为 `SKIPPED (uses skills)`。
+
+### OpenSpec commands / skills 补充与校验
+
+OpenSpec 可能按 profile 生成不同数量的 commands / skills，且文件集合随 profile、版本和工具配置变化。`openspec init` / `openspec update` 的权威输出目录是 `~/.claude/commands/` 与 `~/.claude/skills/`，不能假设它只会更新 `commands/opsx/` 或只生成 `openspec-*` skills。
+
+更新 OpenSpec 后，必须按以下固定顺序执行：
+
+```bash
+rsync -r --delete ~/.claude/commands/ ~/.agents/commands/
+```
+
+然后同步当前 profile 在 `~/.claude/skills/` 下实际生成的完整 Agent Skills。`.claude` 是 OpenSpec 更新后的权威源，无论本地是否有差异，均直接覆盖：
+
+```bash
+for skill_dir in ~/.claude/skills/*; do
+  [ -d "$skill_dir" ] || continue
+  skill_name=$(basename "$skill_dir")
+  target_dir="$HOME/.agents/skills/$skill_name"
+
+  if diff -rq "$skill_dir" "$target_dir" >/dev/null 2>&1; then
+    continue
+  fi
+
+  rsync -r --delete "$skill_dir/" "$target_dir/"
+  printf '[OVERWRITE] %s\n' "$skill_name"
+done
+```
+
+`.claude` 是权威源，当前 profile 实际生成的 skills 遇到差异时直接用 `rsync -r --delete` 覆盖 `.agents` 副本，并在汇总中报告已覆盖的 skill 名称（`[OVERWRITE]`）。两者一致时静默跳过。
+
+**同步范围说明**：该同步是 OpenSpec 生成的 commands 和 skills 的同步。模块 3 维护的 skills（来自 `self/skills/` 仓库）的最新性由模块 3 保证（模块 3 在模块 2 之后执行，覆盖回正确版本）。`~/.claude/skills/` 的运行时备份由模块 4 的步骤 4.4 保证。数据流为单向，不反向同步 `.agents/skills/ → .claude/skills/`。
+
+完成上述同步后，必须立即通过 skill 工具运行 `/opsx-workflow-hooks`，恢复并校验 `propose.md` / `apply.md` 的 Hook A / Hook B。因为 `rsync -r --delete ~/.claude/commands/ ~/.agents/commands/` 会先覆盖 `.agents` 运行时副本，若不立即恢复 hook，下一次 `/opsx` 流程将失去自动回调。
+
+不要从旧的 `~/.agents/commands/` 或 `~/.agents/skills/` 反向覆盖新版 `.claude` 文件；`.claude` 是 OpenSpec 更新后的权威源。
+
+OpenSpec 升级后，完整 commands / skills 的实际文件集合以 `~/.claude/commands/` 与 `~/.claude/skills/` 目录内容为准，不应假定固定的文件名列表或仅同步某个子目录。
+
+升级后必须检查以下两处目录：
+
+- OpenSpec 权威源 commands：`/Users/kangll13/.claude/commands/`
+- 运行时目标 commands：`/Users/kangll13/.agents/commands/`
+- OpenSpec 权威源 skills：`/Users/kangll13/.claude/skills/`
+- 运行时目标 skills：`/Users/kangll13/.agents/skills/`
+
+commands 校验应满足：`~/.claude/commands/` 与 `~/.agents/commands/` 包含相同的实际文件集合。skills 校验应满足：当前 profile 在 `~/.claude/skills/` 下实际生成的每个 skill，都已同步到 `~/.agents/skills/` 且内容一致；`.agents/skills/` 中保留的其他非 OpenSpec skills 不视为异常。随后仅允许 `.agents/commands/opsx/` 中的 `propose.md` 和 `apply.md` 比 `.claude/commands/opsx/` 多出 append-only 的 Hook A / Hook B 尾部；如果新版 OpenSpec 源文件没有 hook，只能在 `.agents` 运行时副本末尾按 append-only 规则补回，不得修改 `.claude` 原命令正文，也不得改动 `/self/gggggggood/` 下用户维护的源文件。

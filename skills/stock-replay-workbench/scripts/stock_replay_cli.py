@@ -21,7 +21,7 @@ from lib.irm import irm_qa
 from lib.market import limit_pool, market_snapshot, rank
 from lib.options import option_codes, option_greeks, option_tquote
 from lib.quote import quote_history, quote_realtime
-from lib.replay_builder import build_replay, classify_market_regime, limit_sentiment
+from lib.replay_builder import build_replay, limit_sentiment
 from lib.sector import sector
 from render_replay_markdown import render_report
 
@@ -31,27 +31,17 @@ CORE_ACCEPTANCE_PATH = (
     Path(__file__).resolve().parents[1] / "evals" / "core-acceptance-stocks.json"
 )
 ANALYSIS_LAYERS = ["facts", "signals", "judgment", "risks"]
-HIGH_VOLATILITY_KEYWORDS = (
-    "芯片",
-    "半导体",
-    "封装",
-    "封测",
-    "科创",
-    "AI",
-    "存储",
-    "算力",
-    "成长",
-)
-DEFENSIVE_KEYWORDS = ("银行", "电力", "高股息", "公用事业", "运营商")
 
 
 def _resolve_output_path(output_path: str) -> Path:
     output = Path(output_path)
     if output.is_absolute():
         return output
-    if output.parent == Path("."):
-        return DEFAULT_OUTPUT_DIR / output.name
-    return output
+    return (
+        DEFAULT_OUTPUT_DIR / output.name
+        if output.parent == Path(".")
+        else DEFAULT_OUTPUT_DIR / output
+    )
 
 
 def _render_replay(input_path: str, output_path: str | None) -> dict:
@@ -100,185 +90,6 @@ def _append_unique(target: list[str], text: str | None) -> None:
     value = str(text or "").strip()
     if value and value not in target:
         target.append(value)
-
-
-def _unique_strings(items: list[str]) -> list[str]:
-    unique: list[str] = []
-    for item in items:
-        _append_unique(unique, item)
-    return unique
-
-
-def _warning_domains(
-    warnings: list[str], payload_data: dict, missing_fields: list[str]
-) -> list[str]:
-    text = " ".join(str(item) for item in warnings)
-    domains: list[str] = []
-    if "资金流" in text or any(
-        field.startswith("money_flow") for field in missing_fields
-    ):
-        domains.append("flow")
-    if "板块" in text or any(
-        field.startswith("sector_membership") for field in missing_fields
-    ):
-        domains.append("sector")
-    if "行情" in text or any(field.startswith("realtime") for field in missing_fields):
-        domains.append("market")
-    if (
-        "估值" in text
-        or "财务" in text
-        or any(field.startswith("fundamental") for field in missing_fields)
-    ):
-        domains.append("fundamental")
-    if payload_data.get("market_context") in (None, {}, []):
-        return domains
-    if "market_context" in missing_fields:
-        domains.append("market")
-    return _unique_strings(domains)
-
-
-def _build_provenance(source_chain: list[dict]) -> dict:
-    primary_sources = [
-        str(item.get("source"))
-        for item in source_chain
-        if isinstance(item, dict) and item.get("ok") is True and item.get("source")
-    ]
-    fallback_sources = [
-        str(item.get("source"))
-        for item in source_chain
-        if isinstance(item, dict) and item.get("ok") is False and item.get("source")
-    ]
-    if primary_sources and fallback_sources:
-        mode = "mixed"
-    elif fallback_sources:
-        mode = "fallback"
-    else:
-        mode = "primary"
-    return {
-        "mode": mode,
-        "primary_sources": _unique_strings(primary_sources),
-        "fallback_sources": _unique_strings(fallback_sources),
-    }
-
-
-def _build_market_regime(payload_data: dict, warnings: list[str]) -> dict:
-    regime = classify_market_regime(payload_data.get("market_context") or {})
-    if not (payload_data.get("market_context") or {}).get("indexes"):
-        regime["signals"] = _unique_strings([*regime.get("signals", []), *warnings[:2]])
-    return regime
-
-
-def _classify_stock_role(payload_data: dict) -> dict:
-    sector_names = " ".join(
-        str(item.get("板块名称", ""))
-        for item in (payload_data.get("sector_membership") or [])
-        if isinstance(item, dict)
-    )
-    pe = _read_path(payload_data, "fundamental.pe")
-    pb = _read_path(payload_data, "fundamental.pb")
-    if any(keyword in sector_names for keyword in HIGH_VOLATILITY_KEYWORDS) or (
-        isinstance(pe, (int, float)) and float(pe) >= 60
-    ):
-        return {
-            "bucket": "high_volatility",
-            "summary": "所属方向偏高弹性，波动和预期回撤都更敏感。",
-        }
-    if any(keyword in sector_names for keyword in DEFENSIVE_KEYWORDS) or (
-        isinstance(pb, (int, float)) and float(pb) <= 2
-    ):
-        return {
-            "bucket": "defensive",
-            "summary": "更偏防御或稳定器属性，不宜在非系统性回撤里优先处理。",
-        }
-    return {
-        "bucket": "trend_following",
-        "summary": "更接近趋势跟随品种，优先级取决于市场环境和板块承接。",
-    }
-
-
-def _build_action_priority(payload_data: dict, market_regime: dict) -> list[dict]:
-    role = _classify_stock_role(payload_data)
-    regime_label = market_regime.get("label")
-    priority = 2
-    action = "observe"
-    if regime_label in {"systemic_weakness", "structural_rotation"}:
-        if role["bucket"] == "high_volatility":
-            priority = 1
-            action = "reduce_first"
-        elif role["bucket"] == "defensive":
-            priority = 3
-            action = "hold_if_not_broken"
-    summary = f"{market_regime.get('summary', '')} {role['summary']}"
-    return [
-        {
-            "symbol": payload_data.get("symbol"),
-            "bucket": role["bucket"],
-            "priority": priority,
-            "action": action,
-            "summary": summary.strip(),
-        }
-    ]
-
-
-def _build_market_context(limit: int) -> tuple[dict, list[dict], list[str]]:
-    source_chain: list[dict] = []
-    warnings: list[str] = []
-
-    snapshot_payload = market_snapshot()
-    sentiment_payload = limit_sentiment(max(limit, 20))
-    industry_rank_payload = sector("industry-rank", None, limit)
-    concept_rank_payload = sector("concept-rank", None, limit)
-
-    for payload in (
-        snapshot_payload,
-        sentiment_payload,
-        industry_rank_payload,
-        concept_rank_payload,
-    ):
-        _extend_chain(source_chain, payload)
-        _extend_warnings(warnings, payload)
-
-    industry_items = (industry_rank_payload.get("data") or {}).get("items") or []
-    concept_items = (concept_rank_payload.get("data") or {}).get("items") or []
-    leaders = [
-        str(item.get("name", "")).strip()
-        for item in industry_items
-        if isinstance(item, dict)
-        and isinstance(item.get("change_percent"), (int, float))
-        and float(item.get("change_percent")) > 0
-        and str(item.get("name", "")).strip()
-    ]
-    laggards = [
-        str(item.get("name", "")).strip()
-        for item in concept_items
-        if isinstance(item, dict)
-        and isinstance(item.get("change_percent"), (int, float))
-        and float(item.get("change_percent")) < 0
-        and str(item.get("name", "")).strip()
-    ]
-
-    context = {
-        "indexes": (snapshot_payload.get("data") or {}).get("indexes") or [],
-        "breadth": (snapshot_payload.get("data") or {}).get("breadth") or {},
-        "limit_sentiment": sentiment_payload.get("data") or {},
-        "sector_context": {
-            "leaders": _unique_strings(leaders)[:2],
-            "laggards": _unique_strings(laggards)[:2],
-        },
-    }
-    return context, source_chain, warnings
-
-
-def _build_confidence_label(
-    warnings: list[str], missing_fields: list[str], source_chain: list[dict]
-) -> str:
-    if missing_fields or any(
-        item.get("ok") is False for item in source_chain if isinstance(item, dict)
-    ):
-        return "low"
-    if warnings:
-        return "medium"
-    return "high"
 
 
 def _build_layered_analysis(
@@ -400,11 +211,6 @@ def _build_layered_analysis(
         for field in (standard.get("required_fields") or [])
         if _read_path(payload_data, str(field)) in (None, [], {})
     ]
-    provenance = _build_provenance(source_chain)
-    degradation_flags = _warning_domains(warnings, payload_data, missing_fields)
-    market_regime = _build_market_regime(payload_data, warnings)
-    action_priority = _build_action_priority(payload_data, market_regime)
-    confidence = _build_confidence_label(warnings, missing_fields, source_chain)
     if missing_fields:
         _append_unique(risks, f"仍缺少关键字段：{', '.join(missing_fields)}。")
     else:
@@ -436,12 +242,6 @@ def _build_layered_analysis(
         "risks": risks,
         "conclusion_tags": tags,
         "source_trace": source_chain,
-        "provenance": provenance,
-        "degradation_flags": degradation_flags,
-        "market_regime": market_regime,
-        "action_priority": action_priority,
-        "confidence": confidence,
-        "warnings": _unique_strings(warnings),
         "rational": True,
     }
 
@@ -578,7 +378,6 @@ def stock_diagnose(symbol: str, limit: int = 20) -> dict:
     sector_payload = sector("stock-membership", symbol, limit)
     fundamental_payload = fundamental(symbol)
     news_payload = news(symbol, limit)
-    market_context, market_chain, market_warnings = _build_market_context(limit)
 
     for payload in (
         realtime_payload,
@@ -590,8 +389,6 @@ def stock_diagnose(symbol: str, limit: int = 20) -> dict:
     ):
         _extend_chain(source_chain, payload)
         _extend_warnings(warnings, payload)
-    source_chain.extend(market_chain)
-    warnings.extend(market_warnings)
 
     realtime_data = realtime_payload.get("data") or {}
     history_data = history_payload.get("data") or {}
@@ -633,7 +430,6 @@ def stock_diagnose(symbol: str, limit: int = 20) -> dict:
         "money_flow": flow_data,
         "sector_membership": sector_data.get("items") or [],
         "fundamental": fundamental_data,
-        "market_context": market_context,
         "news_titles": [
             str(item.get("title")).strip()
             for item in news_items

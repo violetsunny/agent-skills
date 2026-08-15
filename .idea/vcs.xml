@@ -2,6 +2,12 @@
 <project version="4">
   <component name="VcsDirectoryMappings">
     <mapping directory="" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/skills/Apple-Hig-Designer" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/skills/a-stock-data" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/skills/global-stock-data" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/skills/gstack" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/skills/short-term-stock-picker" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/skills/stock-analysis-skill" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/skills/stock-analyst" vcs="Git" />
   </component>
 </project>

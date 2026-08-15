@@ -1,0 +1,59 @@
+# 共享规则与前置条件
+
+## 前置条件
+
+- 目标根目录：`/Users/kangll13/aiot/java-code/self`
+- Skill 目标目录：`/Users/kangll13/.agents/skills/`
+- 必须使用 `/usr/bin/git` 绝对路径（zsh 的 `for` 循环子 shell 中 PATH 可能不包含 git）
+- `openspec` CLI 应通过 `@fission-ai/openspec@latest` 全局安装；如环境尚未初始化或刚切换 profile，先按模块 2 完成 `openspec init` / profile 切换，再确认 `openspec --version`
+
+---
+
+## 代码回滚保护
+
+`/Users/kangll13/aiot/java-code/self/gggggggood/` 是用户自行维护和使用的代码目录，适用于该目录下的所有仓库及嵌套仓库。执行任何操作前，必须按以下保护规则处理：
+
+- 禁止执行 `git reset`、`git restore`、`git checkout --`、`git clean`、强制 checkout、强制 pull、覆盖式复制或删除用户文件。
+- 禁止执行 `git stash`，禁止自动 stash、自动 pop、自动解决冲突或自动修复工作区。
+- 发现已修改的跟踪文件、合并冲突、rebase/merge 状态、远端分支冲突或其他异常时，只读取并报告仓库路径、状态和简要原因，然后跳过该仓库。**注意：仅有未跟踪文件（.DS_Store 等）的仓库不触发此规则，可安全执行 `git pull --ff-only`。**
+- 对保护目录中的干净仓库，只允许执行非破坏性的远端检查和普通 `git pull --ff-only`；拉取失败或无法快进时直接提示并跳过。
+- 技能同步涉及保护目录中的源文件时，同样禁止使用会删除或覆盖用户文件的操作；发现源或目标存在差异、异常或冲突时直接提示并跳过同步。
+- 任何不确定是否会修改、删除或覆盖保护目录内容的命令都不得执行，先提示用户确认。
+
+保护规则优先级高于本技能其他章节。结果汇总必须单独列出保护目录中跳过的仓库及原因，不得报告为成功。
+
+---
+
+## Dirty 仓库分类：`[SAFE-UNTRACKED]` vs `[SKIP-DIRTY]`
+
+执行批量更新时，不是所有有本地变化的仓库都应该跳过。必须区分两类情况：
+
+**`[SAFE-UNTRACKED]`** — 仓库只有未跟踪文件（如 `.DS_Store`、`node_modules/` 等），**没有修改任何已跟踪文件**：
+- `git pull --ff-only` 对这些仓库是完全安全的，不会丢失任何本地改动
+- 快进合并只更新已跟踪文件的提交历史，不影响未跟踪文件
+- **应该正常执行 `git pull --ff-only`，不跳过**
+
+**`[SKIP-DIRTY]`** — 仓库有已修改的跟踪文件（`git status --porcelain` 输出中包含 ` M`、`M `、`MM`、`AM`、`RM` 等状态码）：
+- `git pull` 可能与本地修改冲突，导致合并失败或数据丢失
+- **必须跳过，不执行 `git pull`**
+- 这是保护性跳过，不是网络失败、认证失败或命令报错
+- 需要与 `[AUTH]`、`[NETWORK]`、`[FAILED]` 分开统计和解释
+
+**分类方法**：对每个非干净仓库执行 `git status --porcelain`，检查输出中是否包含已修改跟踪文件的状态码（`^ M`、`^M `、`^MM`、`^AM`、`^RM`、`^ T`）。不包含 → `[SAFE-UNTRACKED]`，可安全拉取；包含 → `[SKIP-DIRTY]`，跳过。
+
+---
+
+## 关键注意事项
+
+- **必须用 `/usr/bin/git` 绝对路径**
+- 模块 1 的 git pull 使用重试机制（3次，间隔递增）；模块 3 依赖模块 1 的拉取结果，不重复 git pull
+- 模块 1 必须设置 `GIT_TERMINAL_PROMPT=0` 防止认证交互挂起；设置 `-c http.timeout=10 -c http.lowSpeedLimit=500 -c http.lowSpeedTime=10` 防止单仓库网络超时阻塞整批
+- 模块 1 的 dirty 分类：只有未跟踪文件（`git status --porcelain` 无 ` M`/`M ` 等已修改跟踪文件状态码）的仓库可安全执行 `git pull --ff-only`，不跳过
+- 分批执行，每批不超过 15 个项目，每批超时 **180s**
+- 扫描深度为 **3 层**（`self/` 下第一层子目录，再往下两层）
+- Skill 同步（模块 3）使用 `rsync -r --delete`，确保 `~/.agents/skills/` 与源完全一致；模块 3.5 和模块 4 同步到 `free-stock-line-skills/` 和 `agent-skills/skills/` 时使用 `rsync -r`（**不加 `--delete`**），保留用户自定义文件
+- matt-skills 的 skill 在 `skills/{category}/{skill_name}/` 嵌套结构下，同步时去掉 category 层级
+- claude-code-java 的 skill 在 `.claude/skills/` 下（而非 `skills/`）
+- `/Users/kangll13/aiot/java-code/self/gggggggood/` 下任何异常、冲突或本地改动都必须单独列出并提示用户，不得自动处理
+- **`stock-replay-workbench` 是重点保护项目**，在模块 3.5 中禁止任何修改、同步或覆盖
+- 模块 3.5 同步到 `free-stock-line-skills/` 使用 `rsync -r` 不加 `--delete`，保留用户自定义文件（AGENTS.md、INDEX.md 等）
