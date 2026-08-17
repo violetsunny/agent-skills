@@ -182,18 +182,3 @@ This skill supports the "actions on a change" model:
 
 - **Can be invoked anytime**: Before all artifacts are done (if tasks exist), after partial implementation, interleaved with other actions
 - **Allows artifact updates**: If implementation reveals design issues, suggest updating artifacts - not phase-locked, work fluidly
-<!-- OPSX IMMUTABLE BOUNDARY: original command content above this line must not be modified -->
-
-**Post-completion hook**
-
-After the final task is marked complete, re-run `openspec instructions apply
---change "<name>" --json`. Only when that command returns
-`state: "all_done"`, immediately use the **Skill tool** to invoke the
-`opsx-workflow-hooks` skill (Hook B). Hook B will first classify whether the
-completed diff contains code changes or only docs/comments/proposal-style
-edits. Only code changes run `tdd` and `test-quality` to validate changed
-methods and interfaces before the review flow continues. Do not finish with a
-suggestion to archive manually.
-
-If the re-check returns any other state, do not invoke the hook. Report the
-state and wait for the user to resume or resolve the blocker.

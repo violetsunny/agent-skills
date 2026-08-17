@@ -6,6 +6,7 @@
 - Skill 目标目录：`/Users/kangll13/.agents/skills/`
 - 必须使用 `/usr/bin/git` 绝对路径（zsh 的 `for` 循环子 shell 中 PATH 可能不包含 git）
 - `openspec` CLI 应通过 `@fission-ai/openspec@latest` 全局安装；如环境尚未初始化或刚切换 profile，先按模块 2 完成 `openspec init` / profile 切换，再确认 `openspec --version`
+- **`openspec init` 和 `openspec update` 必须在用户主目录（`~`）下执行**，不得在项目目录或批处理子 shell 中代执行
 
 ---
 
@@ -52,8 +53,9 @@
 - 分批执行，每批不超过 15 个项目，每批超时 **180s**
 - 扫描深度为 **3 层**（`self/` 下第一层子目录，再往下两层）
 - Skill 同步（模块 3）使用 `rsync -r --delete`，确保 `~/.agents/skills/` 与源完全一致；模块 3.5 和模块 4 同步到 `free-stock-line-skills/` 和 `agent-skills/skills/` 时使用 `rsync -r`（**不加 `--delete`**），保留用户自定义文件
-- matt-skills 的 skill 通过 `npx skills@latest add mattpocock/skills` 交互式安装到 `~/.agents/skills/`，不走 rsync 直同步；模块 4.1A 排除 matt-skills
+- matt-skills 的 skill 在 `skills/{category}/{skill_name}/` 嵌套结构下，同步时去掉 category 层级
 - claude-code-java 的 skill 在 `.claude/skills/` 下（而非 `skills/`）
 - `/Users/kangll13/aiot/java-code/self/gggggggood/` 下任何异常、冲突或本地改动都必须单独列出并提示用户，不得自动处理
 - **`stock-replay-workbench` 是重点保护项目**，在模块 3.5 中禁止任何修改、同步或覆盖
 - 模块 3.5 同步到 `free-stock-line-skills/` 使用 `rsync -r` 不加 `--delete`，保留用户自定义文件（AGENTS.md、INDEX.md 等）
+- **汇总口径**：模块 2 的汇总必须区分两类独立动作——(1) OpenSpec 对各工具目录的**直接生成状态**（仅记录成功/跳过/失败），(2) `.claude -> .agents` 的**迁移结果**（记录同步的 commands/skills 数量和 `[OVERWRITE]` 列表）。模块 4 的 `[BACKUP-SYNC]` 也需单独记录，不得与生成状态或迁移结果混为一条

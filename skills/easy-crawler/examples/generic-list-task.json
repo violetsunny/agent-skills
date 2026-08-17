@@ -1,0 +1,71 @@
+{
+  "task_name": "generic-list-http-demo",
+  "targets": [
+    {
+      "url": "https://example.com",
+      "page_type": "list",
+      "intent": "extract_links",
+      "requires_js": false
+    }
+  ],
+  "extraction": {
+    "record_type": "page_listing",
+    "fields": ["title", "url"],
+    "pagination": {
+      "type": "none",
+      "max_pages": 1
+    }
+  },
+  "run": {
+    "mode": "http",
+    "output_format": "json",
+    "http": {
+      "timeout_seconds": 20,
+      "user_agent": "easy-crawler/0.2",
+      "accept_language": "en-US,en;q=0.9",
+      "max_redirects": 5
+    },
+    "browser": {
+      "required": false,
+      "storage_state_path": null,
+      "connect_url": null,
+      "stealth": false,
+      "headers_profile": "desktop-chrome",
+      "attach_to_existing": false
+    }
+  },
+  "social": {
+    "platform": null,
+    "search_query": null,
+    "creator_handle": null,
+    "include_comments": false,
+    "include_replies": false,
+    "login_state": "optional",
+    "dynamic_rendering": false
+  },
+  "anti_bot": {
+    "proxy_profile": "none",
+    "real_browser": false,
+    "challenge_handling": "fail_visible",
+    "requires_captcha_solver": false,
+    "user_agent_strategy": "fixed",
+    "header_profile": "desktop-chrome",
+    "rate_limit_window_seconds": 0,
+    "preferred_region": null
+  },
+  "discovery": {
+    "strategy": "follow_links",
+    "max_discovered_targets": 20,
+    "dedupe_by": "url",
+    "checkpoint_key": null,
+    "resume_from_checkpoint": false
+  },
+  "platform": {
+    "requires_signing": false
+  },
+  "artifacts": {
+    "capture_html": true,
+    "capture_trace": false,
+    "capture_screenshot": false
+  }
+}

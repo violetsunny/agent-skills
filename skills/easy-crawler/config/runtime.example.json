@@ -1,0 +1,27 @@
+{
+  "default_output_format": "json",
+  "default_http_timeout_seconds": 20,
+  "default_user_agent": "easy-crawler/0.2",
+  "capture_html_by_default": true,
+  "capture_trace_by_default": false,
+  "capture_screenshot_by_default": false,
+  "discovery": {
+    "default_strategy": "none",
+    "default_max_discovered_targets": 100,
+    "default_dedupe_by": "url",
+    "default_resume_from_checkpoint": false
+  },
+  "browser_backend": {
+    "name": "playwright",
+    "ready_env": "EASY_CRAWLER_BROWSER_READY",
+    "connect_url": null,
+    "storage_state_path": null,
+    "headers_profile": "desktop-chrome"
+  },
+  "anti_bot": {
+    "default_proxy_profile": "none",
+    "default_challenge_handling": "fail_visible",
+    "default_user_agent_strategy": "fixed",
+    "default_rate_limit_window_seconds": 0
+  }
+}

@@ -1,0 +1,43 @@
+{
+  "result": {
+    "task_name": "generic-list-http-demo",
+    "selected_mode": "http",
+    "dry_run": true,
+    "discovered_targets": [
+      {
+        "source_target": "https://example.com",
+        "discovery_type": "follow_links",
+        "target": "https://example.com/discovered-1",
+        "record_id": null,
+        "status": "discovered",
+        "checkpoint": null,
+        "placeholder": true
+      }
+    ],
+    "records": [
+      {
+        "target": "https://example.com",
+        "status": "planned",
+        "title": null,
+        "content_type": null
+      }
+    ]
+  },
+  "run_summary": {
+    "selected_mode": "http",
+    "selection_reasons": [
+      "requested_http_mode"
+    ],
+    "target_count": 1,
+    "discovered_target_count": 1,
+    "success_count": 0,
+    "failure_count": 0,
+    "planned_count": 1
+  },
+  "error_summary": {
+    "errors": []
+  },
+  "debug_artifacts": {
+    "artifacts": []
+  }
+}

@@ -1,0 +1,74 @@
+{
+  "task_name": "social-search-plan-demo",
+  "targets": [
+    {
+      "url": "https://social.example/search?q=robotics",
+      "page_type": "search",
+      "intent": "extract_posts",
+      "requires_js": true
+    }
+  ],
+  "extraction": {
+    "record_type": "social_post",
+    "fields": ["post_id", "author", "title", "published_at"],
+    "pagination": {
+      "type": "infinite_scroll",
+      "max_pages": 3
+    }
+  },
+  "run": {
+    "mode": "auto",
+    "output_format": "json",
+    "http": {
+      "timeout_seconds": 20,
+      "user_agent": "easy-crawler/0.2",
+      "accept_language": "zh-CN,zh;q=0.9,en;q=0.8",
+      "max_redirects": 5
+    },
+    "browser": {
+      "required": false,
+      "storage_state_path": "./state/social.json",
+      "connect_url": null,
+      "stealth": true,
+      "headers_profile": "desktop-chrome-zh",
+      "attach_to_existing": true
+    }
+  },
+  "social": {
+    "platform": "social-feed",
+    "search_query": "robotics",
+    "creator_handle": null,
+    "include_comments": false,
+    "include_replies": false,
+    "login_state": "optional",
+    "dynamic_rendering": true,
+    "sort": "latest",
+    "time_scope": "7d",
+    "entry_hint": "search_tab"
+  },
+  "anti_bot": {
+    "proxy_profile": "rotating-residential",
+    "real_browser": true,
+    "challenge_handling": "manual_intervention",
+    "requires_captcha_solver": false,
+    "user_agent_strategy": "rotate",
+    "header_profile": "desktop-chrome-zh",
+    "rate_limit_window_seconds": 3,
+    "preferred_region": "cn-hk"
+  },
+  "discovery": {
+    "strategy": "search_results",
+    "max_discovered_targets": 50,
+    "dedupe_by": "record_id",
+    "checkpoint_key": "next_cursor",
+    "resume_from_checkpoint": false
+  },
+  "platform": {
+    "requires_signing": false
+  },
+  "artifacts": {
+    "capture_html": true,
+    "capture_trace": true,
+    "capture_screenshot": true
+  }
+}

@@ -2,7 +2,7 @@
 
 > 共享规则见 `modules/shared.md`
 
-OpenSpec 旧版本的 `openspec update` 只能更新已有工具文件，不能完成 CLI 本身升级。并且如果当前 profile 仍是基础/核心最小集合，即使执行了 init/update，生成出来的 commands / skills 也不会是用户要的"最全"集合。必须先确认并在需要时切换到更完整的 profile，再在用户自己的 macOS Terminal 中执行 `openspec init`、升级 CLI、运行 `openspec update`。优先从用户主目录运行，而不是由批处理子 shell 或项目目录代执行。
+OpenSpec 旧版本的 `openspec update` 只能更新已有工具文件，不能完成 CLI 本身升级。并且如果当前 profile 仍是基础/核心最小集合，即使执行了 init/update，生成出来的 commands / skills 也不会是用户要的"最全"集合。必须先确认并在需要时切换到更完整的 profile，再在用户自己的 macOS Terminal 中执行 `openspec init`、升级 CLI、运行 `openspec update`。**必须从用户主目录（`~`）执行 `openspec init` 和 `openspec update`，不得在项目目录或批处理子 shell 中代执行。**
 
 ### "最全"的判定
 
@@ -60,7 +60,9 @@ openspec update
 
 OpenSpec 升级可能清理旧版命令文件，并将 OPSX 迁移到 Agent Skills。出现 `No user content to preserve` 时可按提示清理；出现 `differ from the copy in .agents` 时不得覆盖用户自定义副本，必须提示并人工比对。不得使用 `--force` 覆盖 `/Users/kangll13/aiot/java-code/self/gggggggood/` 下用户代码或用户自行维护的文件。
 
-### 多工具目录生成状态
+### 多工具目录生成状态（OpenSpec 直接生成，仅记录状态）
+
+> 本节描述的是 OpenSpec 对各工具目录的**直接生成状态**，仅用于汇总报告。实际的 `.claude -> .agents` 迁移步骤见下一节"OpenSpec commands / skills 补充与校验"。
 
 OpenSpec v1.9.0 为多个工具生成文件，包括但不限于：`.claude/`、`.agents/`、`.codebuddy/`、`.cursor/`、`.gemini/`、`.github/`、`.lingma/`、`.trae/`。`openspec init` / `openspec update` 的输出会列出所有已配置工具的 `Setup complete for <tool>` 或 `Updated <tool>` 状态。
 
@@ -70,7 +72,9 @@ OpenSpec v1.9.0 为多个工具生成文件，包括但不限于：`.claude/`、
 - 模块 2 在汇总中报告所有已配置工具的生成状态，但不自动操作其他工具目录。
 - **Codex 特殊行为**：Codex 工具使用 skills 而非 commands。`openspec init` / `openspec update` 输出 `Commands skipped for: codex (uses skills)` 是正常行为，不视为错误。Codex 的 commands 状态在汇总中标记为 `SKIPPED (uses skills)`。
 
-### OpenSpec commands / skills 补充与校验
+### OpenSpec commands / skills 补充与校验（`.claude -> .agents` 迁移步骤）
+
+> 本节描述的是 OpenSpec 更新完成后**额外的 `.claude -> .agents` 迁移步骤**，与上一节的"直接生成状态"是两个独立动作，需在汇总中分别记录。
 
 OpenSpec 可能按 profile 生成不同数量的 commands / skills，且文件集合随 profile、版本和工具配置变化。`openspec init` / `openspec update` 的权威输出目录是 `~/.claude/commands/` 与 `~/.claude/skills/`，不能假设它只会更新 `commands/opsx/` 或只生成 `openspec-*` skills。
 
