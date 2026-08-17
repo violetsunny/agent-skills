@@ -10,13 +10,13 @@ Role definition for the **web image acquisition path**: translate the active res
 
 ## 1. License Tier Discipline
 
-Every **provider-sourced** image is classified into one of two tiers; anything else is rejected outright. A third tier, `manual`, exists **only** for a user-supplied [`--from-url`](#5-running-image_searchpy) replacement — it is never the result of a provider search accepting an unknown license.
+Every **provider-sourced** image is classified into one of two tiers; anything else is rejected outright. A third tier, `manual`, exists **only** for a directly selected replacement from [`--from-url`](#5-running-image_searchpy) or an adopted-page source package — it is never the result of a provider search accepting an unknown license.
 
 | Tier | Licenses | On-slide attribution |
 |---|---|---|
 | `no-attribution` | CC0, Public Domain, Pexels License, Pixabay Content License | None |
 | `attribution-required` | CC BY, CC BY-SA | Inline credit `<text>` on the slide |
-| `manual` | User-supplied via `--from-url` (license unverified) | None — verifying rights / any credit is the user's responsibility |
+| `manual` | Directly selected URL or adopted-page package image (license unverified) | None — verifying rights / any credit is the user's responsibility |
 
 **Forbidden — auto-rejected licenses**:
 
@@ -125,7 +125,7 @@ python3 scripts/image_search.py "<query>" \
 | `--max-candidates` | no | `8` | Thumbnail page size. `0` explicitly requests the complete pool and is reserved for debugging / exceptional review, not normal Generate |
 | `--candidate-page` | no | `1` | Ranked thumbnail page to fetch. Page 2 starts at rank 9 with the default page size. Batch rows may override with `candidate_page` |
 | `--promote` | no | — | Download exactly one selected candidate original, enforce the request's size/readability gates, and write provenance |
-| `--from-url` | no | — | Manual replace: download a user-supplied image URL into `--filename` (recorded `license_tier: manual`); works without a multimodal model |
+| `--from-url` | no | — | Manual replace: download a directly selected image URL into `--filename` (recorded `license_tier: manual`); works without a multimodal model |
 
 ### Batch mode (≥ 2 web rows) — preferred
 
@@ -192,16 +192,10 @@ Do not tune this into a visual taste engine. The scorer removes obvious metadata
 
 A metadata-ranked top hit is *downloadable and token-relevant*, not necessarily *visually suitable* — `score_candidate` never sees pixels. Review it against the active Reference and Crop Policy before it is trusted:
 
-- **Multimodal model**: run `--save-candidates`. The tool aggregates explicit query variants, deduplicates them, and saves at most the first **8** ranked previews under `candidates/<stem>/review/`; `review_sheet.jpg` contains only that page and no original is downloaded. Use the sheet for triage, then open an individual `review/candidate_NN.jpg` when exact identity or fine detail is uncertain. Only after one candidate passes should `--promote` download that original. If `has_more_candidates` is true and none passes, fetch `--candidate-page 2` before changing the query.
+- **Multimodal review available**: run `--save-candidates`. The tool aggregates explicit query variants, deduplicates them, and saves at most the first **8** ranked previews under `candidates/<stem>/review/`; `review_sheet.jpg` contains only that page and no original is downloaded. Run [`web-image-review.md`](../workflows/stages/web-image-review.md): use one isolated vision reviewer for the current batch when available, otherwise review locally. Only the active image owner may use the returned candidate filename with `--promote`. If `has_more_candidates` is true and none passes, fetch `--candidate-page 2` before changing the query.
 - **Non-multimodal model (no vision)**: omit `--save-candidates`; the tool excludes every `visual-verification-required` near match, downloads only the first candidate that passes all strict metadata / license / dimension gates, and records `selection_method: metadata-ranked`. Do **not** describe this as visual confirmation. If no strict candidate exists, or the active Reference requires a viewpoint, crop, expression, or fine identity detail that metadata cannot establish, mark the row `Needs-Manual`; Quick does not open an acquisition-time interaction.
 
-Apply this order during multimodal selection:
-
-1. pre-selection hard gates — allowed license, exact subject/identity, readable preview, and upstream dimensions when known;
-2. page fit — requested orientation, focal placement, crop safety, and usable quiet region;
-3. expression fit — the Reference's requested view, action, and mood;
-4. tie-breakers — higher expected usable resolution / lower crop loss, then no-attribution;
-5. post-selection hard gate — download only the winner and verify its actual readable dimensions before provenance is committed.
+The review stage owns pixel-inspection gates, bounded detail reads, and the compact decision receipt. It receives only the locked row intent plus candidate sidecars/sheets; it never receives the full planning or acquisition context.
 
 If no thumbnail on the current page passes, download no original. When
 `has_more_candidates` is true, advance to `next_candidate_page` first. Only
@@ -216,10 +210,11 @@ Never treat a generic `required_terms` pass as acceptance. For example, matching
 
 **Replacement ladder when the first round is not right**:
 
-1. With vision, promote one passing thumbnail from the current page; this is the first original-image request.
+1. With vision, promote the one passing thumbnail selected under the review-stage contract; this is the first original-image request.
 2. If none passes and `has_more_candidates` is true, fetch the next ranked page (8 by default). Candidate numbers continue globally, so page 2 starts at `candidate_09`; do not repeat page 1 or download an original.
 3. After the current pool is exhausted, add materially different query variants for identity wording, official translation, alias, viewpoint, or disambiguation and generate a fresh pool; do not repeat a semantically exhausted query.
-4. **manual URL replace (universal, model-agnostic)** — use a user-supplied URL and swap it in:
+4. With vision only, if normal search is exhausted, select one relevant adopted `source_url` and follow [`topic-research`](../workflows/stages/topic-research.md) § Hand-off to fetch its Markdown + companion-image source package. Review that package, copy only one passing image into `<project>/images/`, and reconcile the query row plus `image_sources.json` from the selected `image_manifest.json` entry with `license_tier: manual`. Fetch another page only when the current package has no passing image; never auto-expand facts URLs or promote the whole package.
+5. **manual URL replace (universal, model-agnostic)** — use a directly selected URL and swap it in:
    ```bash
    python3 scripts/image_search.py --from-url <image-url> --filename <name>.jpg -o <project_path>/images
    ```
@@ -231,9 +226,7 @@ Never treat a generic `required_terms` pass as acceptance. For example, matching
    that query row and the active roster to `Sourced` before export; a stale
    `Needs-Manual` status remains blocking
    ([`executor-web-image.md`](./executor-web-image.md) §1);
-5. When the query variants, ranked pages, configured provider chain, and permitted license stages are exhausted and no user-confirmed manual URL is available, mark the row `Needs-Manual`.
-
-Web search is far cheaper than AI generation, so this review pass is well worth it.
+6. When the query variants, ranked pages, configured provider chain, permitted license stages, and eligible adopted-page package fallback are exhausted, mark the row `Needs-Manual`.
 
 **This review never opens an acquisition-time interaction** ([`image-base.md`](./image-base.md) §6). Default Generate may build a placeholder and continue to Step 6. Quick Generate finishes all permitted automated strategies, records `Needs-Manual`, and blocks direct export when the unresolved image is required.
 
@@ -326,7 +319,7 @@ Every successful download appends or replaces one entry keyed on `filename`:
 | `selection_method` | `visual-thumbnail` after promotion from a reviewed preview, or `metadata-ranked` for the strict no-vision / best-only path. It never claims a visual check that did not occur. |
 | `width` / `height` | Measured from the file actually saved to disk. Use these for layout. |
 | `metadata_dimensions` | Present only when upstream-claimed size differs from the saved file (preview vs original). Informational only. |
-| `license_tier` | Drives Executor's attribution decision: `no-attribution` / `attribution-required` for provider-sourced images, or `manual` for a user-supplied `--from-url` replacement (embed only; rights/credit are the user's responsibility). |
+| `license_tier` | Drives Executor's attribution decision: `no-attribution` / `attribution-required` for provider-sourced images, or `manual` for a directly selected URL/source-package replacement (embed only; rights/credit are the user's responsibility). |
 | `attribution_required` | Boolean alias of `license_tier == "attribution-required"`. |
 | `attribution_text` | Canonical credit source. Preserve its author/provider/license facts; compress only through §7's visual grammar rather than inventing or dropping identity. |
 | `stage` | `all` by default, or `no-attribution-only` when strict mode is used. |
@@ -397,7 +390,7 @@ Executor reads `image_sources.json` per slide that uses a Sourced image. For eac
 |---|---|
 | `no-attribution` | Embed `<image>` only |
 | `attribution-required` | Embed `<image>` **and** an inline credit element per §7 |
-| `manual` | Embed `<image>` only — user-supplied URL (`--from-url`); verifying usage rights / any required credit is the user's responsibility |
+| `manual` | Embed `<image>` only — directly selected URL or adopted-page package image; verifying usage rights / any required credit is the user's responsibility |
 
 Executor does not interpret raw license strings — `license_tier` is sufficient.
 
@@ -411,7 +404,7 @@ In addition to the shared checkpoint in [`image-base.md`](./image-base.md) §10:
 
 - [ ] Every required web row is `Sourced` with a downloaded original at `project/images/<filename>` OR is marked `Needs-Manual`; `Needs-Selection` remains incomplete
 - [ ] Each multimodal `Sourced` web image was selected from a bounded ranked thumbnail page and only its winner original was downloaded; a no-pass page advanced through remaining pages before query replacement. Without vision, only strict metadata candidates may become `Sourced`, with `selection_method: metadata-ranked`; unresolved or visually unprovable intent becomes `Needs-Manual` without pretending a visual check occurred
-- [ ] Each `Sourced` row has a manifest entry with valid `license_tier` and non-empty `attribution_text` (except `manual` `--from-url` rows, which carry no `attribution_text`)
+- [ ] Each `Sourced` row has a manifest entry with valid `license_tier` and non-empty `attribution_text` (except `manual` directly selected rows, which carry no `attribution_text`)
 - [ ] Any `attribution-required` image has visible author + license credit in every SVG that references it
 - [ ] `metadata_dimensions` warnings surfaced when downloaded preview is much smaller than upstream-claimed size
 - [ ] `Needs-Manual` rows include the failure reason

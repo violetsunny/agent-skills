@@ -58,6 +58,39 @@ openspec update
    - `Setup complete for <tool>` / `Updated <tool>`：从 init/update 输出中提取所有已配置工具名称及状态（成功/跳过/失败），在汇总中列出完整工具列表。
 7. 运行完成后，通过 skill 工具加载并运行 `/opsx-workflow-hooks` skill，完成 OPSX 工作流初始化。
 
+### 步骤 6A：命令数量校验与自动修复（`openspec update` 后、迁移前）
+
+> `openspec update` 在 custom profile 下可能误删已选定的 workflow 命令文件（输出 `Removed: N command files (deselected workflows)`），导致 `.claude/commands/opsx/` 实际命令数少于 profile 选定的 workflow 数。**必须在执行 `.claude -> .agents` 迁移之前自动校验，不通过时自动修复，不得让用户手动操作。**
+
+**校验逻辑**：
+
+1. 从 `openspec config profile` 非交互输出中提取当前选定的 workflow 数量（例如 `12 selected`）。
+2. 统计 `~/.claude/commands/opsx/` 下 `.md` 文件数量。
+3. 如果实际命令数 < 选定 workflow 数 → 标记 `[COMMAND-COUNT-MISMATCH]`，**自动执行 `openspec update --force`** 重新生成完整命令集合，然后重新统计确认数量一致。
+4. 如果 `--force` 后仍不一致 → 停止迁移，标记 `[COMMAND-FIX-FAILED]`，在汇总中报告并提示用户检查 OpenSpec 版本或 profile 配置。
+5. 只有数量一致时才继续执行下一步的 `.claude -> .agents` 迁移。
+
+```bash
+cd ~
+# 提取选定 workflow 数量
+selected_count=$(openspec config profile 2>&1 | grep -oE '[0-9]+ selected' | grep -oE '[0-9]+')
+# 统计实际命令文件数
+actual_count=$(ls -1 ~/.claude/commands/opsx/*.md 2>/dev/null | wc -l | tr -d ' ')
+
+if [ "$actual_count" -lt "$selected_count" ]; then
+  printf '[COMMAND-COUNT-MISMATCH] 期望 %s 个命令，实际 %s 个，执行 openspec update --force\n' "$selected_count" "$actual_count"
+  openspec update --force
+  actual_count=$(ls -1 ~/.claude/commands/opsx/*.md 2>/dev/null | wc -l | tr -d ' ')
+fi
+
+if [ "$actual_count" -lt "$selected_count" ]; then
+  printf '[COMMAND-FIX-FAILED] --force 后仍只有 %s 个命令（期望 %s），停止迁移\n' "$actual_count" "$selected_count"
+  # 不执行迁移，在汇总中报告
+else
+  printf '[COMMAND-COUNT-OK] %s 个命令，与 profile 选定的 %s 个 workflow 一致\n' "$actual_count" "$selected_count"
+fi
+```
+
 OpenSpec 升级可能清理旧版命令文件，并将 OPSX 迁移到 Agent Skills。出现 `No user content to preserve` 时可按提示清理；出现 `differ from the copy in .agents` 时不得覆盖用户自定义副本，必须提示并人工比对。不得使用 `--force` 覆盖 `/Users/kangll13/aiot/java-code/self/gggggggood/` 下用户代码或用户自行维护的文件。
 
 ### 多工具目录生成状态（OpenSpec 直接生成，仅记录状态）
@@ -78,7 +111,7 @@ OpenSpec v1.9.0 为多个工具生成文件，包括但不限于：`.claude/`、
 
 OpenSpec 可能按 profile 生成不同数量的 commands / skills，且文件集合随 profile、版本和工具配置变化。`openspec init` / `openspec update` 的权威输出目录是 `~/.claude/commands/` 与 `~/.claude/skills/`，不能假设它只会更新 `commands/opsx/` 或只生成 `openspec-*` skills。
 
-更新 OpenSpec 后，必须按以下固定顺序执行：
+更新 OpenSpec 后，**必须先完成步骤 6A 的命令数量校验并通过后**，再按以下固定顺序执行迁移：
 
 ```bash
 rsync -r --delete ~/.claude/commands/ ~/.agents/commands/

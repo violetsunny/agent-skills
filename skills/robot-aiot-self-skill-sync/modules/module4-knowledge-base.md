@@ -33,6 +33,7 @@ rsync -r ~/.agents/skills/ /Users/kangll13/aiot/java-code/self/gggggggood/agent-
 
 - 若 `self/skills/<project>/SKILL.md` 存在，则按单 skill 项目处理，同步到 `agent-skills/skills/<project>/`
 - 若 `self/skills/<project>/skills/` 存在，则遍历其下每个子目录，分别同步到 `agent-skills/skills/<skill_name>/`
+- 若 `self/skills/<project>/.agents/skills/` 存在（如 gstack），则遍历其下每个子目录，分别同步到 `agent-skills/skills/<skill_name>/`
 - 同步到当前项目时仍然**不加 `--delete`**，只覆盖已有文件与新增文件
 - 只同步当前项目里已经存在或明确需要保留的 skill 目录；不要删除知识库中的额外 skill
 
@@ -41,9 +42,10 @@ rsync -r ~/.agents/skills/ /Users/kangll13/aiot/java-code/self/gggggggood/agent-
 ```bash
 for project in /Users/kangll13/aiot/java-code/self/skills/*; do
   [ -d "$project" ] || continue
+  project_name=$(basename "$project")
 
   if [ -f "$project/SKILL.md" ]; then
-    rsync -r "$project/" "/Users/kangll13/aiot/java-code/self/gggggggood/agent-skills/skills/$(basename "$project")/"
+    rsync -r "$project/" "/Users/kangll13/aiot/java-code/self/gggggggood/agent-skills/skills/$project_name/"
     continue
   fi
 
@@ -52,9 +54,21 @@ for project in /Users/kangll13/aiot/java-code/self/skills/*; do
       [ -d "$skill_dir" ] || continue
       rsync -r "$skill_dir/" "/Users/kangll13/aiot/java-code/self/gggggggood/agent-skills/skills/$(basename "$skill_dir")/"
     done
+    continue
+  fi
+
+  # 第三种结构：.agents/skills/（如 gstack）
+  if [ -d "$project/.agents/skills" ]; then
+    for skill_dir in "$project"/.agents/skills/*; do
+      [ -d "$skill_dir" ] || continue
+      rsync -r "$skill_dir/" "/Users/kangll13/aiot/java-code/self/gggggggood/agent-skills/skills/$(basename "$skill_dir")/"
+    done
+    continue
   fi
 done
 ```
+
+**gstack 特别说明**：gstack 的 skill 位于项目内的 `.agents/skills/` 目录下（完整路径 `/Users/kangll13/aiot/java-code/self/skills/gstack/.agents/skills/`），不是常见的 `skills/` 目录。上述脚本的第三种结构专门处理此情况，避免路径歧义。
 
 ### 步骤 4.2：同步完整 commands（如模块 2 有更新）
 

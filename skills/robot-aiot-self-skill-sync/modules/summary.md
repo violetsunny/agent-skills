@@ -55,12 +55,14 @@
 |------|------|--------------|
 | superpowers | N | N |
 | claude-code-java | N | N |
-| matt-skills | N | N |
+| matt-skills | `[NPX-AUTO]` 或 `[NPX-FAILED]` | — |
 | anthropics-skills | N | N |
 | ui-ux-pro-max-skill | N | N |
 | ppt-master | N | N |
 
 同步数 = 源中有且 `~/.agents/skills/` 中也有匹配的 skill 数（交集），新增数 = 源中有但 `~/.agents/skills/` 中无匹配的 skill 数（拒绝同步）。
+
+matt-skills 通过 `npx skills@latest add mattpocock/skills` 自动安装，安装成功标记 `[NPX-AUTO]`，失败标记 `[NPX-FAILED]`，不参与同步/新增统计。
 
 ## free-stock-line-skills 同步汇总（模块 3.5）
 
@@ -79,6 +81,10 @@
 | 未变 | N |
 
 列出变更的 skill 名称清单（新增和更新），未变的不逐个列出。提示用户审查后自行 `git add` + `git commit`。
+
+| 字段 | 说明 |
+|------|------|
+| gstack 知识库同步 | 从 `self/skills/gstack/.agents/skills/` 同步到 `agent-skills/skills/` 的 skill 数量 |
 
 | 字段 | 说明 |
 |------|------|

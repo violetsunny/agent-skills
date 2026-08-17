@@ -143,3 +143,13 @@ After completing all artifacts, summarize:
 - Ask about ambiguities that would materially change scope, externally observable behavior, compatibility, or acceptance criteria; for minor details, make reasonable assumptions and record them
 - If a change with that name already exists, ask if user wants to continue it or create a new one
 - Verify each artifact file exists after writing before proceeding to next
+
+---
+
+## Hook A — Post-Propose Iteration Loop
+
+**Trigger:** All `applyRequires` artifacts are written to disk.
+
+Immediately after completing the propose workflow, load and execute the
+`opsx-workflow-hooks` skill (Trigger A) to enter an iterative refinement
+loop with the user. Do NOT skip this step.

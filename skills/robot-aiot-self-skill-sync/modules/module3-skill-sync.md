@@ -45,9 +45,24 @@ for each project:
 |---|---|
 | 路径 | `/Users/kangll13/aiot/java-code/self/skills/matt-skills/` |
 | 远端 | `https://github.com/mattpocock/skills.git` |
-| 源 skill 目录 | `skills/{category}/{skill_name}/`（嵌套在 category 子目录下） |
+| 安装方式 | `npx skills@latest add mattpocock/skills`（自动执行） |
+| 目标目录 | `~/.agents/skills/{skill_name}/`（npx 安装后自动生成） |
 
-遍历 `skills/*/` 下所有子目录，与 `~/.agents/skills/` 做交集匹配，仅同步匹配的。源路径为 `skills/{category}/{skill_name}/`，目标路径为 `~/.agents/skills/{skill_name}/`（去掉 category 层级）。
+matt-skills 的 skill 不在 git 仓库代码中直接可用，**不走 rsync 同步**。模块 3 SHALL 自动执行 `npx skills@latest add mattpocock/skills` 安装到 `~/.agents/skills/`，不要求用户手动操作。
+
+执行时设置超时（300s），安装成功后在汇总中标记 `[NPX-AUTO]` 并报告安装的 skill 数量；安装失败时标记 `[NPX-FAILED]`，记录错误信息，**不中断后续项目的同步**，提示用户稍后可手动重试。
+
+```bash
+cd ~
+timeout 300 npx skills@latest add mattpocock/skills 2>&1
+if [ $? -eq 0 ]; then
+  printf '[NPX-AUTO] matt-skills 安装成功\n'
+else
+  printf '[NPX-FAILED] matt-skills 安装失败，可稍后手动重试: npx skills@latest add mattpocock/skills\n'
+fi
+```
+
+安装完成后，skill 自动出现在 `~/.agents/skills/` 中，模块 4.1 全量 rsync 会将其同步到知识库，无需额外处理。
 
 ### 3.4 anthropics-skills（`self/skills/anthropics-skills/`）
 

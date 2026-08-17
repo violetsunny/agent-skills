@@ -182,3 +182,14 @@ This skill supports the "actions on a change" model:
 
 - **Can be invoked anytime**: Before all artifacts are done (if tasks exist), after partial implementation, interleaved with other actions
 - **Allows artifact updates**: If implementation reveals design issues, suggest updating artifacts - not phase-locked, work fluidly
+
+---
+
+## Hook B — Post-Apply Review and Archive
+
+**Trigger:** `state: "all_done"` — every task is checked off.
+
+Immediately after all apply tasks are complete, load and execute the
+`opsx-workflow-hooks` skill (Trigger B) to run a mandatory review-then-archive
+sequence. Do NOT skip this step. Do NOT trigger if apply is paused mid-way
+(`state: "paused"` or partial progress).
