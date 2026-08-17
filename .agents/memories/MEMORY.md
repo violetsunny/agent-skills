@@ -1,1 +1,1 @@
-matt-skills 需通过 `npx skills@latest add mattpocock/skills` 交互式安装到 `~/.agents/skills/`，不走 rsync 直同步；模块3.3 标记为 `[NPX-MANUAL]`，模块4.1A 排除 matt-skills（走4.1全量同步）。
+matt-skills 模块3.3 自动执行 `npx skills@latest add mattpocock/skills` 安装到 `~/.agents/skills/`（标记 [NPX-AUTO]）；npx 失败时 fallback 遍历 git 三级结构 skills/{category}/{skill_name}/ 同步（标记 [NPX-FALLBACK]）；模块4.1A 排除 matt-skills（走4.1全量同步）。

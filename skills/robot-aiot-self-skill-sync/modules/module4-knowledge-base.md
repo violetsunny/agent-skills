@@ -31,6 +31,7 @@ rsync -r ~/.agents/skills/ /Users/kangll13/aiot/java-code/self/gggggggood/agent-
 
 执行规则：
 
+- **排除 matt-skills**：matt-skills 的 skill 由模块 3.3（npx 或 fallback）安装到 `~/.agents/skills/` 后，经步骤 4.1 全量 rsync 同步到知识库，4.1A 不再处理，避免三级结构被误判为二级结构
 - 若 `self/skills/<project>/SKILL.md` 存在，则按单 skill 项目处理，同步到 `agent-skills/skills/<project>/`
 - 若 `self/skills/<project>/skills/` 存在，则遍历其下每个子目录，分别同步到 `agent-skills/skills/<skill_name>/`
 - 若 `self/skills/<project>/.agents/skills/` 存在（如 gstack），则遍历其下每个子目录，分别同步到 `agent-skills/skills/<skill_name>/`
@@ -43,6 +44,9 @@ rsync -r ~/.agents/skills/ /Users/kangll13/aiot/java-code/self/gggggggood/agent-
 for project in /Users/kangll13/aiot/java-code/self/skills/*; do
   [ -d "$project" ] || continue
   project_name=$(basename "$project")
+
+  # 排除 matt-skills：走模块3.3 npx/fallback + 步骤4.1全量同步
+  [ "$project_name" = "matt-skills" ] && continue
 
   if [ -f "$project/SKILL.md" ]; then
     rsync -r "$project/" "/Users/kangll13/aiot/java-code/self/gggggggood/agent-skills/skills/$project_name/"
