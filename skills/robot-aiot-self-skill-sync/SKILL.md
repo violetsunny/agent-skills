@@ -31,6 +31,6 @@ description: >
 2. **模块 2** — 在用户 Terminal 中先确认当前 OpenSpec profile 是否已切到足够完整的集合；如有需要先执行 `openspec config profile` 与 `openspec init`，再执行 `npm install -g @fission-ai/openspec@latest`，通过 `openspec --version` 确认当前版本后，从用户主目录运行 `openspec update`；先同步 `.claude` 实际生成的完整 commands / skills 到 `.agents`，再立即运行 `/opsx-workflow-hooks` 恢复 hook，最后校验完整文件集合与 workflow hooks，按输出区分成功、可选提示和真实失败
 3. **模块 3** — Skill 同步（模块 1 已完成 git pull，直接 rsync 匹配的 skill）
 4. **模块 3.5** — 将 `self/skills/` 下更新的项目强制同步到 `free-stock-line-skills/` 中匹配的目录（不加 `--delete`，保留用户自定义文件；`stock-replay-workbench` 禁止修改）
-5. **模块 4** — 先将 `self/skills/` 下更新后的 skill 项目内容同步到当前项目 `agent-skills/skills/`，再全量同步 `~/.agents/skills/` 到 `agent-skills/skills/`、同步 `~/.agents/commands/` 到 `agent-skills/commands/`（均不加 `--delete`），报告变更清单供用户审查
+5. **模块 4** — 先将 `~/.agents/skills/` 全量同步到当前项目 `agent-skills/skills/`，再补充同步 `self/skills/` 下各项目自身携带的 skill 源内容到 `agent-skills/skills/`（包括项目根目录、`skills/`、项目内 `.claude/skills/`、项目内 `.agents/skills/` 四类结构，均不回退到用户根目录查找），同时同步 `~/.agents/commands/` 到 `agent-skills/commands/`（均不加 `--delete`），报告变更清单供用户审查
 
 > 执行各模块前，必先阅读 `modules/shared.md` 中的前置条件、代码回滚保护、Dirty 仓库分类和关键注意事项。结果汇总模板见 `modules/summary.md`。

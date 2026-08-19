@@ -1,7 +1,7 @@
 ---
 name: robot-aiot-draw-flowchart
 description: 机器人/IoT 业务图表（流程图、架构图）绘制能力，输出 draw.io XML 格式。提供统一的机器人图标样式、多种 draw.io 图表类型（线性流程、分支流程、循环流程、并行流程、泳道图、分层架构图等）的绘制规范和 XML 生成能力。
-version: 2.0.0
+version: 2.2.0
 author: kangll13
 license: MIT
 metadata:
@@ -149,16 +149,94 @@ metadata:
 </mxCell>
 ```
 
-**样式属性速查：**
-- `fillColor=#0078D4` — 填充色
+**样式属性速查（属性含义，标准值见 §5）：**
+- `fillColor=#FFFFFF` — 填充色（常规节点白色，§5.1）
 - `strokeColor=#005A9E` — 边框色
 - `fontColor=#FFFFFF` — 文字色
-- `strokeWidth=2` — 边框宽度
+- `strokeWidth=2` — 边框宽度（节点标准值，§5.1；箭头/容器标准值见 §5.2/§5.3）
 - `rounded=1` — 圆角
-- `arcSize=20` — 圆角半径
-- `shadow=1` — 阴影
-- `dashed=1` — 虚线
+- `arcSize=15` — 圆角半径（标准值，§5.1）
+- `shadow=0` — 阴影（常规节点标准值，§5.1）
+- `dashed=1` — 虚线（仅反馈/循环，§5.3）
 - `opacity=60` — 透明度
+
+### 5. 统一样式规范（Style Consistency Standards）
+
+> **此规范为唯一权威标准。** 当 `references/` 中的 XML 示例与本规范冲突时，以本规范为准。绘制任何图表时，以下样式属性必须全局统一，不得在同类元素间出现不同取值。
+
+#### 5.1 节点样式标准
+
+| 属性 | 标准值 | 说明 |
+|------|--------|------|
+| fontSize | 12 | 所有节点统一，不得出现 11/13 等变体 |
+| strokeWidth | 2 | 所有节点统一 |
+| arcSize | 15 | 圆角半径统一，不得使用 20 |
+| shadow | 0 | 常规节点不使用阴影 |
+| fillColor | #FFFFFF | 常规节点白色填充，不使用层背景色填充节点 |
+
+#### 5.2 分层容器样式标准
+
+| 属性 | 标准值 | 说明 |
+|------|--------|------|
+| strokeWidth | 3 | 分层容器统一，不得出现 2 |
+| 层标签 fontSize | 16 | 层标签统一，不得出现 14 |
+| 层标签 fontColor | 层边框色 | 使用标准层色，不使用深色变体 |
+| 蓝色层 fillColor | #E8F4FD | 统一蓝色层背景，不得使用 #E3F2FD（后者仅用于状态卡片背景） |
+| 主椭圆 strokeWidth | 3 | 核心椭圆降级但仍强调，不得使用 4 |
+
+#### 5.3 箭头样式标准
+
+| 属性 | 标准值 | 说明 |
+|------|--------|------|
+| strokeWidth | 3 | 所有箭头统一，不得出现 2 |
+| dashed 语义 | 仅反馈/循环 | 虚线仅用于反馈回路和循环回退；演进/推进/错误路径箭头一律实线 |
+
+#### 5.4 文本与内嵌样式标准
+
+| 属性 | 标准值 | 说明 |
+|------|--------|------|
+| 内嵌 HTML font-size | 11px | 节点内 HTML 富文本的字号统一 |
+| 副标题位置 | x=450, w=900 | 比主标题窄，居中对齐（1800px 画布标准） |
+
+#### 5.5 颜色使用标准
+
+- **只允许使用色板内颜色** — 不得引入 `references/color-schemes.md` 色板外的颜色值
+- 警告黄色系：背景 `#FFF8E1`，边框/主色 `#FFA000`（不得使用 `#FFF3E0`/`#FF9800`）
+- 蓝色层背景：`#E8F4FD`（不得使用 `#E3F2FD`，后者仅用于状态卡片背景）
+
+#### 5.6 语义例外（保留的合理差异）
+
+以下元素允许偏离上述标准，因其具有明确的语义强调作用：
+
+| 元素 | 偏离项 | 原因 |
+|------|--------|------|
+| 语义强调节点（如安全边界、学习反馈等） | 特殊背景色 + strokeWidth=3 | 语义强调，需视觉突出 |
+| 总结条/摘要条 | fontSize=14 | 特殊层级，需区别于普通节点 |
+| 核心视觉元素（主椭圆） | fillColor=层色 + shadow=1 + strokeWidth=3 | 核心视觉焦点保留强调 |
+
+> **判断原则**：偏离标准必须有明确的语义理由。无语义理由的样式差异属于不一致，必须修正。
+
+### 6. 高保真 HTML/SVG 输出（委托 archify）
+
+除 draw.io XML 主路径外，本 SKILL 可委托 archify SKILL 输出自包含 HTML/SVG（暗/亮主题切换 + PNG/JPEG/WebP/双主题 SVG 导出），适用于汇报展示与 README 嵌入场景。
+
+- 选型指南、图表类型→archify 五模式映射、Mermaid 委托、校验命令见 `references/archify-integration.md`
+- archify 不可用时降级为 draw.io XML 主路径并告知用户
+
+## 布局叙事与交付前自审
+
+**布局叙事四原则（适用于所有输出）：**
+1. **单一主路径** — 读者可无交叉追踪 happy path（左→右或泳道→列）
+2. **少标签边** — 仅给跨边界或不显而易见的边加标签，相邻步骤不加标签
+3. **短侧分支** — 次要节点从最近主路径节点垂直引出，不得斜穿无关组件
+4. **细节入卡片** — 补充说明放入摘要卡片，不画额外箭头
+
+**交付前自审清单：**
+- [ ] 无元素重叠、标签碰撞、标签宽于节点
+- [ ] 无越界元素；viewBox/画布余量 ≥20px
+- [ ] 图例位于所有容器/boundary 之外且在其下方
+- [ ] draw.io 输出对照 §5 统一样式规范逐项核对
+- [ ] archify 输出通过 `validate`/`check` 且满足主题兼容约束（见 archify-integration.md）
 
 ## 工作流程
 
@@ -167,12 +245,14 @@ metadata:
 - 识别关键节点和连接关系
 - 确定需要使用的机器人状态（如适用）
 - 对于分层架构图：确定层级数量、每层名称、核心组件
+- 确定输出路径（draw.io XML 或 archify HTML/SVG，决策规则见 archify-integration.md）
 
 ### 步骤 2：加载样式资源
 - 读取 `references/robot-icons.md` 获取机器人图标（如需要）
 - 读取 `references/color-schemes.md` 获取配色方案
 - 读取 `references/flowchart-patterns.md` 获取流程图类型规范
 - 读取 `references/layered-architecture.md` 获取分层架构图规范（如需要）
+- 读取 `references/archify-integration.md` 获取选型与委托规范（选定 archify 路径时）
 
 ### 步骤 3：生成 XML 结构
 - 创建 mxfile 根元素
@@ -193,6 +273,7 @@ metadata:
 - 写入 .xml 文件，保存到当前项目的 `doc-ppt/` 目录下
 - 使用 midea_oss_tool 上传（仅独立使用时）
 - 告知用户下载链接和重命名方法（仅独立使用时）
+- **archify 路径**：交付 .html 文件即可（自包含、可直接浏览器打开），跳过 OSS 上传
 
 > **HTML 转换规范**：如需将图表 XML 转为 HTML 预览（如进入 PPT 工作流），必须通过 robot-aiot-xml-html-bridge 转换，且最终 HTML 须符合 Material Design 3 规范，不得直接手工生成 HTML。
 
@@ -247,3 +328,20 @@ metadata:
 - [ ] 跨层连接线使用目标层主题色
 - [ ] 数据支撑区卡片数值突出显示
 - [ ] 图例区覆盖所有层类型
+
+### 样式一致性检查项（必检）
+- [ ] 所有节点 fontSize=12、strokeWidth=2、arcSize=15、shadow=0、fillColor=#FFFFFF
+- [ ] 分层容器 strokeWidth=3，层标签 fontSize=16、fontColor=层边框色
+- [ ] 所有箭头 strokeWidth=3
+- [ ] 虚线仅用于反馈/循环箭头，演进/推进/错误路径箭头为实线
+- [ ] 内嵌 HTML font-size=11px
+- [ ] 颜色值全部来自色板，无色板外颜色
+- [ ] 蓝色层背景使用 #E8F4FD，非 #E3F2FD
+- [ ] 所有样式偏离均有语义理由（参见 §5.6 语义例外表）
+
+### archify 输出检查项（选定 archify 路径时）
+- [ ] 模式映射正确（架构→architecture、流程→workflow、序列→sequence、数据流→dataflow、状态→lifecycle）
+- [ ] SVG 无硬编码 fill/stroke 十六进制（CSS class 颜色系统）
+- [ ] `.toolbar`/`<script>`/`:root`/`[data-theme]` 未被改动（主题切换与导出菜单可用）
+- [ ] 通过 `node bin/archify.mjs validate`/`check` 校验
+- [ ] 布局满足叙事四原则（单一主路径/少标签边/短侧分支/细节入卡片）

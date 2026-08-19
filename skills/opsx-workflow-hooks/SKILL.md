@@ -138,9 +138,17 @@ final check.
    2. **`java-code-review`** — use IN ADDITION to `code-review` for
       Java/Spring projects (load both, run `java-code-review` first per
       project convention).
-   3. **Other review skills** — if neither above is available, use the most
-      specific review skill present in the workspace.
-   4. **Manual inspection** — if no review skill exists at all, read every
+   3. **`ui-ux-pro-max`** — use IN ADDITION to `code-review` when the
+      implementation involves **HTML and/or CSS styling** (e.g., new pages,
+      UI components, layout changes, responsive design, typography/color
+      adjustments, animation, or any visual/interaction changes). Load
+      `ui-ux-pro-max` via the Skill tool and apply its review checks
+      (accessibility, touch & interaction, layout & responsive, typography
+      & color, etc.) alongside the standard code review. This is mandatory
+      — do NOT skip even if the visual change looks minor.
+   4. **Other review skills** — if none of the above is available, use the
+      most specific review skill present in the workspace.
+   5. **Manual inspection** — if no review skill exists at all, read every
       file modified during apply, cross-check each against `proposal.md` and
       `design.md`, and document what was checked.
 
@@ -157,6 +165,9 @@ final check.
    - **Task completeness** — does every checked-off task have corresponding code?
    - **No regressions** — do existing tests still pass (run the project's test
      command if one is available)?
+   - **UI/UX quality** (when HTML/CSS is involved) — are accessibility,
+     responsive layout, typography, color contrast, and interaction patterns
+     validated per `ui-ux-pro-max` guidelines?
 
    Present findings in this format:
 
@@ -210,6 +221,8 @@ final check.
 
 - Only trigger when `state: "all_done"`. If apply is paused, do nothing.
 - Never skip the review step, even if the implementation looks clean.
+- When the implementation involves HTML/CSS styling, `ui-ux-pro-max` is
+  mandatory — never skip it, even if the visual change appears trivial.
 - Never archive with unresolved CRITICAL issues.
 - WARNING-level issues require a user decision — do not silently ignore or
   silently fix them.

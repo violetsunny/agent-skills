@@ -2,14 +2,21 @@
 
 > 共享规则见 `modules/shared.md`
 
-**核心规则**：只同步在 `~/.agents/skills/` 中**已经存在**的 skill，不新增。已经存在但源仓库中不存在该 skill → 不做任何操作（保留现有）。
+**核心规则**：对 3.1 / 3.2 / 3.4 / 3.5 / 3.6 这 5 个常规项目，只同步在 `~/.agents/skills/` 中**已经存在**的 skill，不新增。已经存在但源仓库中不存在该 skill → 不做任何操作（保留现有）。
+
+**例外规则**：3.3 `matt-skills` 属于安装型来源，优先通过 `npx skills@latest add mattpocock/skills` 安装；若走 fallback，则允许按安装结果创建 `~/.agents/skills/{skill_name}/`，其行为以“安装成功后应具备完整 matt-skills skill 集合”为准，不参与常规项目的“交集匹配 / 新增拒绝”口径。
 
 ### 同步流程
 
-对于以下 6 个项目，模块 1 已完成 git pull，直接同步普通 skill；OpenSpec 在 `~/.claude/skills/` 下生成的完整 skills 集合只走模块 2 的专门同步流程：
+对于以下 6 个项目，模块 1 已完成 git pull。其中文件同步分两类：
+
+- **常规项目（3.1 / 3.2 / 3.4 / 3.5 / 3.6）**：直接 rsync 已存在且匹配的 skill
+- **安装型项目（3.3 matt-skills）**：走 `npx` 安装或 fallback 安装
+
+OpenSpec 在 `~/.claude/skills/` 下生成的完整 skills 集合只走模块 2 的专门同步流程：
 
 ```
-for each project:
+for each regular project:
   1. 枚举项目 source_dir/{skill_name}/ 子目录
   2. 对每个 skill_name，检查 ~/.agents/skills/{skill_name}/ 是否存在
      → 存在：rsync -r --delete source_dir/{skill_name}/ → ~/.agents/skills/{skill_name}/
@@ -50,7 +57,7 @@ for each project:
 
 matt-skills 的 skill 优先通过 npx 自动安装，**不走常规 rsync 同步**。模块 3 SHALL 自动执行 `npx skills@latest add mattpocock/skills` 安装到 `~/.agents/skills/`，不要求用户手动操作。npx 安装更可靠，能正确处理 skill 依赖和元数据。
 
-执行时设置超时（300s），安装成功后在汇总中标记 `[NPX-AUTO]` 并报告安装的 skill 数量；安装失败时自动 fallback 到 git 仓库中的三级结构，标记 `[NPX-FALLBACK]`；fallback 也失败时标记 `[NPX-FAILED]`，**不中断后续项目的同步**。
+执行时设置超时（300s），安装成功后在汇总中标记 `[NPX-AUTO]` 并报告安装的 skill 数量；安装失败时自动 fallback 到 git 仓库中的三级结构，标记 `[NPX-FALLBACK]`；fallback 也失败时标记 `[NPX-FAILED]`，**不中断后续项目的同步**。fallback 属于安装补救路径，允许创建新的 `~/.agents/skills/{skill_name}/` 目录，以对齐 npx 安装结果。
 
 ```bash
 cd ~
@@ -101,7 +108,7 @@ fi
 | 远端 | `https://github.com/nextlevelbuilder/ui-ux-pro-max-skill.git`   |
 | 源 skill 目录 | `.claude/skills/`(全路径：`/Users/kangll13/aiot/java-code/self/skills/ui-ux-pro-max-skill/.claude/skills/`)                           |
 
-同步 `/Users/kangll13/aiot/java-code/self/skills/ui-ux-pro-max-skill/.claude/skills/` 到 `~/.agents/skills/`，且目标目录必须已存在。该仓库本地改动不作为用户代码保留；更新前允许清理未提交改动，再拉取远端并同步技能。
+同步前遍历 `/Users/kangll13/aiot/java-code/self/skills/ui-ux-pro-max-skill/.claude/skills/` 下所有子目录，与 `~/.agents/skills/` 做交集匹配，仅同步匹配的。不得将整个 `.claude/skills/` 目录直接整体覆盖到 `~/.agents/skills/`。该仓库本地改动不作为用户代码保留；更新前允许清理未提交改动，再拉取远端并同步技能。
 
 ### 3.6 ppt-master（`self/skills/ppt-master/`）
 
@@ -111,4 +118,4 @@ fi
 | 远端 | `https://github.com/hugohe3/ppt-master.git` |
 | 源 skill 目录 | `skills/`（直接子目录即为 skill 名） |
 
-同步 `skills/` 到 `~/.agents/skills/`，且目标目录必须已存在。
+同步前遍历 `skills/` 下所有子目录，与 `~/.agents/skills/` 做交集匹配，仅同步匹配的。不得将整个 `skills/` 目录直接整体覆盖到 `~/.agents/skills/`。

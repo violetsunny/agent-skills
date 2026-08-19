@@ -55,14 +55,14 @@
 |------|------|--------------|
 | superpowers | N | N |
 | claude-code-java | N | N |
-| matt-skills | `[NPX-AUTO]` 或 `[NPX-FAILED]` | — |
+| matt-skills | `[NPX-AUTO]` / `[NPX-FALLBACK]` / `[NPX-FAILED]` | — |
 | anthropics-skills | N | N |
 | ui-ux-pro-max-skill | N | N |
 | ppt-master | N | N |
 
 同步数 = 源中有且 `~/.agents/skills/` 中也有匹配的 skill 数（交集），新增数 = 源中有但 `~/.agents/skills/` 中无匹配的 skill 数（拒绝同步）。
 
-matt-skills 通过 `npx skills@latest add mattpocock/skills` 自动安装，安装成功标记 `[NPX-AUTO]`，失败标记 `[NPX-FAILED]`，不参与同步/新增统计。
+matt-skills 通过 `npx skills@latest add mattpocock/skills` 自动安装，安装成功标记 `[NPX-AUTO]`；npx 失败但 fallback 成功标记 `[NPX-FALLBACK]`；两者都失败标记 `[NPX-FAILED]`。它属于安装型来源，不参与常规项目的同步/新增统计。
 
 ## free-stock-line-skills 同步汇总（模块 3.5）
 
@@ -84,6 +84,11 @@ matt-skills 通过 `npx skills@latest add mattpocock/skills` 自动安装，安�
 
 | 字段 | 说明 |
 |------|------|
+| `~/.agents/skills/` 全量同步 | 步骤 4.1 从 `~/.agents/skills/` 同步到 `agent-skills/skills/` 的变更数量 |
+| `self/skills/` 项目源补充同步 | 步骤 4.1A 从 `self/skills/<project>/` 内部结构同步到 `agent-skills/skills/` 的变更数量；仅允许读取项目根目录、`skills/`、项目内 `.claude/skills/`、项目内 `.agents/skills/` |
+| 统一发现补充检查 | 步骤 4.1B 基于 `SKILL.md` 倒推 skill 根目录时发现的补充 skill 数量、跳过数量和冲突数量 |
+| `[DUPLICATE-SKILL]` 冲突列表 | 同一项目内多个 `SKILL.md` 映射到同一个 `skill_name` 的冲突项；必须报告路径并跳过该 skill |
+| 无关文件排除统计 | 同步时排除的 `.git/`、`.DS_Store`、`__pycache__/`、`.idea/`、`.vscode/` 等文件/目录数量 |
 | gstack 知识库同步 | 从 `self/skills/gstack/.agents/skills/` 同步到 `agent-skills/skills/` 的 skill 数量 |
 
 | 字段 | 说明 |

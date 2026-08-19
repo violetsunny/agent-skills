@@ -44,9 +44,9 @@ font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
 
 ### 3.1 封面页
 
-- 布局：浅蓝渐变背景 + SVG 弧形装饰 + 核心结论文字 + 四能力卡片
+- 布局：浅蓝渐变背景 + SVG 弧形装饰 + 核心结论文字 + 四能力卡片 + **右上角美的品牌 Logo**
 - 不使用页眉蓝条
-- 坐标参考：标题 top:60-120px，能力卡片 top:600-800px
+- 坐标参考：标题 top:60-120px，能力卡片 top:600-800px，Logo right:60px;top:60px;height:72px
 
 ### 3.2 架构图页
 
@@ -81,8 +81,8 @@ font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
 
 ### 3.8 尾页
 
-- 布局：核心结论大字居中 + 底部联系信息
-- 坐标参考：结论文字 top:400-500px
+- 布局：核心结论大字居中 + 底部联系信息 + **底部居中美的品牌 Logo**
+- 坐标参考：结论文字 top:400-500px，Logo bottom:60px;height:56px
 
 ---
 
@@ -298,6 +298,16 @@ top 值与上方最近元素间距 ≤40px。
     position: absolute; bottom: var(--space-md); left: var(--space-md);
     font-size: 16px; color: #aab4cc;
   }
+  /* 美的品牌 Logo — 封面页右上角 */
+  .brand-logo-cover {
+    position: absolute; right: 60px; top: 60px; height: 72px;
+    object-fit: contain;
+  }
+  /* 美的品牌 Logo — 内容页页脚水印 */
+  .brand-logo-footer {
+    position: absolute; right: 60px; bottom: 24px; height: 28px;
+    object-fit: contain; opacity: 0.85;
+  }
 </style>
 </head>
 <body>
@@ -330,6 +340,9 @@ top 值与上方最近元素间距 ≤40px。
   </div>
 
   <div class="page-num">第 N 页</div>
+
+  <!-- 美的品牌 Logo（内容页页脚水印，封面页改用 .brand-logo-cover 类） -->
+  <img src="../assets/midea-logo.png" class="brand-logo-footer" alt="Midea"/>
 </div>
 </body>
 </html>

@@ -15,7 +15,7 @@
 - **禁止**：执行 `git reset`、`git checkout --`、`git clean` 等破坏性操作
 - **同步后**：仅报告变更清单（新增 N 个、更新 N 个、未变 N 个），由用户自行审查和提交
 
-### 步骤 4.1：全量同步
+### 步骤 4.1：从 `~/.agents/skills/` 全量同步到知识库
 
 ```bash
 # 全量同步，不加 --delete，保留知识库中独有的 skill
@@ -28,17 +28,57 @@ rsync -r ~/.agents/skills/ /Users/kangll13/aiot/java-code/self/gggggggood/agent-
 
 - **直接目录结构**：项目根目录本身就是一个 skill 目录
 - **二级 `skills/` 结构**：项目根目录下存在 `skills/<skill_name>/`
+- **项目内 `.claude/skills/` 结构**：项目根目录下存在 `.claude/skills/<skill_name>/`
+- **项目内 `.agents/skills/` 结构**：项目根目录下存在 `.agents/skills/<skill_name>/`
+
+**路径作用域约束**：本步骤处理的是 `self/skills/<project>/` 各项目自身携带的 skill 源文件。凡是这里提到的 `.claude/skills/`、`.agents/skills/`，都必须解释为**项目目录下的相对路径**，即 `self/skills/<project>/.claude/skills/` 或 `self/skills/<project>/.agents/skills/`，**禁止**在本步骤中回退到用户根目录 `~/.claude/skills/` 或 `~/.agents/skills/` 查找。用户根目录下的 `~/.agents/skills/` 全量同步只由步骤 4.1 负责；OpenSpec 生成的 `~/.claude/skills/` 只由模块 2 / 步骤 4.4 按各自规则处理。
 
 执行规则：
 
 - **排除 matt-skills**：matt-skills 的 skill 由模块 3.3（npx 或 fallback）安装到 `~/.agents/skills/` 后，经步骤 4.1 全量 rsync 同步到知识库，4.1A 不再处理，避免三级结构被误判为二级结构
 - 若 `self/skills/<project>/SKILL.md` 存在，则按单 skill 项目处理，同步到 `agent-skills/skills/<project>/`
 - 若 `self/skills/<project>/skills/` 存在，则遍历其下每个子目录，分别同步到 `agent-skills/skills/<skill_name>/`
+- 若 `self/skills/<project>/.claude/skills/` 存在，则遍历其下每个子目录，分别同步到 `agent-skills/skills/<skill_name>/`
 - 若 `self/skills/<project>/.agents/skills/` 存在（如 gstack），则遍历其下每个子目录，分别同步到 `agent-skills/skills/<skill_name>/`
 - 同步到当前项目时仍然**不加 `--delete`**，只覆盖已有文件与新增文件
+- 同步 skill 根目录时，**必须排除** `.git/`、`.gitignore`、`.gitmodules`、`.DS_Store`、`__pycache__/`、`*.pyc`、`.idea/`、`.vscode/` 等与 skill 运行/文档无关的版本控制或本地缓存文件，不要把这些内容带入知识库
 - 只同步当前项目里已经存在或明确需要保留的 skill 目录；不要删除知识库中的额外 skill
 
-示意：
+### 步骤 4.1B：统一发现（非默认逻辑，仅作补充校验或疑难场景兜底）
+
+当项目结构不规则、难以用步骤 4.1A 的显式目录分支覆盖时，允许使用“**查找 `SKILL.md`，再倒推其父目录为 skill 根目录**”作为统一发现手段，但它**不是默认逻辑**，不能替代 4.1A 的显式结构规则。
+
+使用约束：
+
+- 只允许在 `self/skills/<project>/` 项目目录内部查找 `SKILL.md`
+- 找到 `SKILL.md` 后，skill 根目录 = `dirname(SKILL.md)`
+- skill 名默认取 `basename(skill_root)`
+- 统一发现仅用于补充识别 skill 根目录，不改变模块 4 的保护规则和同步目标
+- **禁止**因为项目里没找到就回退到 `~/.claude/skills/` 或 `~/.agents/skills/` 继续扫描
+
+冲突处理：
+
+- 若同一项目内发现多个 `SKILL.md` 最终映射到同一个 `skill_name`，标记 `[DUPLICATE-SKILL]`
+- 出现 `[DUPLICATE-SKILL]` 时，必须报告冲突的 `SKILL.md` 路径列表并跳过该 `skill_name` 的同步，禁止自动挑选其一覆盖
+- 只有 `skill_name` 唯一时，才允许将该 skill 根目录同步到知识库
+
+统一发现示意：
+
+```bash
+project="/Users/kangll13/aiot/java-code/self/skills/<project>"
+
+find "$project" \
+  \( -path "$project/.git" -o -path "$project/.git/*" \
+     -o -path "$project/node_modules" -o -path "$project/node_modules/*" \
+     -o -path "$project/.venv" -o -path "$project/.venv/*" \
+     -o -path "$project/venv" -o -path "$project/venv/*" \
+     -o -path "$project/__pycache__" -o -path "$project/__pycache__/*" \) -prune \
+  -o -name SKILL.md -print
+```
+
+找到 `SKILL.md` 后，仅同步其父目录下真正属于 skill 的资源文件；`.git/`、缓存文件、IDE 配置目录等无关内容必须继续排除。
+
+4.1A 默认结构分支示意：
 
 ```bash
 for project in /Users/kangll13/aiot/java-code/self/skills/*; do
@@ -61,7 +101,16 @@ for project in /Users/kangll13/aiot/java-code/self/skills/*; do
     continue
   fi
 
-  # 第三种结构：.agents/skills/（如 gstack）
+  # 第三种结构：项目内 .claude/skills/
+  if [ -d "$project/.claude/skills" ]; then
+    for skill_dir in "$project"/.claude/skills/*; do
+      [ -d "$skill_dir" ] || continue
+      rsync -r "$skill_dir/" "/Users/kangll13/aiot/java-code/self/gggggggood/agent-skills/skills/$(basename "$skill_dir")/"
+    done
+    continue
+  fi
+
+  # 第四种结构：项目内 .agents/skills/（如 gstack）
   if [ -d "$project/.agents/skills" ]; then
     for skill_dir in "$project"/.agents/skills/*; do
       [ -d "$skill_dir" ] || continue
@@ -72,7 +121,9 @@ for project in /Users/kangll13/aiot/java-code/self/skills/*; do
 done
 ```
 
-**gstack 特别说明**：gstack 的 skill 位于项目内的 `.agents/skills/` 目录下（完整路径 `/Users/kangll13/aiot/java-code/self/skills/gstack/.agents/skills/`），不是常见的 `skills/` 目录。上述脚本的第三种结构专门处理此情况，避免路径歧义。
+**作用域说明**：这里的 `.claude/skills/` 与 `.agents/skills/` 都是指项目目录内部的 skill 源路径，不是用户主目录下的 `~/.claude/skills/` 或 `~/.agents/skills/`。模块 4.1A / 4.1B 都只从 `self/skills/<project>/...` 读取，不跨到用户根目录查找。
+
+**gstack 特别说明**：gstack 的 skill 位于项目内的 `.agents/skills/` 目录下（完整路径 `/Users/kangll13/aiot/java-code/self/skills/gstack/.agents/skills/`），不是常见的 `skills/` 目录。上述脚本的第四种结构专门处理此情况，避免路径歧义。
 
 ### 步骤 4.2：同步完整 commands（如模块 2 有更新）
 
@@ -82,15 +133,9 @@ done
 rsync -r ~/.agents/commands/ /Users/kangll13/aiot/java-code/self/gggggggood/agent-skills/commands/
 ```
 
-### 步骤 4.2A：同步 `.agents/skills/` 的完整集合同步到知识库
+### 步骤 4.2A：口径说明
 
-模块 2 扩展为同步 `~/.claude/skills/` 的完整集合后，模块 4 也必须把更新后的 `~/.agents/skills/` 完整集合同步到当前项目知识库：
-
-```bash
-rsync -r ~/.agents/skills/ /Users/kangll13/aiot/java-code/self/gggggggood/agent-skills/skills/
-```
-
-该步骤仍然**不加 `--delete`**，只覆盖已有和新增内容，不删除知识库中额外保留的 skill。
+步骤 4.1 已经负责 `~/.agents/skills/ -> agent-skills/skills/` 的全量同步，因此模块 4 不再单独重复执行第二次同路径 rsync。后续汇总时，只需把步骤 4.1 记为来自 `~/.agents/skills/` 的全量同步，把步骤 4.1A 记为来自 `self/skills/<project>/...` 的项目源补充同步，两者分开统计即可。
 
 ### 步骤 4.3：变更报告
 

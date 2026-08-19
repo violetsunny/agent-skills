@@ -9,7 +9,7 @@
 | --- | --- | --- |
 | Primary | `#0078D4` | Main robot body, primary buttons |
 | Secondary | `#4DA8DA` | LiDAR, highlights, accents |
-| Background | `#E3F2FD` | Status card backgrounds |
+| Background | `#E3F2FD` | Status card backgrounds (layer/zone 背景请使用 `#E8F4FD`，见 Zone Background Colors) |
 | Border | `#005A9E` | Strokes, main flow arrows |
 | Text | `#003D6B` | Titles, important labels |
 
@@ -82,6 +82,20 @@ ellipse;fillColor=#9673A6;strokeColor=#6A4C7D;strokeWidth=2;shadow=1;
 
 ## Secondary Colors
 
+### Product Silver (产品银)
+**Use for:** Product-illustration style robot bodies (detailed top-view icons), hardware shells with light metallic look
+
+| Element | Color Code | Style |
+| --- | --- | --- |
+| Primary | `#D9D9D9` | Light metallic body fill |
+| Border | `#666666` | Body rim, seam lines |
+| Highlight | `#FFFFFF` | Inner disc, panels |
+
+**Style Code:**
+```
+ellipse;fillColor=#D9D9D9;strokeColor=#666666;strokeWidth=3;shadow=0;
+```
+
 ### Warning Yellow (警告黄)
 **Use for:** Charging, low battery, caution states
 
@@ -107,14 +121,17 @@ shape=spiral;fillColor=none;strokeColor=#FF6B35;strokeWidth=2;
 
 ## Arrow Colors by Purpose
 
+> **统一样式规范：** 所有箭头 strokeWidth=3。虚线（dashed）仅用于反馈回路和循环回退，演进/推进/错误路径一律实线。
+
 | Purpose | Color | Stroke Width | Style |
 | --- | --- | --- | --- |
-| Main flow | `#005A9E` | 2px | Solid |
-| Success path | `#82B366` | 2px | Solid |
-| Error/blocked | `#B85450` | 2px | Dashed |
-| Feedback loop | `#0078D4` | 1px | Dashed |
+| Main flow | `#005A9E` | 3px | Solid |
+| Success path | `#82B366` | 3px | Solid |
+| Error/blocked | `#B85450` | 3px | Solid |
+| Feedback loop | `#0078D4` | 3px | Dashed |
 | Data reporting | `#82B366` | 3px | Solid |
-| Control signal | `#B85450` | 2px | Dashed |
+| Control signal | `#B85450` | 3px | Solid |
+| Cross-layer | target layer color | 3px | Solid |
 
 ## Status Card Backgrounds
 
@@ -165,9 +182,11 @@ rounded=1;fillColor=#E8F4FD;strokeColor=#0078D4;strokeWidth=2;dashed=1;arcSize=8
 2. **Consistent meaning** — Red always means error, green always means success
 3. **Background opacity** — Zone backgrounds should be 60% opacity to avoid visual dominance
 4. **Text contrast** — Always ensure text is readable against background (use dark text on light backgrounds)
-5. **Border consistency** — Main elements use 2px borders, details use 1px
-6. **Shadow usage** — Apply shadows to key elements (robot bodies, status cards) for depth
-7. **Dashed for special** — Use dashed lines for feedback loops, blocked paths, optional flows
+5. **Border consistency** — Main elements use 2px borders, details use 1px, layer containers use 3px
+6. **Shadow usage** — Apply shadows only to key visual elements (robot bodies, core ellipses); regular nodes use shadow=0
+7. **Dashed for feedback only** — Use dashed lines exclusively for feedback loops and loop-back arrows; error paths and progression arrows are solid
+8. **Palette-only colors** — Only use colors defined in this file. Do NOT introduce off-palette colors (e.g., `#FFF3E0`/`#FF9800` are forbidden; use `#FFF8E1`/`#FFA000` for warning yellow instead)
+9. **Blue layer background** — Layer/zone backgrounds use `#E8F4FD`; `#E3F2FD` is reserved for status card backgrounds only
 
 ## PPT 场景配色对齐声明
 

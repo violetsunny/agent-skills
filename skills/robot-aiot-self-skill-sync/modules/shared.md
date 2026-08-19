@@ -53,6 +53,9 @@
 - 分批执行，每批不超过 15 个项目，每批超时 **180s**
 - 扫描深度为 **3 层**（`self/` 下第一层子目录，再往下两层）
 - Skill 同步（模块 3）使用 `rsync -r --delete`，确保 `~/.agents/skills/` 与源完全一致；模块 3.5 和模块 4 同步到 `free-stock-line-skills/` 和 `agent-skills/skills/` 时使用 `rsync -r`（**不加 `--delete`**），保留用户自定义文件
+- 模块 4 可使用“查找 `SKILL.md` 并倒推其父目录”为统一发现补充手段，但**不是默认逻辑**；仅允许在 `self/skills/<project>/` 项目目录内部查找，禁止回退到用户根目录 `~/.claude/skills/` / `~/.agents/skills/`
+- 模块 4 若发现同一项目内多个 `SKILL.md` 映射到同一个 `skill_name`，必须标记 `[DUPLICATE-SKILL]` 并跳过该 skill，禁止自动覆盖
+- 同步 skill 目录时必须排除 `.git/`、`.gitignore`、`.gitmodules`、`.DS_Store`、`__pycache__/`、`*.pyc`、`.idea/`、`.vscode/` 等无关文件或本地缓存
 - matt-skills 的 skill 在 `skills/{category}/{skill_name}/` 嵌套结构下，同步时去掉 category 层级
 - claude-code-java 的 skill 在 `.claude/skills/` 下（而非 `skills/`）
 - `/Users/kangll13/aiot/java-code/self/gggggggood/` 下任何异常、冲突或本地改动都必须单独列出并提示用户，不得自动处理
