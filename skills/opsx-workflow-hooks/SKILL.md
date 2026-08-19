@@ -50,6 +50,30 @@ iteration loop so the proposal converges before any implementation starts.
 
    - **If the user provides new ideas or concerns:**
      - Acknowledge the input briefly (one sentence).
+     - Before editing artifacts, classify the work type and load supporting
+       skills to strengthen the proposal/design/tasks output. Use the Skill
+       tool proactively when the request clearly falls into one of these
+       categories:
+     - **Backend code work** (for example Java or Python services, APIs,
+       scheduling, persistence, data flow, integration logic): load the most
+       relevant backend design skill available before refining artifacts.
+       Prefer domain- or stack-specific skills such as `spring-boot-patterns`
+       for Spring/Java work, plus any review/design skill that matches the
+       architecture topic.
+     - **Frontend work** (for example HTML, CSS, Vue, UI interaction,
+       responsive layout, component behavior): load `ui-ux-pro-max`
+       before refining artifacts. If the task is primarily visual or UX-led,
+       let that skill shape acceptance criteria, design trade-offs, and task
+       breakdown.
+     - **Textual方案 / 技术设计方案** (for example proposal, design doc,
+       technical options, architecture explanation, ADR-like material): load
+       the most relevant documentation/design-writing skill before refining
+       artifacts. Prefer `doc-coauthoring` for structure and reader clarity.
+       Use `chinese-documentation` only when the user explicitly requests
+       Chinese documentation formatting rules.
+     - Use the selected skills to improve artifact quality, not to expand scope.
+       Their role here is to sharpen acceptance criteria, structure, trade-offs,
+       edge cases, and task decomposition within the current request.
      - First classify the request:
        - **Tiny implementation change** — can be completed with a very small,
          local code edit (`<= 5` changed lines), in one file, with no new
@@ -98,6 +122,9 @@ iteration loop so the proposal converges before any implementation starts.
 
 - Default to artifact iteration during this hook; only bypass `/opsx:apply` for
   a tiny implementation change that meets the strict threshold above.
+- Hook A may proactively load supporting skills for backend, frontend, or
+  documentation/design work, but only to improve the current planning artifacts.
+  Do not let skill usage introduce new product scope or speculative features.
 - If the user's input is ambiguous (could be a question or a change request),
   treat it as a change request and propose an update, then ask for confirmation.
 - Surgical edits only: change exactly what the user asked for, nothing more.
@@ -116,13 +143,13 @@ partial progress); in that case, wait for the user to resume and complete apply.
 
 ### Purpose
 
-Implementation can introduce subtle logic errors or missed edge cases. This hook
-enforces a mandatory review-then-archive sequence so nothing lands without a
-final check.
+Implementation can introduce subtle logic errors, missed edge cases, and weak or
+missing test coverage. This hook enforces a mandatory review-and-verification
+sequence before archive so nothing lands without a final code and test check.
 
 ### Steps
 
-1. **Run the review**
+1. **Run the review and test verification**
 
    Announce: "Implementation complete. Running review before archiving…"
 
@@ -146,9 +173,23 @@ final check.
       (accessibility, touch & interaction, layout & responsive, typography
       & color, etc.) alongside the standard code review. This is mandatory
       — do NOT skip even if the visual change looks minor.
-   4. **Other review skills** — if none of the above is available, use the
-      most specific review skill present in the workspace.
-   5. **Manual inspection** — if no review skill exists at all, read every
+   4. **`tdd` and/or `test-driven-development`** — use when the change adds or
+      changes behavior and the implementation should have regression coverage.
+      Validate that the final code is backed by behavior-focused tests at the
+      correct seam, and that any new bug fix or feature is not relying only on
+      ad-hoc manual checking.
+   5. **`test-quality`** — use IN ADDITION for Java projects when tests were
+      added or updated. Review whether assertions are meaningful, behavior-based,
+      and maintainable rather than superficial coverage.
+   6. **`webapp-testing`** — use when the implementation includes browser-facing
+      HTML/CSS/JS behavior that should be verified in a rendered UI, especially
+      for interaction, layout, or end-to-end user flows.
+   7. **`verification-before-completion`** — use before reporting success or
+      archiving. Fresh verification evidence is mandatory; never rely on assumed
+      passing state or stale command output.
+   8. **Other review/testing skills** — if none of the above is available, use
+      the most specific review or testing skill present in the workspace.
+   9. **Manual inspection** — if no review skill exists at all, read every
       file modified during apply, cross-check each against `proposal.md` and
       `design.md`, and document what was checked.
 
@@ -163,11 +204,19 @@ final check.
      `proposal.md` and `design.md`?
    - **Edge cases** — are obvious failure paths handled?
    - **Task completeness** — does every checked-off task have corresponding code?
+   - **Regression coverage** — for each new behavior or bug fix, is there a
+     corresponding automated test, or a clearly documented reason why one cannot
+     be added?
    - **No regressions** — do existing tests still pass (run the project's test
      command if one is available)?
+   - **Test quality** — are the new/updated tests behavior-focused, meaningful,
+     and exercising public seams rather than implementation details?
    - **UI/UX quality** (when HTML/CSS is involved) — are accessibility,
      responsive layout, typography, color contrast, and interaction patterns
      validated per `ui-ux-pro-max` guidelines?
+   - **Rendered UI verification** (when browser-facing behavior changes) — was a
+     suitable rendered verification performed, such as Playwright/browser-level
+     checks, instead of relying only on static code inspection?
 
    Present findings in this format:
 
@@ -194,9 +243,11 @@ final check.
      - Do NOT proceed to archive.
      - Report each critical issue with its location (`file_path:line_number`
        where applicable).
-      - Fix them now (minimal code change only — no scope creep).
-      - After fixing, re-run the same review method (built-in, skill, or manual)
-        scoped to the affected files only.
+     - Fix them now (minimal code change only — no scope creep).
+     - If the critical issue is missing or inadequate test coverage, add or
+       improve the smallest meaningful automated test before re-running review.
+     - After fixing, re-run the same review and verification method (built-in,
+       skill, or manual) scoped to the affected files only.
      - Once no CRITICAL issues remain, continue to Step 3.
 
 3. **Archive**
@@ -223,6 +274,12 @@ final check.
 - Never skip the review step, even if the implementation looks clean.
 - When the implementation involves HTML/CSS styling, `ui-ux-pro-max` is
   mandatory — never skip it, even if the visual change appears trivial.
+- When behavior changes, do not treat existing green tests as automatically
+  sufficient — verify whether new or changed behavior has targeted coverage.
+- When tests are added or changed, review their quality; avoid placeholder,
+  tautological, or implementation-coupled tests.
+- Never claim verification passed without fresh evidence from the relevant test,
+  build, or browser-level command.
 - Never archive with unresolved CRITICAL issues.
 - WARNING-level issues require a user decision — do not silently ignore or
   silently fix them.

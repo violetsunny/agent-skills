@@ -2,7 +2,7 @@
 name: robot-aiot-self-skill-sync
 description: >
   批量更新 self 目录下所有 git 项目；同步 superpowers / claude-code-java / matt-skills / anthropics-skills / ui-ux-pro-max-skill / ppt-master 的 skill 文件到 ~/.agents/skills/；先切换到更完整的 OpenSpec profile、升级并运行 openspec init/update，再将 OpenSpec 在 ~/.claude 下实际生成的完整 commands 和 skills 集合按保护规则同步到 ~/.agents。递归三层扫描所有嵌套 git 仓库；处理网络重试并报告冲突；仅在 ~/.agents/skills/ 中已存在的普通 skill 才会被同步（OpenSpec 生成物按专门流程同步）。
-  模块 4 在模块 2-3 完成后，将 ~/.agents/skills/ 全量同步到个人知识库 /Users/kangll13/aiot/java-code/self/gggggggood/agent-skills/skills/（不加 --delete，只覆盖已有 + 新增）。
+  模块 4 在模块 2-3 完成后，将 ~/.agents/skills/ 全量同步到个人知识库 /Users/kangll13/aiot/java-code/self/gggggggood/agent-skills/skills/（不加 --delete，只覆盖已有 + 新增）。模块 5 在所有 skills 同步完成后，更新 `docs/skills-overview.md`，分别汇总 `~/.agents/skills/` 与 `agent-skills/skills/` 下的技能和说明。
   其中 /Users/kangll13/aiot/java-code/self/gggggggood/ 下的代码由用户维护，禁止任何回滚、清理、覆盖或自动冲突处理；发现异常或冲突必须直接提示用户并跳过。
   模块 4 的 skill 文件同步是用户明确要求的例外：允许将 ~/.agents/skills/ 的 skill 文件覆盖到 agent-skills/skills/，但仍禁止 --delete、禁止 git commit/push 等写操作，同步后仅报告变更清单由用户自行审查和提交。
   触发词包括：更新self、更新self代码、更新self仓库、拉取self、更新/拉取/刷新 /Users/kangll13/aiot/java-code/self 下的代码/仓库/项目、更新self下所有git项目、同步skills、更新skills。
@@ -11,7 +11,7 @@ description: >
 
 # Git Self Update — 批量更新 self 项目 + 同步 skill 文件
 
-包含5个模块：模块1 批量 git pull、模块2 openspec update、模块3 skill 文件同步（涉及6个项目）、模块3.5 同步到 free-stock-line-skills 汇总项目、模块4 全量同步到个人知识库 agent-skills。
+包含6个模块：模块1 批量 git pull、模块2 openspec update、模块3 skill 文件同步（涉及6个项目）、模块3.5 同步到 free-stock-line-skills 汇总项目、模块4 全量同步到个人知识库 agent-skills、模块5 更新技能总览文档。
 
 ## 模块索引
 
@@ -23,6 +23,7 @@ description: >
 | 模块 3 | `modules/module3-skill-sync.md` | 6 个项目 skill 同步、匹配规则、rsync --delete |
 | 模块 3.5 | `modules/module3.5-free-stock-line-skills.md` | 同步到 free-stock-line-skills 汇总项目（不加 --delete） |
 | 模块 4 | `modules/module4-knowledge-base.md` | 全量同步到 agent-skills 知识库（不加 --delete）、变更报告 |
+| 模块 5 | `modules/module5-skills-overview.md` | 更新 `docs/skills-overview.md`，分别汇总 `~/.agents/skills/` 与 `agent-skills/skills/` |
 | 结果汇总 | `modules/summary.md` | 各模块结果汇总表格模板 |
 
 ## 执行顺序
@@ -32,5 +33,6 @@ description: >
 3. **模块 3** — Skill 同步（模块 1 已完成 git pull，直接 rsync 匹配的 skill）
 4. **模块 3.5** — 将 `self/skills/` 下更新的项目强制同步到 `free-stock-line-skills/` 中匹配的目录（不加 `--delete`，保留用户自定义文件；`stock-replay-workbench` 禁止修改）
 5. **模块 4** — 先将 `~/.agents/skills/` 全量同步到当前项目 `agent-skills/skills/`，再补充同步 `self/skills/` 下各项目自身携带的 skill 源内容到 `agent-skills/skills/`（包括项目根目录、`skills/`、项目内 `.claude/skills/`、项目内 `.agents/skills/` 四类结构，均不回退到用户根目录查找），同时同步 `~/.agents/commands/` 到 `agent-skills/commands/`（均不加 `--delete`），报告变更清单供用户审查
+6. **模块 5** — 在所有 skills 同步完成后，更新 `docs/skills-overview.md`，文档分为两部分：`~/.agents/skills/` 下的技能和说明，以及 `agent-skills/skills/` 下的技能和说明
 
 > 执行各模块前，必先阅读 `modules/shared.md` 中的前置条件、代码回滚保护、Dirty 仓库分类和关键注意事项。结果汇总模板见 `modules/summary.md`。

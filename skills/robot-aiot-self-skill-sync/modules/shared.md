@@ -56,6 +56,8 @@
 - 模块 4 可使用“查找 `SKILL.md` 并倒推其父目录”为统一发现补充手段，但**不是默认逻辑**；仅允许在 `self/skills/<project>/` 项目目录内部查找，禁止回退到用户根目录 `~/.claude/skills/` / `~/.agents/skills/`
 - 模块 4 若发现同一项目内多个 `SKILL.md` 映射到同一个 `skill_name`，必须标记 `[DUPLICATE-SKILL]` 并跳过该 skill，禁止自动覆盖
 - 同步 skill 目录时必须排除 `.git/`、`.gitignore`、`.gitmodules`、`.DS_Store`、`__pycache__/`、`*.pyc`、`.idea/`、`.vscode/` 等无关文件或本地缓存
+- 模块 5 更新 `docs/skills-overview.md` 时，必须分别扫描 `~/.agents/skills/` 与 `agent-skills/skills/`，只读取各自目录内的 `SKILL.md`，不得混扫或跨目录回退
+- 模块 5 生成的技能总览应以实际扫描结果为准，不依赖手工维护的静态技能分组列表；`description` 多行内容需折叠为单行摘要
 - matt-skills 的 skill 在 `skills/{category}/{skill_name}/` 嵌套结构下，同步时去掉 category 层级
 - claude-code-java 的 skill 在 `.claude/skills/` 下（而非 `skills/`）
 - `/Users/kangll13/aiot/java-code/self/gggggggood/` 下任何异常、冲突或本地改动都必须单独列出并提示用户，不得自动处理

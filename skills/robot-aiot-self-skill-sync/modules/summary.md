@@ -94,3 +94,14 @@ matt-skills 通过 `npx skills@latest add mattpocock/skills` 自动安装，安�
 | 字段 | 说明 |
 |------|------|
 | `[BACKUP-SYNC]` 备份同步 | 模块 4 运行时备份同步到 `.claude/skills/` 的 skill 数量，使用 `rsync -r` 不加 `--delete`。此步骤与 OpenSpec 直接生成和模块 2 迁移是独立动作，需分开记录 |
+
+## 技能总览文档汇总（模块 5）
+
+| 字段 | 说明 |
+|------|------|
+| 文档路径 | `/Users/kangll13/aiot/java-code/self/gggggggood/agent-skills/docs/skills-overview.md` |
+| `~/.agents/skills/` 技能数 | 第一部分实际扫描到的 skill 数量 |
+| `agent-skills/skills/` 技能数 | 第二部分实际扫描到的 skill 数量 |
+| 缺失 `name` 数量 | frontmatter 未提供 `name:`，需回退到目录名的 skill 数量 |
+| 缺失 `description` 数量 | frontmatter 未提供 `description:` 或为空的 skill 数量 |
+| 文档写入结果 | 成功 / 跳过 / 失败，以及失败原因 |
