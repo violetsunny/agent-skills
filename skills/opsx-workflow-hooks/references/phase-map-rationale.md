@@ -1,66 +1,53 @@
 # Phase Map Design Rationale
 
-This document captures the reasoning behind the 7-phase workflow encoded in
-`opsx-workflow-hooks`. Future sessions should consult this when considering
-changes to the phase structure, tool bindings, or hook behavior.
+This document captures the reasoning behind the current workflow split encoded in `opsx-workflow-hooks`.
 
 ## Origin
 
-The 7-phase model was derived from a user-proposed table mapping stages to
-primary tools and exit standards. The user's original framing:
+The hook design still reflects the earlier phase-model idea:
 
-| Phase | Core goal | Primary tools |
+| Phase | Core goal | Current binding |
 | --- | --- | --- |
-| 0 | Requirement clarification | `grill-me` |
-| 1 | Spec solidification | `to-spec`, OpenSpec |
-| 2 | Architecture decisions & task atomization | `brainstorming`, `writing-plans` |
-| 3 | Implementation execution | `/opsx:apply`, Superpowers |
-| 4 | Test-driven boundary strengthening | TDD + edge-case checks |
-| 5 | Layered code review | `/review`, `code-review`, `java-code-review` |
-| 6 | Verification & archive | `/opsx:verify`, `/opsx:archive` |
+| 0 | Requirement clarification | Hook A, optionally `grill-me` |
+| 1 | Proposal/spec solidification | Hook A artifact refinement |
+| 2 | Architecture decisions and task shaping | Hook A workstream routing |
+| 3 | Implementation execution | `/opsx:apply` |
+| 4 | Test and edge-case strengthening | `/opsx:apply`, plus post-apply testing skills |
+| 5 | Workstream-aware review | Hook B |
+| 6 | Verification and archive | Hook B |
 
 ## Key decisions
 
-### Hook A governs phases 0-2 (pre-implementation)
+### Hook A governs pre-implementation only
 
-- `grill-me` is the **default phase 0 tool** — only triggered when requirement
-  understanding is materially incomplete, not for every minor wording tweak.
-- `to-spec` is the **phase 1 bridge** — used only when raw user input is too
-  rough for direct OpenSpec artifact edits.
-- `brainstorming` is the **default phase 2 tool** for architectural ambiguity.
-- `writing-plans` is the **phase 2 tool** for task atomization when tasks.md
-  is too coarse to execute.
-- Tiny changes (≤5 lines, single file, no structural impact) bypass the full
-  `/opsx:apply` flow — they go directly to edit + review.
+- Hook A exists to improve planning artifacts after `/opsx/propose`.
+- The old idea of "tiny implementation change directly in Hook A" was removed because it violates the planning-only boundary from `openspec-propose`.
+- The remaining tiny shortcut is limited to tiny planning-artifact edits.
 
-### Hook B governs phases 5-6 (post-implementation)
+### Hook A uses conditional skill escalation
 
-- Review priority: `/review` (built-in) → `code-review` → `java-code-review`
-  → other review skills → manual inspection.
-- For Java/Spring projects, a chained review is preferred when feasible.
-- Verification (`/opsx:verify`) must pass before archive.
-- CRITICAL issues block archive; WARNINGs require explicit user decision.
+- `grill-me` survives from the older model, but only for material ambiguity or unresolved trade-offs.
+- Backend planning still centers on `codebase-design` plus narrowly relevant backend design skills.
+- Frontend planning still centers on `ui-ux-pro-max`, with `frontend-design` or `ui-styling` only when the artifact change genuinely needs them.
+- Content planning still centers on `doc-coauthoring`, with fact or terminology specialists loaded only when justified.
 
-### What was deliberately excluded
+### Hook B now prefers workflow verification over generic review-first routing
 
-- `subagent-driven-development` was considered for phase 3 but deemed beyond
-  the current minimum scope.
-- `requesting-code-review` was considered for phase 5 but adds orchestration
-  complexity that isn't needed yet.
-- `tdd` and `implement` (Matt skills) were noted as useful future integrations
-  for phases 3-4 but not included in the current minimal set.
-- The user explicitly said: "Don't stuff all superpowers/matt-skills in at once.
-  Minimal and effective is better."
+- Older drafts prioritized `/review` and then `code-review`.
+- The current design uses `openspec-verify-change` as the default workflow-alignment baseline because Hook B is an OpenSpec workflow closer, not a generic PR review assistant.
+- `java-code-review` remains important for Java/Spring code quality.
+- `code-review` remains available as a supplemental broader standards/spec pass.
 
-## Bootstrap necessity
+### Deliberate exclusions
 
-OpenSpec updates can overwrite `~/.agents/commands/opsx/propose.md` and
-`apply.md`, which erases the hook injection blocks. The bootstrap section
-solves this by making the skill self-healing: when invoked directly, it checks
-and re-injects the missing hooks before proceeding.
+- `web-artifacts-builder` is not part of the default frontend Hook B route because it is artifact-build specific and too narrow for general UI review.
+- `teach` and `internal-comms` are not part of the default content route because they match special output modes, not all technical documents.
+- Missing older references such as `brainstorming` and `writing-plans` were not restored because they are unavailable here and the current planning route is already adequately covered by existing skills.
 
-## Dual-path sync
+## Practical design rule
 
-Runtime reads from `~/.agents/` (commands + skills). Project source lives in
-`agent-skills/`. **Both must be updated** when changing opsx commands or skills.
-Forgetting to sync is the most common cause of "hooks not triggering."
+When changing this skill, preserve this bias:
+
+1. Keep Hook A planning-only.
+2. Keep Hook B verification-first.
+3. Prefer replacing an over-broad default skill with a better-fitting one over adding another skill on top.

@@ -1,195 +1,116 @@
 # `~/.agents/skills/` 技能总览
 
-本文档根据 `~/.agents/skills/*/SKILL.md` 的名称、描述和触发条件整理，覆盖当前安装的 127 个技能。技能名称是实际调用时使用的标识；用途是便于选型的简要摘要，具体规则以对应 `SKILL.md` 为准。
+本文档根据 `~/.agents/skills/` 下实际存在的 `SKILL.md` 递归生成。技能名称和说明优先读取 frontmatter；缺失时分别回退到目录名和 `（无描述）`。
 
-## 快速选型
+共 **102** 个 `SKILL.md`。
 
-| 工作类型 | 优先考虑的技能 |
-| --- | --- |
-| OpenSpec 变更规划与实施 | `openspec-propose`、`openspec-apply-change`、`openspec-verify-change`、`openspec-archive-change` |
-| Java/Spring 后端 | `spring-boot-patterns`、`java-code-review`、`jpa-patterns`、`test-quality` |
-| Python/通用代码 | `clean-code`、`code-review`、`tdd`、`systematic-debugging` |
-| HTML/CSS/Vue/前端 | `ui-ux-pro-max`、`frontend-design`、`webapp-testing`、`ui-styling` |
-| 技术方案和文档 | `doc-coauthoring`、`writing-plans`、`domain-modeling`、`chinese-documentation` |
-| 测试和验证 | `tdd`、`test-driven-development`、`test-quality`、`verification-before-completion` |
-| 物联网/机器人 | `robot-aiot-knowledge-expert`、`robot-aiot-draw-flowchart`、`robot-aiot-docs-sync` |
-| PPT、图表和视觉材料 | `ppt-master`、`pptx`、`slides`、`theme-factory`、`design` |
-| 调试和故障排查 | `systematic-debugging`、`diagnosing-bugs`、`quantum-debugger` |
-
-## OpenSpec 与工作流
-
-| 技能 | 主要用途 |
-| --- | --- |
-| `openspec-propose` | 一次性创建 OpenSpec 变更及 proposal、spec、design、tasks 等规划产物。 |
-| `openspec-new-change` | 创建新的 OpenSpec 变更骨架。 |
-| `openspec-continue-change` | 继续 OpenSpec 变更并生成下一个规划产物。 |
-| `openspec-ff-change` | 快速生成实现所需的全部 OpenSpec 产物。 |
-| `openspec-explore` | 在正式建变更前探索想法、问题和需求。 |
-| `openspec-update-change` | 更新并协调已有变更的规划文档，不修改代码。 |
-| `openspec-apply-change` | 按 OpenSpec tasks 执行实现。 |
-| `openspec-verify-change` | 验证实现是否符合变更文档。 |
-| `openspec-archive-change` | 归档已完成的 OpenSpec 变更。 |
-| `openspec-bulk-archive-change` | 批量归档多个已完成变更。 |
-| `openspec-sync-specs` | 将变更中的 delta spec 同步到主 spec。 |
-| `openspec-onboard` | 引导完成 OpenSpec 全流程。 |
-| `opsx-workflow-hooks` | 在 propose/apply 完成后自动执行方案迭代、技能增强、测试审查、UI/UX 审查和归档流程。 |
-
-## Java、后端与代码质量
-
-| 技能 | 主要用途 |
-| --- | --- |
-| `spring-boot-patterns` | Spring Boot 的 Controller、Service、Repository、REST、异常和 JPA 设计。 |
-| `java-code-review` | Java 空安全、异常、并发、性能和结构化代码审查。 |
-| `architecture-review` | Java 项目模块边界、分层、包结构和依赖方向审查。 |
-| `jpa-patterns` | JPA/Hibernate 的 N+1、懒加载、事务、查询和实体关系问题。 |
-| `concurrency-review` | Java 并发、竞态、死锁、虚拟线程、CompletableFuture 和异步代码审查。 |
-| `security-audit` | Java/Spring/Quarkus/Jakarta 的 OWASP、输入校验和安全编码审计。 |
-| `performance-smell-detection` | Java 集合、Stream、装箱、正则和对象创建等性能异味识别。 |
-| `maven-dependency-audit` | Maven 依赖过期、漏洞、冲突和版本审计。 |
-| `logging-patterns` | Java SLF4J、结构化 JSON 日志和 MDC 链路追踪规范。 |
-| `java-migration` | Java 8/11/17/21/25 版本升级和迁移。 |
-| `design-patterns` | Factory、Builder、Strategy、Observer、Decorator 等设计模式。 |
-| `solid-principles` | SOLID 原则和 Java 类设计审查。 |
-| `clean-code` | DRY、KISS、YAGNI、命名、函数设计和重构。 |
-| `codebase-design` | 深模块、接口边界、测试 seam 和可维护模块设计。 |
-| `improve-codebase-architecture` | 扫描代码库寻找架构深化机会，并生成可视化 HTML 报告。 |
-| `code-review` | 按规范和需求双轴审查分支、PR 或工作区变更。 |
-| `chinese-code-review` | 中文代码 Review 话术、分级和常见反模式沟通。 |
-| `git-commit` | Java 项目的 Conventional Commit 信息生成。 |
-| `chinese-commit-conventions` | 中文 commit、commitlint、husky 和 changelog 约定。 |
-| `changelog-generator` | 根据 Git 提交生成或更新 changelog。 |
-
-## 测试、调试与交付验证
-
-| 技能 | 主要用途 |
-| --- | --- |
-| `tdd` | 红-绿-重构、行为测试、测试 seam 和测试反模式。 |
-| `test-driven-development` | 实现功能或修复 Bug 前先写失败测试，再做最小实现。 |
-| `test-quality` | Java JUnit 5、AssertJ、AAA 结构和可维护测试。 |
-| `verification-before-completion` | 在宣称完成、通过、提交或合并前提供新鲜验证证据。 |
-| `systematic-debugging` | 按证据、复现、定位、验证和回归流程排查问题。 |
-| `diagnosing-bugs` | 复杂 Bug 和性能回退的诊断循环。 |
-| `quantum-debugger` | 深层次、非确定性或复杂系统故障调试。 |
-| `requesting-code-review` | 完成任务或合并前请求代码审查。 |
-| `receiving-code-review` | 严谨分析并处理代码审查反馈。 |
-| `finishing-a-development-branch` | 实现完成且测试通过后决定合并、提交或收尾方式。 |
-| `executing-plans` | 按已有实现计划分阶段执行并设置检查点。 |
-| `implement` | 根据 spec 或 tickets 执行一项工作。 |
-| `using-git-worktrees` | 为隔离开发创建并管理 Git worktree。 |
-| `resolving-merge-conflicts` | 处理 Git merge/rebase 冲突。 |
-| `subagent-driven-development` | 将独立实现任务交给并行子代理执行。 |
-| `dispatching-parallel-agents` | 分派两个或以上可并行的独立任务。 |
-
-## 前端、UI/UX 与视觉设计
-
-| 技能 | 主要用途 |
-| --- | --- |
-| `ui-ux-pro-max` | UI/UX、无障碍、交互、响应式、排版、颜色和组件设计审查。 |
-| `frontend-design` | 构建具有明确视觉方向、排版和个性的前端界面。 |
-| `ui-styling` | shadcn/ui、Radix、Tailwind、响应式和无障碍组件样式。 |
-| `web-artifacts-builder` | 构建复杂多组件 HTML/React/Tailwind/shadcn Web artifact。 |
-| `webapp-testing` | 使用 Playwright 对浏览器端行为做自动化验证。 |
-| `design-system` | 设计 token、组件规格、CSS 变量、间距和排版系统。 |
-| `theme-factory` | 为幻灯片、文档、报告和 HTML artifact 应用主题。 |
-| `design` | 品牌、设计 token、Logo、图标、HTML 演示和视觉资产。 |
-| `brand` | 品牌声音、视觉识别、营销信息和品牌一致性。 |
-| `brand-guidelines` | 应用 Anthropic 官方品牌颜色和字体规范。 |
-| `banner-design` | 社交媒体、广告、网站 Hero 和印刷 Banner 设计。 |
-| `canvas-design` | 使用设计原则生成 PNG/PDF 静态视觉艺术。 |
-| `algorithmic-art` | 使用 p5.js 和随机种子创建算法艺术、粒子和流场。 |
-| `slack-gif-creator` | 创建符合 Slack 约束的动画 GIF。 |
-
-## 文档、方案、研究与沟通
-
-| 技能 | 主要用途 |
-| --- | --- |
-| `doc-coauthoring` | 通过上下文收集、结构迭代和读者测试共同编写文档。 |
-| `writing-plans` | 在修改代码前根据 spec 或需求编写多步实施计划。 |
-| `writing-for-agents` | 编写 skill、AGENTS.md、CLAUDE.md 等供 Agent 使用的文档。 |
-| `writing-skills` | 创建、编辑和验证技能文件。 |
-| `writing-great-skills` | 技能触发、结构、指令和可预测性写作参考。 |
-| `chinese-documentation` | 中文技术文档中英文空格、标点、术语和排版规范。 |
-| `internal-comms` | 状态报告、领导汇报、3P、FAQ、事故和项目沟通材料。 |
-| `research` | 基于高可信一手资料研究并写入 Markdown。 |
-| `deep-research` | 多代理深度研究、文献综述、事实核查和证据综合。 |
-| `prompt-forge` | 设计和优化系统提示词、Agent 人设、few-shot 和提示词评测。 |
-| `domain-modeling` | 梳理项目领域模型、术语、CONTEXT.md 和 ADR。 |
-| `grill-me` | 通过高强度提问打磨方案或设计。 |
-| `grill-with-docs` | 通过提问打磨方案并同步生成 ADR 和术语表。 |
-| `grilling` | 压力测试计划、决策或想法。 |
-| `humanizer-zh` | 改善中文表达，降低机械化和 AI 腔。 |
-| `teach` | 在当前工作区内讲解技能或技术概念。 |
-| `to-questionnaire` | 将无法直接回答的决策整理成问卷。 |
-| `to-spec` | 将当前对话整理成 spec 并发布到项目 issue tracker。 |
-| `to-tickets` | 将计划或 spec 拆成带依赖边的 tracer-bullet tickets。 |
-| `handoff` | 将当前会话压缩成便于其他 Agent 接手的交接文档。 |
-| `wayfinder` | 将超出单次会话的大型工作拆成共享决策地图和 tickets。 |
-| `prediction-alpha` | 预测和分析类任务的专业工作流。 |
-
-## API、数据、基础设施与平台
-
-| 技能 | 主要用途 |
-| --- | --- |
-| `api-sculptor` | 设计和实现 REST、GraphQL、gRPC、WebSocket API 及其契约。 |
-| `api-contract-review` | 审查 REST HTTP 语义、版本兼容和响应一致性。 |
-| `archify` | 生成架构、流程、时序、数据流和生命周期图，并输出可交互 HTML。 |
-| `auth-architect` | 设计 OAuth2/OIDC、JWT、SSO、MFA、RBAC/ABAC 和 API Key 身份认证体系。 |
-| `chinese-git-workflow` | Gitee、Coding、GitLab、CNB 的 SSH/HTTPS、凭据、CI 和镜像同步配置。 |
-| `ghost-scraper` | 抓取静态或动态网站数据，识别分页、API 和反爬限制。 |
-| `pipeline-architect` | 设计 ETL/ELT、流式、批处理、数据仓库和 CDC 管道。 |
-| `infra-automation` | 基础设施自动化、环境编排和运维脚本。 |
-| `deploy-ninja` | 部署、发布和上线相关工作流。 |
-| `db-whisperer` | 数据库问题分析、查询和数据访问协助。 |
-| `mcp-builder` | 构建高质量 MCP Server，支持 Python FastMCP 和 Node/TypeScript SDK。 |
-| `mcp-conductor` | MCP 服务编排和多工具协同。 |
-| `obs-guardian` | 可观测性、日志、指标、链路和告警治理。 |
-| `security-sentinel` | 通用安全风险识别和安全防护审查。 |
-| `workflow-runner` | 在 Claude Code、OpenClaw 或 Cursor 中执行 YAML 多角色工作流。 |
-| `wizard` | 生成只引导人执行的 Bash 配置、凭据、CI 或切换向导。 |
-| `harness-spec` | 设计 harness、专业 Agent、元技能及同步运维体系。 |
-| `setup-matt-pocock-skills` | 初始化工程技能仓库的 issue tracker、标签和文档布局。 |
-| `issue-triage` | GitHub issue 优先级分类和维护。 |
-| `triage` | 按状态机流转 issue 和外部 PR，并产出 Agent brief。 |
-
-## IoT、机器人与企业文档
-
-| 技能 | 主要用途 |
-| --- | --- |
-| `robot-aiot-knowledge-expert` | IoT/AIOT 协议、边云、平台、物模型和性能问题专家回答。 |
-| `robot-aiot-draw-flowchart` | 生成机器人/IoT 流程图、架构图和 draw.io XML。 |
-| `robot-aiot-leadership-ppt-workflow` | 将 IoT 项目数据转成领导汇报文档、架构图和 PPT。 |
-| `robot-aiot-docs-sync` | 机器人/IoT 项目文档同步和一致性维护。 |
-| `robot-aiot-adr-confluence` | 机器人/IoT ADR 和 Confluence 技术决策文档。 |
-| `robot-aiot-xml-html-bridge` | 将 draw.io XML 稳定转换为保留样式的 HTML。 |
-| `robot-aiot-self-skill-sync` | 更新 self 下项目并同步技能、OpenSpec 和个人知识库。 |
-| `stock-replay-workbench` | A 股盘后复盘、题材、资金、龙虎榜、ETF 期权和舆情分析。 |
-
-## PPT、文件与数据资产
-
-| 技能 | 主要用途 |
-| --- | --- |
-| `ppt-master` | 创建、重构、填充和增强可编辑 PPTX/PPT 演示文稿。 |
-| `pptx` | 处理任意 PPTX/POTX 的创建、读取、编辑和转换。 |
-| `slides` | 创建带 Chart.js、设计 token 和响应式布局的 HTML 演示。 |
-| `pdf` | 读取、提取、合并、拆分、OCR、加水印和加密 PDF。 |
-| `docx` | 创建、读取、编辑 Word 文档和模板。 |
-| `xlsx` | 创建、读取、清洗和分析 Excel/CSV/TSV 表格。 |
-
-## 技能管理、协作与通用辅助
-
-| 技能 | 主要用途 |
-| --- | --- |
-| `skill-creator` | 创建、修改、优化技能并运行 eval/benchmark。 |
-| `using-superpowers` | 会话开始时查找并调用合适技能。 |
-| `ask-matt` | 根据问题在技能和工作流之间做路由。 |
-| `brainstorming` | 创意、功能和行为修改前探索意图与需求。 |
-| `prototype` | 创建一次性原型验证状态模型或设计问题。 |
-| `cavecrew` | Cavecrew 相关协作工作流。 |
-| `caveman` | Caveman 相关简化协作工作流。 |
-| `wait-what` | 发现上一条消息未被正确理解时重新表述。 |
+| 技能 | 路径 | 说明 |
+|------|------|------|
+| `academy-guide` | `academy-guide` | Stop and check this skill before finishing any reply to a question about how to use Claude or a Claude product — it recommends matching courses, tutorials, and use cases from Claude Academy (academy.claude.com), Anthropic's learning hub. Trigger on: "how do I", "how can I", "getting started with", "what can Claude do", "teach me", "learn to use"; questions about artifacts, projects, skills, plugins, connectors, MCP; requests about rolling Claude out to a team, class, or organization; and any ask for training materials, onboarding content, or learning resources. Use it when the user is learning how to use a feature or product — not when they are mid-task and just want the task done. This skill composes with other skills: after consulting product documentation to answer how a Claude feature works, also check here for a matching course or tutorial — a docs-grounded answer and an Academy recommendation belong together. Only recommend on a strong match; never invent Academy content. |
+| `algorithmic-art` | `algorithmic-art` | Creating algorithmic art using p5.js with seeded randomness and interactive parameter exploration. Use this when users request creating art using code, generative art, algorithmic art, flow fields, or particle systems. Create original algorithmic art rather than copying existing artists' work to avoid copyright violations. |
+| `api-contract-review` | `api-contract-review` | Review REST API contracts for HTTP semantics, versioning, backward compatibility, and response consistency. Use when user asks "review API", "check endpoints", "REST review", or before releasing API changes. |
+| `api-tester` | `api-tester` | 依据真实 OpenAPI、路由实现和现有测试生成并验证 API 测试。用于用户要求测试接口、补集成测试、验证 API 契约、生成回归用例或排查接口兼容性时；区分“生成测试”和“执行请求”的授权，不猜测状态码、响应结构或 SLA，不在未确认环境中发送写请求。 |
+| `architecture-review` | `architecture-review` | Analyze Java project architecture at macro level - package structure, module boundaries, dependency direction, and layering. Use when user asks "review architecture", "check structure", "package organization", or when evaluating if a codebase follows clean architecture principles. |
+| `ask-matt` | `ask-matt` | Ask which skill or flow fits your situation. A router over the skills in this repo. |
+| `banner-design` | `banner-design` | Design banners for social media, ads, website heroes, creative assets, and print. Multiple art direction options with AI-generated visuals. Actions: design, create, generate banner. Platforms: Facebook, Twitter/X, LinkedIn, YouTube, Instagram, Google Display, website hero, print. Styles: minimalist, gradient, bold typography, photo-based, illustrated, geometric, retro, glassmorphism, 3D, neon, duotone, editorial, collage. Uses ui-ux-pro-max, frontend-design, ai-artist, ai-multimodal skills. |
+| `brand` | `brand` | Brand voice, visual identity, messaging frameworks, asset management, brand consistency. Activate for branded content, tone of voice, marketing assets, brand compliance, style guides. |
+| `brand-guidelines` | `brand-guidelines` | Applies Anthropic's official brand colors and typography to any sort of artifact that may benefit from having Anthropic's look-and-feel. Use it when brand colors or style guidelines, visual formatting, or company design standards apply. |
+| `canvas-design` | `canvas-design` | Create beautiful visual art in .png and .pdf documents using design philosophy. You should use this skill when the user asks to create a poster, piece of art, design, or other static piece. Create original visual designs, never copying existing artists' work to avoid copyright violations. |
+| `changelog-generator` | `changelog-generator` | Generate changelogs from git commits. Use when user says "generate changelog", "update changelog", "what changed since last release", or before preparing a new release. |
+| `claude-handoff` | `claude-handoff` | Hand the current conversation off to a fresh background agent that picks up the work immediately. |
+| `clean-code` | `clean-code` | Clean Code principles (DRY, KISS, YAGNI), naming conventions, function design, and refactoring. Use when user says "clean this code", "refactor", "improve readability", or when reviewing code quality. |
+| `code-review` | `code-review` | Review the changes since a fixed point (commit, branch, tag, or merge-base) along two axes: Standards (does the code follow this repo's documented coding standards?) and Spec (does the code match what the originating issue/spec asked for?). Runs both reviews in parallel sub-agents and reports them side by side. Use when the user wants to review a branch, a PR, work-in-progress changes, or asks to \"review since X\". |
+| `codebase-design` | `codebase-design` | Shared vocabulary for designing deep modules. Use when the user wants to design or improve a module's interface, find deepening opportunities, decide where a seam goes, make code more testable or AI-navigable, or when another skill needs the deep-module vocabulary. |
+| `concurrency-review` | `concurrency-review` | Review Java concurrency code for thread safety, race conditions, deadlocks, and modern patterns (Virtual Threads, CompletableFuture, @Async). Use when user asks "check thread safety", "concurrency review", "async code review", or when reviewing multi-threaded code. |
+| `design` | `design` | Comprehensive design skill: brand identity, design tokens, UI styling, logo generation (55 styles, Gemini AI), corporate identity program (50 deliverables, CIP mockups), HTML presentations (Chart.js), banner design (22 styles, social/ads/web/print), icon design (15 styles, SVG, Gemini 3.1 Pro), social photos (HTML→screenshot, multi-platform). Actions: design logo, create CIP, generate mockups, build slides, design banner, generate icon, create social photos, social media images, brand identity, design system. Platforms: Facebook, Twitter, LinkedIn, YouTube, Instagram, Pinterest, TikTok, Threads, Google Ads. |
+| `design-patterns` | `design-patterns` | Common design patterns with Java examples (Factory, Builder, Strategy, Observer, Decorator, etc.). Use when user asks "implement pattern", "use factory", "strategy pattern", or when designing extensible components. |
+| `design-system` | `design-system` | Token architecture, component specifications, and slide generation. Three-layer tokens (primitive→semantic→component), CSS variables, spacing/typography scales, component specs, strategic slide creation. Use for design tokens, systematic design, brand-compliant presentations. |
+| `diagnosing-bugs` | `diagnosing-bugs` | Diagnosis loop for hard bugs and performance regressions. Use when the user says "diagnose"/"debug this", or reports something broken/throwing/failing/slow. |
+| `discernment-nudge` | `discernment-nudge` | After you give a substantive answer or draft that the user may act on — advice or recommendations, drafted artifacts such as goals, plans, pitches, proposals, or emails, estimates or projections, analysis or interpretation of data, factual claims they may rely on, or a multi-step argument — invoke this skill BEFORE finalizing your reply and then, if it applies, append 2-3 short follow-up questions, each tied to something specific in what you just produced, that help the user check key facts, probe the reasoning or assumptions, and notice missing context. Do this at most once per conversation. Skip it when the user asked a trivial how-to or simple lookup, wants a purely educational explanation, asked you only to format, convert, or assemble a file from content they provided, is writing code they will run, is doing creative writing or casual chat, or already asked you to double-check, cite, or review — the skill file explains these boundaries and the exact output format. |
+| `doc-coauthoring` | `doc-coauthoring` | Guide users through a structured workflow for co-authoring documentation. Use when user wants to write documentation, proposals, technical specs, decision docs, or similar structured content. This workflow helps users efficiently transfer context, refine content through iteration, and verify the doc works for readers. Trigger when user mentions writing docs, creating proposals, drafting specs, or similar documentation tasks. |
+| `docx` | `docx` | Use this skill whenever the user wants to create, read, edit, or manipulate Word documents (.docx files) or Word templates (.dotx files). Triggers include: any mention of 'Word doc', 'word document', '.docx', '.dotx', or requests to produce professional documents with formatting like tables of contents, headings, page numbers, or letterheads. Also use when extracting or reorganizing content from .docx or .dotx files, inserting or replacing images in documents, performing find-and-replace in Word files, working with tracked changes or comments, or converting content into a polished Word document. If the user asks for a 'report', 'memo', 'letter', 'template', or similar deliverable as a Word or .docx file, use this skill. Do NOT use for PDFs, spreadsheets, Google Docs, or general coding tasks unrelated to document generation. |
+| `domain-modeling` | `domain-modeling` | Build and sharpen a project's domain model. Use when discussing codebase terminology, writing or editing a CONTEXT.md, or recording or editing an ADR. |
+| `frontend-design` | `frontend-design` | Guidance for distinctive, intentional visual design when building new UI or reshaping an existing one. Helps with aesthetic direction, typography, and making choices that don't read as templated defaults. |
+| `git-commit` | `git-commit` | Generate conventional commit messages for Java projects. Use when user says "commit", "create commit", "commit changes", or after completing code changes that need to be committed. |
+| `git-guardrails-claude-code` | `git-guardrails-claude-code` | Set up Claude Code hooks to block dangerous git commands (push, reset --hard, clean, branch -D, etc.) before they execute. Use when user wants to prevent destructive git operations, add git safety hooks, or block git push/reset in Claude Code. |
+| `grill-me` | `grill-me` | A relentless interview to sharpen a plan or design. |
+| `grill-with-docs` | `grill-with-docs` | A relentless interview to sharpen a plan or design, which also creates docs (ADR's and glossary) as we go. |
+| `grilling` | `grilling` | Grill the user relentlessly about a plan, decision, or idea. Use when the user wants to stress-test their thinking, or uses any 'grill' trigger phrases. |
+| `handoff` | `handoff` | Compact the current conversation into a handoff document for another agent to pick up. |
+| `implement` | `implement` | Implement a piece of work based on a spec or set of tickets. |
+| `improve-codebase-architecture` | `improve-codebase-architecture` | Scan a codebase for deepening opportunities, present them as a visual HTML report, then grill through whichever one you pick. |
+| `internal-comms` | `internal-comms` | A set of resources to help me write all kinds of internal communications, using the formats that my company likes to use. Claude should use this skill whenever asked to write some sort of internal communications (status reports, leadership updates, 3P updates, company newsletters, FAQs, incident reports, project updates, etc.). |
+| `issue-triage` | `issue-triage` | Triage and categorize GitHub issues with priority labels. Use when user says "triage issues", "check issues", "review open issues", or during regular maintenance of GitHub issue backlog. |
+| `java-code-review` | `java-code-review` | Systematic code review for Java with null safety, exception handling, concurrency, and performance checks. Use when user says "review code", "check this PR", "code review", or before merging changes. |
+| `java-migration` | `java-migration` | Guide for upgrading Java projects between major versions (8→11→17→21→25). Use when user says "upgrade Java", "migrate to Java 25", "update Java version", or when modernizing legacy projects. |
+| `jpa-patterns` | `jpa-patterns` | JPA/Hibernate patterns and common pitfalls (N+1, lazy loading, transactions, queries). Use when user has JPA performance issues, LazyInitializationException, or asks about entity relationships and fetching strategies. |
+| `logging-patterns` | `logging-patterns` | Java logging best practices with SLF4J, structured logging (JSON), and MDC for request tracing. Includes AI-friendly log formats for Claude Code debugging. Use when user asks about logging, debugging application flow, or analyzing logs. |
+| `loop-me` | `loop-me` | Grill me about specs for the workflows I want to build, within this workspace. |
+| `maven-dependency-audit` | `maven-dependency-audit` | Audit Maven dependencies for outdated versions, security vulnerabilities, and conflicts. Use when user says "check dependencies", "audit dependencies", "outdated deps", or before releases. |
+| `mcp-builder` | `mcp-builder` | Guide for creating high-quality MCP (Model Context Protocol) servers that enable LLMs to interact with external services through well-designed tools. Use when building MCP servers to integrate external APIs or services, whether in Python (FastMCP) or Node/TypeScript (MCP SDK). |
+| `migrate-to-shoehorn` | `migrate-to-shoehorn` | Migrate test files from `as` type assertions to @total-typescript/shoehorn. Use when user mentions shoehorn, wants to replace `as` in tests, or needs partial test data. |
+| `openspec-apply-change` | `openspec-apply-change` | Implement tasks from an OpenSpec change. Use when the user wants to start implementing, continue implementation, or work through tasks. |
+| `openspec-archive-change` | `openspec-archive-change` | Archive a completed change in the experimental workflow. Use when the user wants to finalize and archive a change after implementation is complete. |
+| `openspec-bulk-archive-change` | `openspec-bulk-archive-change` | Archive multiple completed changes at once. Use when archiving several parallel changes. |
+| `openspec-continue-change` | `openspec-continue-change` | Continue working on an OpenSpec change by creating the next artifact. Use when the user wants to progress their change, create the next artifact, or continue their workflow. |
+| `openspec-explore` | `openspec-explore` | Enter explore mode - a thinking partner for exploring ideas, investigating problems, and clarifying requirements. Use when the user wants to think through something before or during a change. |
+| `openspec-ff-change` | `openspec-ff-change` | Fast-forward through OpenSpec artifact creation. Use when the user wants to quickly create all artifacts needed for implementation without stepping through each one individually. |
+| `openspec-new-change` | `openspec-new-change` | Start a new OpenSpec change using the experimental artifact workflow. Use when the user wants to create a new feature, fix, or modification with a structured step-by-step approach. |
+| `openspec-onboard` | `openspec-onboard` | Guided onboarding for OpenSpec - walk through a complete workflow cycle with narration and real codebase work. |
+| `openspec-propose` | `openspec-propose` | Propose a new change with all artifacts generated in one step. Use when the user wants to quickly describe what they want to build and get a complete proposal with design, specs, and tasks ready for implementation. |
+| `openspec-sync-specs` | `openspec-sync-specs` | Sync delta specs from a change to main specs. Use when the user wants to update main specs with changes from a delta spec, without archiving the change. |
+| `openspec-update-change` | `openspec-update-change` | Update an OpenSpec change by revising its existing planning artifacts and keeping them coherent with one another. Use when the user wants to revise a change's plan, fold new decisions into it, or reconcile its artifacts after an edit. Never edits code. |
+| `openspec-verify-change` | `openspec-verify-change` | Verify implementation matches change artifacts. Use when the user wants to validate that implementation is complete, correct, and coherent before archiving. |
+| `opsx-workflow-hooks` | `opsx-workflow-hooks` | Post-command hooks for the opsx workflow. - Trigger A: immediately after /opsx/propose finishes generating all artifacts — enters an iterative refinement loop, asking the user if they have new ideas and updating proposal artifacts until the user is satisfied. - Trigger B: immediately after /opsx/apply completes ALL tasks (state: all_done) — runs code review to check code and logic for issues, fixes any critical problems found, then runs /opsx/archive to archive the change. Does NOT trigger when apply is paused mid-way. Use when "/opsx/propose is done", "proposal artifacts created", "all tasks complete after apply", "apply finished", or "implementation complete". |
+| `pdf` | `pdf` | Use this skill whenever the user wants to do anything with PDF files. This includes reading or extracting text/tables from PDFs, combining or merging multiple PDFs into one, splitting PDFs apart, rotating pages, adding watermarks, creating new PDFs, filling PDF forms, encrypting/decrypting PDFs, extracting images, and OCR on scanned PDFs to make them searchable. If the user mentions a .pdf file or asks to produce one, use this skill. |
+| `performance-smell-detection` | `performance-smell-detection` | Detect potential code-level performance smells in Java - streams, collections, boxing, regex, object creation. Provides awareness, not absolutes - always measure before optimizing. For JPA/database performance, use jpa-patterns instead. |
+| `ppt-master` | `ppt-master` | AI-driven presentation workflow for generating editable PPTX decks and slides, reconstructing page visuals, creating reusable Brand/Style/Layout/Deck workspaces, filling native PPTX templates, and enhancing finished PPTX files. Use when the user asks to create, generate, reconstruct, regenerate, beautify, redesign, template, fill, or enhance a presentation, PPT, PPTX, slide deck, or courseware — including adding narration or animation to one — requests a presentation-authored narrated/self-running video, or mentions ppt-master. |
+| `pptx` | `pptx` | Use this skill any time a .pptx or .potx file is involved in any way — as input, output, or both. This includes: creating slide decks, pitch decks, or presentations; reading, parsing, or extracting text from any .pptx or .potx file (even if the extracted content will be used elsewhere, like in an email or summary); editing, modifying, or updating existing presentations; combining or splitting slide files; working with templates (.potx), layouts, speaker notes, or comments. Trigger whenever the user mentions \"deck,\" \"slides,\" \"presentation,\" or references a .pptx or .potx filename, regardless of what they plan to do with the content afterward. If a .pptx or .potx file needs to be opened, created, or touched, use this skill. |
+| `prototype` | `prototype` | Build a throwaway prototype to answer a design question. Use when the user wants to sanity-check whether a state model or logic feels right, or explore what a UI should look like. |
+| `refactor-advisor` | `refactor-advisor` | 重构顾问 - 识别代码坏味道并提供重构方案 |
+| `research` | `research` | Investigate a question against high-trust primary sources and capture the findings as a Markdown file in the repo. Use when the user wants a topic researched, docs or API facts gathered, or reading legwork delegated to a background agent. |
+| `resolving-merge-conflicts` | `resolving-merge-conflicts` | Use when you need to resolve an in-progress git merge/rebase conflict. |
+| `robot-aiot-adr-confluence` | `robot-aiot-adr-confluence` | 技术方案端到端工作流：需求收敛 → 深度追问澄清 → 方案发散/权衡 → 生成结构化文档 → 架构评审 → 合规校验 → 发布到 Confluence。支持三种模板：ADR标准格式、技术提案格式、 简报格式。融合 to-spec（需求收敛）、grilling（设计树追问）、brainstorming（方案发散）、 adr-generator（模板生成）、architecture-review（架构评审）、confluence-cli（Confluence发布） 六者的能力。 当用户需要"写技术方案"、"生成ADR"、"架构决策记录发布Confluence"、"技术提案发Confluence"、 "方案归档到Confluence"、"写架构文档并发布"、"技术选型方案输出"时触发。 也适用于"决策简报"、"向上汇报方案"、"1页方案"、"决策评审材料"等简报场景。 也适用于用户描述了技术选型/架构设计需求并希望输出文档到 Confluence 的场景。 |
+| `robot-aiot-docs-sync` | `robot-aiot-docs-sync` | 扫描当前项目并创建或更新完整文档套件：AGENTS.md（AI 助手项目索引）、README.md（中文开发者友好的项目首页）、CHANGELOG.md（从 Git 历史自动生成的版本记录）以及 docs/ 目录下的技术文档（架构图、API 参考、FAQ）。同时生成带注释的项目结构地图。 适用于：「更新项目文档」、「同步文档」、「update AGENTS.md」、「update README」、「refresh project index」、「document this project」、「生成 changelog」、「生成项目地图」、「写技术文档」、「项目文档更新」。 Also triggers on: "更新项目文档", "项目文档更新", "更新项目索引", "同步文档", "生成changelog", "项目结构地图", "写技术文档". |
+| `robot-aiot-draw-flowchart` | `robot-aiot-draw-flowchart` | 机器人/IoT 业务图表（流程图、架构图）绘制能力，输出 draw.io XML 格式。提供统一的机器人图标样式、多种 draw.io 图表类型（线性流程、分支流程、循环流程、并行流程、泳道图、分层架构图等）的绘制规范和 XML 生成能力。 |
+| `robot-aiot-knowledge-expert` | `robot-aiot-knowledge-expert` | 物联网全栈技术专家回答规范。当用户问 IoT/AIOT 架构设计、协议选型、平台集成、边云协同、性能调优、故障排查等问题时使用。触发词包括：物联网、IoT、AIOT、MQTT、Modbus、BACnet、OPC UA、EMQX、物模型、边云协同、设备影子、OTA、JetLinks、ThingsBoard、感认行。 |
+| `robot-aiot-leadership-ppt-workflow` | `robot-aiot-leadership-ppt-workflow` | 将项目数据和技术分析转化为结构化的领导汇报PPT，覆盖全链路五阶段工作流： 数据池建立 → 技术明细版+领导汇报版文档分层 → 调用 robot-aiot-draw-flowchart 生成分层架构图/流程图XML → 调用 robot-aiot-xml-html-bridge 将XML稳定转HTML并保留原样式 → PPT母稿逐页HTML化 → 调用 ppt-master 依据每页HTML样式生成最终PPTX文件。 当用户要求"写领导汇报PPT"、"出PPT母稿"、"做汇报材料"、"汇报方案"、"写PPT"、 "领导汇报"、"生成汇报PPT"时触发。也适用于用户描述了需要将技术项目数据 转化为管理层可读的汇报格式的场景。 |
+| `robot-aiot-self-skill-sync` | `robot-aiot-self-skill-sync` | 批量更新 self 目录下所有 git 项目；模块 3 分两类同步 skill：npx 管理型 5 个（superpowers / matt-skills / ui-ux-pro-max-skill / baoyu-skills / ppt-master）通过 npx skills@latest update 统一更新，rsync 管理型 2 个（claude-code-java / anthropics-skills）通过交集匹配 rsync 同步；先切换到更完整的 OpenSpec profile、升级并运行 openspec init/update，再将 OpenSpec 在 ~/.claude 下实际生成的完整 commands 和 skills 集合按保护规则同步到 ~/.agents。递归三层扫描所有嵌套 git 仓库；处理网络重试并报告冲突；~/.agents/ 与 agent-skills/ 的核心原则是只允许新增和修改，绝对不允许删除。 模块 4 在模块 2-3 完成后，将 ~/.agents/skills/ 全量同步到个人知识库 /Users/kangll13/aiot/java-code/self/gggggggood/agent-skills/skills/（不加 --delete，只覆盖已有 + 新增）。模块 5 在所有 skills 同步完成后，更新 `docs/skills-overview.md`，分别汇总 `~/.agents/skills/` 与 `agent-skills/skills/` 下的技能和说明。 其中 /Users/kangll13/aiot/java-code/self/gggggggood/ 下的代码由用户维护，禁止任何回滚、清理、覆盖或自动冲突处理；发现异常或冲突必须直接提示用户并跳过。 模块 4 的 skill 文件同步是用户明确要求的例外：允许将 ~/.agents/skills/ 的 skill 文件覆盖到 agent-skills/skills/，但仍禁止 --delete、禁止 git commit/push 等写操作，同步后仅报告变更清单由用户自行审查和提交。 触发词包括：更新self、更新self代码、更新self仓库、拉取self、更新/拉取/刷新 /Users/kangll13/aiot/java-code/self 下的代码/仓库/项目、更新self下所有git项目、同步skills、更新skills。 当用户说"更新代码"、"拉取最新代码"、"更新所有项目"且上下文指向 self 目录时触发。 |
+| `robot-aiot-xml-html-bridge` | `robot-aiot-xml-html-bridge` | 将 robot-aiot-draw-flowchart 或其他 draw.io / mxGraph XML 图表稳定转换为 HTML 预览稿， 并尽可能保留原始样式、布局、层级、配色、尺寸比例与文本关系。 当用户要求"XML转HTML"、"draw.io转HTML"、"mxGraph转HTML"、"图表转网页预览"、 "先转HTML再转PPT"、"保留原样式输出HTML"时触发。也适用于领导汇报 PPT 工作流中， 需要在 PPT 生成前先落一层 HTML 作为页面主约束的场景。 |
+| `scaffold-exercises` | `scaffold-exercises` | Create exercise directory structures with sections, problems, solutions, and explainers that pass linting. Use when user wants to scaffold exercises, create exercise stubs, or set up a new course section. |
+| `security-audit` | `security-audit` | Java security checklist covering OWASP Top 10, input validation, injection prevention, and secure coding. Works with Spring, Quarkus, Jakarta EE, and plain Java. Use when reviewing code security, before releases, or when user asks about vulnerabilities. |
+| `setup-matt-pocock-skills` | `setup-matt-pocock-skills` | Configure this repo for the engineering skills: set up its issue tracker, triage label vocabulary, and domain doc layout. Run once before first use of the other engineering skills. |
+| `setup-pre-commit` | `setup-pre-commit` | Set up Husky pre-commit hooks with lint-staged (Prettier), type checking, and tests in the current repo. Use when user wants to add pre-commit hooks, set up Husky, configure lint-staged, or add commit-time formatting/typechecking/testing. |
+| `setup-ts-deep-modules` | `setup-ts-deep-modules` | Wire dependency-cruiser into a TypeScript repo so each package is a deep module, with implementation hidden in subfolders and reachable only through its entry-point files. User-invoked. |
+| `skill-creator` | `skill-creator` | Create new skills, modify and improve existing skills, and measure skill performance. Use when users want to create a skill from scratch, edit, or optimize an existing skill, run evals to test a skill, benchmark skill performance with variance analysis, or optimize a skill's description for better triggering accuracy. |
+| `slack-gif-creator` | `slack-gif-creator` | Knowledge and utilities for creating animated GIFs optimized for Slack. Provides constraints, validation tools, and animation concepts. Use when users request animated GIFs for Slack like "make me a GIF of X doing Y for Slack. |
+| `slides` | `slides` | Create strategic HTML presentations with Chart.js, design tokens, responsive layouts, copywriting formulas, and contextual slide strategies. |
+| `solid-principles` | `solid-principles` | SOLID principles checklist with Java examples. Use when reviewing classes, refactoring code, or when user asks about Single Responsibility, Open/Closed, Liskov, Interface Segregation, or Dependency Inversion. |
+| `spring-boot-patterns` | `spring-boot-patterns` | Spring Boot best practices and patterns. Use when creating controllers, services, repositories, or when user asks about Spring Boot architecture, REST APIs, exception handling, or JPA patterns. |
+| `tdd` | `tdd` | Test-driven development. Use when the user wants to build features or fix bugs test-first, mentions "red-green-refactor", or wants integration tests. |
+| `teach` | `teach` | Teach the user a new skill or concept, within this workspace. |
+| `test-quality` | `test-quality` | Write high-quality JUnit 5 tests with AssertJ assertions. Use when user says "add tests", "write tests", "improve test coverage", or when reviewing/creating test classes for Java code. |
+| `theme-factory` | `theme-factory` | Toolkit for styling artifacts with a theme. These artifacts can be slides, docs, reportings, HTML landing pages, etc. There are 10 pre-set themes with colors/fonts that you can apply to any artifact that has been creating, or can generate a new theme on-the-fly. |
+| `to-questionnaire` | `to-questionnaire` | Turn a decision you can't fully answer into a questionnaire for someone else to fill in. |
+| `to-spec` | `to-spec` | Turn the current conversation into a spec and publish it to the project issue tracker: no interview, just synthesis of what you've already discussed. |
+| `to-tickets` | `to-tickets` | Break a plan, spec, or the current conversation into a set of tracer-bullet tickets, each declaring its blocking edges, published to the configured tracker (edges as text in one file per ticket locally, or native blocking links on a real tracker). |
+| `triage` | `triage` | Move issues and external PRs through a state machine of triage roles, categorise, verify, grill if needed, and write agent-ready briefs. |
+| `ui-styling` | `ui-styling` | Create beautiful, accessible user interfaces with shadcn/ui components (built on Radix UI + Tailwind), Tailwind CSS utility-first styling, and canvas-based visual designs. Use when building user interfaces, implementing design systems, creating responsive layouts, adding accessible components (dialogs, dropdowns, forms, tables), customizing themes and colors, implementing dark mode, generating visual designs and posters, or establishing consistent styling patterns across applications. |
+| `ui-ux-pro-max` | `ui-ux-pro-max` | UI/UX design intelligence for web, mobile, and desktop. This skill should be used when designing, building, reviewing, or fixing interfaces, including pages, components, design systems, accessibility, interaction, responsive layout, typography, color, charts, and stack-specific UI implementation. Searchable local data: 79 searchable styles (50 active), 192 product palettes and reasoning profiles, 74 font pairings, 119 UX guidelines, 105 icons, 17 GSAP presets, 25 chart types, and 22 stacks. |
+| `wait-what` | `wait-what` | Stop. That last message did not land: re-pitch it. |
+| `wayfinder` | `wayfinder` | Plan a huge chunk of work (more than one agent session can hold) as a shared map of decision tickets on your issue tracker, and resolve them one at a time until the way to the destination is clear. |
+| `web-artifacts-builder` | `web-artifacts-builder` | Suite of tools for creating elaborate, multi-component claude.ai HTML artifacts using modern frontend web technologies (React, Tailwind CSS, shadcn/ui). Use for complex artifacts requiring state management, routing, or shadcn/ui components - not for simple single-file HTML/JSX artifacts. |
+| `webapp-testing` | `webapp-testing` | Toolkit for interacting with and testing local web applications using Playwright. Supports verifying frontend functionality, debugging UI behavior, capturing browser screenshots, and viewing browser logs. |
+| `wizard` | `wizard` | Generate an interactive bash wizard that walks a human through steps only they can perform. Use when provisioning infrastructure, setting up credentials or CI secrets, walking an unfamiliar third-party dashboard, or running a one-off migration or cutover. Don't invoke this for steps the agent can perform itself. |
+| `writing-beats` | `writing-beats` | Writing, exploit; assemble raw material into a journey of beats, grounding each term before a beat leans on it. |
+| `writing-for-agents` | `writing-for-agents` | Writing documents for agents. Use when creating or editing skills, or modifying AGENTS.md or CLAUDE.md. |
+| `writing-fragments` | `writing-fragments` | Writing, explore: mine raw fragments, no structure yet. |
+| `writing-shape` | `writing-shape` | Writing, exploit: shape raw material into an article, paragraph by paragraph. |
+| `xlsx` | `xlsx` | Use this skill any time a spreadsheet file is the primary input or output. This means any task where the user wants to: open, read, edit, or fix an existing .xlsx, .xlsm, .xltx, .csv, or .tsv file (e.g., adding columns, computing formulas, formatting, charting, cleaning messy data); create a new spreadsheet from scratch or from other data sources; or convert between tabular file formats. Trigger especially when the user references a spreadsheet file by name or path — even casually (like \"the xlsx in my downloads\") — and wants something done to it or produced from it. Also trigger for cleaning or restructuring messy tabular data files (malformed rows, misplaced headers, junk data) into proper spreadsheets. The deliverable must be a spreadsheet file. Do NOT trigger when the primary deliverable is a Word document, HTML report, standalone Python script, database pipeline, or Google Sheets API integration, even if tabular data is involved. |
+| `zh-code-reviewer` | `zh-code-reviewer` | 中文代码审查专家 - 生成详细的中文代码审查报告 |
 
 ## 维护说明
 
-- 本文档是用途索引，不替代具体技能文件；使用前应加载对应 `SKILL.md`。
-- 技能描述和安装集合可能变化，建议在技能同步后重新生成本表。
-- 部分技能的 frontmatter 描述为空或不完整，本文档根据技能名称和目录用途做了最小化概括。
+- 本文档只作为 `~/.agents/skills/` 的技能索引，不替代具体 `SKILL.md`。
+- 文档按技能名称和相对路径排序；分类目录中的重复技能会分别列出。
+- 技能内容变化后，应重新扫描 `~/.agents/skills/` 更新本文档。
