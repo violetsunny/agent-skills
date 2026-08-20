@@ -17,6 +17,7 @@ author: workspace-cli-agent
 - 用户提到"感认行"平台、AIOT 闭环
 - 用户提到 Midea 机器人 IoT 云端运维：新品 SN8 配置、省心模式、快捷指令、OTA 审批、耗材适配、隐私条款、语音包
 - 用户提到 OTA 升级流程、灰度策略、黑名单、定推、压测、通道变更、固件下载、版本查询优先级、升级状态回传
+- 用户提到 OTA 平台汇报、双库数据整合、release_mode/release_type 字段映射、升级成功率口径、历史大表取数、env 与区域区分、全球分发架构、安全签名覆盖、V16/M10 型号案例
 - 用户提到 M7 语音项目（m7-voice）发音人（Speaker）、语音包管理、packagemanagement 模块、设备家庭关系
 
 ## 回复结构（必须按此顺序）
@@ -207,6 +208,13 @@ AIOTK 项目采用 Karpathy 三层 Wiki 架构（`raw/` → `wiki/` ← `CLAUDE.
 15. **M7 语音包重新压缩仅遍历根目录**：`VoiceListServiceImpl.handleVoiceFile`（~L579）解压原 ZIP 时支持子目录，但重新压缩时只遍历 `tmpWorkDirectory.listFiles()`（第一层），且仅保留根目录下 `endsWith(".mp3")`（大小写敏感，`.MP3` 不匹配）的文件和 `index` 文件；`.wav`、图片、文本及子目录内的文件全部被丢弃。**症状**：上传后 ZIP 只剩 `index`，MP3 音频全部丢失。**修复方向**：重新压缩时递归遍历子目录并保留相对路径。修改此流程前务必先核对原 ZIP 的目录结构。详见 `references/m7-voice-pack-versioning.md`。
 16. **OTA 版本查询优先级覆盖**：`DevServiceImpl.getUpgradeDeviceVersion` 的优先级链是 压测 > 定推 > 关键版本 > 最新版本。定推任务会覆盖关键版本和最新版本，如果设备有定推记录但已是目标版本，定推记录会被自动清除（`removeSpecifyPushById`）。排查"设备查不到预期版本"时，先检查是否有压测或定推任务覆盖了正常版本查询。详见 `references/ota-upgrade-flow.md`。
 17. **OTA 黑名单仅判定导航模块**：`BanListServiceImpl.checkAddBanList` 只处理 `FIRMWARE_IS_MODULE_1`（导航模块）且 `upgradeStatus=3`（失败）的设备，整包升级失败不会触发自动黑名单。排查黑名单未生效时需确认失败模块类型。同时压测设备被排除在黑名单判定之外。详见 `references/ota-upgrade-flow.md`。
+18. **OTA1 与 OTA2 定推机制不同**：OTA1 定推（`releaseMode=9`）通过白名单表 `t_white_firmware` 实现，定推设备 SN 写入白名单，版本查询时白名单 JOIN 过滤——定推和白名单共用一套机制。OTA2 定推（`releaseType=0`）是独立机制，使用独立表 `t_specify_push`，版本检查时独立查询且优先级高于白名单（验证发布 `releaseType=1` 用 `t_release_verification`）——定推和白名单完全分离。排查定推问题时需先确认是 OTA1 还是 OTA2 渠道，再按对应机制定位。详见 `references/ota-upgrade-flow.md`。
+19. **OTA1/OTA2 双库不可 JOIN**：OTA1（`ota_system`）与 OTA2（`ota_system_2`）是独立数据库实例，各区域（CN/NA/EU）也各自独立。跨库合计须分别取数后手工相加，不能在单个连接中 JOIN。设备纳管规模和累计升级设备可合并（直接相加，含过渡期重叠未去重），成功率/失败率/发布趋势/黑名单数不可合并。加密固件/预下载/通道观察为 OTA2 专属。详见 `references/ota-platform-business-overview.md`。
+20. **release_mode 与 release_type 不可混用**：OTA1 `t_firmware_info.release_mode`（0=全面/1=白名单/9=定推/100/500/1000/5000=灰度）与 OTA2 `t_release_info.release_type`（0=定向/1=验证/2=全面）是两套完全不同的枚举，合并展示时须各自独立统计。iFlow `t_iflow_detail_info.release_type` 又是第三套枚举（1=验证/2=全面/3=10%灰度/100/500/1000/5000），三者均不可混用。详见 `references/ota-platform-business-overview.md`。
+21. **OTA 升级成功率口径陷阱**：当前快照成功率（`t_device_file_version`）≠ 历史最终成功率。快照分母仅含 `1/2/3/300-399`，排除 `4/5/400-499`（进度码，不计入分母也不计入失败）。大量设备处于"升级中/待升级"导致快照完成率显著偏低，**不代表历史最终成功率**（终态口径只看 status=2/3，数值远高于快照口径）。同一设备不同模块可能状态不同，存在设备维度近似误差。具体数值实时计算，不引用历史数值。详见 `references/ota-platform-business-overview.md`。
+22. **OTA 历史大表取数约束**：`t_device_release_record`（OTA2, 亿级行, **无任何索引**）禁止聚合/时间范围统计/ORDER BY；`t_device_file_version_record`（OTA2, 亿级行）只能 `device_id IN(...)` 走联合索引首列；`t_module_status_history`（OTA1, 亿级行）只能 `device_id IN(...)`；`t_firmware_status_history`（OTA1, 百万级行）全表聚合安全。历史成功率/趋势应由 DBA 建汇总表后取数。详见 `references/ota-platform-business-overview.md`。
+23. **OTA1/OTA2 黑名单机制不同**：OTA1 `t_ban_list` 用 `status=0`(活跃)/`1`(已移除)，两种移除路径（status 更新 + 直接删除），PPT"自动隔离"应使用 `status=0` 的 `device_count`。OTA2 修复后直接删除记录，无 status 区分，`COUNT(*)` 即全部活跃。两库黑名单不可混算。OTA1 有 `upgrade_version` 字段可统计异常版本数，OTA2 无此字段改用"累计被隔离产品数"。详见 `references/ota-platform-business-overview.md`。
+24. **env 是升级通道不是国家/区域**：`t_device_release.env`（prod/test/dev/beta）用于将设备从生产通用通道中隔离，**不能直接表述为国家覆盖或全球区域覆盖**。全球区域数据来自不同 IDC/区域数据库实例。"通道观察设备数"=非 prod 通道设备数。`env` 相关指标只能表述为环境/通道分布。详见 `references/ota-platform-business-overview.md`。
 
 ## Reference Files
 
@@ -214,4 +222,5 @@ AIOTK 项目采用 Karpathy 三层 Wiki 架构（`raw/` → `wiki/` ← `CLAUDE.
 - `references/m7-robot-iot-cloud-ops.md` — M7 机器人 IoT 云端运维手册（新品 SN8 配置、省心模式/快捷指令 SQL 模板、隐私条款 t_service_agreement、耗材 ProductPartLifetimeEnum 适配、OTA1/OTA2 IFLOW 审批、语音包、设备家庭关系、电梯联动、服务地址多区域对照、日志平台、设备ID/SN互查、OTA状态流转、营销广告、控制台架构、AI服务端点、核心术语速查）
 - `references/m7-voice-speaker-module.md` — M7 语音项目发音人（Speaker）模块（Entity/Mapper/Service/Controller 结构、MyBatis-Plus 架构、S3 音色资源存储、业务逻辑流程）
 - `references/m7-voice-pack-versioning.md` — M7 语音项目语音包版本管理（voiceIndex 生成/更新/设备查新版本逻辑、zip 解压补写 index 文件重新压缩流程、发音人表结构与 ai_tts_isp 枚举、MyBatis-Plus 无 XML Mapper 架构）
-- `references/ota-upgrade-flow.md` — OTA 升级全链路流程（代码级：iFlow审批→发布创建→灰度策略→设备通知→版本查询优先级链→固件下载URL构建→状态回传→黑名单自动判定→异常修复手段→控制台治理）
+- `references/ota-upgrade-flow.md` — OTA 升级全链路流程（代码级：iFlow审批→发布创建→灰度策略→设备通知→版本查询优先级链→固件下载URL构建→状态回传→黑名单自动判定→异常修复手段→控制台治理→OTA1/OTA2定推机制对比）
+- `references/ota-platform-business-overview.md` — OTA 升级平台业务知识总览（平台定位、双库架构与口径分类、字段语义映射、精准策略体系、全球分发架构、安全体系、黑名单与风险闭环、历史大表取数约束、env与区域关系、iFlow审批流程、成功率计算口径、V16/M10案例、关键数据表速查）

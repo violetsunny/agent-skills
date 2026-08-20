@@ -2,95 +2,88 @@
 
 > 共享规则见 `modules/shared.md`
 
-**核心规则**：对 3.1 / 3.2 / 3.4 / 3.5 / 3.6 这 5 个常规项目，只同步在 `~/.agents/skills/` 中**已经存在**的 skill，不新增。已经存在但源仓库中不存在该 skill → 不做任何操作（保留现有）。
+模块 3 分为两类同步方式：
 
-**例外规则**：3.3 `matt-skills` 属于安装型来源，优先通过 `npx skills@latest add mattpocock/skills` 安装；若走 fallback，则允许按安装结果创建 `~/.agents/skills/{skill_name}/`，其行为以“安装成功后应具备完整 matt-skills skill 集合”为准，不参与常规项目的“交集匹配 / 新增拒绝”口径。
+- **npx 管理型**（5 个项目）：通过 `npx skills@latest update` 统一更新，安装到 `~/.agents/skills/`
+- **rsync 管理型**（2 个项目）：通过 rsync 交集匹配同步，只同步已存在的 skill
 
-### 同步流程
+OpenSpec 在 `~/.claude/skills/` 下生成的完整 skills 集合只走模块 2 的专门同步流程。
 
-对于以下 6 个项目，模块 1 已完成 git pull。其中文件同步分两类：
+## 3.1 npx 管理型项目（5 个）
 
-- **常规项目（3.1 / 3.2 / 3.4 / 3.5 / 3.6）**：直接 rsync 已存在且匹配的 skill
-- **安装型项目（3.3 matt-skills）**：走 `npx` 安装或 fallback 安装
+以下 5 个项目通过 `npx skills@latest` 安装和更新，**不走常规 rsync 同步**。npx 安装更可靠，能正确处理 skill 依赖和元数据，大幅减少同步错误的可能性。
 
-OpenSpec 在 `~/.claude/skills/` 下生成的完整 skills 集合只走模块 2 的专门同步流程：
+| 项目 | GitHub 仓库 | 初始化安装命令 |
+|------|-----------|--------------|
+| superpowers | `obra/superpowers` | `npx skills@latest add obra/superpowers` |
+| matt-skills | `mattpocock/skills` | `npx skills@latest add mattpocock/skills` |
+| ui-ux-pro-max-skill | `nextlevelbuilder/ui-ux-pro-max-skill` | `npx skills@latest add nextlevelbuilder/ui-ux-pro-max-skill` |
+| baoyu-skills | `JimLiu/baoyu-skills` | `npx skills@latest add JimLiu/baoyu-skills` |
+| ppt-master | `hugohe3/ppt-master` | `npx skills@latest add hugohe3/ppt-master` |
+
+### 更新流程
+
+> **Tip**：使用 `--yes`（`-y`）和 `--global`（`-g`）标志可跳过交互提示，实现非交互式安装/更新。
+
+1. `cd ~`（**必须在用户主目录下执行**）
+2. 执行 `npx skills@latest update -y -g`（`-y` 跳过确认，`-g` 全局安装并 Copy to all agents）
+3. 等待更新完成
+
+```bash
+cd ~
+timeout 300 npx skills@latest update -y -g 2>&1
+```
+
+### 初始化安装
+
+仅首次或新增项目时执行。逐个运行上述安装命令，同样在用户主目录下运行，加 `-y -g` 跳过交互提示。
+
+```bash
+cd ~
+npx skills@latest add obra/superpowers -y -g
+npx skills@latest add mattpocock/skills -y -g
+npx skills@latest add nextlevelbuilder/ui-ux-pro-max-skill -y -g
+npx skills@latest add JimLiu/baoyu-skills -y -g
+npx skills@latest add hugohe3/ppt-master -y -g
+```
+
+### 注意事项
+
+- **必须在用户主目录（`~`）下执行**，不得在项目目录或批处理子 shell 中代执行
+- 使用 `-y -g` 标志跳过交互提示（`--yes` 确认安装，`--global` 全局安装并 Copy to all agents）
+- 设置超时（300s），**不中断后续 rsync 项目的同步**
+- 安装/更新成功标记 `[NPX-AUTO]` 并报告更新的 skill 数量；失败标记 `[NPX-FAILED]`
+- 这些项目的 skill 最终在 `~/.agents/skills/` 中，模块 4.1 全量 rsync 会同步到知识库
+- **模块 4.1A 排除所有 npx 管理型项目**（见模块 4 文档），避免其 `self/skills/` 下的 git 源结构被误判
+
+## 3.2 rsync 管理型项目（2 个）
+
+以下 2 个项目目前不支持 npx 安装，仍通过 rsync 同步。
+
+**核心规则**：只同步在 `~/.agents/skills/` 中**已经存在**的 skill，不新增。已经存在但源仓库中不存在该 skill → 不做任何操作（保留现有）。
+
+工具：`rsync -r`（只覆盖已有文件和新增文件，**不删除** `~/.agents/skills/` 中的现有内容）、`cp -r` 作为备选。
 
 ```
-for each regular project:
+for each rsync project:
   1. 枚举项目 source_dir/{skill_name}/ 子目录
   2. 对每个 skill_name，检查 ~/.agents/skills/{skill_name}/ 是否存在
-     → 存在：rsync -r --delete source_dir/{skill_name}/ → ~/.agents/skills/{skill_name}/
+     → 存在：rsync -r source_dir/{skill_name}/ → ~/.agents/skills/{skill_name}/
      → 不存在：跳过
   3. 汇总统计：同步了 N 个，新增（被拒绝）M 个
 ```
 
-工具：`rsync -r --delete`（删除目标中源没有的文件，确保完全同步）、`cp -r` 作为备选。
-
-### 3.1 superpowers（`self/skills/superpowers/`）
+### 3.2.1 claude-code-java（`self/skills/claude-code-java/`）
 
 | 字段 | 值 |
 |---|---|
-| 路径 | `/Users/kangll13/aiot/java-code/self/skills/superpowers/` |
-| 远端 | `https://github.com/obra/superpowers.git` |
-| 源 skill 目录 | `skills/`（直接子目录即为 skill 名） |
-
-同步前遍历 `skills/` 下所有子目录，与 `~/.agents/skills/` 做交集匹配，仅同步匹配的。
-
-### 3.2 claude-code-java（`self/skills/claude-code-java/`）
-
-| 字段 | 值                                                              |
-|---|----------------------------------------------------------------|
 | 路径 | `/Users/kangll13/aiot/java-code/self/skills/claude-code-java/` |
-| 远端 | `https://github.com/decebals/claude-code-java.git`             |
-| 源 skill 目录 | `.claude/skills/`（全路径：`/Users/kangll13/aiot/java-code/self/skills/claude-code-java/.claude/skills/`）                                        |
+| 远端 | `https://github.com/decebals/claude-code-java.git` |
+| 源 skill 目录 | `.claude/skills/`（全路径：`/Users/kangll13/aiot/java-code/self/skills/claude-code-java/.claude/skills/`） |
 
 同步前遍历 `/Users/kangll13/aiot/java-code/self/skills/claude-code-java/.claude/skills/` 下所有子目录，与 `~/.agents/skills/` 做交集匹配，仅同步匹配的。
 
-### 3.3 matt-skills（`self/skills/matt-skills/`）
-
-| 字段 | 值 |
-|---|---|
-| 路径 | `/Users/kangll13/aiot/java-code/self/skills/matt-skills/` |
-| 远端 | `https://github.com/mattpocock/skills.git` |
-| 安装方式 | `npx skills@latest add mattpocock/skills`（自动执行） |
-| 目标目录 | `~/.agents/skills/{skill_name}/`（npx 安装后自动生成） |
-
-matt-skills 的 skill 优先通过 npx 自动安装，**不走常规 rsync 同步**。模块 3 SHALL 自动执行 `npx skills@latest add mattpocock/skills` 安装到 `~/.agents/skills/`，不要求用户手动操作。npx 安装更可靠，能正确处理 skill 依赖和元数据。
-
-执行时设置超时（300s），安装成功后在汇总中标记 `[NPX-AUTO]` 并报告安装的 skill 数量；安装失败时自动 fallback 到 git 仓库中的三级结构，标记 `[NPX-FALLBACK]`；fallback 也失败时标记 `[NPX-FAILED]`，**不中断后续项目的同步**。fallback 属于安装补救路径，允许创建新的 `~/.agents/skills/{skill_name}/` 目录，以对齐 npx 安装结果。
-
-```bash
-cd ~
-timeout 300 npx skills@latest add mattpocock/skills 2>&1
-if [ $? -eq 0 ]; then
-  printf '[NPX-AUTO] matt-skills 安装成功\n'
-else
-  # fallback: 从 git 仓库三级结构 skills/{category}/{skill_name}/ 提取
-  src="/Users/kangll13/aiot/java-code/self/skills/matt-skills/skills"
-  count=0
-  if [ -d "$src" ]; then
-    for category_dir in "$src"/*/; do
-      [ -d "$category_dir" ] || continue
-      for skill_dir in "$category_dir"*/; do
-        [ -d "$skill_dir" ] || continue
-        [ -f "$skill_dir/SKILL.md" ] || continue
-        skill_name=$(basename "$skill_dir")
-        rsync -r --delete "$skill_dir" ~/.agents/skills/"$skill_name"/
-        count=$((count + 1))
-      done
-    done
-    printf '[NPX-FALLBACK] matt-skills npx 失败，从 git 三级结构同步了 %d 个 skill\n' "$count"
-  else
-    printf '[NPX-FAILED] matt-skills npx 失败且 git skills/ 目录不存在\n'
-  fi
-fi
-```
-
-**fallback 三级结构说明**：`matt-skills/skills/` 下是分类目录（`engineering/`、`productivity/`、`misc/`、`in-progress/`），每个分类目录下才是真正的 skill 目录（含 `SKILL.md`）。fallback 脚本遍历第三层，将含 `SKILL.md` 的目录同步到 `~/.agents/skills/{skill_name}/`，跳过无 skill 的分类（如 `deprecated/`）。
-
-无论 npx 成功还是 fallback，skill 最终都在 `~/.agents/skills/` 中，模块 4.1 全量 rsync 会将其同步到知识库，**模块 4.1A 排除 matt-skills**（见模块 4 文档）。
-
-### 3.4 anthropics-skills（`self/skills/anthropics-skills/`）
+### 3.2.2 anthropics-skills（`self/skills/anthropics-skills/`）
 
 | 字段 | 值 |
 |---|---|
@@ -99,23 +92,3 @@ fi
 | 源 skill 目录 | `skills/`（直接子目录即为 skill 名） |
 
 同步前遍历 `skills/` 下所有子目录，与 `~/.agents/skills/` 做交集匹配，仅同步匹配的。
-
-### 3.5 ui-ux-pro-max-skill（`self/skills/ui-ux-pro-max-skill/`）
-
-| 字段 | 值                                                               |
-|---|-----------------------------------------------------------------|
-| 路径 | `/Users/kangll13/aiot/java-code/self/skills/ui-ux-pro-max-skill/` |
-| 远端 | `https://github.com/nextlevelbuilder/ui-ux-pro-max-skill.git`   |
-| 源 skill 目录 | `.claude/skills/`(全路径：`/Users/kangll13/aiot/java-code/self/skills/ui-ux-pro-max-skill/.claude/skills/`)                           |
-
-同步前遍历 `/Users/kangll13/aiot/java-code/self/skills/ui-ux-pro-max-skill/.claude/skills/` 下所有子目录，与 `~/.agents/skills/` 做交集匹配，仅同步匹配的。不得将整个 `.claude/skills/` 目录直接整体覆盖到 `~/.agents/skills/`。该仓库本地改动不作为用户代码保留；更新前允许清理未提交改动，再拉取远端并同步技能。
-
-### 3.6 ppt-master（`self/skills/ppt-master/`）
-
-| 字段 | 值 |
-|---|---|
-| 路径 | `/Users/kangll13/aiot/java-code/self/skills/ppt-master/` |
-| 远端 | `https://github.com/hugohe3/ppt-master.git` |
-| 源 skill 目录 | `skills/`（直接子目录即为 skill 名） |
-
-同步前遍历 `skills/` 下所有子目录，与 `~/.agents/skills/` 做交集匹配，仅同步匹配的。不得将整个 `skills/` 目录直接整体覆盖到 `~/.agents/skills/`。

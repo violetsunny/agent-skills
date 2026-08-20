@@ -52,14 +52,13 @@
 - 模块 1 的 dirty 分类：只有未跟踪文件（`git status --porcelain` 无 ` M`/`M ` 等已修改跟踪文件状态码）的仓库可安全执行 `git pull --ff-only`，不跳过
 - 分批执行，每批不超过 15 个项目，每批超时 **180s**
 - 扫描深度为 **3 层**（`self/` 下第一层子目录，再往下两层）
-- Skill 同步（模块 3）使用 `rsync -r --delete`，确保 `~/.agents/skills/` 与源完全一致；模块 3.5 和模块 4 同步到 `free-stock-line-skills/` 和 `agent-skills/skills/` 时使用 `rsync -r`（**不加 `--delete`**），保留用户自定义文件
+- Skill 同步（模块 3）分两类：npx 管理型 5 个（superpowers / matt-skills / ui-ux-pro-max-skill / baoyu-skills / ppt-master）通过 `npx skills@latest update -y -g` 统一更新（在用户主目录执行，`-y` 跳过确认，`-g` 全局安装并 Copy to all agents）；rsync 管理型 2 个（claude-code-java / anthropics-skills）使用 `rsync -r`（**不加 `--delete`**）做交集匹配同步；模块 3.5 和模块 4 同步到 `free-stock-line-skills/` 和 `agent-skills/skills/` 时同样使用 `rsync -r`（**不加 `--delete`**），保留用户自定义文件
 - 模块 4 可使用“查找 `SKILL.md` 并倒推其父目录”为统一发现补充手段，但**不是默认逻辑**；仅允许在 `self/skills/<project>/` 项目目录内部查找，禁止回退到用户根目录 `~/.claude/skills/` / `~/.agents/skills/`
 - 模块 4 若发现同一项目内多个 `SKILL.md` 映射到同一个 `skill_name`，必须标记 `[DUPLICATE-SKILL]` 并跳过该 skill，禁止自动覆盖
 - 同步 skill 目录时必须排除 `.git/`、`.gitignore`、`.gitmodules`、`.DS_Store`、`__pycache__/`、`*.pyc`、`.idea/`、`.vscode/` 等无关文件或本地缓存
 - 模块 5 更新 `docs/skills-overview.md` 时，必须分别扫描 `~/.agents/skills/` 与 `agent-skills/skills/`，只读取各自目录内的 `SKILL.md`，不得混扫或跨目录回退
 - 模块 5 生成的技能总览应以实际扫描结果为准，不依赖手工维护的静态技能分组列表；`description` 多行内容需折叠为单行摘要
-- matt-skills 的 skill 在 `skills/{category}/{skill_name}/` 嵌套结构下，同步时去掉 category 层级
-- claude-code-java 的 skill 在 `.claude/skills/` 下（而非 `skills/`）
+- claude-code-java 的 skill 在 `.claude/skills/` 下（而非 `skills/`），详见模块 3.2.1
 - `/Users/kangll13/aiot/java-code/self/gggggggood/` 下任何异常、冲突或本地改动都必须单独列出并提示用户，不得自动处理
 - **`stock-replay-workbench` 是重点保护项目**，在模块 3.5 中禁止任何修改、同步或覆盖
 - 模块 3.5 同步到 `free-stock-line-skills/` 使用 `rsync -r` 不加 `--delete`，保留用户自定义文件（AGENTS.md、INDEX.md 等）

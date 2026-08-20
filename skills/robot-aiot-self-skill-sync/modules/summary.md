@@ -51,18 +51,30 @@
 
 ## Skill 同步汇总
 
+### (1) npx 管理型项目（5 个）
+
+通过 `npx skills@latest update` 统一更新，安装到 `~/.agents/skills/`。
+
+| 项目 | 状态 |
+|------|------|
+| superpowers | `[NPX-AUTO]` / `[NPX-FAILED]` |
+| matt-skills | `[NPX-AUTO]` / `[NPX-FAILED]` |
+| ui-ux-pro-max-skill | `[NPX-AUTO]` / `[NPX-FAILED]` |
+| baoyu-skills | `[NPX-AUTO]` / `[NPX-FAILED]` |
+| ppt-master | `[NPX-AUTO]` / `[NPX-FAILED]` |
+
+更新成功标记 `[NPX-AUTO]` 并报告更新的 skill 数量；失败标记 `[NPX-FAILED]`。这些项目不参与常规 rsync 同步/新增统计。
+
+### (2) rsync 管理型项目（2 个）
+
+通过 `rsync -r`（**不加 `--delete`**）交集匹配同步，只同步已存在的 skill。
+
 | 项目 | 同步 | 新增（被拒绝） |
 |------|------|--------------|
-| superpowers | N | N |
 | claude-code-java | N | N |
-| matt-skills | `[NPX-AUTO]` / `[NPX-FALLBACK]` / `[NPX-FAILED]` | — |
 | anthropics-skills | N | N |
-| ui-ux-pro-max-skill | N | N |
-| ppt-master | N | N |
 
 同步数 = 源中有且 `~/.agents/skills/` 中也有匹配的 skill 数（交集），新增数 = 源中有但 `~/.agents/skills/` 中无匹配的 skill 数（拒绝同步）。
-
-matt-skills 通过 `npx skills@latest add mattpocock/skills` 自动安装，安装成功标记 `[NPX-AUTO]`；npx 失败但 fallback 成功标记 `[NPX-FALLBACK]`；两者都失败标记 `[NPX-FAILED]`。它属于安装型来源，不参与常规项目的同步/新增统计。
 
 ## free-stock-line-skills 同步汇总（模块 3.5）
 
