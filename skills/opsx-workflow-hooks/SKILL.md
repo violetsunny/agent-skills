@@ -5,10 +5,12 @@ description: |
   - Trigger A: immediately after /opsx/propose finishes generating all
     artifacts - enters an iterative refinement loop, asking the user if they
     have new ideas and updating proposal artifacts until the user is satisfied.
-  - Trigger B: immediately after /opsx/apply completes ALL tasks (state:
-    all_done) - runs a workstream-aware review and verification pass, fixes
-    critical issues, then runs /opsx/archive to archive the change. Does NOT
-    trigger when apply is paused mid-way.
+  - Trigger B: immediately after /opsx/apply reaches an implementation-complete
+    handoff - either all tasks are done, or the only remaining work is
+    user/external verification such as SIT/UAT/manual checks. It runs the
+    review/test/verification pass before the user spends time on manual
+    validation, fixes critical issues, and archives only when all tasks are
+    truly complete. Does NOT trigger for ordinary mid-implementation pauses.
   Use when "/opsx/propose is done", "proposal artifacts created", "all tasks
   complete after apply", "apply finished", or "implementation complete".
 ---
@@ -20,8 +22,8 @@ Post-completion behavior injected after `/opsx/propose` and `/opsx/apply`.
 ## Runtime Entry Points
 
 - Trigger A - after `/opsx/propose`, read and follow `references/hook-a-after-propose.md`.
-- Trigger B - after `/opsx/apply` reaches `state: "all_done"`, read and follow `references/hook-b-after-apply.md`.
-- If apply is paused mid-way, Hook B does nothing.
+- Trigger B - after `/opsx/apply` reaches an implementation-complete handoff, read and follow `references/hook-b-after-apply.md`.
+- If apply is paused with agent-completable implementation work still remaining, Hook B does nothing.
 
 ## Change Discipline
 

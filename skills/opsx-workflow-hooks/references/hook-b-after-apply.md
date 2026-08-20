@@ -2,18 +2,30 @@
 
 ## Trigger
 
-`/opsx/apply` has finished and `state: "all_done"` - every task is checked off.
-Do not trigger if apply paused mid-way (`state: "paused"` or partial progress).
+`/opsx/apply` has reached an implementation-complete handoff.
+
+Trigger Hook B in either case:
+
+1. `/opsx/apply` finished with `state: "all_done"` - every task is checked off.
+2. `/opsx/apply` is pausing only because the remaining tasks are user/external verification steps after implementation is complete, such as SIT, UAT, manual exploratory checks, or environment-owned validation that the agent cannot perform.
+
+Do not trigger Hook B for ordinary mid-implementation pauses, blockers, unresolved design questions, or partial progress where agent-completable implementation work still remains.
+Only treat a remaining task as user/external verification when it inherently requires a human judgment, a user-owned credential, or an external system/environment that the agent cannot operate. If the agent can still move the work forward by changing code, adding tests, reading logs, or running accessible automated checks, this is not the manual-validation handoff path.
 
 ## Purpose
 
-Implementation can introduce subtle logic errors, weak generated UI, missing validation, or low-quality written content. This hook enforces a mandatory workstream-aware execution-fix, review, verification, and archive-summary sequence before archive so nothing lands without a final quality check.
+Implementation can introduce subtle logic errors, weak generated UI, missing validation, or low-quality written content. This hook enforces a mandatory workstream-aware execution-fix, review, verification, and archive-summary sequence before archive, and crucially before the user spends time on manual verification, so obvious bugs are caught first.
 
 ## Steps
 
-1. **Classify the completed work and load the right skills**
+1. **Classify the implementation-complete handoff and load the right skills**
 
-   Announce: `Implementation complete. Running review before archiving...`
+   Announce: `Implementation pass complete. Running review and automated verification before user validation or archive...`
+
+   First classify the handoff into one of two paths:
+
+   - **Archive-ready path**: all tasks are complete (`state: "all_done"`).
+   - **Manual-validation handoff path**: implementation work is complete, but the remaining tasks are only user/external verification.
 
    Use the Skill tool to load and execute review or verification skills inline. First classify the completed work into one primary workstream, then load the minimum effective execution, review, testing, and verification skills.
 
@@ -21,14 +33,14 @@ Implementation can introduce subtle logic errors, weak generated UI, missing val
 
    - **Backend code writing**
      - Execution/fix: `implement` for minimal follow-up fixes required by critical findings.
-     - Verification baseline: `openspec-verify-change`.
+     - Verification baseline: `openspec-verify-change` only on the archive-ready path. Skip it on the manual-validation handoff path because user/external verification tasks may remain intentionally unchecked.
      - Code review: `java-code-review` for Java/Spring work. Add `code-review` only when a broader standards/spec diff review would add signal.
      - Testing: `tdd` and `test-quality` when changed behavior needs meaningful regression coverage. Add `api-tester` when API contracts or integration behavior changed.
      - Optional structure context: `codebase-design`, `spring-boot-patterns`, `design-patterns`, `jpa-patterns`, or `api-contract-review` only when the findings point there.
 
    - **Frontend code auto-generation**
      - Execution/fix: `implement` for minimal follow-up fixes required by critical findings.
-     - Verification baseline: `openspec-verify-change`.
+     - Verification baseline: `openspec-verify-change` only on the archive-ready path. Skip it on the manual-validation handoff path because user/external verification tasks may remain intentionally unchecked.
      - UI review: `ui-ux-pro-max` is mandatory for HTML/CSS/UI work.
      - Testing: `webapp-testing` for rendered browser behavior.
      - Add `frontend-design` only when the review reveals a visual-direction or layout-language problem that needs design-level guidance.
@@ -38,7 +50,7 @@ Implementation can introduce subtle logic errors, weak generated UI, missing val
 
    - **Technical-solution or knowledge-content writing**
      - Execution/fix: `implement` only when findings require direct file fixes.
-     - Verification baseline: `openspec-verify-change`.
+     - Verification baseline: `openspec-verify-change` only on the archive-ready path. Skip it on the manual-validation handoff path because user/external verification tasks may remain intentionally unchecked.
      - Document quality baseline: `doc-coauthoring`.
      - Add `research` only for fact-heavy claims.
      - Add `domain-modeling` when terminology, concept boundaries, or ADR consistency matter.
@@ -48,7 +60,7 @@ Implementation can introduce subtle logic errors, weak generated UI, missing val
 
 3. **Core skill selection priority**
 
-   1. `openspec-verify-change` - the mandatory workflow-alignment baseline before archive.
+   1. `openspec-verify-change` - the mandatory workflow-alignment baseline before archive on the archive-ready path only.
    2. `implement` - only when critical findings require minimal follow-up fixes.
    3. `java-code-review` - for Java/Spring code quality review.
    4. `ui-ux-pro-max` - mandatory for HTML/CSS/UI work.
@@ -64,11 +76,14 @@ Implementation can introduce subtle logic errors, weak generated UI, missing val
 
 4. **Run the review and verification pass**
 
+   - **Archive-ready path:** include `openspec-verify-change` in the gate.
+   - **Manual-validation handoff path:** skip `openspec-verify-change` and rely on the workstream-specific review/test gate instead.
+
    The review must cover:
 
    - **Logic correctness** - does the implementation match the intent in `proposal.md` and `design.md`?
    - **Edge cases** - are obvious failure paths handled?
-   - **Task completeness** - does every checked-off task have corresponding implementation or deliverable updates?
+    - **Task completeness** - does every checked-off task have corresponding implementation or deliverable updates?
    - **Backend/API correctness** (when backend code changed) - are API contracts, persistence behavior, transaction boundaries, and error paths consistent with the plan?
    - **Regression coverage** - for each new behavior or bug fix, is there a corresponding automated test, or a clearly documented reason why one cannot be added?
    - **No regressions** - do existing tests still pass (run the project's test command if one is available)?
@@ -102,36 +117,53 @@ Implementation can introduce subtle logic errors, weak generated UI, missing val
      - Do not proceed to archive.
      - Report each critical issue with its location (`file_path:line_number` where applicable).
      - Fix them now using the minimum scoped file change needed to resolve the issue.
-     - If the critical issue is missing or inadequate test coverage, add or improve the smallest meaningful automated test before re-running review.
-     - After fixing, re-run `openspec-verify-change` and the same workstream-specific review/testing path scoped to the affected files only.
-     - Once no CRITICAL issues remain, continue to Step 6.
+      - If the critical issue is missing or inadequate test coverage, add or improve the smallest meaningful automated test before re-running review.
+      - After fixing, re-run the same verification path that applied to this handoff:
+        - archive-ready path -> re-run `openspec-verify-change` plus the same workstream-specific review/testing path
+        - manual-validation handoff path -> re-run the same workstream-specific review/testing path only
+      - Once no CRITICAL issues remain, continue to Step 6.
 
-6. **Archive**
+6. **Choose the correct post-review outcome**
 
-   Announce: `Review passed. Archiving change...`
+    - **If remaining tasks are only user/external verification tasks:**
+      - Do not archive yet.
+      - Hand off to the user only after the automated review/test/verification pass is clean enough to proceed.
+      - State clearly that the implementation has passed the automated gate and the next step is manual/external verification.
+      - Tell the user to resume the workflow after SIT/UAT/manual validation is complete so the remaining tasks can be checked off and archive can proceed.
+      - Do not treat those intentionally open user/external verification tasks as CRITICAL by themselves; only agent-completable implementation gaps or failing automated checks should block the handoff.
 
-   Execute `/opsx/archive` for the same change name already known from the apply session. Do not ask the user for the change name again.
+   - **If all tasks are complete (`state: "all_done"`):**
+     - Announce: `Review passed. Archiving change...`
+     - Execute `/opsx/archive` for the same change name already known from the apply session. Do not ask the user for the change name again.
+     - The archive command will handle delta-spec sync check, task completion check, directory move, and summary output. Let it run to completion.
 
-   The archive command will handle delta-spec sync check, task completion check, directory move, and summary output. Let it run to completion.
+7. **Confirm the handoff or completion**
 
-7. **Confirm completion**
-
-   Before the final completion message, use a summary skill only when it improves the archive handoff:
+   Before the final message, use a summary skill only when it improves the archive handoff or the manual-validation handoff:
 
    - **Code-dominant changes** - use `changelog-generator` when a concise code change summary would make the archive easier to review.
    - **Cross-functional or content-heavy changes** - use `handoff` when a short, structured completion note would help the next reader understand scope, decisions, and follow-up context.
 
-   Print the archive summary from `/opsx/archive`, then append:
+   - **If archiving now:**
+     - Print the archive summary from `/opsx/archive`, then append:
 
-   ```
-   Workflow complete: propose -> apply -> review -> archive
-   ```
+       ```
+       Workflow complete: propose -> apply -> review -> archive
+       ```
+
+   - **If handing off to user/external verification:**
+     - Summarize the automated review/test result briefly, then append:
+
+       ```
+       Automated review complete: proceed with SIT/UAT/manual verification
+       ```
 
 ## Guardrails
 
-- Only trigger when `state: "all_done"`. If apply is paused, do nothing.
+- Trigger Hook B before the user spends time on SIT/UAT/manual verification when implementation work is already complete and only external validation remains.
+- Do not trigger Hook B for ordinary paused mid-way implementation states.
 - Never skip the review step, even if the implementation looks clean.
-- `openspec-verify-change` is the workflow-alignment baseline before archive; do not replace it with a weaker generic review by default.
+- `openspec-verify-change` is the workflow-alignment baseline before archive, but skip it for the manual-validation handoff path where user/external verification tasks intentionally remain open.
 - When the implementation involves HTML/CSS styling, `ui-ux-pro-max` is mandatory.
 - When behavior changes, do not treat existing green tests as automatically sufficient - verify whether new or changed behavior has targeted coverage.
 - When tests are added or changed, review their quality; avoid placeholder, tautological, or implementation-coupled tests.
@@ -139,6 +171,7 @@ Implementation can introduce subtle logic errors, weak generated UI, missing val
 - Use the minimum effective skill set for the active workstream. Do not load every adjacent review skill just because it exists.
 - Backend, frontend, and technical/knowledge content must each use workstream-appropriate skills.
 - For technical-solution or knowledge-content changes, do not pretend code review alone is sufficient - perform structure, fact, and reader-clarity checks.
+- Do not send the user to manual verification while obvious automated review/test failures are still unresolved.
 - Never archive with unresolved CRITICAL issues.
 - WARNING-level issues require a user decision - do not silently ignore or silently fix them.
 - If `/opsx/archive` fails (for example, archive already exists), surface the error and options to the user; do not force-proceed.

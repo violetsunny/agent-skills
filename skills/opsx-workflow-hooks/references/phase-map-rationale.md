@@ -37,6 +37,8 @@ The hook design still reflects the earlier phase-model idea:
 - The current design uses `openspec-verify-change` as the default workflow-alignment baseline because Hook B is an OpenSpec workflow closer, not a generic PR review assistant.
 - `java-code-review` remains important for Java/Spring code quality.
 - `code-review` remains available as a supplemental broader standards/spec pass.
+- Hook B starts as soon as agent-completable implementation work is done, even if user/external validation tasks still remain, so automated review/test happens before SIT/UAT.
+- When Hook B is entered through the manual-validation handoff path, it skips `openspec-verify-change` because that skill treats intentionally open verification tasks as blocking incompleteness.
 
 ### Deliberate exclusions
 

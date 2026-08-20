@@ -93,12 +93,12 @@ Implement tasks from an OpenSpec change.
    - Mark task complete in the tasks file: `- [ ]` → `- [x]`
    - Continue to next task
 
-   **Pause if:**
-   - Task is unclear → ask for clarification
-   - Implementation reveals a design issue → suggest updating artifacts
-   - A task needs work beyond what the spec and tasks describe, or you are tempted to drop, narrow, defer, or accept exceptions to specified behavior to make it fit → surface the added scope and ask; do not absorb it silently
-   - Error or blocker encountered → report and wait for guidance
-   - User interrupts
+    **Pause if:**
+    - Task is unclear → ask for clarification
+    - Implementation reveals a design issue → suggest updating artifacts
+    - A task needs work beyond what the spec and tasks describe, or you are tempted to drop, narrow, defer, or accept exceptions to specified behavior to make it fit → surface the added scope and ask; do not absorb it silently
+    - Error or blocker encountered → report and wait for guidance
+    - User interrupts
 
 7. **On completion or pause, show status**
 
@@ -187,9 +187,15 @@ This skill supports the "actions on a change" model:
 
 ## Hook B — Post-Apply Review and Archive
 
-**Trigger:** `state: "all_done"` — every task is checked off.
+**Trigger:** `/opsx/apply` has reached an implementation-complete handoff.
 
-Immediately after all apply tasks are complete, load and execute the
-`opsx-workflow-hooks` skill (Trigger B) to run a mandatory review-then-archive
-sequence. Do NOT skip this step. Do NOT trigger if apply is paused mid-way
-(`state: "paused"` or partial progress).
+Trigger Hook B when either:
+- `state: "all_done"` — every task is checked off
+- apply is pausing only because the remaining tasks are user/external verification such as SIT/UAT/manual checks after implementation work is complete
+
+Immediately after either trigger condition is reached, load and execute the
+`opsx-workflow-hooks` skill (Trigger B) to run the mandatory review/test gate.
+If all tasks are done, continue to archive after Hook B passes. If only
+manual/external verification remains, stop after Hook B and hand off to the
+user for that validation. Do NOT trigger this hook for ordinary mid-way pauses,
+blockers, or partial implementation progress.

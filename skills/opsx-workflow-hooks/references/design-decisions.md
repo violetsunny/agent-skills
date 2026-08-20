@@ -32,6 +32,8 @@
 - `openspec-verify-change` is now the default workflow-alignment baseline before archive.
 - `java-code-review` remains the main Java-specific quality pass.
 - `code-review` is now supplemental, not the default baseline for every backend or frontend change.
+- Hook B runs before user/external validation when implementation is complete, so SIT/UAT is not the first line of bug discovery.
+- On the manual-validation handoff path, skip `openspec-verify-change` rather than forcing incomplete user/external verification tasks through a pre-archive completeness gate.
 
 ### 7. Frontend route is intentionally narrower
 - `ui-ux-pro-max` is the mandatory core skill for HTML/CSS/UI work.
