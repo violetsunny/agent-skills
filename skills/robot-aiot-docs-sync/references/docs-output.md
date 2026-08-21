@@ -12,6 +12,17 @@
 1. 不单独生成 `docs/api-reference.md`
 2. FAQ 作为 `docs/architecture.md` 的一个章节，而不是独立文件
 
+## 文档分层映射
+
+吸收 `gstack-document-generate` 的 Diataxis 思路，但保持当前技能的输出边界不变：
+
+1. `README.md`：tutorial / how-to 入口
+2. `docs/project-map.md`：reference
+3. `docs/architecture.md`：explanation
+4. `CHANGELOG.md`：时间维度的 reference
+
+规则：用“分工”解决文档混乱，不用“加更多文件”解决问题。
+
 ## 6a. project-map.md
 
 生成带注释的目录树，帮助读者快速理解仓库结构。
@@ -22,6 +33,7 @@
 2. 最多展示 3 层深度
 3. 每个关键目录附一行中文说明
 4. monorepo 场景分 package 列出
+5. 目录树要服务于定位，不追求全量枚举
 
 ### 应包含内容
 
@@ -42,6 +54,13 @@
 6. 扩展点（可选）
 7. 已知限制（可选）
 8. 常见问题（FAQ）章节
+
+### 说明文档增强规则
+
+1. 先写系统概览，再写模块关系，最后写 FAQ / 限制
+2. Mermaid 图优先表达主链路和关键依赖，不追求“把所有模块都画进去”
+3. 如果项目中能确认数据流、调用链、边界条件，优先用列表或表格结构化呈现
+4. 无法确认的地方明确写 `TODO: 待补充` 或 `<!-- TODO: verify -->`
 
 凡无法从代码确认的内容，写 `TODO: 待补充` 或 `<!-- TODO: verify -->`，不编造。
 

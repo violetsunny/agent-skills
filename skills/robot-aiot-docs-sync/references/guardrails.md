@@ -8,3 +8,7 @@
 6. 若 init 命令已引导生成 `AGENTS.md`，后续只在此基础上补充
 7. 仅修改文档范围：`AGENTS.md`、`README.md`、`CHANGELOG.md`、`docs/project-map.md`、`docs/architecture.md`
 8. README、project-map、architecture 以中文为主，技术名词保留英文原文
+9. 文档职责不能串位：不要把架构说明塞进 README，不要把使用指南塞进 CHANGELOG
+10. 优先沿用项目既有格式、标题层级、版本风格和术语口径
+11. 中文润色只能优化表达，不能改变已确认事实
+12. 生成后至少做一次术语、一致性、链接和命令可复制性检查

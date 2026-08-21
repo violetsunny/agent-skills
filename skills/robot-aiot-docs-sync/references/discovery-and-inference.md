@@ -10,6 +10,7 @@
 2. 是否已有 `AGENTS.md`、`README.md`、`CHANGELOG.md`、`docs/`
 3. 是否存在项目级 init 命令
 4. Git tag 与近期提交
+5. 现有文档分别承担什么职责，是否已有明显的 README / changelog / docs 分层
 
 ## Step 1: 处理 init 命令
 
@@ -62,7 +63,17 @@
 8. 包管理器
 9. 是否 monorepo
 
-### 2d. 业务目的提炼
+### 2d. 文档分层判断
+
+吸收 `gstack-document-generate` 的 Diataxis 思路，但只落在现有 5 个文件中：
+
+1. `README.md` 主要承担 tutorial / how-to 入口
+2. `docs/project-map.md` 主要承担 reference
+3. `docs/architecture.md` 主要承担 explanation
+4. `CHANGELOG.md` 主要承担时间线式 reference
+5. `AGENTS.md` 主要承担 Agent 操作约束
+
+### 2e. 业务目的提炼
 
 从代码和配置中回答：
 
@@ -71,3 +82,13 @@
 3. 主要能力有哪些
 4. 明确不做什么
 5. 与同类方案相比的差异点是什么
+
+### 2f. 文档缺口识别
+
+在开始写文档前，先判断缺的是哪一类内容，避免把所有信息都塞进 README：
+
+1. 缺入口说明：优先补 README
+2. 缺 Agent 工作约束：优先补 `AGENTS.md`
+3. 缺版本演进记录：优先补 `CHANGELOG.md`
+4. 缺结构说明：优先补 `docs/project-map.md`
+5. 缺架构与设计解释：优先补 `docs/architecture.md`
