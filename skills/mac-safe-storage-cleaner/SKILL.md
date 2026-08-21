@@ -29,7 +29,8 @@ description: >
 
 ### 阈值
 
-- 总占用达到或超过 `50 GB` 才进入清理候选流程。
+- 统计范围总占用达到或超过 `50 GB` 才进入清理候选预览。
+- `Documents` 目录只参与占用统计，不进入自动删除候选。
 
 ### 保留时间
 
@@ -40,7 +41,7 @@ description: >
 - `/private/var/tmp`：`90 天`，忽略系统保留临时目录
 - 下载目录中的安装包和压缩包：`30 天`
 - Workspace 检查点和 Workspace cache：`90 天`
-- `Documents`：只统计，不自动删除
+- `Documents`：只统计，不自动删除，也不计入待删除文件列表
 
 位于 `/private/tmp` 或 `/private/var/tmp` 中、名称带 `workspace` 或 `ws` 的普通文件不做特殊豁免，仍按各自目录的保留周期处理。
 
@@ -96,7 +97,7 @@ zsh scripts/clean-old-files.zsh
 
 用简明结构汇报：
 
-- 当前总占用
+- 当前统计范围总占用
 - 各目录占用明细
 - 是否达到 `50 GB`
 - 若未达到：明确说明“不执行清理”

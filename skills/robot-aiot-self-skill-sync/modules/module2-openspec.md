@@ -56,7 +56,7 @@ openspec update
    - `Removed: N command files (deselected workflows)`：OpenSpec 主动删除了被 deselect 的 command 文件。在汇总中记录被删除的 command 文件数量，并提示用户这些文件因 workflow 被 deselect 而被删除。
    - `Removed: N skill directories (deselected workflows)`：OpenSpec 主动删除了被 deselect 的 skill 目录。在汇总中记录被删除的 skill 目录数量，并提示用户这些目录因 workflow 被 deselect 而被删除。
    - `Setup complete for <tool>` / `Updated <tool>`：从 init/update 输出中提取所有已配置工具名称及状态（成功/跳过/失败），在汇总中列出完整工具列表。
-7. 运行完成后，通过 skill 工具加载并运行 `/opsx-workflow-hooks` skill，完成 OPSX 工作流初始化。
+7. 运行完成后，继续执行下文定义的 `.claude -> .agents` 迁移与 hook 恢复步骤，完成 OPSX 工作流初始化。
 
 ### 步骤 6A：命令数量校验与自动修复（`openspec update` 后、迁移前）
 
@@ -91,11 +91,11 @@ else
 fi
 ```
 
-OpenSpec 升级可能清理旧版命令文件，并将 OPSX 迁移到 Agent Skills。出现 `No user content to preserve` 时可按提示清理；出现 `differ from the copy in .agents` 时不得覆盖用户自定义副本，必须提示并人工比对。不得使用 `--force` 覆盖 `/Users/kangll13/aiot/java-code/self/gggggggood/` 下用户代码或用户自行维护的文件。
+OpenSpec 升级可能清理旧版命令文件，并将 OPSX 迁移到 Agent Skills。出现 `No user content to preserve` 时可按提示清理；出现 `differ from the copy in .agents` 时不得覆盖用户自定义副本，必须提示并人工比对。**`--force` 只允许用于步骤 6A 在用户主目录重新生成 OpenSpec 文件集合**，不得拿它覆盖 `/Users/kangll13/aiot/java-code/self/gggggggood/` 下用户代码或用户自行维护的文件。
 
 ### 多工具目录生成状态（OpenSpec 直接生成，仅记录状态）
 
-> 本节描述的是 OpenSpec 对各工具目录的**直接生成状态**，仅用于汇总报告。实际的 `.claude -> .agents` 迁移步骤见下一节"OpenSpec commands / skills 补充与校验"。
+> 本节只记录 OpenSpec 对各工具目录的直接生成状态；实际的 `.claude -> .agents` 迁移步骤见下一节。
 
 OpenSpec v1.9.0 为多个工具生成文件，包括但不限于：`.claude/`、`.agents/`、`.codebuddy/`、`.cursor/`、`.gemini/`、`.github/`、`.lingma/`、`.trae/`。`openspec init` / `openspec update` 的输出会列出所有已配置工具的 `Setup complete for <tool>` 或 `Updated <tool>` 状态。
 
@@ -107,9 +107,9 @@ OpenSpec v1.9.0 为多个工具生成文件，包括但不限于：`.claude/`、
 
 ### OpenSpec commands / skills 补充与校验（`.claude -> .agents` 迁移步骤）
 
-> 本节描述的是 OpenSpec 更新完成后**额外的 `.claude -> .agents` 迁移步骤**，与上一节的"直接生成状态"是两个独立动作，需在汇总中分别记录。
+> 本节是 OpenSpec 更新完成后的额外迁移步骤；与上一节的直接生成状态是两个独立动作，汇总时必须分开记录。
 
-OpenSpec 可能按 profile 生成不同数量的 commands / skills，且文件集合随 profile、版本和工具配置变化。`openspec init` / `openspec update` 的权威输出目录是 `~/.claude/commands/` 与 `~/.claude/skills/`，不能假设它只会更新 `commands/opsx/` 或只生成 `openspec-*` skills。
+OpenSpec 可能按 profile 生成不同数量的 commands / skills，且文件集合随 profile、版本和工具配置变化。权威输出目录始终是 `~/.claude/commands/` 与 `~/.claude/skills/`，不能假设只会更新 `commands/opsx/` 或只生成 `openspec-*` skills。
 
 更新 OpenSpec 后，**必须先完成步骤 6A 的命令数量校验并通过后**，再按以下固定顺序执行迁移：
 
@@ -136,13 +136,11 @@ done
 
 `.claude` 是权威源，当前 profile 实际生成的 skills 遇到差异时直接用 `rsync -r --delete` 覆盖 `.agents` 副本，并在汇总中报告已覆盖的 skill 名称（`[OVERWRITE]`）。两者一致时静默跳过。
 
-**同步范围说明**：该同步是 OpenSpec 生成的 commands 和 skills 的同步。模块 3 维护的 skills（来自 `self/skills/` 仓库）的最新性由模块 3 保证（模块 3 在模块 2 之后执行，覆盖回正确版本）。`~/.claude/skills/` 的运行时备份由模块 4 的步骤 4.4 保证。数据流为单向，不反向同步 `.agents/skills/ → .claude/skills/`。
+**同步范围说明**：这里仅同步 OpenSpec 生成的 commands 和 skills。模块 3 负责其他 skills 的最新性，模块 4.4 负责 `~/.claude/skills/` 的运行时备份；数据流单向，不反向同步 `.agents/skills/ -> .claude/skills/`。
 
-完成上述同步后，必须立即通过 skill 工具运行 `/opsx-workflow-hooks`，恢复并校验 `propose.md` / `apply.md` 的 Hook A / Hook B。因为 `rsync -r --delete ~/.claude/commands/ ~/.agents/commands/` 会先覆盖 `.agents` 运行时副本，若不立即恢复 hook，下一次 `/opsx` 流程将失去自动回调。
+完成上述同步后，必须立即通过 skill 工具运行 `/opsx-workflow-hooks`，恢复并校验 `propose.md` / `apply.md` 的 Hook A / Hook B。原因只有一个：`rsync -r --delete ~/.claude/commands/ ~/.agents/commands/` 会先覆盖 `.agents` 运行时副本；若不立刻补回 hook，下一次 `/opsx` 流程将失去自动回调。
 
-不要从旧的 `~/.agents/commands/` 或 `~/.agents/skills/` 反向覆盖新版 `.claude` 文件；`.claude` 是 OpenSpec 更新后的权威源。
-
-OpenSpec 升级后，完整 commands / skills 的实际文件集合以 `~/.claude/commands/` 与 `~/.claude/skills/` 目录内容为准，不应假定固定的文件名列表或仅同步某个子目录。
+不要从旧的 `~/.agents/commands/` 或 `~/.agents/skills/` 反向覆盖新版 `.claude` 文件；完整 commands / skills 集合始终以 `~/.claude/commands/` 与 `~/.claude/skills/` 的实际目录内容为准。
 
 升级后必须检查以下两处目录：
 

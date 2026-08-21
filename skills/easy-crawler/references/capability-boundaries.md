@@ -39,7 +39,7 @@
 
 1. `platform.requires_signing=true`
 2. `anti_bot.requires_captcha_solver=true`
-3. `run.mode=browser` 且缺少浏览器依赖
+3. 已请求 `run.mode=browser`，或任务因 `requires_js`、社媒页类型、登录态、评论抓取等条件自动升级到 `browser`，且当前环境缺少浏览器依赖
 4. 必填字段缺失或冲突
 5. 请求恢复断点，但没有可验证的 checkpoint 来源
 

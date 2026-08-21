@@ -25,6 +25,7 @@
 
 - `run.mode=browser`
 - `run.browser.required=true`
+- 任一 target `page_type` 属于 `search`、`timeline`、`creator`、`comments`
 - 任一 target `requires_js=true`
 - `social.dynamic_rendering=true`
 - `social.login_state=required`
@@ -53,12 +54,13 @@
 当以下任一条件成立时，应从 `http` 升级到 `browser`：
 
 1. 页面内容依赖 JS 才可见
-2. 需要登录态才能访问目标内容
-3. 需要滚动触发更多内容
-4. 需要抓评论树或子评论
-5. 需要创作者主页时间线抓取
-6. 需要真实浏览器、隐身浏览器或 challenge 页处理
-7. 需要断点游标推进或时间窗口滚动发现
+2. 任务目标本身就是社媒入口页：`search`、`timeline`、`creator`、`comments`
+3. 需要登录态才能访问目标内容
+4. 需要滚动触发更多内容
+5. 需要抓评论树或子评论
+6. 需要创作者主页时间线抓取
+7. 需要真实浏览器、隐身浏览器或 challenge 页处理
+8. 需要断点游标推进或时间窗口滚动发现
 
 ## Prerequisites
 

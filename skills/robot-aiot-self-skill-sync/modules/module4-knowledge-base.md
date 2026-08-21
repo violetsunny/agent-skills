@@ -137,7 +137,7 @@ rsync -r ~/.agents/commands/ /Users/kangll13/aiot/java-code/self/gggggggood/agen
 
 ### 步骤 4.2A：口径说明
 
-步骤 4.1 已经负责 `~/.agents/skills/ -> agent-skills/skills/` 的全量同步，因此模块 4 不再单独重复执行第二次同路径 rsync。后续汇总时，只需把步骤 4.1 记为来自 `~/.agents/skills/` 的全量同步，把步骤 4.1A 记为来自 `self/skills/<project>/...` 的项目源补充同步，两者分开统计即可。
+步骤 4.1 已负责 `~/.agents/skills/ -> agent-skills/skills/` 的全量同步，因此模块 4 不再重复执行同路径 rsync。汇总时把步骤 4.1 记为全量同步，把步骤 4.1A 记为项目源补充同步，两者分开统计。
 
 ### 步骤 4.3：变更报告
 
@@ -159,9 +159,9 @@ rsync -r ~/.agents/commands/ /Users/kangll13/aiot/java-code/self/gggggggood/agen
 
 ### 步骤 4.4：备份同步到 .claude/skills/（模块 4 备份，非 OpenSpec 直接生成）
 
-> 此步骤是模块 4 的**运行时备份同步**，与 OpenSpec 对 `.claude/skills/` 的直接生成是两个独立动作。在汇总中需与模块 2 的 `.claude -> .agents` 迁移结果分开记录，不得混为"OpenSpec 生成状态"。
+> 此步骤是模块 4 的运行时备份同步，与 OpenSpec 直接生成和模块 2 的 `.claude -> .agents` 迁移结果都要分开记录。
 
-完成知识库同步和变更报告后，将 `~/.agents/skills/` 全量同步到 `~/.claude/skills/` 作为运行时备份，确保 `.claude/skills/` 与 `.agents/skills/` 保持一致。
+完成知识库同步和变更报告后，将 `~/.agents/skills/` 全量同步到 `~/.claude/skills/` 作为运行时备份。
 
 ```bash
 # 备份同步，不加 --delete，保留 .claude/skills/ 中可能存在的额外文件

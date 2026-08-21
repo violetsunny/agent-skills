@@ -32,7 +32,7 @@ font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
 
 页面 HTML 中的区域间距、内边距和配色应引用第 4 节 `:root` 定义的 CSS 变量，不使用随意硬编码值：
 
-- **间距**：`margin`、`padding` 引用 `var(--space-sm/md/lg)`，值尽量对齐 MD3 8dp 倍数（8/16/24/32/48px）
+- **间距**：`margin`、`padding` 引用 `var(--space-sm/md/lg)`，值尽量对齐 8px 倍数（8/16/24/32/48px）
 - **配色**：背景色、边框色、文字色引用 `var(--primary-color)`、`var(--accent-color)`、`var(--bg-color)` 等
 - **设计系统注入**：Phase 4 调用 `ui-ux-pro-max --design-system` 后，其输出覆盖 `:root` 变量初始值
 
@@ -102,16 +102,16 @@ font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
   --text-secondary: #555555;      /* 次文字色 */
   --header-bg: #E3F2FD;           /* 浅蓝背景 */
 
-  /* 间距系统变量 — 参考 MD3 8dp 间距 token，由 ui-ux-pro-max 设计系统输出注入 */
-  --space-sm: 8px;                /* 小间距（MD3 8dp × 1） */
-  --space-md: 16px;               /* 中间距（MD3 8dp × 2） */
-  --space-lg: 24px;               /* 大间距（MD3 8dp × 3） */
+  /* 间距系统变量 — 以 8px 倍数为基线，由 ui-ux-pro-max 设计系统输出注入 */
+  --space-sm: 8px;                /* 小间距（8px × 1） */
+  --space-md: 16px;               /* 中间距（8px × 2） */
+  --space-lg: 24px;               /* 大间距（8px × 3） */
 }
 ```
 
 **配色变量说明**：上述配色变量为初始默认值。Phase 4 调用 `ui-ux-pro-max --design-system` 后，将输出的配色方案注入这些变量。其中 `--primary-color` 由首页架构图 XML 确立的主色优先覆盖，`ui-ux-pro-max` 推荐的主色降级为辅助色。
 
-**间距变量说明**：上述间距变量参考 `material-3/references/layout-and-responsive.md` 的 MD3 8dp 间距 token 系统（8/16/24/32/48px）。Phase 4 调用 `ui-ux-pro-max --design-system` 后，将输出的间距系统注入这些变量。页面 HTML 中的区域间距和内边距应引用这些变量，不使用随意值。
+**间距变量说明**：上述间距变量以 8px 倍数间距系统（8/16/24/32/48px）为基线。Phase 4 调用 `ui-ux-pro-max --design-system` 后，将输出的间距系统注入这些变量。页面 HTML 中的区域间距和内边距应引用这些变量，不使用随意值。
 
 ### 色板速查表
 

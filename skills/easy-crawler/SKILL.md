@@ -126,7 +126,7 @@ python skills/easy-crawler/scripts/crawl_task.py \
 ### 步骤 2：选择执行模式
 
 - `http`：静态页面、简单列表/详情、无需登录和 JS 渲染
-- `browser`：需要 JS、滚动加载、登录态、评论树、创作者主页交互或挑战页处理
+- `browser`：需要 JS、滚动加载、登录态、评论树、创作者主页交互，或命中社媒入口页 `search` / `timeline` / `creator` / `comments`
 - `auto`：根据任务字段自动选择，规则见 `references/execution-modes.md`
 
 ### 步骤 3：检查边界和依赖
@@ -139,7 +139,7 @@ python skills/easy-crawler/scripts/crawl_task.py \
 
 - 默认 dry-run：输出执行计划和目标摘要
 - `--execute` 且模式为 `http`：执行最小 HTTP 拉取，保存 HTML dump 和标题摘要
-- `--execute` 且模式为 `browser`：只做依赖与边界校验，当前返回 `not_implemented_yet`
+- `--execute` 且模式为 `browser`：只做依赖与边界校验，当前返回 `browser_backend_not_implemented`
 
 当任务是列表页、搜索页、时间线页时，允许先输出发现结果而不是伪装成完整详情抓取。发现结果结构见 `references/output-contract.md`。
 

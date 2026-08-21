@@ -61,190 +61,22 @@ description: >
 
 ## 工作流
 
-### Phase 1: 识别 XML 结构
+详细转换步骤见 `references/workflow.md`。
 
-先确认输入是否为可稳定转换的 draw.io / mxGraph XML：
+主文件只保留三条入口约束：
 
-- 是否存在 `mxfile`
-- 是否存在 `diagram`
-- 是否存在 `mxGraphModel`
-- 是否存在 `root` / `mxCell`
-
-如果不满足，先告诉调用方这不是本技能支持的 XML 结构，不要盲目生成 HTML。
-
-### Phase 2: 选择稳定转换路径
-
-优先级如下：
-
-1. **确定性渲染路径**：使用 `scripts/xml_to_html.py` 脚本执行转换，配合 `references/xml-html-mapping.md` 中的样式映射表。这是默认首选路径——脚本用标准库 `xml.etree.ElementTree` 解析 XML，按映射表确定性生成坐标驱动 HTML，不依赖 AI 即兴发挥。
-
-   **脚本位置**：`scripts/xml_to_html.py` 位于 `~/.agents/skills/robot-aiot-xml-html-bridge/scripts/` 目录下。在执行前，先确认脚本文件是否存在；若该文件不存在（非 Python 环境缺失），这属于环境配置问题，应提示用户检查 skill 安装完整性，而非直接降级为手工映射。
-
-2. **手工映射降级路径**：若目标环境无 Python（已确认 Python 环境缺失），agent 可按 `references/xml-html-mapping.md` 中的映射规则手工将 mxCell 样式翻译为 CSS，但必须逐项对照映射表，不可跳过或自创规则
-3. **人工近似路径禁止直接放行**：如果只能"肉眼照着重画"，该结果不能作为 PPT 主约束输入
-
-调用脚本示例：
-```bash
-python3 scripts/xml_to_html.py doc-ppt/<图表名>.xml -o doc-ppt/<图表名>.html
-```
-
-选择原则：
-
-- 只要存在确定性脚本路径，就不要使用人工重排路径
-- 若无稳定路径，必须明确阻塞，并说明缺少哪种解析/渲染能力
-
-### Phase 3: 生成 HTML 桥接稿
-
-#### 步骤 0: 加载 UI 设计参考
-
-**必须加载 `ui-ux-pro-max` 和 Material Design 3 参考规范，不得跳过。** 若参考文件路径不可用，应提示用户修复 skill 安装，不得在未加载规范的情况下继续生成 HTML。
-
-在执行样式映射前，先加载以下 UI 设计规范作为补充参考：
-
-1. **加载 `ui-ux-pro-max` 准则**：读取 `ui-ux-pro-max` 的 `references/quick-reference.md` 中 §6（Typography & Color）和 §10（Charts & Data）准则，作为配色对比度和图表可读性的补充约束
-2. **加载 `material-3` MD3 配色角色**：读取 `material-3/references/color-system.md`，参考 MD3 的 primary/secondary/tertiary 配色角色定义来理解图表中的色彩层级关系
-3. **加载 `material-3` MD3 字体梯度**：读取 `material-3/references/typography-and-shape.md`，参考 MD3 Type Scale（Display/Headline/Title/Body/Label 五类）来理解字体层级梯度标准
-
-这些参考不改变 `xml-html-mapping.md` 中的确定性映射规则，仅作为 Phase 4 保真校验中 UI 规范补充检查的依据。
-
-#### 步骤 1: 生成 HTML 结构
-
-HTML 桥接稿推荐具备以下结构：
-
-```html
-<html>
-  <head>
-    <style>
-      /* 固定画布尺寸、颜色变量、节点/连线/标签样式 */
-    </style>
-  </head>
-  <body>
-    <div class="diagram-canvas">
-      <!-- 容器 -->
-      <!-- 节点 -->
-      <!-- 标签 -->
-      <!-- 连线或等价表示 -->
-    </div>
-  </body>
-</html>
-```
-
-要求：
-
-1. 使用固定画布尺寸，避免响应式改版导致布局漂移
-2. 采用显式坐标或等价布局约束，保证节点位置稳定
-3. 颜色、边框、字体、间距均来自 XML 样式映射，不自行换皮
-4. 如原图存在分层区块、泳道、数据卡片、图例，必须逐项落地
-
-> ⚠️ `mxgraph.flowchart.*` 命名空间形状（如 `merge_or_storage`）目前无映射规则，转换时触发未映射属性警告。已知缺口，待后续 change 补充。
-
-### Phase 4: 保真校验
-
-生成 HTML 后，必须做最少一轮保真校验。`scripts/xml_to_html.py` 的 `verify_fidelity()` 会自动执行以下校验并输出结构化报告：
-
-**脚本自动校验覆盖：**
-
-1. **Vertex 数量校验**：HTML 中定位元素数量与 XML vertex 数量一致，不一致时非零退出
-2. **Edge 数量校验**：HTML 中 SVG `<line>` 元素数量与 XML edge 数量一致，不一致时非零退出
-3. **文本内容校验**：对每个 vertex 的 value 做 HTML 转义后检查是否出现在 HTML 输出中，缺失时标记 vertex ID 和预期文本
-4. **未映射样式属性报告**：列出所有映射表未定义的 style 属性名和值，不阻塞转换但标记为需人工确认
-
-**脚本 PASS 后 agent 还须手工校验（脚本不覆盖视觉感知项）：**
-
-5. **容器/泳道/层级嵌套结构**：检查容器、泳道、层级嵌套结构是否正确（脚本不校验层级嵌套关系）
-6. **配色对应**：核对主视觉配色是否与原 XML 色板对应
-7. **整体布局视觉密度**：核对整体相对布局是否一致、视觉密度是否合理（脚本不校验视觉感知项）
-
-校验报告输出格式：
-```
---- Fidelity Report ---
-  Vertices: N
-  Edges: M
-  Text: all matched / N missing
-  Unmapped: N
-  Result: PASS / FAIL
-```
-
-如果发生以下情况，结果不能进入 PPT 阶段：
-
-1. 节点缺失
-2. 连线语义丢失
-3. 图例或数据锚点缺失
-4. 分层/泳道边界消失
-5. 页面比例明显变化
-
-#### UI 规范补充检查（非阻塞）
-
-保真校验通过后，额外执行以下 UI 规范检查。这些检查基于 Phase 3 步骤 0 加载的 `ui-ux-pro-max` 准则和 `material-3` MD3 参考规范，不通过时标记 `[UI-WARN]` 警告，**不阻塞转换流程**（保真校验仍为唯一阻塞门）：
-
-1. **配色对比度**：检查图表 HTML 中各节点文字色与背景色的对比度，低于 4.5:1（WCAG 标准）时标记 `[UI-WARN]`，建议调整文字色或背景色
-2. **字体层级梯度**：检查图表 HTML 中多个文字层级（标题、标签、数据锚点）的 font-size 是否形成清晰梯度，相邻层级差值低于 2px 时标记 `[UI-WARN]`。参考 MD3 Type Scale 五类（Display/Headline/Title/Body/Label）的梯度划分
-3. **图表可读性**：检查图表 HTML 中的数据表格或看板卡片，行高低于 32px 或卡片内边距低于 12px 时标记 `[UI-WARN]`
-
-agent 看到 `[UI-WARN]` 警告后可自行决定是否调整，不影响 HTML 交付。
-
-### Phase 5: 交付与冻结
-
-交付时应明确：
-
-1. XML 是图表真源
-2. HTML 是 PPT 前的视觉约束层
-3. 若 XML 后续变更，HTML 必须整稿重生，不能只手改 HTML
-
-推荐在输出说明中附带：
-
-```markdown
-- 图表真源：doc-ppt/<name>.xml
-- 图表 HTML：doc-ppt/<name>.html
-- 状态：HTML 已完成，可进入 PPT 页面编排
-```
+1. 先判定 XML 是否属于可稳定转换的 draw.io / mxGraph 结构
+2. 默认优先运行 `scripts/xml_to_html.py`，只有在已确认无 Python 环境时才允许手工映射
+3. HTML 是桥接层，不是重新设计稿，禁止“肉眼照着重画”后直接放行
 
 ---
 
-## 与其他技能的协作关系
+## 校验与协作边界
 
-### 与 `robot-aiot-draw-flowchart`
+保真校验、`[UI-WARN]` 补充检查、阻塞条件与技能边界见 `references/validation-and-handoff.md`。
 
-- `robot-aiot-draw-flowchart` 负责产出图表 XML
-- 本技能负责把 XML 转成 HTML 桥接稿
-- 不要把 XML->HTML 能力写回 `robot-aiot-draw-flowchart`，避免边界混乱
+主文件保留最终判断标准：
 
-### 与 `robot-aiot-leadership-ppt-workflow`
-
-- 本技能处于 `draw-flowchart` 和 `ppt-master` 之间
-- 没有完成 HTML，不允许进入 PPT 生成
-- 页面级 `doc-ppt/pages/*.html` 可以引用本技能输出的图表 HTML
-
-### 与 `ppt-master`
-
-- 本技能不负责生成最终 PPTX
-- 本技能只负责提供稳定、可审查、可冻结的 HTML 约束输入
-- 若后续存在专门的 HTML->PPT 技能，则本技能的输出应作为其直接输入
-
----
-
-## 验证清单
-
-**阻塞项**（任一不满足则不得进入下一阶段）：
-
-- [ ] HTML 生成前已加载 ui-ux-pro-max 设计系统和 Material Design 3 规范
-- [ ] 输入 XML 为支持的 draw.io / mxGraph 结构
-- [ ] 输出 HTML 与 XML 一一对应
-- [ ] Vertex 数量一致
-- [ ] Edge 数量一致
-- [ ] 文本内容一致
-- [ ] 容器/泳道/层级结构一致
-- [ ] 关键标签、图例、数据锚点一致
-- [ ] 主色、边框色、字体层级未漂移
-- [ ] 画布比例和相对布局未漂移
-- [ ] 未映射样式属性已人工确认
-- [ ] 已声明 XML 为真源，HTML 为桥接约束层
-- [ ] 若 XML 变更，HTML 需整稿重生的规则已声明
-
-**非阻塞项 [UI-WARN]**（不满足时记录警告但不阻塞）：
-
-- [ ] 配色对比度达标（文字与背景对比度 ≥ 4.5:1，不达标项已标记 `[UI-WARN]`）
-- [ ] 字体层级梯度清晰（相邻层级 font-size 差值 ≥ 2px，参考 MD3 Type Scale 五类）
-- [ ] 图表可读性达标（表格行高 ≥ 32px，卡片内边距 ≥ 12px，不达标项已标记 `[UI-WARN]`）
-
-若以上任一**阻塞项**不满足，不要宣称"已可进入 PPT 阶段"。
+1. 任一阻塞项不满足，就不能宣称“已可进入 PPT 阶段”
+2. `robot-aiot-draw-flowchart` 只负责 XML，本技能只负责 XML 到 HTML 桥接
+3. 本技能不生成 PPTX，只向上游 workflow 提供稳定、可冻结的 HTML 约束输入

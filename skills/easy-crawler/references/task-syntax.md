@@ -79,8 +79,8 @@
 
 ## Target Fields
 
-- `url`: 目标地址。通用网页场景建议必填。
-- `page_type`: `list` | `detail` | `search` | `timeline` | `creator` | `comments`
+- `url`: 目标地址。通用网页执行场景通常必填；纯规划任务可由上游先只声明页面类型。
+- `page_type`: `list` | `detail` | `search` | `timeline` | `creator` | `comments`。当前校验要求每个 target 都显式提供该字段。
 - `intent`: 目标动作，例如 `extract_links`、`extract_records`、`extract_comments`
 - `requires_js`: 是否依赖 JS 渲染
 
@@ -160,10 +160,11 @@
 ## Validation Rules
 
 - `targets` 必须是非空数组
+- 每个 target 都必须显式提供 `page_type`
 - 每个 target 至少提供 `url` 或 `page_type`
 - 当 `social.include_replies=true` 时，建议 `social.include_comments=true`
 - 当 `run.mode=browser` 或 `browser.required=true` 时，应同时明确浏览器依赖来源
-- 当 `social.login_state=required` 时，应提供 `browser.storage_state_path` 或人工登录方案
+- 当 `social.login_state=required` 时，应提供 `browser.storage_state_path`
 - 当 `discovery.strategy!=none` 时，建议明确 `max_discovered_targets`
 - 当声明 `discovery.checkpoint_key` 时，应同时声明外部如何保存或恢复该断点
 - 当 `social.sort` 或 `social.time_scope` 出现时，目标页类型通常应为 `search`、`timeline` 或 `comments`

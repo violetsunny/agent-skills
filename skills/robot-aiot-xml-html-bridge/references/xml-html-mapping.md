@@ -101,7 +101,7 @@ draw.io 的 `shape=` 属性决定节点的基本渲染形态：
 
 转换后的 HTML 在视觉质量上的补充约束来自以下两个来源：
 
-1. **`ui-ux-pro-max` 的 `references/quick-reference.md`**：§6（Typography & Color）提供配色对比度准则，§10（Charts & Data）提供图表可读性准则
-2. **`material-3` 的 MD3 参考文档**：`references/color-system.md` 提供配色角色定义（primary/secondary/tertiary），`references/typography-and-shape.md` 提供字体梯度标准（Display/Headline/Title/Body/Label 五类）
+1. **`ui-ux-pro-max` 的 `references/quick-reference.md`**：Typography、Color、Charts & Data 相关准则提供配色对比度和图表可读性约束
+2. **本技能内置的 MD3 风格补充规则**：使用类似 primary/secondary/tertiary 的配色角色和 Display/Headline/Title/Body/Label 的字体层级，辅助判断色彩层级与字号梯度是否清晰
 
 这些 UI 准则由 agent 在 Phase 4 保真校验后作为**补充检查**执行（标记 `[UI-WARN]` 警告，不阻塞流程），不改变本映射表中的确定性映射规则，也不修改 `xml_to_html.py` 脚本逻辑。

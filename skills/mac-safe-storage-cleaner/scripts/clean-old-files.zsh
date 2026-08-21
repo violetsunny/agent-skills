@@ -180,7 +180,7 @@ echo "受保护目录下允许按 ${WORKSPACE_AGE_DAYS} 天清理的 Workspace �
 printf '  %s\n' "${ALLOWED_UNDER_PROTECTED_DIRS[@]}"
 
 echo
-echo "待处理目录总占用约 ${total_gb} GB"
+echo "统计目录总占用约 ${total_gb} GB"
 echo "清理阈值：${THRESHOLD_GB} GB"
 
 if (( total_gb < THRESHOLD_GB )); then
