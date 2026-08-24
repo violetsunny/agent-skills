@@ -13,6 +13,13 @@ Phase 5 负责将母稿、图表 XML/HTML、逐页 HTML 一并移交给 `ppt-mas
 7. 每页已生成对应 HTML，图表 HTML / 页面 HTML 全部完成后才可启动 PPT 阶段
 8. 图表 HTML 与页面 HTML 配色同属一个体系，间距遵循统一基线
 9. `doc-ppt/assets/midea-logo.png` 已就位，封面与页脚引用正确
+10. 若启用轻量 MD3 规范化，图表 HTML 与页面 HTML 的 token 语义一致，且未引入新的结构漂移
+
+## Sub Agent 建议
+
+1. 交付前结构验证、数据验证、视觉验证可拆给独立 sub agents 并行检查
+2. 主线程汇总各 sub agent 发现后统一修正，再决定是否调用 `ppt-master`
+3. `ppt-master` 调用和最终“可交付”判断只能由主线程执行
 
 ## 调用 ppt-master 时提供
 
@@ -50,5 +57,6 @@ Phase 5 负责将母稿、图表 XML/HTML、逐页 HTML 一并移交给 `ppt-mas
 2. 配色体系无漂移
 3. 字号层级清晰
 4. 无乱码或格式错位
+5. 轻量 MD3 规范化仅体现在容器、字体、间距和语义色层级，不影响图表事实表达
 
 质量收敛通常需要 2-3 轮，每轮只聚焦一个层面。

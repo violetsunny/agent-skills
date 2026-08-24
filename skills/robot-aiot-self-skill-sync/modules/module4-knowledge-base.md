@@ -173,3 +173,13 @@ rsync -r ~/.agents/skills/ ~/.claude/skills/
 - 目的是运行时备份，不改变模块 2 中 `.claude/` 作为 OpenSpec 权威源的关系
 - 下次 `openspec update` 有权覆盖 `.claude/skills/` 中的任何内容
 - 在汇总中报告备份同步的 skill 数量（`[BACKUP-SYNC]`）
+
+### Sub Agent 建议
+
+1. 用 fresh sub agent 分别处理：
+   - `~/.agents/skills/ -> agent-skills/skills/` 的差异扫描
+   - `self/skills/<project>/...` 四类结构发现与冲突识别
+   - `git status --short` 变更清单整理
+2. 对 `[DUPLICATE-SKILL]`、无关文件排除统计、gstack 特殊路径识别，优先交给 sub agent 生成报告草稿
+3. 主线程执行真实同步、保护目录例外判断与最终变更报告输出
+4. 任何覆盖知识库文件的动作都必须由主线程执行，sub agent 只能提供候选差异和冲突信息

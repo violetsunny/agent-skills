@@ -37,6 +37,13 @@ fi
 
 **拉取阶段**：每批 10–15 个项目，超时 180s。对 `[SAFE-UNTRACKED]` 和干净仓库统一执行 `git pull --ff-only`。
 
+### Sub Agent 建议
+
+1. 先用 fresh sub agent 扫描三层仓库并生成候选仓库清单
+2. 再用 sub agent 做 `git status --porcelain` 分类草稿，区分干净 / `[SAFE-UNTRACKED]` / `[SKIP-DIRTY]`
+3. 主线程根据分类结果分批执行真实 `git pull --ff-only`
+4. 失败重试和保护目录跳过由主线程处理，sub agent 只负责识别和汇总，不负责执行 git 命令
+
 设置 git http 超时参数，避免单个仓库网络超时阻塞整批：
 
 ```bash

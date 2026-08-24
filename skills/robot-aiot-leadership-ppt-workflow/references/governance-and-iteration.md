@@ -45,6 +45,22 @@
 2. 母稿没改却只改页面 HTML
 3. 图表真源没改却只改图表 HTML
 
+## Sub Agent 控制面
+
+1. Phase 1-5 中，非 trivial 工作默认先交给 fresh sub agent，保持每阶段上下文独立干净
+2. 主线程负责控制面：
+   - 维护当前阶段状态
+   - 决定是否允许进入下一阶段
+   - 写入最终产物到 `doc-ppt/`
+   - 触发跨阶段一致性校验与重生链
+3. sub agent 负责工作面：
+   - 数据提取与口径归并建议
+   - 受众分层与术语翻译草稿
+   - 图表结构规划与页面内容草稿
+   - 页面审查、数据核对、交付前检查
+4. sub agent 产出必须回到主线程汇总后，才允许写文件或触发下一阶段
+5. tiny 单点修正可跳过 sub agent，直接由主线程处理
+
 ## 迭代循环
 
 ```text
@@ -67,11 +83,12 @@
 
 ```text
 本技能
-├── Phase 1-2: 自行完成
-├── Phase 3: 调用 robot-aiot-draw-flowchart
-├── Phase 3.5: 调用 robot-aiot-xml-html-bridge
-├── Phase 4: 自行完成，并调用 ui-ux-pro-max 的设计系统能力
-└── Phase 5: 调用 ppt-master
+├── 主线程: 负责阶段编排、落盘、阻塞校验、最终交付
+├── Sub agents: 负责阶段内分析/起草/审查
+├── Phase 3: 主线程调用 robot-aiot-draw-flowchart
+├── Phase 3.5: 主线程调用 robot-aiot-xml-html-bridge
+├── Phase 4: 主线程调用 ui-ux-pro-max 的设计系统能力
+└── Phase 5: 主线程调用 ppt-master
 ```
 
 ## 实战经验沉淀

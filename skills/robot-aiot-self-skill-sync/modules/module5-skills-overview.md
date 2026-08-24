@@ -39,6 +39,12 @@
 4. 生成两部分 Markdown 文档并写入 `docs/skills-overview.md`
 5. 报告总技能数、缺失描述数、写入路径
 
+### Sub Agent 建议
+
+1. 用 fresh sub agent 递归扫描两个目录下的 `SKILL.md`，提取 `name` / `description` 并折叠多行描述
+2. 若技能较多，可并行 sub agents 分别扫描 `~/.agents/skills/` 与 `agent-skills/skills/`
+3. 主线程负责写入 `docs/skills-overview.md` 并给出最终统计，避免扫描上下文与写入上下文混杂
+
 ### 建议文档结构
 
 ```md

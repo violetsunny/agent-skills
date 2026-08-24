@@ -13,6 +13,12 @@ description: >
 
 包含6个模块：模块1 批量 git pull、模块2 openspec update、模块3 skill 文件同步（涉及6个项目）、模块3.5 同步到 free-stock-line-skills 汇总项目、模块4 全量同步到个人知识库 agent-skills、模块5 更新技能总览文档。
 
+Sub agent 原则：
+- 非 trivial 的扫描、分类、差异比对、冲突识别、文档汇总，优先交给 fresh sub agent 执行，避免不同模块的状态信息互相污染
+- 主线程保留控制面：真正执行 `git pull` / `openspec update` / `npx skills update` / `rsync` / 文档落盘 / 最终汇总与用户提示
+- 涉及保护目录、覆盖式同步、是否跳过、是否继续执行下一模块等决定，只能由主线程拍板
+- tiny 单文件说明修正或单条汇总补充可直接主线程处理，不必起 sub agent
+
 ## 模块索引
 
 | 模块 | 文件 | 说明 |
@@ -36,3 +42,5 @@ description: >
 6. **模块 5** — 在所有 skills 同步完成后，更新 `docs/skills-overview.md`，文档分为两部分：`~/.agents/skills/` 下的技能和说明，以及 `agent-skills/skills/` 下的技能和说明
 
 > 执行各模块前，必先阅读 `modules/shared.md` 中的前置条件、代码回滚保护、Dirty 仓库分类和关键注意事项。结果汇总模板见 `modules/summary.md`。
+
+推荐执行方式：每个模块先由 sub agent 在干净上下文中完成本模块扫描/分类/校验草稿，再回到主线程执行真实命令、写入结果和决定是否放行下一模块。

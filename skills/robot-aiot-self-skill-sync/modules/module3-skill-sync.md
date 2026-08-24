@@ -56,6 +56,13 @@ npx skills@latest add hugohe3/ppt-master -y -g
 - 这些项目的 skill 最终在 `~/.agents/skills/` 中，模块 4.1 全量 rsync 会同步到知识库
 - **模块 4.1A 排除所有 npx 管理型项目**（见模块 4 文档），避免其 `self/skills/` 下的 git 源结构被误判
 
+### Sub Agent 建议
+
+1. 用 fresh sub agent 预先枚举 npx 管理型与 rsync 管理型项目，生成执行清单
+2. rsync 管理型项目先由 sub agent 做交集匹配草稿：哪些 skill 已存在、哪些新增会被拒绝
+3. 主线程执行 `npx skills@latest update -y -g` 和实际 `rsync -r`
+4. 成功/失败计数、拒绝新增数量和项目级状态由主线程统一汇总
+
 ## 3.2 rsync 管理型项目（2 个）
 
 以下 2 个项目目前不支持 npx 安装，仍通过 rsync 同步。

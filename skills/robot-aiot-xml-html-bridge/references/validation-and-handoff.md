@@ -38,11 +38,21 @@
 
 ## UI 规范补充检查
 
-以下项基于 `ui-ux-pro-max` 与本技能内置 MD3 风格补充规则执行，结果记为 `[UI-WARN]`，不阻塞流程：
+以下项基于 `ui-ux-pro-max` 与本技能内置轻量 MD3 规范化规则执行，结果记为 `[UI-WARN]`，不阻塞流程：
 
 1. 配色对比度低于 4.5:1
 2. 字体层级梯度不清晰，相邻字号差值低于 2px
 3. 数据卡片或表格可读性不足，如行高低于 32px、内边距低于 12px
+4. 外层容器缺少统一 surface / surface-container 层次，导致视觉层级混乱
+5. 同类容器圆角不一致，无法归入稳定的 small / medium / large 档位
+
+## 轻量 MD3 规范化记录
+
+若执行了轻量 MD3 规范化，交付说明必须明确记录：
+
+1. 哪些调整只作用于外层背景、间距、圆角、字体层级
+2. 哪些颜色仍完全保留 XML 真源
+3. 规范化是否只影响桥接 HTML，不回写 XML 真源
 
 ## 与其他技能的边界
 
@@ -51,6 +61,7 @@
 1. `robot-aiot-draw-flowchart` 负责产出 XML
 2. 本技能负责 XML 到 HTML 的稳定桥接
 3. 不要把 XML->HTML 逻辑重新塞回 `robot-aiot-draw-flowchart`
+4. 若页面工作流要继续做轻量 MD3 规范化，应以本技能已冻结的图表 HTML 为上限，不得重新解释图表结构
 
 ### 与 `robot-aiot-leadership-ppt-workflow`
 

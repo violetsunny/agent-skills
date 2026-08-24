@@ -16,6 +16,8 @@ Only treat a remaining task as user/external verification when it inherently req
 
 Implementation can introduce subtle logic errors, weak generated UI, missing validation, or low-quality written content. This hook enforces a mandatory workstream-aware execution-fix, review, verification, and archive-summary sequence before archive, and crucially before the user spends time on manual verification, so obvious bugs are caught first.
 
+Use fresh sub agents for non-trivial review and verification passes so the assessment runs in a clean context, then return to the main thread for fixes, user decisions, and archive.
+
 ## Steps
 
 1. **Classify the implementation-complete handoff and load the right skills**
@@ -27,9 +29,18 @@ Implementation can introduce subtle logic errors, weak generated UI, missing val
    - **Archive-ready path**: all tasks are complete (`state: "all_done"`).
    - **Manual-validation handoff path**: implementation work is complete, but the remaining tasks are only user/external verification.
 
-   Use the Skill tool to load and execute review or verification skills inline. First classify the completed work into one primary workstream, then load the minimum effective execution, review, testing, and verification skills.
+    First classify the completed work into one primary workstream for orchestration, then run the main review/verification pass in one or more fresh sub agents. If the change also touches other workstreams, add the matching secondary review/verification passes for each affected workstream before deciding the gate is clean. The main thread remains responsible for follow-up fixes, user decisions, and archive.
 
-2. **Route to the minimum effective post-apply skills**
+2. **Use sub agents as the default non-trivial review worker**
+
+    - Launch fresh sub agents for the main review/verification pass whenever the handoff includes meaningful code, UI, tests, content, or multiple changed files.
+    - Each sub agent should have one narrow responsibility: workflow verification, standards/spec review, UI review, browser verification, test-quality review, or content-quality review.
+    - Choose one primary workstream to organize the pass, but do not stop there: if backend, frontend, and technical/knowledge content are all affected, the review plan must cover every affected workstream, not just the primary one.
+    - Prefer parallel sub agents when the checks are independent. This keeps each review context focused and avoids cross-contamination between standards, UI, and behavior concerns.
+    - After the sub agents return, the main thread aggregates findings across all affected workstreams, decides whether CRITICAL issues exist, applies fixes, re-runs the needed checks, and decides whether archive is allowed.
+   - Tiny follow-up checks on a one-line/local change may stay in the main thread.
+
+3. **Route to the minimum effective post-apply skills**
 
    - **Backend code writing**
      - Execution/fix: `implement` for minimal follow-up fixes required by critical findings.
@@ -58,7 +69,7 @@ Implementation can introduce subtle logic errors, weak generated UI, missing val
      - Add `internal-comms` only for stakeholder-facing or internal update formats.
      - Do not pretend code-style checks alone are sufficient for content-heavy deliverables.
 
-3. **Core skill selection priority**
+4. **Core skill selection priority**
 
    1. `openspec-verify-change` - the mandatory workflow-alignment baseline before archive on the archive-ready path only.
    2. `implement` - only when critical findings require minimal follow-up fixes.
@@ -74,7 +85,7 @@ Implementation can introduce subtle logic errors, weak generated UI, missing val
    12. Other review/testing skills - if none of the above is available, use the most specific skill present in the workspace.
    13. Manual inspection - if no review skill exists at all, read every file modified during apply, cross-check each against `proposal.md` and `design.md`, and document what was checked.
 
-4. **Run the review and verification pass**
+5. **Run the review and verification pass**
 
    - **Archive-ready path:** include `openspec-verify-change` in the gate.
    - **Manual-validation handoff path:** skip `openspec-verify-change` and rely on the workstream-specific review/test gate instead.
@@ -107,11 +118,11 @@ Implementation can introduce subtle logic errors, weak generated UI, missing val
    <overall assessment - one or two sentences>
    ```
 
-5. **Act on findings**
+6. **Act on findings**
 
-   - **No CRITICAL issues:**
-     - If there are WARNINGs, list them and ask the user whether to fix them now or proceed.
-     - Once the user decides, continue to Step 6.
+    - **No CRITICAL issues:**
+      - If there are WARNINGs, list them and ask the user whether to fix them now or proceed.
+      - Once the user decides, continue to Step 7.
 
    - **One or more CRITICAL issues:**
      - Do not proceed to archive.
@@ -121,9 +132,9 @@ Implementation can introduce subtle logic errors, weak generated UI, missing val
       - After fixing, re-run the same verification path that applied to this handoff:
         - archive-ready path -> re-run `openspec-verify-change` plus the same workstream-specific review/testing path
         - manual-validation handoff path -> re-run the same workstream-specific review/testing path only
-      - Once no CRITICAL issues remain, continue to Step 6.
+      - Once no CRITICAL issues remain, re-run Step 5 as needed for fresh evidence, then return to Step 6 to confirm the gate is clean before continuing to Step 7.
 
-6. **Choose the correct post-review outcome**
+7. **Choose the correct post-review outcome**
 
     - **If remaining tasks are only user/external verification tasks:**
       - Do not archive yet.
@@ -137,7 +148,7 @@ Implementation can introduce subtle logic errors, weak generated UI, missing val
      - Execute `/opsx/archive` for the same change name already known from the apply session. Do not ask the user for the change name again.
      - The archive command will handle delta-spec sync check, task completion check, directory move, and summary output. Let it run to completion.
 
-7. **Confirm the handoff or completion**
+8. **Confirm the handoff or completion**
 
    Before the final message, use a summary skill only when it improves the archive handoff or the manual-validation handoff:
 
@@ -163,13 +174,15 @@ Implementation can introduce subtle logic errors, weak generated UI, missing val
 - Trigger Hook B before the user spends time on SIT/UAT/manual verification when implementation work is already complete and only external validation remains.
 - Do not trigger Hook B for ordinary paused mid-way implementation states.
 - Never skip the review step, even if the implementation looks clean.
+- For non-trivial review/testing/verification work, prefer fresh sub agents so each pass runs with a clean context and complete local evidence.
+- The main thread is the only place that may decide severity, apply fixes, ask the user about WARNINGs, or archive the change.
 - `openspec-verify-change` is the workflow-alignment baseline before archive, but skip it for the manual-validation handoff path where user/external verification tasks intentionally remain open.
 - When the implementation involves HTML/CSS styling, `ui-ux-pro-max` is mandatory.
 - When behavior changes, do not treat existing green tests as automatically sufficient - verify whether new or changed behavior has targeted coverage.
 - When tests are added or changed, review their quality; avoid placeholder, tautological, or implementation-coupled tests.
 - Never claim verification passed without fresh evidence from the relevant test, build, browser-level command, or OpenSpec verification pass.
 - Use the minimum effective skill set for the active workstream. Do not load every adjacent review skill just because it exists.
-- Backend, frontend, and technical/knowledge content must each use workstream-appropriate skills.
+- A primary workstream is only an orchestration aid. If multiple workstreams are affected, backend, frontend, and technical/knowledge content must each still receive workstream-appropriate review coverage before handoff or archive.
 - For technical-solution or knowledge-content changes, do not pretend code review alone is sufficient - perform structure, fact, and reader-clarity checks.
 - Do not send the user to manual verification while obvious automated review/test failures are still unresolved.
 - Never archive with unresolved CRITICAL issues.

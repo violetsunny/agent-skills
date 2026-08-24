@@ -20,6 +20,11 @@ description: >
 - **robot-aiot-xml-html-bridge** — 在 XML 生成后，稳定转换为 HTML 预览稿，作为 PPT 前的主约束
 - **ppt-master** — 在母稿逐页 HTML 化后，读取逐页 HTML/MD 生成最终 PPTX 文件
 
+Sub agent 原则：
+- 非 trivial 的阶段分析、分层提炼、图表规划、页面草拟、交叉校验，优先交给 fresh sub agent 执行，保持上下文干净
+- 主线程只做总控：阶段切换、用户确认、真实文件落盘、跨阶段一致性校验、外部技能调用与最终交付判断
+- tiny wording tweak、单页局部小改、局部格式修正可直接在主线程完成，不必起 sub agent
+
 强制中间层原则：
 - **XML 先转 HTML**：凡是由 `robot-aiot-draw-flowchart` 生成的图表 XML，在进入 PPT 阶段前必须先通过 `robot-aiot-xml-html-bridge` 转成 HTML 预览文件
 - **母稿逐页转 HTML**：在调用 `ppt-master` 之前，必须把 PPT 母稿的每一页都落成单页 HTML
@@ -72,6 +77,8 @@ Phase 5: PPT生成     → 调用 ppt-master，读取逐页 HTML/MD 生成最终
 
 每个阶段产出是下一阶段的输入，逐级收敛。
 
+建议执行方式：每个阶段先由 sub agent 在干净上下文中完成本阶段分析/起草/审查，再回到主线程做统一落盘和阶段阻塞检查，避免 Phase 1-5 信息互相污染。
+
 ---
 
 ## Phase 1: 方案基础 — 数据池建立
@@ -102,12 +109,13 @@ Phase 5: PPT生成     → 调用 ppt-master，读取逐页 HTML/MD 生成最终
 
 图表类型选择、XML/HTML 产物、阻塞规则与协作边界见 `references/phase3-chart-pipeline.md`。
 
-主文件保留四条硬约束：
+主文件保留五条硬约束：
 
 1. Phase 3 先调用 `robot-aiot-draw-flowchart` 生成图表 XML 真源
 2. Phase 3.5 必须调用 `robot-aiot-xml-html-bridge` 为每个 XML 生成对应 HTML
 3. 没有图表 HTML，不得进入 Phase 4
 4. 首页架构图确定全局主色基调，后续页面保持配色统一但允许版式多样
+5. 允许在 Phase 3.5 和 Phase 4 做轻量 Material 3 规范化，但只能整理 token、字体层级、间距和容器语义，不能改图表结构和数据语义
 
 ---
 
@@ -121,6 +129,7 @@ Phase 5: PPT生成     → 调用 ppt-master，读取逐页 HTML/MD 生成最终
 2. 每页必须满足“标题 / 结论 / 上屏内容 / 话术”四要素
 3. 每页对应一个独立 HTML 文件，且图表优先引用 Phase 3.5 输出的图表 HTML
 4. `page-html-template.md` 第 5 节布局审查清单 10 项全部通过，才允许进入 Phase 5
+5. 页面允许做轻量 MD3 规范化，但不得破坏首页图表确立的主色语义与图表 HTML 的冻结约束
 
 ---
 
@@ -128,10 +137,11 @@ Phase 5: PPT生成     → 调用 ppt-master，读取逐页 HTML/MD 生成最终
 
 移交前校验、输入清单和交付后三层验证见 `references/phase5-ppt-delivery.md`。
 
-主文件保留两条原则：
+主文件保留三条原则：
 
 1. `ppt-master` 的直接视觉输入是逐页 HTML，XML 只负责图表真源追溯，MD 负责语义来源
 2. 风格一致性指配色体系统一，不等于所有页面复用同一种版式
+3. 若采用轻量 MD3 规范化，必须贯穿图表 HTML 与页面 HTML，而不是只在某几页单独套新风格
 
 ---
 

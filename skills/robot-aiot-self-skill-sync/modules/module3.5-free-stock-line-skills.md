@@ -69,3 +69,9 @@ done
 | ✅ 同步 | N | 源端和目标端都有匹配，已同步 |
 | ⏭️ 跳过 | N | 目标端无匹配，或为非 skill 目录 |
 | 🔒 保护 | 1 | stock-replay-workbench，禁止修改 |
+
+### Sub Agent 建议
+
+1. 先由 fresh sub agent 做大小写不敏感匹配草稿，识别哪些项目能同步、哪些无匹配、哪些属于保护或非 skill 目录
+2. 主线程再执行真实 `rsync -r`，确保保护项目和跳过规则得到严格执行
+3. `stock-replay-workbench` 的保护决策只能由主线程维持，sub agent 只能标记不可碰

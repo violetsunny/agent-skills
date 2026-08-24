@@ -21,8 +21,9 @@
 
 ### 4. Minimum effective skill set beats skill stacking
 - Do not load every plausible skill for a workstream.
-- Choose one primary workstream, then load only the smallest set that materially improves the current phase.
-- This principle is stronger than historical "phase completeness" instincts from earlier drafts.
+- Choose one primary workstream to organize the phase, then load only the smallest set that materially improves the current phase.
+- For Hook B, "primary workstream" is only an orchestration aid: if multiple workstreams are affected, each affected workstream still needs matching review coverage before handoff or archive.
+- This principle is stronger than historical "phase completeness" instincts from earlier drafts, but it does not permit skipping required review coverage for affected workstreams.
 
 ### 5. Reused planning-side capability from earlier references
 - `grill-me` is still useful in Hook A, but only when requirement understanding or trade-offs are materially incomplete.
@@ -44,3 +45,9 @@
 - `doc-coauthoring` is the default document-quality baseline.
 - `research` and `domain-modeling` are conditional based on factual density or concept-boundary importance.
 - `teach` and `internal-comms` are format-specific specialists, not default always-on content skills.
+
+### 9. Sub agents are the default worker for non-trivial hook passes
+- Hook A and Hook B should prefer fresh sub agents for substantial planning, review, and verification work.
+- Reason: sub agents start with clean context, so artifact drafting and review findings are less likely to be polluted by unrelated prior discussion.
+- The main thread stays as the control plane: user interaction, file writes, validation commands, fixes, and archive decisions remain there.
+- Tiny one-file wording tweaks or tiny local checks stay in the main thread to avoid unnecessary orchestration overhead.

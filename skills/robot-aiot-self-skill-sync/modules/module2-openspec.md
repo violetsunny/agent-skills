@@ -8,6 +8,13 @@ OpenSpec 旧版本的 `openspec update` 只能更新已有工具文件，不能�
 
 本技能中"最全"的含义不是某个固定 profile 名称，也不是只看 `opsx` 是否存在，而是：**当前启用 profile 在 `~/.claude/commands/` 与 `~/.claude/skills/` 下实际生成的 commands / skills 集合，是否已经覆盖用户需要的完整内容**。判断时以运行后的实际目录内容为准，不写死文件名名单。
 
+### Sub Agent 建议
+
+1. 用 fresh sub agent 对 `openspec update` 输出做结构化归类：版本、profile、工具生成状态、删除项、leftover、commands skipped
+2. 用 sub agent 单独比对 `~/.claude/commands/`、`~/.agents/commands/`、`~/.claude/skills/`、`~/.agents/skills/` 的集合差异，生成迁移前后的校验草稿
+3. 主线程负责真正执行 `openspec config profile`、`openspec init`、`openspec update`、`.claude -> .agents` 迁移与 hook 恢复
+4. 任何 `--force`、覆盖迁移、leftover 提示是否继续，都只能由主线程决定
+
 **操作步骤**：
 
 1. 打开 macOS Terminal，确认 shell 初始化完成；若出现 `compinit` insecure files 提示，按终端提示选择继续即可，该提示与 OpenSpec 无关。

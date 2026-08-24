@@ -17,6 +17,7 @@ allowed-tools:
   - WebSearch
 metadata:
   trigger: 当用户提供股票代码要求分析，或问某只股票走势/建议时触发
+  author: Alex Leo (赛哥)
   version: "1.0"
   last_updated: "2026-03-04"
 ---
