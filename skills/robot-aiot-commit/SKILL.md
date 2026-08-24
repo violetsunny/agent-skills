@@ -4,7 +4,6 @@ description: >
   为本项目生成统一格式的中文提交说明，并在用户明确要求时配合 Git 提交流程执行 commit。
   适用于“生成 commit message”“按规范提交”“总结这次 diff”“写提交说明”“提交代码”
   “根据分支提取 JIRA”“按 FEAT/FIX/ENH/DOC/CHORE 分类提交”等场景。
-  吸收 caveman-commit、chinese-commit-conventions、git-commit、git-workflow 的最小有效能力，
   输出优先服务本项目提交规范，而不是通用 Conventional Commits 模板。
 ---
 
@@ -66,16 +65,19 @@ DIFF: <具体修改代码总结>
 
 标准规则：
 
-1. 优先按 `/` 分段
-2. 若分支是三段结构，取最后一段作为 JIRA
-3. 若不是三段结构，仍取最后一段，并在结果中沿用原值
-4. 若当前不在 Git 分支、无法获取分支名，明确标记为 `JIRA: [待补充]`
+1. 优先适配本项目常见分支：`feature_YYYYMMDD_IOTRP-xxxx`、`fix_YYYYMMDD_IOTRP-xxxx`
+2. 对上述下划线命名，按 `_` 分段并取最后一段作为 JIRA
+3. 若不是上述命名，再回退按 `/` 分段并取最后一段
+4. 若既不含 `_` 也不含 `/`，则直接沿用整个分支名
+5. 若当前不在 Git 分支、无法获取分支名，明确标记为 `JIRA: [待补充]`
 
 示例：
 
-1. `feature/robot/AIOT-123` -> `JIRA: AIOT-123`
-2. `bugfix/order/OMS-998` -> `JIRA: OMS-998`
-3. `hotfix/HF-001` -> `JIRA: HF-001`
+1. `feature_20260721_IOTRP-4697` -> `JIRA: IOTRP-4697`
+2. `fix_20260721_IOTRP-4697` -> `JIRA: IOTRP-4697`
+3. `feature/robot/AIOT-123` -> `JIRA: AIOT-123`
+4. `bugfix/order/OMS-998` -> `JIRA: OMS-998`
+5. `hotfix/HF-001` -> `JIRA: HF-001`
 
 ## 工作流
 
