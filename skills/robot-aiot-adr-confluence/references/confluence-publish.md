@@ -36,9 +36,10 @@ done
 1. 检查 `uv --version`
 2. 若缺少 `uv`，停止发布链路，说明当前只能交付本地 Markdown，并提示先安装 `uv` 后再重试
 3. 若本轮文档命中了验证链触发条件，先确认核查已完成，或已在交付说明中记录跳过原因
-4. 将文档保存为本地 `.md`
-5. 先执行 `page publish-markdown --dry-run`
-6. 确认标题层级、表格、列表、Mermaid、折叠块、任务列表、公式和 `confluence-storage` 围栏都被正确转换
+4. 若当前发布的是 ADR，且前序已按 `robot-aiot-adr-generator` 完成核查，应保留其验证摘要或跳过说明随文档一并交付
+5. 将文档保存为本地 `.md`
+6. 先执行 `page publish-markdown --dry-run`
+7. 确认标题层级、表格、列表、Mermaid、折叠块、任务列表、公式和 `confluence-storage` 围栏都被正确转换
 
 ## 正式发布
 

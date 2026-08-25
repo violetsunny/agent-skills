@@ -24,7 +24,7 @@ description: >
 说明：
 
 1. `to-spec`、`grilling`、`brainstorming`、`architecture-review` 是可借用的上游能力
-2. 三个模板由本 skill 自带 `references/` 提供，不依赖外部 `adr-generator` skill
+2. 当目标文档是 ADR 时，优先按 `robot-aiot-adr-generator` 的规则生成和核查；技术提案与简报仍由本 skill 自带模板完成
 3. Confluence 发布依赖本地可用的 `confluence-cli` 脚本；没有脚本时只输出 Markdown，不报错硬失败
 
 ## 工作流总览
@@ -69,6 +69,11 @@ description: >
 1. `references/adr-standard-template.md`
 2. `references/tech-proposal-template.md`
 3. `references/brief-template.md`
+
+ADR 优先入口：
+
+1. 用户要 ADR 时，优先复用 `robot-aiot-adr-generator` 的输入约束、生成顺序和验证链核查逻辑
+2. 只有在当前上下文明确要求继续走 Confluence 发布链路时，才在 ADR 生成后回到本 skill 后续阶段
 
 主文件保留三条硬约束：
 

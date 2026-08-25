@@ -2,7 +2,7 @@
 
 本文档根据 `~/.agents/skills/` 下实际存在的 `SKILL.md` 递归生成。技能名称和说明优先读取 frontmatter；缺失时分别回退到目录名和 `（无描述）`。
 
-共 **102** 个 `SKILL.md`。
+共 **104** 个 `SKILL.md`。
 
 | 技能 | 路径 | 说明 |
 |------|------|------|
@@ -70,7 +70,9 @@
 | `refactor-advisor` | `refactor-advisor` | 重构顾问 - 识别代码坏味道并提供重构方案 |
 | `research` | `research` | Investigate a question against high-trust primary sources and capture the findings as a Markdown file in the repo. Use when the user wants a topic researched, docs or API facts gathered, or reading legwork delegated to a background agent. |
 | `resolving-merge-conflicts` | `resolving-merge-conflicts` | Use when you need to resolve an in-progress git merge/rebase conflict. |
-| `robot-aiot-adr-confluence` | `robot-aiot-adr-confluence` | 技术方案端到端工作流：需求收敛 → 深度追问澄清 → 方案发散/权衡 → 生成结构化文档 → 架构评审 → 合规校验 → 发布到 Confluence。支持三种模板：ADR标准格式、技术提案格式、 简报格式。融合 to-spec（需求收敛）、grilling（设计树追问）、brainstorming（方案发散）、 adr-generator（模板生成）、architecture-review（架构评审）、confluence-cli（Confluence发布） 六者的能力。 当用户需要"写技术方案"、"生成ADR"、"架构决策记录发布Confluence"、"技术提案发Confluence"、 "方案归档到Confluence"、"写架构文档并发布"、"技术选型方案输出"时触发。 也适用于"决策简报"、"向上汇报方案"、"1页方案"、"决策评审材料"等简报场景。 也适用于用户描述了技术选型/架构设计需求并希望输出文档到 Confluence 的场景。 |
+| `robot-aiot-adr-confluence` | `robot-aiot-adr-confluence` | 技术方案文档端到端工作流：先做信息评估，再按需做需求收敛、追问澄清和方案比较，最后生成 ADR、技术提案或决策简报，并在需要时发布到 Confluence。适用于“写技术方案”“生成 ADR”“输出技术提案”“写决策简报”“架构决策记录发 Confluence”“方案归档到 Confluence”“技术选型文档输出”等场景。如用户只要文档，可停在 Markdown 草稿；如用户明确要求发布，再进入 Confluence 发布阶段。 |
+| `robot-aiot-adr-generator` | `robot-aiot-adr-generator` | 生成并校验 ADR 架构决策记录：先根据业务/技术需求产出标准 ADR 文档，再按需对其中可外部验证的关键技术断言执行验证链核查。适用于“生成 ADR”“写架构决策记录”“输出技术选型归档”“生成 ADR 并核查”“写完 ADR 后校验版本/兼容性/性能说法”“ADR 发布前审稿”等场景。输出优先服务技术决策归档，而不是通用技术文章写作。 |
+| `robot-aiot-commit` | `robot-aiot-commit` | 为本项目生成统一格式的中文提交说明，并在用户明确要求时配合 Git 提交流程执行 commit。适用于“生成 commit message”“按规范提交”“总结这次 diff”“写提交说明”“提交代码”“根据分支提取 JIRA”“按 FEAT/FIX/ENH/DOC/CHORE 分类提交”等场景。输出优先服务本项目提交规范，而不是通用 Conventional Commits 模板。 |
 | `robot-aiot-docs-sync` | `robot-aiot-docs-sync` | 扫描当前项目并创建或更新完整文档套件：AGENTS.md（AI 助手项目索引）、README.md（中文开发者友好的项目首页）、CHANGELOG.md（从 Git 历史自动生成的版本记录）以及 docs/ 目录下的技术文档（架构图、API 参考、FAQ）。同时生成带注释的项目结构地图。 适用于：「更新项目文档」、「同步文档」、「update AGENTS.md」、「update README」、「refresh project index」、「document this project」、「生成 changelog」、「生成项目地图」、「写技术文档」、「项目文档更新」。 Also triggers on: "更新项目文档", "项目文档更新", "更新项目索引", "同步文档", "生成changelog", "项目结构地图", "写技术文档". |
 | `robot-aiot-draw-flowchart` | `robot-aiot-draw-flowchart` | 机器人/IoT 业务图表（流程图、架构图）绘制能力，输出 draw.io XML 格式。提供统一的机器人图标样式、多种 draw.io 图表类型（线性流程、分支流程、循环流程、并行流程、泳道图、分层架构图等）的绘制规范和 XML 生成能力。 |
 | `robot-aiot-knowledge-expert` | `robot-aiot-knowledge-expert` | 物联网全栈技术专家回答规范。当用户问 IoT/AIOT 架构设计、协议选型、平台集成、边云协同、性能调优、故障排查等问题时使用。触发词包括：物联网、IoT、AIOT、MQTT、Modbus、BACnet、OPC UA、EMQX、物模型、边云协同、设备影子、OTA、JetLinks、ThingsBoard、感认行。 |
