@@ -3,7 +3,7 @@ name: robot-aiot-leadership-ppt-workflow
 description: >
   将项目数据和技术分析转化为结构化的领导汇报PPT，覆盖全链路五阶段工作流：
   数据池建立 → 技术明细版+领导汇报版文档分层 → 调用 robot-aiot-draw-flowchart 生成分层架构图/流程图XML →
-  调用 robot-aiot-xml-html-bridge 将XML稳定转HTML并保留原样式 → PPT母稿逐页HTML化 → 调用 ppt-master 依据每页HTML样式生成最终PPTX文件。
+  调用 robot-aiot-xml-html-bridge 将XML稳定转HTML并保留原样式 → 调用 robot-aiot-slide-html-author 完成 PPT 母稿逐页HTML化 → 调用 ppt-master 依据每页HTML样式生成最终PPTX文件。
   当用户要求"写领导汇报PPT"、"出PPT母稿"、"做汇报材料"、"汇报方案"、"写PPT"、
   "领导汇报"、"生成汇报PPT"时触发。也适用于用户描述了需要将技术项目数据
   转化为管理层可读的汇报格式的场景。
@@ -15,9 +15,10 @@ description: >
 **让领导一目了然，一眼看懂** — 每页必须有业务价值结论 + 数据支撑，
 不讲代码实现。
 
-本技能覆盖从原始数据到最终 PPTX 的全链路，涉及三个外部技能调用：
+本技能覆盖从原始数据到最终 PPTX 的全链路，涉及四个外部技能调用：
 - **robot-aiot-draw-flowchart** — 在文档分层完成后，生成分层架构图/流程图 XML
 - **robot-aiot-xml-html-bridge** — 在 XML 生成后，稳定转换为 HTML 预览稿，作为 PPT 前的主约束
+- **robot-aiot-slide-html-author** — 在母稿确定后，将每页结构化内容落成固定画布 HTML，并统一页面 token、层级和布局审查
 - **ppt-master** — 在母稿逐页 HTML 化后，读取逐页 HTML/MD 生成最终 PPTX 文件
 
 Sub agent 原则：
@@ -121,15 +122,15 @@ Phase 5: PPT生成     → 调用 ppt-master，读取逐页 HTML/MD 生成最终
 
 ## Phase 4: PPT母稿 — 按页结构化
 
-母稿模板、逐页 HTML 规则、设计系统注入、布局审查和 CSS 分层见 `references/phase4-page-authoring.md`，页面模板细节见 `references/page-html-template.md`。
+Phase 4 的逐页 HTML 编写能力已拆分到 `robot-aiot-slide-html-author`。本工作流只负责阶段编排、阻塞校验与产物衔接；页面模板、token 规则、布局审查和 CSS 分层由该技能维护。
 
 主文件只保留阻塞性要求：
 
-1. 逐页 HTML 生成必须通过 `ui-ux-pro-max` 的设计系统能力驱动
+1. 逐页 HTML 生成必须调用 `robot-aiot-slide-html-author`
 2. 每页必须满足“标题 / 结论 / 上屏内容 / 话术”四要素
 3. 每页对应一个独立 HTML 文件，且图表优先引用 Phase 3.5 输出的图表 HTML
-4. `page-html-template.md` 第 5 节布局审查清单 10 项全部通过，才允许进入 Phase 5
-5. 页面允许做轻量 MD3 规范化，但不得破坏首页图表确立的主色语义与图表 HTML 的冻结约束
+4. `robot-aiot-slide-html-author/references/page-html-template.md` 的布局审查清单 10 项全部通过，才允许进入 Phase 5
+5. 页面允许做轻量语义化规范化，但不得破坏首页图表确立的主色语义与图表 HTML 的冻结约束
 
 ---
 
@@ -141,7 +142,7 @@ Phase 5: PPT生成     → 调用 ppt-master，读取逐页 HTML/MD 生成最终
 
 1. `ppt-master` 的直接视觉输入是逐页 HTML，XML 只负责图表真源追溯，MD 负责语义来源
 2. 风格一致性指配色体系统一，不等于所有页面复用同一种版式
-3. 若采用轻量 MD3 规范化，必须贯穿图表 HTML 与页面 HTML，而不是只在某几页单独套新风格
+3. 若采用轻量语义化规范化，必须贯穿图表 HTML 与页面 HTML，而不是只在某几页单独套新风格
 
 ---
 

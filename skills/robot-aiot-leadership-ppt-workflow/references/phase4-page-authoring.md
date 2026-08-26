@@ -1,96 +1,19 @@
 # Phase 4: 母稿与逐页 HTML
 
-Phase 4 负责把前面收敛出的数据、结论和图表落成可审查的母稿与单页 HTML。
+Phase 4 仍然负责把前面收敛出的数据、结论和图表落成可审查的母稿与单页 HTML，但逐页 HTML 的规则所有权已拆分到 `robot-aiot-slide-html-author`。
 
-## 母稿原则
+## 本文件只保留 Phase 4 入口约束
 
 1. 先写 Markdown 母稿，聚焦“说什么”
-2. 再把每页落成 HTML，固定布局、图表摆位、留白和样式层级
-3. 页面表达遵循“一页一主题”
+2. 再调用 `robot-aiot-slide-html-author` 把每页落成 HTML
+3. 每页必须满足“标题 / 结论 / 上屏内容 / 话术”四要素
+4. 图表优先引用 `doc-ppt/<图表名>.html`
+5. 页面完成后，必须按新技能的布局清单审查通过后才能进入 Phase 5
 
-## 每页四要素
+## 详细规则入口
 
-```markdown
-## 第 N 页：<页面标题>
+Phase 4 页面编写时，改为读取：
 
-### 标题
-> <一句话定位>
-
-### 页面结论
-> <一句话结论>
-
-### 页面上屏内容
-<表格、图表、关键数据>
-
-### 汇报话术
-- <要点>
-```
-
-## 内容原则
-
-1. 数据先行，话术解释意义，不重复数字
-2. 每行数据尽量配业务价值说明
-3. 架构图、流程图等视觉页补 2-3 个数字锚点
-4. 流程表达优先使用“准备 → 执行 → 治理”闭环结构
-
-## 设计系统前置
-
-逐页 HTML 化之前，必须用 `skill` 工具加载 `ui-ux-pro-max`，触发其 `--design-system` 能力，提取：
-
-1. 配色方案
-2. 字体配对
-3. 间距系统
-4. 反模式建议
-
-同时应用本技能的 MD3 风格间距基线：`8/16/24/32/48px`。
-
-## 轻量 Material 3 规范化边界
-
-这里采用的是**轻量规范化**，不是把页面重做成标准 Material 3 App：
-
-1. 允许统一页面背景、区块容器、标题层级、按钮/标签圆角和间距基线
-2. 允许为页面定义 `primary / secondary / tertiary / surface / outline` 等语义色角色
-3. 允许把标题、结论、数字、注释分别整理为接近 `Headline / Title / Body / Label` 的层级
-4. 不允许改图表内节点坐标、结构、颜色语义和数据锚点
-5. 不允许把图表页重做成另一套卡片式 dashboard 风格
-
-### 配色冲突
-
-当 `ui-ux-pro-max` 推荐主色与首页架构图主色冲突时：
-
-1. 首页架构图主色优先覆盖 `--primary-color`
-2. `ui-ux-pro-max` 主色降级为辅助色
-3. 字体、间距和辅助色建议仍保留
-
-## 逐页 HTML 生成
-
-首先读取 `references/page-html-template.md`，再生成每页 HTML。
-
-要求：
-
-1. 一页对应一个 `doc-ppt/pages/<页码>-<slug>.html`
-2. 先固定结构，再做美化
-3. 图表优先引用 `doc-ppt/<图表名>.html`
-4. 每个 HTML 文件只表达一页幻灯片
-5. 页面风格受图表 HTML 约束，不得另造一份不同风格图表
-6. 封面页与内容页页脚嵌入品牌 Logo
-7. 若启用轻量 MD3 规范化，只能增强页面壳层和信息层级，不得越过图表 HTML 的冻结边界
-
-## Sub Agent 建议
-
-1. 每页 HTML 草拟优先交给 fresh sub agent，按“标题 / 结论 / 上屏内容 / 话术”四要素独立组织
-2. 页面较多时，可并行 sub agents 分页起草，但主线程必须统一审一遍标题层级、配色、页脚和数据一致性后再落盘
-3. 布局审查与业务化术语清理也优先由独立 sub agent 复核，再回主线程做最终修正
-
-## 生成后检查
-
-1. 从 `references/page-html-template.md` 第 5 节读取布局审查清单，10 项全部通过才可进入 Phase 5
-2. 检查 HTML 中无技术表名、类名、内部 API 路径等技术命名残留
-
-## CSS 分层模式
-
-1. 基础层：布局、间距、定位、尺寸
-2. 增强层：渐变、阴影、圆角胶囊、数字样式等视觉增强
-3. 增强层不得改 `position`、`width`、`height`、`top`、`left` 等布局属性
-4. 增强层失效时移除即可，基础布局仍应完整
-5. 若使用 MD3 token，优先放在增强层的颜色、圆角、字级和 spacing 变量中，不得侵入基础层坐标约束
+1. `skills/robot-aiot-slide-html-author/SKILL.md`
+2. `skills/robot-aiot-slide-html-author/references/page-authoring-rules.md`
+3. `skills/robot-aiot-slide-html-author/references/page-html-template.md`

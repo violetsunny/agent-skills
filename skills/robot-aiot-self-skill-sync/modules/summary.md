@@ -46,9 +46,9 @@
 
 | 字段 | 说明 |
 |------|------|
-| commands 迁移结果 | `rsync -r --delete ~/.claude/commands/ ~/.agents/commands/` 执行后，两目录文件集合是否一致 |
+| commands 迁移结果 | 仅针对模块 2 的 `.claude -> .agents` 运行时镜像迁移：`rsync -r --delete ~/.claude/commands/ ~/.agents/commands/` 执行后，两目录文件集合是否一致 |
 | skills 迁移结果 | `~/.claude/skills/` 下每个 skill 同步到 `~/.agents/skills/` 的结果，差异时 `[OVERWRITE]` 覆盖 |
-| `[OVERWRITE]` 覆盖的 skills 列表 | 有差异并被 `rsync -r --delete` 覆盖的 skill 名称 |
+| `[OVERWRITE]` 覆盖的 skills 列表 | 仅针对模块 2：有差异并被 `rsync -r --delete` 覆盖的运行时 skill 名称；不代表模块 3.5 / 4 可以删除目标端文件 |
 | 其他工具目录迁移说明 | 明确说明其他工具目录（`.codebuddy/`、`.cursor/` 等）仅记录生成状态，不参与 `.agents` 迁移 |
 
 ## Skill 同步汇总

@@ -264,6 +264,17 @@
       "created_at": "2026-08-25T03:47:23.000Z",
       "pinned": false
     },
+    "robot-aiot-slide-html-author": {
+      "name": "robot-aiot-slide-html-author",
+      "created_by": "agent",
+      "state": "active",
+      "use_count": 0,
+      "view_count": 0,
+      "patch_count": 0,
+      "last_activity_at": "2026-08-26T00:00:00.000Z",
+      "created_at": "2026-08-26T00:00:00.000Z",
+      "pinned": false
+    },
     "openspec-propose": {
       "name": "openspec-propose",
       "created_by": "user",

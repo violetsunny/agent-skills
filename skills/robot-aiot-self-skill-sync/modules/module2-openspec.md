@@ -120,6 +120,8 @@ OpenSpec 可能按 profile 生成不同数量的 commands / skills，且文件�
 
 更新 OpenSpec 后，**必须先完成步骤 6A 的命令数量校验并通过后**，再按以下固定顺序执行迁移：
 
+这里的 `--delete` 仅用于**模块 2 的 `.claude -> .agents` 运行时镜像迁移**：目标是让 `.agents` 精确跟随当前 OpenSpec profile 的实际生成结果。它不适用于模块 3、模块 3.5、模块 4 或知识库同步；这些场景仍然遵循“不加 `--delete`、不删除用户自定义文件”的保护规则。
+
 ```bash
 rsync -r --delete ~/.claude/commands/ ~/.agents/commands/
 ```
@@ -141,7 +143,7 @@ for skill_dir in ~/.claude/skills/*; do
 done
 ```
 
-`.claude` 是权威源，当前 profile 实际生成的 skills 遇到差异时直接用 `rsync -r --delete` 覆盖 `.agents` 副本，并在汇总中报告已覆盖的 skill 名称（`[OVERWRITE]`）。两者一致时静默跳过。
+`.claude` 是权威源，当前 profile 实际生成的 skills 遇到差异时直接用 `rsync -r --delete` 覆盖 `.agents` 副本，并在汇总中报告已覆盖的 skill 名称（`[OVERWRITE]`）。两者一致时静默跳过。再次强调：这是模块 2 对运行时副本的受控覆盖例外，不得外推到 agent-skills、free-stock-line-skills 或其他用户维护目录。
 
 **同步范围说明**：这里仅同步 OpenSpec 生成的 commands 和 skills。模块 3 负责其他 skills 的最新性，模块 4.4 负责 `~/.claude/skills/` 的运行时备份；数据流单向，不反向同步 `.agents/skills/ -> .claude/skills/`。
 

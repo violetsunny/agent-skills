@@ -87,7 +87,7 @@
 ├── Sub agents: 负责阶段内分析/起草/审查
 ├── Phase 3: 主线程调用 robot-aiot-draw-flowchart
 ├── Phase 3.5: 主线程调用 robot-aiot-xml-html-bridge
-├── Phase 4: 主线程调用 ui-ux-pro-max 的设计系统能力
+├── Phase 4: 主线程调用 robot-aiot-slide-html-author 生成逐页 HTML
 └── Phase 5: 主线程调用 ppt-master
 ```
 
