@@ -1,8 +1,8 @@
 ---
 name: stock-replay-workbench
-description: Use when the user asks for A-share 盘后复盘、收盘简报、主线题材梳理、强势股/观察池、个股为何走强、题材与资金联动、龙虎榜/公告/研报/财务交叉分析, or when a stock query must expand from a simple quote into a structured workflow with task routing, source priority, timestamps, warnings, and layered conclusions. Covers 打板情绪(涨停/炸板/跌停/昨涨停四池+连板分析+涨停揭秘)、ETF期权(T型报价+希腊字母+IV)、舆情互动(热榜/人气榜/互动易)等能力.
+description: Use when the user asks for A-share 盘后复盘、收盘简报、主线题材梳理、强势股/观察池、个股为何走强、题材与资金联动、龙虎榜/公告/研报/财务交叉分析, or when a stock query must expand from a simple quote into a structured workflow with task routing, source priority, timestamps, warnings, and layered conclusions. Covers 打板情绪(涨停/炸板/跌停/昨涨停四池+连板分析+涨停揭秘)、ETF期权(T型报价+希腊字母+IV)、舆情互动(热榜/人气榜/互动易)等能力. 多股对比/复盘多维度分析通过 sub-agent 并行编排, 深度报告强制经 cross-check-reviewer 第二意见复查校对.
 metadata:
-  version: "0.3.0"
+  version: "0.4.0"
   origin: custom
 ---
 
@@ -33,7 +33,8 @@ metadata:
 | 快查 (quick lookup) | `茅台最新价`、`今天涨停有哪些` | 直接调用底层开源库(如 akshare)获取 |
 | 深度分析 (deep analysis) | `宁德时代今天为什么强` | 先拿底稿，再补多域数据 |
 | 短线筛选 (short-term screening) | `找短线强势股` | 读 `references/screening-playbook.md` |
-| 盘后复盘 (post-market replay) | `复盘今天 A 股` | 读 `references/replay-template.md` |
+| 盘后复盘 (post-market replay) | `复盘今天 A 股` | 读 `references/replay-template.md`；维度多时可升级多标的并行模式 |
+| 多标的并行 (multi-target) | `比较这 5 只票` | 读 `references/subagent-playbook.md`，派发 sub-agent |
 
 默认入口：
 
@@ -81,6 +82,7 @@ python3 scripts/stock_replay_cli.py <subcommand> [...args]
 5. 先利用独立开源库拿到底稿。
 6. 只有需要独有字段时，才按 `references/source-playbook.md` 升级数据源。
 7. 输出时分清事实、信号、判断、风险 (facts, signals, judgment, risks)，并附来源、时间戳和 warning。
+8. 多标的 / 多维度任务按 `references/subagent-playbook.md` 派发 sub-agent 并行分析；深度分析、复盘、筛选报告在交付前强制经 `cross-check-reviewer` 复查校对。
 
 ## 核心原则
 
@@ -156,6 +158,13 @@ python3 scripts/stock_replay_cli.py <subcommand> [...args]
 
 如果当前查询不在契约覆盖范围内，直接说明，不要假装能做。
 
+### 7. 多标的并行分析，交付前强制复查 (parallel sub-agents, mandatory review)
+
+Sub-agent 上下文干净，适合多股 / 多维度并行分析与第二意见复查。派发条件、角色分工、编排阶段见 `references/subagent-playbook.md`。两条铁律：
+
+1. 取数集中在主会话，sub-agent 只消费底稿（东财限流是进程内变量，跨进程并发必封 IP）。
+2. 深度分析、复盘、筛选报告交付前强制经 `cross-check-reviewer` 复查。
+
 ## 任务类型路由
 
 ### 1. 快查 (quick lookup)
@@ -215,6 +224,21 @@ python3 scripts/stock_replay_cli.py <subcommand> [...args]
 1. 读 `references/replay-template.md`。
 2. 覆盖指数、市场宽度、题材、板块、关键个股、资金与事件。
 3. 落到可验证的明日观察点，而不是空泛预测。
+
+### 5. 多标的并行 (multi-target parallel)
+
+多标的并行是**执行模式**，不是与前四类互斥的任务类型：深度分析涉及 ≥3 只标的，或盘后复盘维度多时，升级到此模式执行。
+
+适用于：
+
+- `比较兆易创新、寒武纪、中芯国际`
+- `这 5 只票各自为什么强`
+
+做法：
+
+1. 读 `references/subagent-playbook.md`。
+2. 主会话集中取数并落底稿，再派发并行 sub-agent（每股 / 每维度一个）。
+3. 汇总后强制经 `cross-check-reviewer` 复查。
 
 ## 数据域判断 (data-domain mapping)
 
@@ -340,6 +364,7 @@ Best-effort (less stable / public-web dependent)：
 - `references/source-playbook.md`：按数据域和任务选源（含数据源优先级、打板/ETF期权/舆情互动、已知坑表、防封机制）
 - `references/screening-playbook.md`：短线筛选框架
 - `references/replay-template.md`：复盘输出模板
+- `references/subagent-playbook.md`：sub-agent 并行编排与复查校对手册
 - `references/validation-playbook.md`：平台无关的验证清单
 - `references/manual-review-template.md`：人工验收记录模板
 - `scripts/validate_skill.py`：基于 `python3` 的通用验证脚本
@@ -352,3 +377,4 @@ Best-effort (less stable / public-web dependent)：
 2. 多源结果冲突时，说明冲突来源和当前采用的优先级。
 3. 不在契约范围内的查询，直接说明当前公开源方案不覆盖。
 4. 不因用户催促而跳过来源、时间戳和 warning。
+5. 深度分析、复盘、筛选报告未经 `cross-check-reviewer` 复查不得交付；复查不通过时先修正再输出。

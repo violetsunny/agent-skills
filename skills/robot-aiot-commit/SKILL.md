@@ -65,7 +65,7 @@ DIFF: <具体修改代码总结>
 
 标准规则：
 
-1. 优先适配本项目常见分支：`feature_YYYYMMDD_IOTRP-xxxx`、`fix_YYYYMMDD_IOTRP-xxxx`
+1. 优先适配本项目常见分支：`feature_YYYYMMDD_XXX-xxxx`、`fix_YYYYMMDD_XXX-xxxx`（JIRA 工单号格式为 `PROJECT-NUMBER`，如 `IOTRP-4697`、`AIOT-123`）
 2. 对上述下划线命名，按 `_` 分段并取最后一段作为 JIRA
 3. 若不是上述命名，再回退按 `/` 分段并取最后一段
 4. 若既不含 `_` 也不含 `/`，则直接沿用整个分支名
@@ -74,7 +74,7 @@ DIFF: <具体修改代码总结>
 示例：
 
 1. `feature_20260721_IOTRP-4697` -> `JIRA: IOTRP-4697`
-2. `fix_20260721_IOTRP-4697` -> `JIRA: IOTRP-4697`
+2. `fix_20260721_AIOT-123` -> `JIRA: AIOT-123`
 3. `feature/robot/AIOT-123` -> `JIRA: AIOT-123`
 4. `bugfix/order/OMS-998` -> `JIRA: OMS-998`
 5. `hotfix/HF-001` -> `JIRA: HF-001`

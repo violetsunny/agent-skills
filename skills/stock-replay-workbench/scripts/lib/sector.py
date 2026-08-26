@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from .common import clean_symbol, em_json_get, pick, source, success
+from .common import clean_symbol, em_json_get, em_market_code, pick, source, success
 
 
 def _records(frame) -> list[dict]:
@@ -77,7 +77,7 @@ def _eastmoney_rank_rows(action: str, limit: int) -> list[dict]:
 
 def _eastmoney_stock_membership(symbol: str, limit: int) -> list[dict]:
     code = clean_symbol(symbol)
-    market = 1 if code.startswith(("5", "6", "9")) else 0
+    market = em_market_code(code)
     payload = em_json_get(
         "https://push2.eastmoney.com/api/qt/slist/get",
         params={

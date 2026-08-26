@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import importlib.util
 import json
+import os
 import sys
 import tempfile
 import unittest
@@ -596,6 +597,372 @@ class StockDiagnoseLibTests(unittest.TestCase):
         self.assertIn("63.88-64.29", buy_plan["summary"])
         self.assertIn("66.76", buy_plan["summary"])
 
+    def test_stock_diagnose_builds_market_context_for_regime_analysis(self):
+        cli = load_cli_module()
+
+        with (
+            mock.patch.object(
+                cli,
+                "quote_realtime",
+                return_value={
+                    "ok": True,
+                    "data": {
+                        "symbol": "603986",
+                        "name": "兆易创新",
+                        "latest_price": 578.9,
+                    },
+                    "source_chain": [{"source": "tencent_quote", "ok": True}],
+                    "warnings": [],
+                },
+            ),
+            mock.patch.object(
+                cli,
+                "quote_history",
+                return_value={
+                    "ok": True,
+                    "data": {
+                        "symbol": "603986",
+                        "candles": [
+                            {
+                                "date": "2026-07-14",
+                                "close": 590.0,
+                                "high": 602.0,
+                                "low": 585.0,
+                            },
+                            {
+                                "date": "2026-07-15",
+                                "close": 578.9,
+                                "high": 594.0,
+                                "low": 570.0,
+                            },
+                        ],
+                        "latest_snapshot": {"date": "2026-07-15", "close": 578.9},
+                    },
+                    "source_chain": [{"source": "tencent_kline", "ok": True}],
+                    "warnings": [],
+                },
+            ),
+            mock.patch.object(
+                cli,
+                "money_flow",
+                return_value={
+                    "ok": True,
+                    "data": {
+                        "scope": "stock",
+                        "summary": {"main_net_inflow": -2200000000.0, "window": 5},
+                        "items": [],
+                    },
+                    "source_chain": [
+                        {"source": "eastmoney_stock_money_flow", "ok": True}
+                    ],
+                    "warnings": [],
+                },
+            ),
+            mock.patch.object(
+                cli,
+                "sector",
+                side_effect=[
+                    {
+                        "ok": True,
+                        "data": {
+                            "items": [
+                                {"板块名称": "存储芯片", "板块代码": "BK9991"},
+                                {"板块名称": "半导体", "板块代码": "BK1036"},
+                            ]
+                        },
+                        "source_chain": [
+                            {"source": "eastmoney_stock_membership", "ok": True}
+                        ],
+                        "warnings": [],
+                    },
+                    {
+                        "ok": True,
+                        "data": {
+                            "items": [
+                                {
+                                    "name": "银行",
+                                    "change_percent": 1.4,
+                                    "leader": "招商银行",
+                                },
+                                {
+                                    "name": "电力",
+                                    "change_percent": 0.8,
+                                    "leader": "长江电力",
+                                },
+                            ]
+                        },
+                        "source_chain": [{"source": "industry_rank", "ok": True}],
+                        "warnings": [],
+                    },
+                    {
+                        "ok": True,
+                        "data": {
+                            "items": [
+                                {
+                                    "name": "半导体",
+                                    "change_percent": -4.2,
+                                    "leader": "兆易创新",
+                                },
+                                {
+                                    "name": "科创",
+                                    "change_percent": -3.6,
+                                    "leader": "寒武纪",
+                                },
+                            ]
+                        },
+                        "source_chain": [{"source": "concept_rank", "ok": True}],
+                        "warnings": [],
+                    },
+                ],
+            ),
+            mock.patch.object(
+                cli,
+                "fundamental",
+                return_value={
+                    "ok": True,
+                    "data": {
+                        "symbol": "603986",
+                        "name": "兆易创新",
+                        "pe": 92.5,
+                        "pb": 8.2,
+                    },
+                    "source_chain": [
+                        {"source": "eastmoney_quote_valuation", "ok": True}
+                    ],
+                    "warnings": [],
+                },
+            ),
+            mock.patch.object(
+                cli,
+                "news",
+                return_value={
+                    "ok": True,
+                    "data": {"items": [{"title": "存储芯片景气仍有分化"}]},
+                    "source_chain": [{"source": "eastmoney_stock_news", "ok": True}],
+                    "warnings": [],
+                },
+            ),
+            mock.patch.object(
+                cli,
+                "market_snapshot",
+                return_value={
+                    "ok": True,
+                    "data": {
+                        "indexes": [
+                            {"name": "上证指数", "change_percent": -0.08},
+                            {"name": "深证成指", "change_percent": -0.38},
+                            {"name": "科创50", "change_percent": -3.67},
+                        ],
+                        "breadth": {"up": 3100, "down": 2100, "flat": 200},
+                    },
+                    "source_chain": [{"source": "market_snapshot", "ok": True}],
+                    "warnings": [],
+                },
+            ),
+            mock.patch.object(
+                cli,
+                "limit_sentiment",
+                return_value={
+                    "ok": True,
+                    "data": {
+                        "break_rate": 24.2,
+                        "advance_rate": 6.0,
+                        "earning_rate": 68.0,
+                    },
+                    "source_chain": [{"source": "limit_sentiment", "ok": True}],
+                    "warnings": [],
+                },
+            ) as patched_limit_sentiment,
+            mock.patch.object(
+                cli,
+                "_load_core_acceptance_standard",
+                return_value={
+                    "symbol": "603986",
+                    "name": "兆易创新",
+                    "thesis": "存储与数字芯片设计样本",
+                    "required_layers": ["facts", "signals", "judgment", "risks"],
+                    "required_fields": ["realtime.latest_price", "fundamental.pe"],
+                    "required_source_trace": True,
+                    "expected_conclusion_tags": ["存储", "芯片设计"],
+                    "tone_constraints": {
+                        "must_be_rational": True,
+                        "forbid_words": ["闭眼买"],
+                    },
+                },
+            ),
+        ):
+            payload = cli.stock_diagnose("603986", 5)
+
+        market_context = payload["data"]["market_context"]
+        analysis = payload["data"]["analysis"]
+        patched_limit_sentiment.assert_called_once_with(20)
+        self.assertEqual(market_context["indexes"][2]["name"], "科创50")
+        self.assertIn("银行", market_context["sector_context"]["leaders"])
+        self.assertIn("半导体", market_context["sector_context"]["laggards"])
+        self.assertEqual(analysis["market_regime"]["label"], "structural_rotation")
+        self.assertEqual(analysis["action_priority"][0]["action"], "reduce_first")
+
+    def test_build_market_context_filters_leaders_and_laggards_by_direction(self):
+        cli = load_cli_module()
+
+        with (
+            mock.patch.object(
+                cli,
+                "market_snapshot",
+                return_value={
+                    "ok": True,
+                    "data": {"indexes": [], "breadth": {}},
+                    "source_chain": [],
+                    "warnings": [],
+                },
+            ),
+            mock.patch.object(
+                cli,
+                "limit_sentiment",
+                return_value={
+                    "ok": True,
+                    "data": {},
+                    "source_chain": [],
+                    "warnings": [],
+                },
+            ),
+            mock.patch.object(
+                cli,
+                "sector",
+                side_effect=[
+                    {
+                        "ok": True,
+                        "data": {
+                            "items": [
+                                {"name": "银行", "change_percent": 1.2},
+                                {"name": "电力", "change_percent": 0.3},
+                                {"name": "煤炭", "change_percent": -0.2},
+                            ]
+                        },
+                        "source_chain": [],
+                        "warnings": [],
+                    },
+                    {
+                        "ok": True,
+                        "data": {
+                            "items": [
+                                {"name": "半导体", "change_percent": -4.2},
+                                {"name": "科创", "change_percent": -3.6},
+                                {"name": "机器人", "change_percent": 1.1},
+                            ]
+                        },
+                        "source_chain": [],
+                        "warnings": [],
+                    },
+                ],
+            ),
+        ):
+            market_context, _, _ = cli._build_market_context(5)
+
+        self.assertEqual(market_context["sector_context"]["leaders"], ["银行", "电力"])
+        self.assertEqual(
+            market_context["sector_context"]["laggards"], ["半导体", "科创"]
+        )
+
+    def test_build_market_context_keeps_empty_directional_buckets_empty(self):
+        cli = load_cli_module()
+
+        with (
+            mock.patch.object(
+                cli,
+                "market_snapshot",
+                return_value={
+                    "ok": True,
+                    "data": {"indexes": [], "breadth": {}},
+                    "source_chain": [],
+                    "warnings": [],
+                },
+            ),
+            mock.patch.object(
+                cli,
+                "limit_sentiment",
+                return_value={
+                    "ok": True,
+                    "data": {},
+                    "source_chain": [],
+                    "warnings": [],
+                },
+            ),
+            mock.patch.object(
+                cli,
+                "sector",
+                side_effect=[
+                    {
+                        "ok": True,
+                        "data": {
+                            "items": [
+                                {"name": "银行", "change_percent": 1.2},
+                                {"name": "电力", "change_percent": 0.3},
+                            ]
+                        },
+                        "source_chain": [],
+                        "warnings": [],
+                    },
+                    {
+                        "ok": True,
+                        "data": {
+                            "items": [
+                                {"name": "机器人", "change_percent": 1.1},
+                                {"name": "消费电子", "change_percent": 0.6},
+                            ]
+                        },
+                        "source_chain": [],
+                        "warnings": [],
+                    },
+                ],
+            ),
+        ):
+            market_context, _, _ = cli._build_market_context(5)
+
+        self.assertEqual(market_context["sector_context"]["leaders"], ["银行", "电力"])
+        self.assertEqual(market_context["sector_context"]["laggards"], [])
+
+    def test_build_layered_analysis_lowers_confidence_when_market_context_inputs_are_missing(
+        self,
+    ):
+        cli = load_cli_module()
+
+        standard = {
+            "symbol": "603986",
+            "name": "兆易创新",
+            "thesis": "存储与数字芯片设计样本",
+            "required_layers": ["facts", "signals", "judgment", "risks"],
+            "required_fields": ["realtime.latest_price", "fundamental.pe"],
+            "required_source_trace": True,
+            "expected_conclusion_tags": ["存储", "芯片设计"],
+            "tone_constraints": {"must_be_rational": True, "forbid_words": ["闭眼买"]},
+        }
+
+        with mock.patch.object(
+            cli, "_load_core_acceptance_standard", return_value=standard
+        ):
+            analysis = cli._build_layered_analysis(
+                "603986",
+                {
+                    "realtime": {"latest_price": 578.9},
+                    "fundamental": {"pe": 92.5, "pb": 8.2},
+                    "sector_membership": [{"板块名称": "半导体"}],
+                    "money_flow": {"summary": {"main_net_inflow": -2200000000.0}},
+                    "market_context": {},
+                },
+                [
+                    {"source": "market_snapshot", "ok": False},
+                    {"source": "limit_sentiment", "ok": False},
+                ],
+                ["市场宽度公开源失败", "limit sentiment unavailable"],
+            )
+
+        self.assertEqual(analysis["confidence"], "low")
+        self.assertEqual(analysis["market_regime"]["label"], "stable_to_constructive")
+        self.assertTrue(
+            any("市场宽度公开源失败" in item for item in analysis["warnings"])
+        )
+
     def test_stock_diagnose_builds_layered_analysis_for_core_acceptance_stock(self):
         cli = load_cli_module()
 
@@ -825,6 +1192,112 @@ class StockDiagnoseLibTests(unittest.TestCase):
         self.assertIn("近5日主力资金净流出", joined_signals)
         self.assertIn("资金分歧", joined_signals)
 
+    def test_build_layered_analysis_marks_fallback_provenance_and_low_confidence(self):
+        cli = load_cli_module()
+
+        standard = {
+            "symbol": "002156",
+            "name": "通富微电",
+            "thesis": "先进封装与封测弹性样本",
+            "required_layers": ["facts", "signals", "judgment", "risks"],
+            "required_fields": [
+                "realtime.latest_price",
+                "sector_membership",
+                "fundamental.pb",
+                "money_flow.summary",
+            ],
+            "required_source_trace": True,
+            "expected_conclusion_tags": ["先进封装", "封测", "弹性"],
+            "tone_constraints": {"must_be_rational": True, "forbid_words": ["闭眼买"]},
+        }
+
+        with mock.patch.object(
+            cli, "_load_core_acceptance_standard", return_value=standard
+        ):
+            analysis = cli._build_layered_analysis(
+                "002156",
+                {
+                    "realtime": {"latest_price": 67.39},
+                    "fundamental": {"pb": 6.61, "pe": 78.0},
+                    "sector_membership": [{"板块名称": "先进封装"}],
+                    "money_flow": {"summary": {}},
+                    "news_titles": ["通富微电获机构净买入2.6亿元"],
+                },
+                [
+                    {"source": "tencent_quote", "ok": True},
+                    {"source": "eastmoney_stock_money_flow", "ok": False},
+                ],
+                ["个股资金流公开源当前不可用"],
+            )
+
+        self.assertEqual(analysis["confidence"], "low")
+        self.assertEqual(analysis["provenance"]["mode"], "mixed")
+        self.assertIn(
+            "eastmoney_stock_money_flow", analysis["provenance"]["fallback_sources"]
+        )
+        self.assertIn("flow", analysis["degradation_flags"])
+        self.assertTrue(analysis["warnings"])
+
+    def test_build_layered_analysis_classifies_structural_rotation_and_prioritizes_high_beta(
+        self,
+    ):
+        cli = load_cli_module()
+
+        standard = {
+            "symbol": "603986",
+            "name": "兆易创新",
+            "thesis": "存储与数字芯片设计样本",
+            "required_layers": ["facts", "signals", "judgment", "risks"],
+            "required_fields": ["realtime.latest_price", "fundamental.pe"],
+            "required_source_trace": True,
+            "expected_conclusion_tags": ["存储", "芯片设计"],
+            "tone_constraints": {"must_be_rational": True, "forbid_words": ["闭眼买"]},
+        }
+
+        with mock.patch.object(
+            cli, "_load_core_acceptance_standard", return_value=standard
+        ):
+            analysis = cli._build_layered_analysis(
+                "603986",
+                {
+                    "realtime": {"latest_price": 578.9, "change_percent": -0.87},
+                    "fundamental": {"pe": 92.5, "pb": 8.2},
+                    "sector_membership": [
+                        {"板块名称": "存储芯片"},
+                        {"板块名称": "半导体"},
+                    ],
+                    "money_flow": {
+                        "summary": {
+                            "main_net_inflow": -2200000000.0,
+                            "window": 5,
+                        }
+                    },
+                    "market_context": {
+                        "indexes": [
+                            {"name": "上证指数", "change_percent": -0.08},
+                            {"name": "深成指", "change_percent": -0.38},
+                            {"name": "科创50", "change_percent": -3.67},
+                        ],
+                        "breadth": {"up": 3100, "down": 2100, "flat": 200},
+                        "limit_sentiment": {
+                            "break_rate": 24.2,
+                            "advance_rate": 6.0,
+                            "earning_rate": 68.0,
+                        },
+                        "sector_context": {
+                            "leaders": ["银行", "电力"],
+                            "laggards": ["半导体", "科创"],
+                        },
+                    },
+                },
+                [{"source": "tencent_quote", "ok": True}],
+                [],
+            )
+
+        self.assertEqual(analysis["market_regime"]["label"], "structural_rotation")
+        self.assertEqual(analysis["action_priority"][0]["bucket"], "high_volatility")
+        self.assertIn("结构性", analysis["market_regime"]["summary"])
+
 
 class ReplayOutputPathTests(unittest.TestCase):
     def test_resolve_output_path_anchors_relative_paths_in_hidden_analysis_dir(self):
@@ -833,6 +1306,13 @@ class ReplayOutputPathTests(unittest.TestCase):
         resolved = cli._resolve_output_path("2026-07-03.json")
 
         self.assertEqual(resolved, cli.DEFAULT_OUTPUT_DIR / "2026-07-03.json")
+
+    def test_resolve_output_path_preserves_explicit_relative_directories(self):
+        cli = load_cli_module()
+
+        resolved = cli._resolve_output_path(".analysis/2026-07-03.json")
+
+        self.assertEqual(resolved, Path(".analysis/2026-07-03.json"))
 
     def test_build_replay_creates_missing_parent_directory(self):
         cli = load_cli_module()
@@ -875,6 +1355,33 @@ class ReplayOutputPathTests(unittest.TestCase):
             saved = json.loads(output_path.read_text(encoding="utf-8"))
             self.assertEqual(saved["trade_date"], "2026-07-03")
 
+    def test_build_replay_preserves_explicit_relative_output_directory(self):
+        cli = load_cli_module()
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            root = Path(tmpdir)
+            hidden_analysis = root / ".analysis"
+            cwd = os.getcwd()
+            try:
+                os.chdir(root)
+                with (
+                    mock.patch.object(
+                        cli,
+                        "build_replay",
+                        return_value={"data": {"trade_date": "2026-07-03"}, "ok": True},
+                    ),
+                    mock.patch.object(cli, "DEFAULT_OUTPUT_DIR", hidden_analysis),
+                ):
+                    cli._build_replay(None, 3, ".analysis/2026-07-03.json")
+            finally:
+                os.chdir(cwd)
+
+            output_path = hidden_analysis / "2026-07-03.json"
+            self.assertTrue(output_path.exists())
+            self.assertFalse(
+                (hidden_analysis / ".analysis" / "2026-07-03.json").exists()
+            )
+
     def test_render_replay_creates_missing_parent_directory(self):
         cli = load_cli_module()
 
@@ -894,6 +1401,31 @@ class ReplayOutputPathTests(unittest.TestCase):
 
             self.assertTrue(output_path.exists())
             self.assertEqual(output_path.read_text(encoding="utf-8"), "# report")
+
+    def test_render_replay_preserves_explicit_relative_output_directory(self):
+        cli = load_cli_module()
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            root = Path(tmpdir)
+            input_path = root / "input.json"
+            input_path.write_text(
+                json.dumps({"trade_date": "2026-07-03"}), encoding="utf-8"
+            )
+            hidden_analysis = root / ".analysis"
+            cwd = os.getcwd()
+            try:
+                os.chdir(root)
+                with (
+                    mock.patch.object(cli, "render_report", return_value="# report"),
+                    mock.patch.object(cli, "DEFAULT_OUTPUT_DIR", hidden_analysis),
+                ):
+                    cli._render_replay(str(input_path), ".analysis/2026-07-03.md")
+            finally:
+                os.chdir(cwd)
+
+            output_path = hidden_analysis / "2026-07-03.md"
+            self.assertTrue(output_path.exists())
+            self.assertFalse((hidden_analysis / ".analysis" / "2026-07-03.md").exists())
 
 
 class LimitPoolLibTests(unittest.TestCase):
@@ -1015,6 +1547,233 @@ class RenderReplayMarkdownScriptTests(unittest.TestCase):
         self.assertIn("- 昨涨停家数: 8", report)
         self.assertIn("- 昨涨停晋级率: 37.50%", report)
         self.assertIn("- 昨涨停赚钱效应: 62.50%", report)
+
+    def test_render_report_includes_regime_and_provenance_sections(self):
+        module_path = SCRIPTS_DIR / "render_replay_markdown.py"
+        spec = importlib.util.spec_from_file_location(
+            "render_replay_markdown", module_path
+        )
+        module = importlib.util.module_from_spec(spec)
+        assert spec is not None
+        assert spec.loader is not None
+        spec.loader.exec_module(module)
+
+        report = module.render_report(
+            {
+                "trade_date": "2026-07-15",
+                "summary": "测试摘要",
+                "market_regime": {
+                    "label": "structural_rotation",
+                    "summary": "当前更像结构性分化，不是系统性崩盘。",
+                    "signals": ["科创50显著弱于宽基", "宽度未同步转弱"],
+                },
+                "analysis_provenance": {
+                    "mode": "mixed",
+                    "primary_sources": ["market_snapshot", "industry_flow"],
+                    "fallback_sources": ["concept_flow_backup"],
+                    "degradation_flags": ["concept_flow"],
+                },
+                "warnings": ["概念资金流公开源当前不可用"],
+                "confidence": "low",
+            }
+        )
+
+        self.assertIn("### 市场结构判断", report)
+        self.assertIn("structural_rotation", report)
+        self.assertIn("### 数据来源与降级说明", report)
+        self.assertIn("concept_flow_backup", report)
+
+
+class ReplayAnalysisMetadataTests(unittest.TestCase):
+    def test_analysis_provenance_marks_flow_degradation_from_english_source_ids(self):
+        from scripts.lib import replay_builder
+
+        provenance = replay_builder._analysis_provenance(
+            [
+                {"source": "market_snapshot", "ok": True},
+                {"source": "eastmoney_stock_money_flow", "ok": False},
+                {"source": "akshare_stock_individual_fund_flow", "ok": False},
+            ]
+        )
+
+        self.assertEqual(provenance["mode"], "mixed")
+        self.assertIn("flow", provenance["degradation_flags"])
+
+    def test_analysis_provenance_marks_sector_degradation_only_from_explicit_sector_sources(
+        self,
+    ):
+        from scripts.lib import replay_builder
+
+        provenance = replay_builder._analysis_provenance(
+            [
+                {"source": "market_snapshot", "ok": True},
+                {"source": "industry_rank", "ok": False},
+                {"source": "concept_flow", "ok": False},
+            ]
+        )
+
+        self.assertIn("sector", provenance["degradation_flags"])
+
+    def test_analysis_provenance_does_not_mark_sector_from_generic_rank_source(self):
+        from scripts.lib import replay_builder
+
+        provenance = replay_builder._analysis_provenance(
+            [
+                {"source": "market_snapshot", "ok": True},
+                {"source": "rank_amount", "ok": False},
+            ]
+        )
+
+        self.assertNotIn("sector", provenance["degradation_flags"])
+
+    def test_build_replay_marks_systemic_weakness_with_low_confidence(self):
+        from scripts.lib import replay_builder
+
+        snapshot_payload = {
+            "ok": True,
+            "source_chain": [{"source": "market_snapshot", "ok": True}],
+            "warnings": [],
+            "data": {
+                "indexes": [
+                    {"name": "上证指数", "latest_price": 3900, "change_percent": -1.5},
+                    {"name": "深成指", "latest_price": 12000, "change_percent": -2.3},
+                    {"name": "创业板指", "latest_price": 2500, "change_percent": -3.1},
+                ],
+                "breadth": {"up": 800, "down": 4200, "flat": 120},
+            },
+        }
+        limit_up_payload = {
+            "ok": True,
+            "source_chain": [{"source": "limit_up", "ok": True}],
+            "warnings": ["涨停池主源降级"],
+            "data": {
+                "returned_count": 12,
+                "items": [{"board_count": 2, "code": "000001", "sector": "银行"}],
+            },
+        }
+        limit_sentiment_payload = {
+            "ok": True,
+            "source_chain": [{"source": "limit_sentiment", "ok": True}],
+            "warnings": [],
+            "data": {
+                "up_count": 12,
+                "break_count": 18,
+                "down_count": 35,
+                "yesterday_up_count": 40,
+                "advance_count": 1,
+                "advance_rate": 2.5,
+                "earning_rate": 18.0,
+                "break_rate": 60.0,
+                "max_height": 2,
+            },
+        }
+        rank_payload = {
+            "ok": True,
+            "source_chain": [{"source": "rank_amount", "ok": True}],
+            "warnings": [],
+            "data": {"items": [{"code": "000001", "amount": 123456}]},
+        }
+        industry_rank_payload = {
+            "ok": True,
+            "source_chain": [{"source": "industry_rank", "ok": True}],
+            "warnings": [],
+            "data": {
+                "items": [{"name": "银行", "change_percent": 1.2, "leader": "招商银行"}]
+            },
+        }
+        concept_rank_payload = {
+            "ok": True,
+            "source_chain": [{"source": "concept_rank", "ok": True}],
+            "warnings": ["概念排行同花顺回退失败"],
+            "data": {
+                "items": [
+                    {"name": "高股息", "change_percent": 0.8, "leader": "长江电力"}
+                ]
+            },
+        }
+        industry_flow_payload = {
+            "ok": True,
+            "source_chain": [{"source": "industry_flow", "ok": True}],
+            "warnings": [],
+            "data": {
+                "items": [
+                    {
+                        "name": "银行",
+                        "main_net_inflow": 1000000000,
+                        "main_net_inflow_percent": 2.0,
+                        "leader": "招商银行",
+                    }
+                ]
+            },
+        }
+        concept_flow_payload = {
+            "ok": True,
+            "source_chain": [{"source": "concept_flow", "ok": False}],
+            "warnings": ["概念资金流公开源当前不可用"],
+            "data": {"items": []},
+        }
+        sentiment_heat_payload = {
+            "ok": True,
+            "source_chain": [{"source": "sentiment_heat", "ok": True}],
+            "warnings": [],
+            "data": {},
+        }
+
+        with (
+            mock.patch.object(
+                replay_builder, "market_snapshot", return_value=snapshot_payload
+            ),
+            mock.patch.object(
+                replay_builder, "limit_pool", return_value=limit_up_payload
+            ),
+            mock.patch.object(
+                replay_builder, "limit_sentiment", return_value=limit_sentiment_payload
+            ),
+            mock.patch.object(replay_builder, "rank", return_value=rank_payload),
+            mock.patch.object(
+                replay_builder,
+                "sector",
+                side_effect=[industry_rank_payload, concept_rank_payload],
+            ),
+            mock.patch.object(
+                replay_builder,
+                "money_flow",
+                side_effect=[industry_flow_payload, concept_flow_payload],
+            ),
+            mock.patch.object(
+                replay_builder,
+                "fundamental",
+                return_value={
+                    "ok": True,
+                    "source_chain": [],
+                    "warnings": [],
+                    "data": {"symbol": "000001", "name": "平安银行"},
+                },
+            ),
+            mock.patch.object(
+                replay_builder, "sentiment_heat", return_value=sentiment_heat_payload
+            ),
+            mock.patch.object(
+                replay_builder,
+                "_build_market_event_snapshots",
+                return_value=(
+                    replay_builder._empty_market_event_snapshots(),
+                    {},
+                    [],
+                    [],
+                ),
+            ),
+            mock.patch.object(
+                replay_builder,
+                "_build_focus_event_snapshot",
+                return_value=({"symbol": "000001", "name": "平安银行"}, [], []),
+            ),
+        ):
+            payload = replay_builder.build_replay("2026-07-15", 3)
+
+        self.assertEqual(payload["data"]["market_regime"]["label"], "systemic_weakness")
+        self.assertEqual(payload["data"]["confidence"], "low")
+        self.assertIn("systemic_weakness", payload["data"]["regime_watchpoints"][0])
 
     def test_main_creates_missing_parent_directory_for_output(self):
         module_path = SCRIPTS_DIR / "render_replay_markdown.py"

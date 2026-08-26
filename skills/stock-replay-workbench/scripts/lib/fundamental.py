@@ -3,6 +3,7 @@ from __future__ import annotations
 from .common import (
     clean_symbol,
     em_json_get,
+    em_market_code,
     full_symbol,
     guess_name,
     safe_float,
@@ -111,7 +112,7 @@ def _scaled_float(value: object, divisor: float) -> float | None:
 
 def _find_quote_metrics(symbol: str) -> tuple[dict, dict]:
     code = clean_symbol(symbol)
-    market = 1 if code.startswith(("5", "6", "9")) else 0
+    market = em_market_code(code)
     payload = em_json_get(
         "https://push2.eastmoney.com/api/qt/stock/get",
         params={

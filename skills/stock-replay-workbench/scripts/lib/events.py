@@ -5,7 +5,7 @@ import json
 import re
 import threading
 
-from .common import clean_symbol, em_get, source, success
+from .common import clean_symbol, detect_exchange, em_get, source, success
 
 
 _PUBLIC_SOURCE_TIMEOUT_SECONDS = 8.0
@@ -137,7 +137,7 @@ def _fetch_stock_news_eastmoney(symbol: str, limit: int) -> list[dict]:
 
 def _fetch_stock_news_sina(symbol: str, limit: int) -> list[dict]:
     code = clean_symbol(symbol)
-    prefix = "sh" if code.startswith(("5", "6", "9")) else "sz"
+    prefix = detect_exchange(symbol).lower()
     response = em_get(
         f"https://vip.stock.finance.sina.com.cn/corp/view/vCB_AllNewsStock.php?symbol={prefix}{code}&Page=1",
         referer="https://finance.sina.com.cn/",

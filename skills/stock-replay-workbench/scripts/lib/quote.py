@@ -39,20 +39,33 @@ def _safe_int(value: str | None) -> int | None:
 def _parse_tencent_quote(text: str, symbol: str) -> dict:
     body = text.split('="', 1)[1].rsplit('";', 1)[0]
     parts = body.split("~")
+    latest_price = _safe_float(parts[3] if len(parts) > 3 else None)
+    prev_close = _safe_float(parts[4] if len(parts) > 4 else None)
+    volume = _safe_int(parts[6] if len(parts) > 6 else None)
+    is_stale = (
+        latest_price is not None
+        and prev_close is not None
+        and volume == 0
+        and latest_price == prev_close
+    )
     return {
         "symbol": clean_symbol(symbol),
         "full_symbol": full_symbol(symbol),
         "name": parts[1] or guess_name(symbol),
-        "latest_price": _safe_float(parts[3] if len(parts) > 3 else None),
-        "prev_close": _safe_float(parts[4] if len(parts) > 4 else None),
+        "latest_price": latest_price,
+        "prev_close": prev_close,
         "open": _safe_float(parts[5] if len(parts) > 5 else None),
-        "volume": _safe_int(parts[6] if len(parts) > 6 else None),
+        "volume": volume,
         "turnover": _safe_float(parts[37] if len(parts) > 37 else None),
         "change": _safe_float(parts[31] if len(parts) > 31 else None),
         "change_percent": _safe_float(parts[32] if len(parts) > 32 else None),
         "high": _safe_float(parts[33] if len(parts) > 33 else None),
         "low": _safe_float(parts[34] if len(parts) > 34 else None),
         "timestamp": parts[30] if len(parts) > 30 else None,
+        "is_stale": is_stale,
+        "stale_reason": "成交量为0且最新价等于昨收，疑似已迁移废码或停牌（僵尸报价）"
+        if is_stale
+        else None,
     }
 
 
@@ -71,6 +84,10 @@ def quote_realtime(symbol: str) -> dict:
         source_chain.append(source("tencent_quote", True))
         if parsed.get("latest_price") is None:
             warnings.append("腾讯行情返回成功，但关键价格字段缺失。")
+        if parsed.get("is_stale"):
+            warnings.append(
+                "疑似僵尸报价（成交量为0且价格未变）：可能是北交所已迁移废码或停牌标的，不要用于估值。"
+            )
         return success("quote_realtime", parsed, source_chain, warnings)
     except Exception as exc:
         warnings.append(f"实时行情降级为本地最小结果: {exc}")

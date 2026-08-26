@@ -195,6 +195,15 @@ def render_report(payload: dict) -> str:
             ]
         )
 
+    market_regime = payload.get("market_regime") or {}
+    if market_regime:
+        lines.append("### 市场结构判断")
+        lines.append(f"- Regime: {market_regime.get('label', 'unknown')}")
+        lines.append(f"- 结论: {market_regime.get('summary', '暂无')}")
+        for item in _ensure_list(market_regime.get("signals")):
+            lines.append(f"- 信号: {item}")
+        lines.append("")
+
     limit_sentiment = payload.get("limit_sentiment")
     if isinstance(limit_sentiment, dict) and limit_sentiment:
         lines.extend(
@@ -378,6 +387,24 @@ def render_report(payload: dict) -> str:
         lines.append("### 免责声明")
         for item in disclaimers:
             lines.append(f"- {item}")
+        lines.append("")
+
+    provenance = payload.get("analysis_provenance") or {}
+    if provenance:
+        lines.append("### 数据来源与降级说明")
+        lines.append(f"- 来源模式: {provenance.get('mode', 'unknown')}")
+        primary_sources = (
+            ", ".join(_ensure_list(provenance.get("primary_sources"))) or "无"
+        )
+        fallback_sources = (
+            ", ".join(_ensure_list(provenance.get("fallback_sources"))) or "无"
+        )
+        degradation_flags = (
+            ", ".join(_ensure_list(provenance.get("degradation_flags"))) or "无"
+        )
+        lines.append(f"- 主源: {primary_sources}")
+        lines.append(f"- 回退源: {fallback_sources}")
+        lines.append(f"- 降级域: {degradation_flags}")
         lines.append("")
 
     source_chain = payload.get("source_chain", [])

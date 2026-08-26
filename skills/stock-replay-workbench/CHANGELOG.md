@@ -1,5 +1,23 @@
 # Changelog
 
+## v0.4.0 - 2026-08-25
+
+### Added
+
+- Added `references/subagent-playbook.md`：sub-agent 并行编排与复查校对手册（借鉴 claude-trading-skills 的 orchestrator + second-opinion agent 模式）。
+- Added 新任务类型「多标的 / 多维度并行」：≥3 只股票对比或复盘多维度时派发并行 sub-agent。
+- Added 核心原则 7「多标的并行分析，交付前强制复查」：取数集中在主会话（防东财并发封 IP），sub-agent 只消费底稿；深度分析/复盘/筛选报告强制经 `cross-check-reviewer` 第二意见校对。
+- Added 三个 sub-agent 角色定义：`symbol-analyst`（个股）、`domain-analyst`（行情维度）、`cross-check-reviewer`（复查校对，含事实核对/分层合规/偏差检测/僵尸报价与北交所老号段数据质量检查）。
+
+### Changed
+
+- Updated `SKILL.md` 任务路由表、核心工作流、失败处理与仓库内参考，纳入 sub-agent 编排路径；版本升至 0.4.0。
+
+### Validation
+
+- frontmatter 解析与引用文档完整性检查 -> passed
+- `python3 scripts/validate_skill.py` 涉及实时取数，未在本次离线改动中重跑
+
 ## v0.3.0 - 2026-07-06
 
 ### Added

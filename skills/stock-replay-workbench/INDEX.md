@@ -193,6 +193,7 @@
 | source-playbook.md | references/ | 按数据域的源选择策略 |
 | replay-template.md | references/ | 复盘输出结构与写作要求 |
 | screening-playbook.md | references/ | 短线筛选框架与硬条件 |
+| subagent-playbook.md | references/ | sub-agent 并行编排与复查校对手册 |
 | validation-playbook.md | references/ | 平台无关的验证清单与发布标准 |
 | manual-review-template.md | references/ | 人工验收记录模板 |
 
@@ -219,5 +220,5 @@ python3 scripts/validate_skill.py
 
 ## 版本
 
-生成时间: 2026-07-02
-Skill版本: v0.3.0
+生成时间: 2026-08-25
+Skill版本: v0.4.0

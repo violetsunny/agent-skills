@@ -2,7 +2,9 @@ from __future__ import annotations
 
 from .common import (
     clean_symbol,
+    detect_exchange,
     em_json_get,
+    em_market_code,
     format_hhmmss,
     safe_float,
     safe_int,
@@ -81,7 +83,7 @@ def _parse_stock_kline(line: str) -> dict | None:
 
 def _stock_flow_from_eastmoney(symbol: str, limit: int) -> tuple[dict, dict]:
     code = clean_symbol(symbol)
-    market = 1 if code.startswith(("5", "6", "9")) else 0
+    market = em_market_code(code)
     payload = em_json_get(
         "https://push2his.eastmoney.com/api/qt/stock/fflow/kline/get",
         params={
@@ -183,7 +185,7 @@ def _stock_flow_from_akshare(symbol: str, limit: int) -> tuple[dict, dict]:
     import akshare as ak  # type: ignore
 
     code = clean_symbol(symbol)
-    market = "sh" if code.startswith(("5", "6", "9")) else "sz"
+    market = detect_exchange(code).lower()
     frame = ak.stock_individual_fund_flow(stock=code, market=market)
     rows = frame.to_dict("records")
     items = []
