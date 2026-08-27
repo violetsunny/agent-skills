@@ -10,7 +10,7 @@ git-self-update 技能的模块 2（`modules/module2-openspec.md`）当前只处
 5. 根据输出判定结果
 6. `rsync -r --delete ~/.claude/commands/ ~/.agents/commands/`
 7. 逐 skill 同步 `.claude/skills/ → .agents/skills/`
-8. 运行 `/opsx-workflow-hooks` 恢复 hooks
+8. 运行 `opsx-workflow-hooks` skill 恢复 hooks
 
 需要增强的是步骤 5（输出判定）和步骤 6-7 之后（新增检查项），以及汇总报告模板。
 

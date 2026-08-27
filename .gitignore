@@ -41,3 +41,6 @@ target/
 
 ## AI 相关文件
 
+### Python cache
+**/__pycache__/
+*.pyc

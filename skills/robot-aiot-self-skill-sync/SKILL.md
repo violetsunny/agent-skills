@@ -35,7 +35,7 @@ Sub agent 原则：
 ## 执行顺序
 
 1. **模块 1** — 批量 git pull（递归三层）所有 self 项目（包括 skill 项目）；先对非干净仓库按 dirty 状态分类：只有未跟踪文件的标记 `[SAFE-UNTRACKED]` 并安全拉取，有已修改跟踪文件的标记 `[SKIP-DIRTY]` 保护性跳过
-2. **模块 2** — 在用户 Terminal 中先确认当前 OpenSpec profile 是否已切到足够完整的集合；如有需要先执行 `openspec config profile` 与 `openspec init`，再执行 `npm install -g @fission-ai/openspec@latest`，通过 `openspec --version` 确认当前版本后，从用户主目录运行 `openspec update`；随后按模块 2 的固定步骤完成 `.claude -> .agents` 迁移、`/opsx-workflow-hooks` 恢复与完整性校验，按输出区分成功、可选提示和真实失败
+2. **模块 2** — 在用户 Terminal 中先确认当前 OpenSpec profile 是否已切到足够完整的集合；如有需要先执行 `openspec config profile` 与 `openspec init`，再执行 `npm install -g @fission-ai/openspec@latest`，通过 `openspec --version` 确认当前版本后，从用户主目录运行 `openspec update`；随后按模块 2 的固定步骤完成 `.claude -> .agents` 迁移、运行 `opsx-workflow-hooks` skill 恢复与完整性校验，按输出区分成功、可选提示和真实失败
 3. **模块 3** — Skill 同步：先在用户主目录执行 `npx skills@latest update`（选择 Global + Copy to all agents）更新 5 个 npx 管理型项目，再对 2 个 rsync 管理型项目做交集匹配同步
 4. **模块 3.5** — 将 `self/skills/` 下更新的项目强制同步到 `free-stock-line-skills/` 中匹配的目录（不加 `--delete`，保留用户自定义文件；`stock-replay-workbench` 禁止修改）
 5. **模块 4** — 先将 `~/.agents/skills/` 全量同步到当前项目 `agent-skills/skills/`，再补充同步 `self/skills/` 下各项目自身携带的 skill 源内容到 `agent-skills/skills/`（包括项目根目录、`skills/`、项目内 `.claude/skills/`、项目内 `.agents/skills/` 四类结构，均不回退到用户根目录查找），同时同步 `~/.agents/commands/` 到 `agent-skills/commands/`（均不加 `--delete`），报告变更清单供用户审查
