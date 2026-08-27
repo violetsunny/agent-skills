@@ -30,7 +30,7 @@ description: >
 
 如果仓库还没建立 matt-skills 的项目上下文，先执行一次：
 
-1. `/setup-matt-pocock-skills`
+1. `setup-matt-pocock-skills`
 
 预期出口：
 
@@ -48,8 +48,8 @@ description: >
 
 根据深度选择：
 
-1. 快速澄清、小需求：`/grill-me`
-2. 中大型需求、需要沉淀文档：`/grill-with-docs`
+1. 快速澄清、小需求：`grill-me`
+2. 中大型需求、需要沉淀文档：`grill-with-docs`
 
 当出现术语混乱、边界不清、对象关系复杂时，补 `domain-modeling`。
 
@@ -71,9 +71,9 @@ description: >
 
 按顺序：
 
-1. `/to-spec`
-2. `/to-tickets`
-3. `/triage`
+1. `to-spec`
+2. `to-tickets`
+3. `triage`
 
 适用场景：
 
@@ -96,7 +96,7 @@ description: >
 2. 接手陌生老项目或工作量超大：`wayfinder`
 3. 需要补齐领域边界：`domain-modeling`
 
-如果用户只是想把当前对话直接转成规格而不想继续访谈，优先 `/to-spec`，不要重复 `grill`。
+如果用户只是想把当前对话直接转成规格而不想继续访谈，优先 `to-spec`，不要重复 `grill`。
 
 ### 不需要正式规格
 
@@ -209,9 +209,9 @@ description: >
 
 1. `grill-with-docs`
 2. `domain-modeling`（如有必要）
-3. `/to-spec`
-4. `/to-tickets`
-5. `/triage`
+3. `to-spec`
+4. `to-tickets`
+5. `triage`
 6. `implement`
 7. `code-review`
 8. 跑验证
@@ -221,7 +221,7 @@ description: >
 
 1. `setup-matt-pocock-skills`（若未初始化）
 2. `wayfinder` 或 `codebase-design`
-3. `/to-spec` / `/to-tickets`（若需多人协作）
+3. `to-spec` / `to-tickets`（若需多人协作）
 4. `implement`
 5. `code-review`
 6. 跑验证

@@ -22,26 +22,26 @@ $ARGUMENTS
 
 如果这是仓库首次接入 matt-skills，或用户明确说还没初始化项目上下文：
 
-1. 先执行 `/setup-matt-pocock-skills`
+1. 先执行 `setup-matt-pocock-skills`
 2. 然后再继续判断需求层
 
 ### 2. 需求层
 
 如果需求模糊、边界不清、用户还在问“怎么做”“从哪开始”：
 
-1. 小需求、快速澄清：执行 `/grill-me $ARGUMENTS`
-2. 中大型需求、需要沉淀：执行 `/grill-with-docs $ARGUMENTS`
+1. 小需求、快速澄清：执行 `grill-me`
+2. 中大型需求、需要沉淀：执行 `grill-with-docs`
 3. 若出现复杂术语、对象边界或领域概念混乱，补充使用 `domain-modeling`
 
 ### 3. 规格设计层
 
 如果任务需要正式规格、票据化拆解或进入 issue tracker：
 
-1. 执行 `/to-spec`
-2. 执行 `/to-tickets`
-3. 执行 `/triage`
+1. 执行 `to-spec`
+2. 执行 `to-tickets`
+3. 执行 `triage`
 
-如果用户明确说“不需要继续访谈，直接转规格”，直接从 `/to-spec` 开始。
+如果用户明确说“不需要继续访谈，直接转规格”，直接从 `to-spec` 开始。
 
 如果任务重点在架构边界而不是票据：
 
@@ -105,4 +105,4 @@ $ARGUMENTS
 4. 不要把 prototype 当成默认生产交付
 5. 发现任务与当前路径不匹配时，明确切换到更合适的层级
 
-现在开始：先分析 `$ARGUMENTS`，给出当前层级与最短合理路径，然后直接调用第一个合适的 skill 或 command。
+现在开始：先分析 `$ARGUMENTS`，给出当前层级与最短合理路径，然后直接调用第一个合适的 skill。
