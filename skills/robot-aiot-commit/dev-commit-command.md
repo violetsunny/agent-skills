@@ -109,6 +109,7 @@ DIFF: dev-commit-command.md 更新 JIRA 提取逻辑，新增 feature_YYYYMMDD_I
 1. 暂存相关文件，排除以下无关改动：
    - `**/__pycache__/**`、`*.pyc`
    - `.DS_Store`
+   - 项目下的 `doc/`、`docs/`、`openspec/`、`.agents/`
    - 嵌入式 git 仓库（`git add` 时出现 "embedded git repository" 警告的路径，用 `git rm --cached` 取消暂存）
    - 其他临时文件
 2. 复核待提交文件范围，确保不混入无关改动
@@ -125,5 +126,6 @@ DIFF: dev-commit-command.md 更新 JIRA 提取逻辑，新增 feature_YYYYMMDD_I
 4. 若改动不足以形成单一逻辑提交，先提醒用户拆分提交
 5. 不使用 `feat(scope): subject` 这种 Conventional Commits 格式
 6. 只在用户明确要求时执行 `git add`、`git commit`、`git push`
+7. 默认不提交项目下的 `doc/`、`docs/`、`openspec/`、`.agents/` 目录；若用户明确要求提交，再单独复核这些路径
 
 $ARGUMENTS
