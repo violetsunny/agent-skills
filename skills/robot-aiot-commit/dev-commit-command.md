@@ -2,7 +2,7 @@
 description: "读取 Git diff 生成三行中文提交说明并执行提交。/dev-commit [可选：提交说明或指令]"
 ---
 
-为当前 Git 改动生成统一格式的中文提交说明，并在用户确认后执行提交。
+为当前 Git 改动生成统一格式的中文提交说明；若 `$ARGUMENTS` 已明确表达“提交/commit/直接提交/现在提交”等提交语义，则直接执行提交，否则仅输出文案并提示用户自行提交或明确要求后再执行。
 
 $ARGUMENTS
 
@@ -99,12 +99,13 @@ DIFF: dev-commit-command.md 更新 JIRA 提取逻辑，新增 feature_YYYYMMDD_I
 ## Step 5 — 输出与确认
 
 1. 向用户展示三行提交说明
-2. 询问用户是否提交（或用户已在 $ARGUMENTS 中明确要求提交时直接执行）
-3. 若用户只要文案，输出三行后停止
+2. 先判断 `$ARGUMENTS` 是否已明确包含“提交/commit/直接提交/现在提交/帮我提交”等提交语义
+3. 若 `$ARGUMENTS` 已明确要求提交，直接进入 Step 6
+4. 若 `$ARGUMENTS` 未明确要求提交，仅输出三行文案，并提示用户可自行提交，或明确要求后再由指令执行提交
 
 ---
 
-## Step 6 — 执行提交（仅当用户确认后）
+## Step 6 — 执行提交（仅当 `$ARGUMENTS` 已明确要求提交时）
 
 1. 暂存相关文件，排除以下无关改动：
    - `**/__pycache__/**`、`*.pyc`
@@ -127,5 +128,6 @@ DIFF: dev-commit-command.md 更新 JIRA 提取逻辑，新增 feature_YYYYMMDD_I
 5. 不使用 `feat(scope): subject` 这种 Conventional Commits 格式
 6. 只在用户明确要求时执行 `git add`、`git commit`、`git push`
 7. 默认不提交项目下的 `doc/`、`docs/`、`openspec/`、`.agents/` 目录；若用户明确要求提交，再单独复核这些路径
+8. `$ARGUMENTS` 没有明确提交语义时，只生成文案，不执行 `git commit`
 
 $ARGUMENTS
