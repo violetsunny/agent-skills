@@ -20,7 +20,15 @@ $ARGUMENTS
 
 ### 1. 前置准备
 
-如果这是仓库首次接入 matt-skills，或用户明确说还没初始化项目上下文：
+不要靠主观判断，先检查是否已初始化。满足以下条件才算初始化完成：
+
+1. 仓库根目录存在 `CLAUDE.md` 或 `AGENTS.md`
+2. 其中已有 `## Agent skills` 区块
+3. 存在 `docs/agents/issue-tracker.md`
+4. 存在 `docs/agents/domain.md`
+5. 若安装了 `triage` skill，还应存在 `docs/agents/triage-labels.md`
+
+如果缺少上述任一核心项，按“未初始化”处理：
 
 1. 先执行 `setup-matt-pocock-skills`
 2. 然后再继续判断需求层

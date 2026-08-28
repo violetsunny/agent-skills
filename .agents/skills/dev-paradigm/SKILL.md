@@ -28,17 +28,37 @@ description: >
 
 ## 1. 前置准备
 
-如果仓库还没建立 matt-skills 的项目上下文，先执行一次：
+不要靠感觉判断“像不像初始化过”，先按下面标准检查。
+
+### 初始化检查标准
+
+满足以下条件，才算这个仓库已经完成 `setup-matt-pocock-skills` 初始化：
+
+1. 仓库根目录存在 `CLAUDE.md` 或 `AGENTS.md`
+2. 该文件中已有 `## Agent skills` 区块
+3. 存在 `docs/agents/issue-tracker.md`
+4. 存在 `docs/agents/domain.md`
+
+补充规则：
+
+1. 如果仓库安装了 `triage` skill，还应存在 `docs/agents/triage-labels.md`
+2. 只看到 `CONTEXT.md`、`docs/adr/`、零散 ADR、issue 文档，不能等价视为已完成初始化
+3. 只要上述核心文件缺任一项，就按“未初始化”处理
+
+### 未初始化时
+
+如果未满足上述标准，先执行一次：
 
 1. `setup-matt-pocock-skills`
 
 预期出口：
 
-1. `CONTEXT.md`
-2. ADR 目录
-3. issue / triage 标签与约定路径
+1. `CLAUDE.md` 或 `AGENTS.md` 中写入 `## Agent skills`
+2. `docs/agents/issue-tracker.md`
+3. `docs/agents/domain.md`
+4. 若安装了 `triage`，再补 `docs/agents/triage-labels.md`
 
-只有在“每个仓库首次接入”或用户明确说还没初始化时才需要这一步，不要每次开发都重复跑。
+只有在检查失败或用户明确要求重建初始化时才需要这一步，不要每次开发都重复跑。
 
 ## 2. 需求层
 
