@@ -155,7 +155,7 @@ $ARGUMENTS
 1. `code-review`
 2. 仓库已有 lint / typecheck / tests / build 验证
 
-Java 项目可叠加 `java-code-review`。
+Java 项目可叠加 `java-code-review`；需要中文审查报告时叠加 `zh-code-reviewer`（评分 + 分级中文结构化报告，与 `code-review` 互补，不替代）。
 
 回流标准：
 

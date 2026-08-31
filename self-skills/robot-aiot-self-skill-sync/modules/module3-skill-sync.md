@@ -2,11 +2,12 @@
 
 > 共享规则见 `modules/shared.md`
 
-模块 3 分为三类同步方式：
+模块 3 分为四类同步方式：
 
 - **npx 管理型**（5 个项目）：通过 `npx skills@latest update` 统一更新，安装到 `~/.agents/skills/`
 - **rsync 管理型**（2 个项目）：通过 rsync 交集匹配同步，只同步已存在的 skill
 - **自写 skill 部署**（模块 3.3）：将 `agent-skills/self-skills/` 单向部署到 `~/.agents/skills/`，排在外部同步之后
+- **自写命令部署**（模块 3.4）：将 `agent-skills/commands/` 下的自写命令单向部署到 `~/.agents/commands/`，排在 3.3 之后
 
 OpenSpec 在 `~/.claude/skills/` 下生成的完整 skills 集合只走模块 2 的专门同步流程。外部同步（npx / rsync 交集）遇到与 `self-skills/` 同名的 skill 一律跳过，自写 skill 的真源规则见 `modules/shared.md`。
 
@@ -144,3 +145,40 @@ done
 1. sub agent 枚举 `self-skills/` 子目录并与 `~/.agents/skills/` 比对，生成新增/更新/一致的部署草稿
 2. 主线程执行真实 `rsync -rtu` 并统一计数 `[SELF-DEPLOY]`
 3. 任何“运行时内容比 self-skills 新”的差异只上报 `[SELF-SKILL-DRIFT]`，由用户决定如何处理，禁止自动反向同步
+
+## 3.4 自写命令部署（commands/ → 运行时）
+
+`agent-skills/commands/` 是自写命令的编辑面。本步骤把自写命令单向部署到运行时 `~/.agents/commands/`，让仓库里的修改生效。
+
+**规则**：
+
+- 部署范围为**自写命令**（当前：`dev-commit.md`、`dev-paradigm.md`）；OpenSpec 生成的命令（`opsx*`）由模块 2 的 `.claude -> .agents` 迁移管理，不在本步骤范围。新增自写命令需人工把文件名加入本清单
+- 方向唯一：`commands/<name>.md` → `~/.agents/commands/<name>.md`；**禁止反向**（运行时不得写回仓库 `commands/`，运行时变更只经模块 2 / 4.2 各自的规则流转）
+- **只更新、不新增**：只部署在 `~/.agents/commands/` 中**已经存在**的命令；运行时没有的绝不私自加入，标记 `[COMMAND-DEPLOY-SKIP]` 并提示用户人工手动加入
+- **不得直接覆盖，先比对新旧**：使用 `rsync -rtu`，覆盖前执行 `modules/shared.md` 的“文件新旧比对规则”；内容不同且运行时更新的文件标记 `[NEWER-TARGET]` 跳过，**严禁旧覆盖新**；确需旧覆盖新必须写明原因由用户手动执行
+- **不加 `--delete`**，不删除运行时中额外的内容
+- 部署成功标记 `[COMMAND-DEPLOY]`
+
+```bash
+commands_dir="/Users/kangll13/aiot/java-code/self/gggggggood/agent-skills/commands"
+
+for cmd in dev-commit.md dev-paradigm.md; do
+  [ -f "$commands_dir/$cmd" ] || continue
+
+  # 只更新不新增：运行时不存在的，留给用户人工手动加入
+  if [ ! -e "$HOME/.agents/commands/$cmd" ]; then
+    printf '[COMMAND-DEPLOY-SKIP] %s（运行时不存在，需人工手动加入）\n' "$cmd"
+    continue
+  fi
+
+  # 先比对新旧（见 shared.md）：内容不同且运行时更新 → 跳过，严禁旧覆盖新
+  if ! cmp -s "$commands_dir/$cmd" "$HOME/.agents/commands/$cmd" \
+     && [ "$HOME/.agents/commands/$cmd" -nt "$commands_dir/$cmd" ]; then
+    printf '[NEWER-TARGET] %s（运行时更新，跳过覆盖）\n' "$cmd"
+    continue
+  fi
+
+  rsync -rtu "$commands_dir/$cmd" "$HOME/.agents/commands/$cmd"
+  printf '[COMMAND-DEPLOY] %s\n' "$cmd"
+done
+```

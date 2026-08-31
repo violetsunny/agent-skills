@@ -46,7 +46,7 @@
 
 ## 文件新旧比对规则（全模块通用）
 
-所有文件级同步（模块 2 的 `.claude -> .agents` 覆盖、模块 3.2 / 3.3 / 3.5、模块 4 的 4.1 / 4.1A / 4.2 / 4.4）在覆盖前必须先比对两边文件的新旧，**严禁用旧文件覆盖新文件**，避免新修改丢失：
+所有文件级同步（模块 2 的 `.claude -> .agents` 覆盖、模块 3.2 / 3.3 / 3.4 / 3.5、模块 4 的 4.1 / 4.1A / 4.2 / 4.4）在覆盖前必须先比对两边文件的新旧，**严禁用旧文件覆盖新文件**，避免新修改丢失：
 
 - 比对口径：文件内容（`cmp`）+ 修改时间（mtime）
   - 目标不存在 → 属“新增”，按各模块自身的新增规则处理（如模块 3.3 的“只更新不新增”）
@@ -106,6 +106,7 @@ done
 - Skill 同步（模块 3）分两类：npx 管理型 5 个（superpowers / matt-skills / ui-ux-pro-max-skill / baoyu-skills / ppt-master）通过 `npx skills@latest update -y -g` 统一更新（在用户主目录执行，`-y` 跳过确认，`-g` 全局安装并 Copy to all agents）；rsync 管理型 2 个（claude-code-java / anthropics-skills）使用 `rsync -rtu`（**不加 `--delete`**）做交集匹配同步；模块 3.5 和模块 4 同步到 `free-stock-line-skills/` 和 `agent-skills/skills/` 时同样使用 `rsync -rtu`（**不加 `--delete`**），保留用户自定义文件
 - **所有文件级同步必须先执行“文件新旧比对规则”**：内容不同且目标端更新的文件标记 `[NEWER-TARGET]` 跳过并报告，严禁旧文件覆盖新文件；确需旧覆盖新必须写明原因由用户手动执行
 - 模块 3.3 负责自写 skill 部署：`agent-skills/self-skills/<name>/` → `~/.agents/skills/<name>/`，`rsync -rtu` 不加 `--delete`，排在外部同步之后执行（同名时自写版本为最终权威）；**只更新运行时已存在的自写 skill，运行时没有的绝不私自新增**（`[SELF-DEPLOY-SKIP]`，人工手动加入）；自写 skill 名单以 `self-skills/` 下的实际子目录为准，不写死清单
+- 模块 3.4 负责自写命令部署：`agent-skills/commands/<name>.md` → `~/.agents/commands/<name>.md`，`rsync -rtu` 不加 `--delete`，排在 3.3 之后执行；范围为自写命令（当前 `dev-commit.md`、`dev-paradigm.md`），OpenSpec 生成的 `opsx*` 归模块 2 管理不在此列；同样**只更新不新增**（`[COMMAND-DEPLOY-SKIP]`），且覆盖前必须先比对新旧，运行时更新的文件标 `[NEWER-TARGET]` 跳过，严禁旧覆盖新
 - 模块 4 可使用“查找 `SKILL.md` 并倒推其父目录”为统一发现补充手段，但**不是默认逻辑**；仅允许在 `self/skills/<project>/` 项目目录内部查找，禁止回退到用户根目录 `~/.claude/skills/` / `~/.agents/skills/`
 - 模块 4 若发现同一项目内多个 `SKILL.md` 映射到同一个 `skill_name`，必须标记 `[DUPLICATE-SKILL]` 并跳过该 skill，禁止自动覆盖
 - 同步 skill 目录时必须排除 `.git/`、`.gitignore`、`.gitmodules`、`.DS_Store`、`__pycache__/`、`*.pyc`、`.idea/`、`.vscode/`、`node_modules/` 等无关文件或本地缓存

@@ -24,7 +24,7 @@ s=<路由目标 skill>
 [ -d "$HOME/.agents/skills/$s" ] || printf '[DEP-MISSING] %s\n' "$s"
 ```
 
-路由目标（按需依赖，matt-skills 系列）：`setup-matt-pocock-skills`、`triage`、`grill-me`、`to-spec`、`to-tickets`、`domain-modeling`、`codebase-design`、`implement`、`tdd`、`diagnosing-bugs`、`code-review`、`java-code-review`、`improve-codebase-architecture`、`spring-boot-patterns`、`wayfinder`、`handoff`、`retro`。
+路由目标（按需依赖，以 matt-skills 系列为主）：`setup-matt-pocock-skills`、`triage`、`grill-me`、`to-spec`、`to-tickets`、`domain-modeling`、`codebase-design`、`implement`、`tdd`、`diagnosing-bugs`、`code-review`、`java-code-review`、`zh-code-reviewer`、`improve-codebase-architecture`、`spring-boot-patterns`、`wayfinder`、`handoff`、`retro`。
 
 - 目标存在 → 略过，正常路由
 - 出现 `[DEP-MISSING]` → 不私自安装，提示用户手动安装该 skill，或经用户确认改走其他可用路径
@@ -302,6 +302,7 @@ s=<路由目标 skill>
 
 1. `code-review`
 2. Java 项目可叠加 `java-code-review`
+3. 需要中文审查报告时叠加 `zh-code-reviewer`（输出评分 + 分级中文结构化报告，与 `code-review` 双轴结论互补，不替代）
 
 重点检查两轴：
 
