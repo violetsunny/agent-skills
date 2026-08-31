@@ -209,7 +209,7 @@ class Vertex:
         self.abs_y = y
 
     def to_html(self):
-        text = escape(self.value) if self.value else ""
+        text = self.value if self.value else ""
         return (
             f'    <div class="vertex" id="v-{self.cell_id}" '
             f'style="position:absolute; left:{self.abs_x}px; top:{self.abs_y}px; '
@@ -261,7 +261,7 @@ class Edge:
         if self.value:
             mx = (x1 + x2) / 2
             my = (y1 + y2) / 2
-            label_text = escape(self.value)
+            label_text = self.value
             label_svg = f'<text x="{mx}" y="{my - 6}" text-anchor="middle" font-size="12" fill="{stroke}">{label_text}</text>'
 
         return (
@@ -368,7 +368,21 @@ def generate_html(vertices, edges, canvas_w, canvas_h):
 <title>Diagram Preview</title>
 <style>
   * {{ margin: 0; padding: 0; box-sizing: border-box; }}
-  body {{ background: #f5f5f5; padding: 20px; }}
+  html, body {{ width: 100%; height: 100%; }}
+  body {{ background: #f5f5f5; padding: 20px; overflow: auto; }}
+  .diagram-stage {{
+    width: 100%;
+    min-height: calc(100vh - 40px);
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+  }}
+  .diagram-scale-box {{
+    position: relative;
+    width: {canvas_w}px;
+    height: {canvas_h}px;
+    transform-origin: top left;
+  }}
   .diagram-canvas {{
     position: relative;
     width: {canvas_w}px;
@@ -400,7 +414,9 @@ def generate_html(vertices, edges, canvas_w, canvas_h):
 </style>
 </head>
 <body>
-  <div class="diagram-canvas">
+  <div class="diagram-stage">
+    <div class="diagram-scale-box" id="diagramScaleBox">
+      <div class="diagram-canvas">
 {vertex_html}    <svg class="edge-layer" width="{canvas_w}" height="{canvas_h}" xmlns="http://www.w3.org/2000/svg">
       <defs>
         <marker id="arrow-end" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
@@ -411,7 +427,29 @@ def generate_html(vertices, edges, canvas_w, canvas_h):
         </marker>
       </defs>
 {edge_svg_lines}    </svg>
+      </div>
+    </div>
   </div>
+  <script>
+    (function() {{
+      const canvasWidth = {canvas_w};
+      const canvasHeight = {canvas_h};
+      const bodyPadding = 40;
+      const box = document.getElementById('diagramScaleBox');
+
+      function fitDiagram() {{
+        const availableWidth = Math.max(window.innerWidth - bodyPadding, 320);
+        const availableHeight = Math.max(window.innerHeight - bodyPadding, 240);
+        const scale = Math.min(availableWidth / canvasWidth, availableHeight / canvasHeight, 1);
+        box.style.transform = `scale(${{scale}})`;
+        box.style.width = `${{canvasWidth * scale}}px`;
+        box.style.height = `${{canvasHeight * scale}}px`;
+      }}
+
+      window.addEventListener('resize', fitDiagram);
+      fitDiagram();
+    }})();
+  </script>
 </body>
 </html>"""
     return html
@@ -451,8 +489,7 @@ def verify_fidelity(vertices, edges, html_content, unmapped_all):
     for vid, vtx in vertices.items():
         if not vtx.value:
             continue
-        escaped_text = escape(vtx.value)
-        if escaped_text not in html_content:
+        if vtx.value not in html_content:
             text_missing.append(f"  vertex {vid}: expected '{vtx.value}'")
     if text_missing:
         print(f"[WARN] Text content: {len(text_missing)} vertex text(s) missing:")

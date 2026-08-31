@@ -61,7 +61,7 @@ npx skills@latest add hugohe3/ppt-master -y -g
 
 1. 用 fresh sub agent 预先枚举 npx 管理型与 rsync 管理型项目，生成执行清单
 2. rsync 管理型项目先由 sub agent 做交集匹配草稿：哪些 skill 已存在、哪些新增会被拒绝
-3. 主线程执行 `npx skills@latest update -y -g` 和实际 `rsync -r`
+3. 主线程执行 `npx skills@latest update -y -g` 和实际 `rsync -rtu`
 4. 成功/失败计数、拒绝新增数量和项目级状态由主线程统一汇总
 
 ## 3.2 rsync 管理型项目（2 个）
@@ -70,15 +70,17 @@ npx skills@latest add hugohe3/ppt-master -y -g
 
 **核心规则**：只同步在 `~/.agents/skills/` 中**已经存在**的 skill，不新增。已经存在但源仓库中不存在该 skill → 不做任何操作（保留现有）。**与 `self-skills/` 同名的 skill 必须跳过**（标记 `[SELF-SKILL-SKIP]`），外部仓库不得覆盖自写 skill。
 
-工具：`rsync -r`（只覆盖已有文件和新增文件，**不删除** `~/.agents/skills/` 中的现有内容）、`cp -r` 作为备选。
+工具：`rsync -rtu`（只覆盖已有文件和新增文件，**不删除** `~/.agents/skills/` 中的现有内容；`-t` 保留 mtime、`-u` 跳过目标端更新的文件，见 `modules/shared.md` 的“文件新旧比对规则”）、`cp -rp` 作为备选。
 
 ```
 for each rsync project:
   1. 枚举项目 source_dir/{skill_name}/ 子目录
   2. 对每个 skill_name，检查 ~/.agents/skills/{skill_name}/ 是否存在
-     → 存在：rsync -r source_dir/{skill_name}/ → ~/.agents/skills/{skill_name}/
+     → 存在：执行文件新旧比对（见 shared.md），再
+       rsync -rtu source_dir/{skill_name}/ → ~/.agents/skills/{skill_name}/
+       内容不同且目标端更新的文件标记 [NEWER-TARGET] 跳过
      → 不存在：跳过
-  3. 汇总统计：同步了 N 个，新增（被拒绝）M 个
+  3. 汇总统计：同步了 N 个，新增（被拒绝）M 个，[NEWER-TARGET] K 个
 ```
 
 ### 3.2.1 claude-code-java（`self/skills/claude-code-java/`）
@@ -109,7 +111,7 @@ for each rsync project:
 
 - 方向唯一：`self-skills/<name>/` → `~/.agents/skills/<name>/`；**禁止反向**（运行时不得写回 `self-skills/`）
 - **只更新、不新增**：只部署在 `~/.agents/skills/` 中**已经存在**的自写 skill；运行时没有的，本技能绝不私自加入，标记 `[SELF-DEPLOY-SKIP]` 并提示用户人工手动加入
-- 使用 `rsync -r`，**不加 `--delete`**，不删除运行时中额外的文件
+- 使用 `rsync -rtu`，**不加 `--delete`**，不删除运行时中额外的文件；`-t` 保留 mtime、`-u` 跳过运行时更新的文件（见 `modules/shared.md` 的“文件新旧比对规则”，被跳过的文件按 `[SELF-SKILL-DRIFT]` 上报）
 - 排在 3.1 / 3.2 之后执行：同名冲突时自写版本是最终权威
 - 自写 skill 名单 = `self-skills/` 下的实际子目录，不写死清单；非目录条目一律跳过
 - 排除 `.git/`、`.DS_Store`、`__pycache__/`、`*.pyc`、`.idea/`、`.vscode/`、`node_modules/` 等无关文件；排除 `_mideameta.json`（市场元数据以运行时为准，仓库副本不得回滚其版本）
@@ -128,7 +130,7 @@ for skill_dir in "$self_skills_dir"/*/; do
     continue
   fi
 
-  rsync -r \
+  rsync -rtu \
     --exclude '.git/' --exclude '.DS_Store' --exclude '__pycache__/' \
     --exclude '*.pyc' --exclude '.idea/' --exclude '.vscode/' \
     --exclude 'node_modules/' --exclude '_mideameta.json' \
@@ -140,5 +142,5 @@ done
 ### Sub Agent 建议
 
 1. sub agent 枚举 `self-skills/` 子目录并与 `~/.agents/skills/` 比对，生成新增/更新/一致的部署草稿
-2. 主线程执行真实 `rsync -r` 并统一计数 `[SELF-DEPLOY]`
+2. 主线程执行真实 `rsync -rtu` 并统一计数 `[SELF-DEPLOY]`
 3. 任何“运行时内容比 self-skills 新”的差异只上报 `[SELF-SKILL-DRIFT]`，由用户决定如何处理，禁止自动反向同步

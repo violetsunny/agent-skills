@@ -15,7 +15,7 @@
 
 - **`stock-replay-workbench` 是重点保护项目，禁止任何修改、同步或覆盖。**
 - 非_skill_ 目录（`docs/`、`scripts/`、`tests/`、`openspec/`）跳过，不同步。
-- 同步使用 `rsync -r`（**不加 `--delete`**），保留用户在汇总项目中自定义的文件（如 `AGENTS.md`、`INDEX.md` 等），只覆盖源端有更新的文件和新增文件。
+- 同步使用 `rsync -rtu`（**不加 `--delete`**），保留用户在汇总项目中自定义的文件（如 `AGENTS.md`、`INDEX.md` 等），只覆盖源端有更新的文件和新增文件；`-t` 保留 mtime、`-u` 跳过目标端更新的文件（见 `modules/shared.md` 的“文件新旧比对规则”，被跳过的文件标记 `[NEWER-TARGET]`）。
 - 该目录位于保护目录 `ggggggood/` 下，但本同步是用户明确要求的操作，适用与模块 4 相同的例外规则。
 
 ### 同步流程
@@ -24,7 +24,9 @@
 for each project in self/skills/:
   1. 获取项目名（如 a-stock-data、Stock-Analysis-Skill）
   2. 在 free-stock-line-skills/ 中做大小写不敏感匹配
-     → 匹配到：rsync -r source/ → free-stock-line-skills/<matched_name>/
+     → 匹配到：执行文件新旧比对（见 shared.md），再
+       rsync -rtu source/ → free-stock-line-skills/<matched_name>/
+       内容不同且目标端更新的文件标记 [NEWER-TARGET] 跳过
      → 未匹配：跳过
   3. 跳过 stock-replay-workbench、docs/、scripts/、tests/、openspec/
 ```
@@ -56,8 +58,8 @@ for src_project in "$src_base"/*/; do
   match=$(find "$target_base" -maxdepth 1 -type d -iname "$project_name" 2>/dev/null | head -1)
   [ -z "$match" ] && continue
   
-  # 强制同步，不加 --delete，保留用户自定义文件
-  rsync -r "$src_project" "$match/"
+  # 强制同步，不加 --delete，保留用户自定义文件；-t 保留 mtime、-u 防旧覆盖新
+  rsync -rtu "$src_project" "$match/"
   echo "[SYNC] $project_name → $(basename "$match")"
 done
 ```
@@ -73,5 +75,5 @@ done
 ### Sub Agent 建议
 
 1. 先由 fresh sub agent 做大小写不敏感匹配草稿，识别哪些项目能同步、哪些无匹配、哪些属于保护或非 skill 目录
-2. 主线程再执行真实 `rsync -r`，确保保护项目和跳过规则得到严格执行
+2. 主线程再执行真实 `rsync -rtu`，确保保护项目和跳过规则得到严格执行
 3. `stock-replay-workbench` 的保护决策只能由主线程维持，sub agent 只能标记不可碰

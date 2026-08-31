@@ -123,8 +123,10 @@ OpenSpec 可能按 profile 生成不同数量的 commands / skills，且文件�
 这里的 `--delete` 仅用于**模块 2 的 `.claude -> .agents` 运行时镜像迁移**：目标是让 `.agents` 精确跟随当前 OpenSpec profile 的实际生成结果。它不适用于模块 3、模块 3.5、模块 4 或知识库同步；这些场景仍然遵循“不加 `--delete`、不删除用户自定义文件”的保护规则。
 
 ```bash
-rsync -r --delete ~/.claude/commands/ ~/.agents/commands/
+rsync -rtu --delete ~/.claude/commands/ ~/.agents/commands/
 ```
+
+> `-t` 保留 mtime、`-u` 防止旧文件覆盖新文件（见 `modules/shared.md` 的“文件新旧比对规则”）。`--delete` 仍负责让 `.agents/commands/` 的文件集合精确跟随当前 profile（集合级镜像不受 `-u` 影响）；被 `-u` 跳过的文件（如 `.agents` 侧因 append-only hook 而更新的 `propose.md` / `apply.md`）需在汇总中标记 `[NEWER-TARGET]` 并提示用户，确需旧覆盖新时写明原因手动执行。执行前按共享规则输出 `[NEWER-TARGET]` 清单。
 
 然后同步当前 profile 在 `~/.claude/skills/` 下实际生成的完整 Agent Skills。`.claude` 是 OpenSpec 更新后的权威源，无论本地是否有差异，均直接覆盖；**但与 `agent-skills/self-skills/` 同名的自写 skill 必须跳过**——模块 4.4 会把运行时的自写 skill 备份进 `~/.claude/skills/`，若不跳过，旧备份会在下一次迁移时把用户已更新的自写 skill 回滚：
 
@@ -147,16 +149,24 @@ for skill_dir in ~/.claude/skills/*; do
     continue
   fi
 
-  rsync -r --delete "$skill_dir/" "$target_dir/"
+  # 比对清单：内容不同且目标端更新的文件禁止自动覆盖，先报告
+  ( cd "$skill_dir" && find . -type f ! -name '.DS_Store' ) | while read -r f; do
+    t="$target_dir/$f"
+    [ -f "$t" ] || continue
+    cmp -s "$skill_dir/$f" "$t" && continue
+    [ "$t" -nt "$skill_dir/$f" ] && printf '[NEWER-TARGET] %s/%s\n' "$skill_name" "$f"
+  done
+
+  rsync -rtu --delete "$skill_dir/" "$target_dir/"
   printf '[OVERWRITE] %s\n' "$skill_name"
 done
 ```
 
-`.claude` 是权威源，当前 profile 实际生成的 skills 遇到差异时直接用 `rsync -r --delete` 覆盖 `.agents` 副本，并在汇总中报告已覆盖的 skill 名称（`[OVERWRITE]`）；被跳过的自写 skill 以 `[SELF-SKILL-SKIP]` 单独计数。两者一致时静默跳过。再次强调：这是模块 2 对运行时副本的受控覆盖例外，不得外推到 agent-skills、free-stock-line-skills 或其他用户维护目录，也不得覆盖自写 skill。
+`.claude` 是权威源，当前 profile 实际生成的 skills 遇到差异时直接用 `rsync -rtu --delete` 覆盖 `.agents` 副本，并在汇总中报告已覆盖的 skill 名称（`[OVERWRITE]`）；被跳过的自写 skill 以 `[SELF-SKILL-SKIP]` 单独计数。两者一致时静默跳过。再次强调：这是模块 2 对运行时副本的受控覆盖例外，不得外推到 agent-skills、free-stock-line-skills 或其他用户维护目录，也不得覆盖自写 skill。
 
 **同步范围说明**：这里仅同步 OpenSpec 生成的 commands 和 skills。模块 3 负责其他 skills 的最新性，模块 4.4 负责 `~/.claude/skills/` 的运行时备份；数据流单向，不反向同步 `.agents/skills/ -> .claude/skills/`。
 
-完成上述同步后，必须立即通过 skill 工具运行 `opsx-workflow-hooks` skill，恢复并校验 `propose.md` / `apply.md` 的 Hook A / Hook B。原因只有一个：`rsync -r --delete ~/.claude/commands/ ~/.agents/commands/` 会先覆盖 `.agents` 运行时副本；若不立刻补回 hook，下一次 `/opsx` 流程将失去自动回调。
+完成上述同步后，必须立即通过 skill 工具运行 `opsx-workflow-hooks` skill，恢复并校验 `propose.md` / `apply.md` 的 Hook A / Hook B。原因只有一个：`rsync -rtu --delete ~/.claude/commands/ ~/.agents/commands/` 会先覆盖 `.agents` 运行时副本；若不立刻补回 hook，下一次 `/opsx` 流程将失去自动回调。
 
 不要从旧的 `~/.agents/commands/` 或 `~/.agents/skills/` 反向覆盖新版 `.claude` 文件；完整 commands / skills 集合始终以 `~/.claude/commands/` 与 `~/.claude/skills/` 的实际目录内容为准。
 

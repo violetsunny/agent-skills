@@ -1,7 +1,7 @@
 ---
 name: robot-aiot-draw-flowchart
-description: 机器人/IoT 业务图表绘制能力。三条输出路径：draw.io XML（可编辑主路径）、直绘 SVG/HTML（汇报级展示）、archify 委托。覆盖流程图、分层架构、时序、状态机、ER、UML 类/用例、网络拓扑、时间线、Agent/记忆架构等 40+ 图表类型；内置机器人视觉语言、12 套 SVG 风格皮肤与品牌 token 定制、几何/构图校验、PNG/GIF 导出与 drawio/Mermaid 导入重绘。
-version: 3.0.0
+description: 机器人/IoT 业务图表绘制能力。三条输出路径：draw.io XML（可编辑主路径）、直绘 SVG/HTML（汇报级展示）、archify 内置渲染（主题切换+导出）。覆盖流程图、分层架构、时序、状态机、ER、UML 类/用例、网络拓扑、时间线、Agent/记忆架构等 40+ 图表类型；内置机器人视觉语言、12 套 SVG 风格皮肤与品牌 token 定制、几何/构图校验、PNG/GIF 导出与 drawio/Mermaid 导入重绘。
+version: 3.1.0
 author: kangll13
 license: MIT
 metadata:
@@ -18,7 +18,7 @@ metadata:
 
 1. **统一的机器人视觉语言** — 标准机器人图标、状态配色、语义样式（draw.io 路径权威）
 2. **40+ 图表类型** — 流程图家族、分层架构、时序、状态机、ER/数据库、UML、网络拓扑、时间线、Agent/记忆架构、数据流、决策分析图等
-3. **三条输出路径** — draw.io XML（可编辑）、直绘 SVG/HTML（汇报展示）、archify 委托（主题切换+导出）
+3. **三条输出路径** — draw.io XML（可编辑）、直绘 SVG/HTML（汇报展示）、archify 内置渲染（主题切换+导出）
 4. **工程化质量管线** — 构图契约、几何校验、复杂度预算、视觉复查门、PNG/GIF 导出
 5. **导入重绘** — 已有 `.drawio` / Mermaid 源可提取结构后按本 SKILL 规范重绘
 
@@ -26,7 +26,7 @@ metadata:
 
 ## 输出路径选型
 
-| 维度 | A. draw.io XML（主路径） | B. 直绘 SVG/HTML | C. archify 委托 |
+| 维度 | A. draw.io XML（主路径） | B. 直绘 SVG/HTML | C. archify 内置渲染 |
 | --- | --- | --- | --- |
 | 产物 | .drawio/.xml 可编辑文件 | 自包含 SVG / HTML + PNG/GIF | 自包含 HTML（内联 SVG） |
 | 适用 | 二次编辑、PPT 工作流、团队协作 | 汇报展示、README、精确几何控制、动图 | 暗/亮主题切换、内置导出菜单 |
@@ -225,9 +225,9 @@ metadata:
 
 **错误恢复协议**：第一次错误定位根因针对性修复；第二次换方法（Python list → 分块生成）；第三次停止并报告用户，不无限重试。
 
-### 路径 C：archify 委托
+### 路径 C：archify 内置渲染
 
-选型、类型→模式映射、Mermaid 方言委托、主题兼容硬约束见 `references/archify-integration.md`。
+archify 渲染引擎内置于 `$SKILL_ROOT/archify/`（零运行时依赖，node ≥ 18），入口 `$ARCHIFY` = `$SKILL_ROOT/archify/bin/archify.mjs`。选型、类型路由、6 步创作流程（schema→候选→validate showcase→deliver→visual-check）、Mermaid 方言映射、主题兼容硬约束见 `references/archify-integration.md`。
 
 ## 导入与重绘
 

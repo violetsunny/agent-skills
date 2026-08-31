@@ -8,7 +8,7 @@
 
 `agent-skills/` 位于保护目录 `ggggggood/` 下，但模块 4 是用户明确要求的同步操作，适用以下例外规则：
 
-- **允许**：将 `~/.agents/skills/` 的 skill 文件覆盖到 `agent-skills/skills/`（rsync 不加 `--delete`）
+- **允许**：将 `~/.agents/skills/` 的 skill 文件覆盖到 `agent-skills/skills/`（`rsync -rtu` 不加 `--delete`；覆盖前执行 `modules/shared.md` 的“文件新旧比对规则”，目标端更新的文件标记 `[NEWER-TARGET]` 跳过）
 - **禁止写入 `self-skills/`**：`agent-skills/self-skills/` 是用户自写 skill 的唯一真源，只能由用户修改；模块 4 不得从运行时或任何其他来源向它同步、覆盖或补充内容
 - **禁止删除 skill**：本技能在任何模块中都不允许删除 skill 目录或文件，只能新增或更新。skill 的删除只能由用户手动执行。这是为了防止误删用户精心积累的知识库内容。
 - **禁止**：使用 `--delete` 删除 `agent-skills/skills/` 中源端没有的 skill 目录（用户可能在知识库中有额外 skill）
@@ -21,18 +21,20 @@
 自写 skill（`self-skills/` 下的子目录）不进入外部库 `agent-skills/skills/`，同步前先构建排除清单：
 
 ```bash
-# 全量同步，不加 --delete，保留知识库中独有的 skill；排除自写 skill
+# 全量同步，不加 --delete，保留知识库中独有的 skill；排除自写 skill 和 _mideameta.json
+# -t 保留 mtime、-u 跳过知识库中更新的文件（文件新旧比对规则，见 shared.md）
 self_skills_dir="/Users/kangll13/aiot/java-code/self/gggggggood/agent-skills/self-skills"
-excludes=()
+excludes=(--exclude '_mideameta.json')
 for d in "$self_skills_dir"/*/; do
   [ -d "$d" ] || continue
   excludes+=(--exclude "/$(basename "$d")")
 done
 
-rsync -r "${excludes[@]}" ~/.agents/skills/ /Users/kangll13/aiot/java-code/self/gggggggood/agent-skills/skills/
+rsync -rtu "${excludes[@]}" ~/.agents/skills/ /Users/kangll13/aiot/java-code/self/gggggggood/agent-skills/skills/
 ```
 
 > 排除项用 `/名称` 锚定顶层目录，避免误伤 skill 内部同名文件；被排除的自写 skill 名单在汇总中单独列出。
+> `_mideameta.json` 是 SKILL 发布/市场元数据，只属于运行时，**知识库不需要**，一律排除、不同步、不校验；该排除不影响模块 4.4 的运行时备份（备份需保留运行时原貌）。
 
 ### 步骤 4.1A：同步 `self/skills/` 下更新后的 skill 项目内容到当前项目
 
@@ -53,8 +55,8 @@ rsync -r "${excludes[@]}" ~/.agents/skills/ /Users/kangll13/aiot/java-code/self/
 - 若 `self/skills/<project>/skills/` 存在，则遍历其下每个子目录，分别同步到 `agent-skills/skills/<skill_name>/`
 - 若 `self/skills/<project>/.claude/skills/` 存在，则遍历其下每个子目录，分别同步到 `agent-skills/skills/<skill_name>/`
 - 若 `self/skills/<project>/.agents/skills/` 存在（如 gstack），则遍历其下每个子目录，分别同步到 `agent-skills/skills/<skill_name>/`
-- 同步到当前项目时仍然**不加 `--delete`**，只覆盖已有文件与新增文件
-- 同步 skill 根目录时，**必须排除** `.git/`、`.gitignore`、`.gitmodules`、`.DS_Store`、`__pycache__/`、`*.pyc`、`.idea/`、`.vscode/`、`node_modules/` 等与 skill 运行/文档无关的版本控制、依赖或本地缓存文件，不要把这些内容带入知识库
+- 同步到当前项目时仍然**不加 `--delete`**，只覆盖已有文件与新增文件；统一使用 `rsync -rtu` 并在覆盖前执行 `modules/shared.md` 的“文件新旧比对规则”，目标端更新的文件标记 `[NEWER-TARGET]` 跳过
+- 同步 skill 根目录时，**必须排除** `.git/`、`.gitignore`、`.gitmodules`、`.DS_Store`、`__pycache__/`、`*.pyc`、`.idea/`、`.vscode/`、`node_modules/`、`_mideameta.json` 等与 skill 运行/文档无关的版本控制、依赖、发布元数据或本地缓存文件，不要把这些内容带入知识库
 - 只同步当前项目里已经存在或明确需要保留的 skill 目录；不要删除知识库中的额外 skill
 
 ### 步骤 4.1B：统一发现（非默认逻辑，仅作补充校验或疑难场景兜底）
@@ -108,14 +110,14 @@ for project in /Users/kangll13/aiot/java-code/self/skills/*; do
   if [ "$project_name" = "gstack" ] && [ -d "$project/.agents/skills" ]; then
     for skill_dir in "$project"/.agents/skills/*; do
       [ -d "$skill_dir" ] || continue
-      rsync -r --exclude '.git/' --exclude '.DS_Store' --exclude 'node_modules/' \
+      rsync -rtu --exclude '.git/' --exclude '.DS_Store' --exclude 'node_modules/' \
         "$skill_dir/" "/Users/kangll13/aiot/java-code/self/gggggggood/agent-skills/skills/$(basename "$skill_dir")/"
     done
     continue
   fi
 
   if [ -f "$project/SKILL.md" ]; then
-    rsync -r --exclude '.git/' --exclude '.DS_Store' --exclude 'node_modules/' \
+    rsync -rtu --exclude '.git/' --exclude '.DS_Store' --exclude 'node_modules/' \
       "$project/" "/Users/kangll13/aiot/java-code/self/gggggggood/agent-skills/skills/$project_name/"
     continue
   fi
@@ -123,7 +125,7 @@ for project in /Users/kangll13/aiot/java-code/self/skills/*; do
   if [ -d "$project/skills" ]; then
     for skill_dir in "$project"/skills/*; do
       [ -d "$skill_dir" ] || continue
-      rsync -r "$skill_dir/" "/Users/kangll13/aiot/java-code/self/gggggggood/agent-skills/skills/$(basename "$skill_dir")/"
+      rsync -rtu "$skill_dir/" "/Users/kangll13/aiot/java-code/self/gggggggood/agent-skills/skills/$(basename "$skill_dir")/"
     done
     continue
   fi
@@ -132,7 +134,7 @@ for project in /Users/kangll13/aiot/java-code/self/skills/*; do
   if [ -d "$project/.claude/skills" ]; then
     for skill_dir in "$project"/.claude/skills/*; do
       [ -d "$skill_dir" ] || continue
-      rsync -r "$skill_dir/" "/Users/kangll13/aiot/java-code/self/gggggggood/agent-skills/skills/$(basename "$skill_dir")/"
+      rsync -rtu "$skill_dir/" "/Users/kangll13/aiot/java-code/self/gggggggood/agent-skills/skills/$(basename "$skill_dir")/"
     done
     continue
   fi
@@ -141,7 +143,7 @@ for project in /Users/kangll13/aiot/java-code/self/skills/*; do
   if [ -d "$project/.agents/skills" ]; then
     for skill_dir in "$project"/.agents/skills/*; do
       [ -d "$skill_dir" ] || continue
-      rsync -r "$skill_dir/" "/Users/kangll13/aiot/java-code/self/gggggggood/agent-skills/skills/$(basename "$skill_dir")/"
+      rsync -rtu "$skill_dir/" "/Users/kangll13/aiot/java-code/self/gggggggood/agent-skills/skills/$(basename "$skill_dir")/"
     done
     continue
   fi
@@ -157,7 +159,7 @@ done
 如果模块 2 中 `~/.agents/commands/` 发生了更新，也同步到知识库：
 
 ```bash
-rsync -r ~/.agents/commands/ /Users/kangll13/aiot/java-code/self/gggggggood/agent-skills/commands/
+rsync -rtu ~/.agents/commands/ /Users/kangll13/aiot/java-code/self/gggggggood/agent-skills/commands/
 ```
 
 ### 步骤 4.2A：口径说明
@@ -190,11 +192,11 @@ rsync -r ~/.agents/commands/ /Users/kangll13/aiot/java-code/self/gggggggood/agen
 
 ```bash
 # 备份同步，不加 --delete，保留 .claude/skills/ 中可能存在的额外文件
-rsync -r ~/.agents/skills/ ~/.claude/skills/
+rsync -rtu ~/.agents/skills/ ~/.claude/skills/
 ```
 
 **注意事项**：
-- 使用 `rsync -r`（**不加 `--delete`**），只覆盖已有文件和新增文件，不删除 `.claude/skills/` 中的额外内容
+- 使用 `rsync -rtu`（**不加 `--delete`**），只覆盖已有文件和新增文件，不删除 `.claude/skills/` 中的额外内容；`-t` 保留 mtime、`-u` 跳过备份端更新的文件（见 `modules/shared.md` 的“文件新旧比对规则”，被跳过的文件标记 `[NEWER-TARGET]`）
 - 备份内容包含已部署的自写 skill，属正常现象；下一次模块 2 的覆盖循环会对自写 skill 输出 `[SELF-SKILL-SKIP]` 并跳过，因此备份不会导致自写 skill 被回滚
 - 目的是运行时备份，不改变模块 2 中 `.claude/` 作为 OpenSpec 权威源的关系
 - 下次 `openspec update` 有权覆盖 `.claude/skills/` 中的任何内容

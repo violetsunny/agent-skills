@@ -19,7 +19,7 @@
 - 发现已修改的跟踪文件、合并冲突、rebase/merge 状态、远端分支冲突或其他异常时，只读取并报告仓库路径、状态和简要原因，然后跳过该仓库。**注意：仅有未跟踪文件（.DS_Store 等）的仓库不触发此规则，可安全执行 `git pull --ff-only`。**
 - 对保护目录中的干净仓库，只允许执行非破坏性的远端检查和普通 `git pull --ff-only`；拉取失败或无法快进时直接提示并跳过。
 - 技能同步涉及保护目录中的源文件时，同样禁止使用会删除或覆盖用户文件的操作；发现源或目标存在差异、异常或冲突时直接提示并跳过同步。
-- **例外**：模块 3.5（同步到 `free-stock-line-skills/`）和模块 4（同步到 `agent-skills/` / `.claude/skills/` 备份）属于用户明确要求的受控同步场景，可在对应模块写明的目标路径内执行 `rsync -r` 这类**不带 `--delete` 的非删除式覆盖同步**；但仍禁止删除、强制 git 操作、自动冲突处理，以及超出模块定义目标范围的覆盖。
+- **例外**：模块 3.5（同步到 `free-stock-line-skills/`）和模块 4（同步到 `agent-skills/` / `.claude/skills/` 备份）属于用户明确要求的受控同步场景，可在对应模块写明的目标路径内执行 `rsync -rtu` 这类**不带 `--delete` 的非删除式覆盖同步**；但仍禁止删除、强制 git 操作、自动冲突处理，以及超出模块定义目标范围的覆盖。
 - 任何不确定是否会修改、删除或覆盖保护目录内容的命令都不得执行，先提示用户确认。
 
 保护规则优先级高于本技能其他章节；但模块 3.5 与模块 4 中写明的“用户显式授权的非删除式同步例外”除外。结果汇总必须单独列出保护目录中跳过的仓库及原因，不得报告为成功。
@@ -35,12 +35,44 @@
 
 硬性规则：
 
-- 同步方向单向：`self-skills/<name>/` → `~/.agents/skills/<name>/`（模块 3.3），使用 `rsync -r` 且**不加 `--delete`**
+- 同步方向单向：`self-skills/<name>/` → `~/.agents/skills/<name>/`（模块 3.3），使用 `rsync -rtu` 且**不加 `--delete`**
 - **只更新、不新增**：`~/.agents/` 下没有的 skill，本技能一律不得私自加入（包括自写 skill），只能由用户人工手动加入；模块 3.3 只部署运行时已存在的自写 skill，缺失的标记 `[SELF-DEPLOY-SKIP]` 并提示
 - 禁止任何模块从 `~/.agents/skills/`、`~/.claude/skills/`、`self/skills/` 或其他任何来源反向写入 `self-skills/`；发现运行时与 `self-skills/` 存在差异时只报告，不自动处理
 - 模块 2 的 `.claude -> .agents` 覆盖循环、模块 3 的 npx/rsync 外部同步，遇到与 `self-skills/` 同名的 skill 必须跳过（标记 `[SELF-SKILL-SKIP]`），禁止用外部内容或 `.claude` 备份副本覆盖、回滚自写 skill
 - 模块 4 步骤 4.1 的 `~/.agents/skills/ -> agent-skills/skills/` 全量同步必须排除 `self-skills/` 中已存在的 skill 名，禁止把自写 skill 混入外部库 `agent-skills/skills/`
 - `self-skills/` 中 skill 的删除、重命名只能由用户手动执行，本技能不删除其中任何内容
+
+---
+
+## 文件新旧比对规则（全模块通用）
+
+所有文件级同步（模块 2 的 `.claude -> .agents` 覆盖、模块 3.2 / 3.3 / 3.5、模块 4 的 4.1 / 4.1A / 4.2 / 4.4）在覆盖前必须先比对两边文件的新旧，**严禁用旧文件覆盖新文件**，避免新修改丢失：
+
+- 比对口径：文件内容（`cmp`）+ 修改时间（mtime）
+  - 目标不存在 → 属“新增”，按各模块自身的新增规则处理（如模块 3.3 的“只更新不新增”）
+  - 内容一致 → 无风险，正常同步（顺带对齐 mtime）
+  - 内容不同且源端更新 → 允许覆盖
+  - 内容不同且目标端更新 → **禁止自动覆盖**，标记 `[NEWER-TARGET]` 并列出文件清单报告用户
+- 同步命令统一使用 `rsync -rtu`：`-t` 保留 mtime（使后续比对有效），`-u` 跳过目标端更新的文件。此前文档中的裸 `rsync -r` 不保留 mtime，一律升级为 `-rt`，需要防旧覆盖新时加 `-u`
+- 确需“旧覆盖新”（如刻意回退到某个版本）时，必须由用户**写明原因并手动执行**（如去掉 `-u` 的 `rsync -rt` 或 `cp`），本技能流程绝不自动执行；手动操作的原因与结果记入汇总
+- 例外：模块 1 的 `git pull` 走 git 自身合并机制，不适用本规则；模块 3.1 由 npx 官方机制管理更新，不走本规则的 rsync 比对（如需本地定制应转为自写 skill 放入 `self-skills/`）
+
+同步前比对清单（每个同步对执行一次，由主线程负责）：
+
+```bash
+# 仅报告“内容不同且目标更新”的项；这些文件禁止自动覆盖
+( cd "$src" && find . -type f ! -name '.DS_Store' ) | while read -r f; do
+  s="$src/$f"; t="$dst/$f"
+  [ -f "$t" ] || continue          # 目标不存在：属新增，按各模块自身规则处理
+  cmp -s "$s" "$t" && continue     # 内容一致：无风险
+  [ "$t" -nt "$s" ] && printf '[NEWER-TARGET] %s\n' "$f"
+done
+
+# 然后用 -rtu 同步（各模块自身的排除项照常附加）：
+# rsync -rtu <各模块排除项> "$src/" "$dst/"
+```
+
+> 比对范围与同步范围一致：被各模块排除项剔除的文件（如知识库同步 4.1 / 4.1A 中的 `_mideameta.json`）不参与比对，也不计入 `[NEWER-TARGET]`。
 
 ---
 
@@ -71,8 +103,9 @@
 - 模块 1 的 dirty 分类：只有未跟踪文件（`git status --porcelain` 无 ` M`/`M ` 等已修改跟踪文件状态码）的仓库可安全执行 `git pull --ff-only`，不跳过
 - 分批执行，每批不超过 15 个项目，每批超时 **180s**
 - 扫描深度为 **3 层**（`self/` 下第一层子目录，再往下两层）
-- Skill 同步（模块 3）分两类：npx 管理型 5 个（superpowers / matt-skills / ui-ux-pro-max-skill / baoyu-skills / ppt-master）通过 `npx skills@latest update -y -g` 统一更新（在用户主目录执行，`-y` 跳过确认，`-g` 全局安装并 Copy to all agents）；rsync 管理型 2 个（claude-code-java / anthropics-skills）使用 `rsync -r`（**不加 `--delete`**）做交集匹配同步；模块 3.5 和模块 4 同步到 `free-stock-line-skills/` 和 `agent-skills/skills/` 时同样使用 `rsync -r`（**不加 `--delete`**），保留用户自定义文件
-- 模块 3.3 负责自写 skill 部署：`agent-skills/self-skills/<name>/` → `~/.agents/skills/<name>/`，`rsync -r` 不加 `--delete`，排在外部同步之后执行（同名时自写版本为最终权威）；**只更新运行时已存在的自写 skill，运行时没有的绝不私自新增**（`[SELF-DEPLOY-SKIP]`，人工手动加入）；自写 skill 名单以 `self-skills/` 下的实际子目录为准，不写死清单
+- Skill 同步（模块 3）分两类：npx 管理型 5 个（superpowers / matt-skills / ui-ux-pro-max-skill / baoyu-skills / ppt-master）通过 `npx skills@latest update -y -g` 统一更新（在用户主目录执行，`-y` 跳过确认，`-g` 全局安装并 Copy to all agents）；rsync 管理型 2 个（claude-code-java / anthropics-skills）使用 `rsync -rtu`（**不加 `--delete`**）做交集匹配同步；模块 3.5 和模块 4 同步到 `free-stock-line-skills/` 和 `agent-skills/skills/` 时同样使用 `rsync -rtu`（**不加 `--delete`**），保留用户自定义文件
+- **所有文件级同步必须先执行“文件新旧比对规则”**：内容不同且目标端更新的文件标记 `[NEWER-TARGET]` 跳过并报告，严禁旧文件覆盖新文件；确需旧覆盖新必须写明原因由用户手动执行
+- 模块 3.3 负责自写 skill 部署：`agent-skills/self-skills/<name>/` → `~/.agents/skills/<name>/`，`rsync -rtu` 不加 `--delete`，排在外部同步之后执行（同名时自写版本为最终权威）；**只更新运行时已存在的自写 skill，运行时没有的绝不私自新增**（`[SELF-DEPLOY-SKIP]`，人工手动加入）；自写 skill 名单以 `self-skills/` 下的实际子目录为准，不写死清单
 - 模块 4 可使用“查找 `SKILL.md` 并倒推其父目录”为统一发现补充手段，但**不是默认逻辑**；仅允许在 `self/skills/<project>/` 项目目录内部查找，禁止回退到用户根目录 `~/.claude/skills/` / `~/.agents/skills/`
 - 模块 4 若发现同一项目内多个 `SKILL.md` 映射到同一个 `skill_name`，必须标记 `[DUPLICATE-SKILL]` 并跳过该 skill，禁止自动覆盖
 - 同步 skill 目录时必须排除 `.git/`、`.gitignore`、`.gitmodules`、`.DS_Store`、`__pycache__/`、`*.pyc`、`.idea/`、`.vscode/`、`node_modules/` 等无关文件或本地缓存
@@ -81,7 +114,7 @@
 - claude-code-java 的 skill 在 `.claude/skills/` 下（而非 `skills/`），详见模块 3.2.1
 - `/Users/kangll13/aiot/java-code/self/gggggggood/` 下任何异常、冲突或本地改动都必须单独列出并提示用户，不得自动处理
 - **`stock-replay-workbench` 是重点保护项目**，在模块 3.5 中禁止任何修改、同步或覆盖
-- 模块 3.5 同步到 `free-stock-line-skills/` 使用 `rsync -r` 不加 `--delete`，保留用户自定义文件（AGENTS.md、INDEX.md 等）
+- 模块 3.5 同步到 `free-stock-line-skills/` 使用 `rsync -rtu` 不加 `--delete`，保留用户自定义文件（AGENTS.md、INDEX.md 等）
 - **汇总口径**：模块 2 的汇总必须区分两类独立动作——(1) OpenSpec 对各工具目录的**直接生成状态**（仅记录成功/跳过/失败），(2) `.claude -> .agents` 的**迁移结果**（记录同步的 commands/skills 数量和 `[OVERWRITE]` 列表）。模块 4 的 `[BACKUP-SYNC]` 也需单独记录，不得与生成状态或迁移结果混为一条
 
 ---

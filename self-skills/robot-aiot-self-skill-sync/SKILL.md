@@ -1,7 +1,7 @@
 ---
 name: robot-aiot-self-skill-sync
 description: >
-  批量更新 self 目录下所有 git 项目；模块 3 对外部 skill 分两类同步：npx 管理型 5 个（superpowers / matt-skills / ui-ux-pro-max-skill / baoyu-skills / ppt-master）通过 npx skills@latest update 统一更新，rsync 管理型 2 个（claude-code-java / anthropics-skills）通过交集匹配 rsync 同步；先切换到更完整的 OpenSpec profile、升级并运行 openspec init/update，再将 OpenSpec 在 ~/.claude 下实际生成的完整 commands 和 skills 集合按保护规则同步到 ~/.agents。递归三层扫描所有嵌套 git 仓库；处理网络重试并报告冲突；~/.agents/ 与 agent-skills/ 的核心原则是只允许新增和修改，绝对不允许删除。
+  批量更新 self 目录下所有 git 项目；模块 3 对外部 skill 分两类同步：npx 管理型 5 个（superpowers / matt-skills / ui-ux-pro-max-skill / baoyu-skills / ppt-master）通过 npx skills@latest update 统一更新，rsync 管理型 2 个（claude-code-java / anthropics-skills）通过交集匹配 rsync 同步；先切换到更完整的 OpenSpec profile、升级并运行 openspec init/update，再将 OpenSpec 在 ~/.claude 下实际生成的完整 commands 和 skills 集合按保护规则同步到 ~/.agents。递归三层扫描所有嵌套 git 仓库；处理网络重试并报告冲突；~/.agents/ 与 agent-skills/ 的核心原则是只允许新增和修改，绝对不允许删除。所有文件级同步必须先比对两边文件新旧（内容 + mtime），严禁用旧文件覆盖新文件导致新修改丢失；目标端更新时标记 [NEWER-TARGET] 跳过并报告，确需旧覆盖新必须写明原因并由用户手动执行。
   agent-skills/ 下区分两个库：skills/ 存放别人写的或 git 获取的外部 skill 副本，禁止私自修改、只能同步覆盖；self-skills/ 存放用户自写 skill，是其唯一真源，可自由修改。模块 3.3 将 self-skills/ 单向部署到 ~/.agents/skills/（不加 --delete，只更新运行时已存在的，绝不私自新增，新增只能人工手动加入）；所有模块禁止反向写入 self-skills/，模块 2 覆盖循环与模块 3 外部交集同步遇到自写 skill 必须跳过，模块 4 知识库同步排除自写 skill、不混入 agent-skills/skills/。
   模块 4 在模块 2-3 完成后，将 ~/.agents/skills/ 全量同步到个人知识库 /Users/kangll13/aiot/java-code/self/gggggggood/agent-skills/skills/（不加 --delete，只覆盖已有 + 新增，排除自写 skill）。模块 5 在所有 skills 同步完成后，更新 `docs/skills-overview.md`，分别汇总 `~/.agents/skills/`、`agent-skills/skills/` 与 `agent-skills/self-skills/` 下的技能和说明。
   其中 /Users/kangll13/aiot/java-code/self/gggggggood/ 下的代码由用户维护，禁止任何回滚、清理、覆盖或自动冲突处理；发现异常或冲突必须直接提示用户并跳过。

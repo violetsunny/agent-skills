@@ -4,6 +4,8 @@
 
 汇总建议：各模块原始扫描、分类、差异比对结果优先由 fresh sub agent 先整理为结构化草稿，再由主线程统一出最终汇总，避免模块 1-5 的状态口径互相污染。
 
+全局规则：所有文件级同步（模块 2 覆盖、模块 3.2 / 3.3 / 3.5、模块 4 的 4.1 / 4.1A / 4.2 / 4.4）统一使用 `rsync -rtu` 并执行 `modules/shared.md` 的“文件新旧比对规则”。内容不同且目标端更新的文件标记 `[NEWER-TARGET]` 跳过并在对应模块汇总中计数；确需旧覆盖新必须写明原因由用户手动执行。
+
 ## Git Pull 汇总
 
 | 状态 | 数量 |
@@ -46,9 +48,9 @@
 
 | 字段 | 说明 |
 |------|------|
-| commands 迁移结果 | 仅针对模块 2 的 `.claude -> .agents` 运行时镜像迁移：`rsync -r --delete ~/.claude/commands/ ~/.agents/commands/` 执行后，两目录文件集合是否一致 |
+| commands 迁移结果 | 仅针对模块 2 的 `.claude -> .agents` 运行时镜像迁移：`rsync -rtu --delete ~/.claude/commands/ ~/.agents/commands/` 执行后，两目录文件集合是否一致 |
 | skills 迁移结果 | `~/.claude/skills/` 下每个 skill 同步到 `~/.agents/skills/` 的结果，差异时 `[OVERWRITE]` 覆盖 |
-| `[OVERWRITE]` 覆盖的 skills 列表 | 仅针对模块 2：有差异并被 `rsync -r --delete` 覆盖的运行时 skill 名称；不代表模块 3.5 / 4 可以删除目标端文件 |
+| `[OVERWRITE]` 覆盖的 skills 列表 | 仅针对模块 2：有差异并被 `rsync -rtu --delete` 覆盖的运行时 skill 名称；不代表模块 3.5 / 4 可以删除目标端文件 |
 | `[SELF-SKILL-SKIP]` 跳过的自写 skills | 与 `agent-skills/self-skills/` 同名而被跳过覆盖的 skill 名称及数量（自写 skill 只由模块 3.3 部署） |
 | 其他工具目录迁移说明 | 明确说明其他工具目录（`.codebuddy/`、`.cursor/` 等）仅记录生成状态，不参与 `.agents` 迁移 |
 
@@ -70,18 +72,18 @@
 
 ### (2) rsync 管理型项目（2 个）
 
-通过 `rsync -r`（**不加 `--delete`**）交集匹配同步，只同步已存在的 skill。
+通过 `rsync -rtu`（**不加 `--delete`**）交集匹配同步，只同步已存在的 skill。
 
-| 项目 | 同步 | 新增（被拒绝） |
-|------|------|--------------|
-| claude-code-java | N | N |
-| anthropics-skills | N | N |
+| 项目 | 同步 | 新增（被拒绝） | `[NEWER-TARGET]` |
+|------|------|--------------|------------------|
+| claude-code-java | N | N | N |
+| anthropics-skills | N | N | N |
 
-同步数 = 源中有且 `~/.agents/skills/` 中也有匹配的 skill 数（交集），新增数 = 源中有但 `~/.agents/skills/` 中无匹配的 skill 数（拒绝同步）。与 `self-skills/` 同名的项跳过并计入 `[SELF-SKILL-SKIP]`。
+同步数 = 源中有且 `~/.agents/skills/` 中也有匹配的 skill 数（交集），新增数 = 源中有但 `~/.agents/skills/` 中无匹配的 skill 数（拒绝同步）。与 `self-skills/` 同名的项跳过并计入 `[SELF-SKILL-SKIP]`；目标端更新而被跳过的文件计入 `[NEWER-TARGET]`。
 
 ### (3) 自写 skill 部署（模块 3.3）
 
-`agent-skills/self-skills/` 单向部署到 `~/.agents/skills/`（`rsync -r`，不加 `--delete`）。
+`agent-skills/self-skills/` 单向部署到 `~/.agents/skills/`（`rsync -rtu`，不加 `--delete`；运行时更新的文件被 `-u` 跳过，计入 `[SELF-SKILL-DRIFT]`）。
 
 | 字段 | 说明 |
 |------|------|
@@ -96,6 +98,7 @@
 | ✅ 同步 | N | self/skills 中有且 free-stock-line-skills 中也有匹配 |
 | ⏭️ 跳过 | N | 目标端无匹配或为非 skill 目录 |
 | 🔒 保护 | 1 | stock-replay-workbench，禁止修改 |
+| `[NEWER-TARGET]` | N | 汇总项目中更新、被比对规则跳过覆盖的文件数 |
 
 ## 知识库同步汇总（模块 4）
 
@@ -113,12 +116,13 @@
 | `self/skills/` 项目源补充同步 | 步骤 4.1A 从 `self/skills/<project>/` 内部结构同步到 `agent-skills/skills/` 的变更数量；仅允许读取项目根目录、`skills/`、项目内 `.claude/skills/`、项目内 `.agents/skills/` |
 | 统一发现补充检查 | 步骤 4.1B 基于 `SKILL.md` 倒推 skill 根目录时发现的补充 skill 数量、跳过数量和冲突数量 |
 | `[DUPLICATE-SKILL]` 冲突列表 | 同一项目内多个 `SKILL.md` 映射到同一个 `skill_name` 的冲突项；必须报告路径并跳过该 skill |
-| 无关文件排除统计 | 同步时排除的 `.git/`、`.DS_Store`、`__pycache__/`、`.idea/`、`.vscode/` 等文件/目录数量 |
+| 无关文件排除统计 | 同步时排除的 `.git/`、`.DS_Store`、`__pycache__/`、`.idea/`、`.vscode/`、`_mideameta.json` 等文件/目录数量 |
 | gstack 知识库同步 | 从 `self/skills/gstack/.agents/skills/` 同步到 `agent-skills/skills/` 的 skill 数量 |
+| `[NEWER-TARGET]` 跳过文件数 | 4.1 / 4.1A / 4.2 中知识库端更新、被比对规则跳过覆盖的文件数量及名单 |
 
 | 字段 | 说明 |
 |------|------|
-| `[BACKUP-SYNC]` 备份同步 | 模块 4 运行时备份同步到 `.claude/skills/` 的 skill 数量，使用 `rsync -r` 不加 `--delete`。此步骤与 OpenSpec 直接生成和模块 2 迁移是独立动作，需分开记录 |
+| `[BACKUP-SYNC]` 备份同步 | 模块 4 运行时备份同步到 `.claude/skills/` 的 skill 数量，使用 `rsync -rtu` 不加 `--delete`（备份端更新的文件标记 `[NEWER-TARGET]` 跳过）。此步骤与 OpenSpec 直接生成和模块 2 迁移是独立动作，需分开记录 |
 
 ## 技能总览文档汇总（模块 5）
 
