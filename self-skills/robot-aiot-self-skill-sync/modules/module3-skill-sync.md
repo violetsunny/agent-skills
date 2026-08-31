@@ -2,12 +2,13 @@
 
 > 共享规则见 `modules/shared.md`
 
-模块 3 分为两类同步方式：
+模块 3 分为三类同步方式：
 
 - **npx 管理型**（5 个项目）：通过 `npx skills@latest update` 统一更新，安装到 `~/.agents/skills/`
 - **rsync 管理型**（2 个项目）：通过 rsync 交集匹配同步，只同步已存在的 skill
+- **自写 skill 部署**（模块 3.3）：将 `agent-skills/self-skills/` 单向部署到 `~/.agents/skills/`，排在外部同步之后
 
-OpenSpec 在 `~/.claude/skills/` 下生成的完整 skills 集合只走模块 2 的专门同步流程。
+OpenSpec 在 `~/.claude/skills/` 下生成的完整 skills 集合只走模块 2 的专门同步流程。外部同步（npx / rsync 交集）遇到与 `self-skills/` 同名的 skill 一律跳过，自写 skill 的真源规则见 `modules/shared.md`。
 
 ## 3.1 npx 管理型项目（5 个）
 
@@ -67,7 +68,7 @@ npx skills@latest add hugohe3/ppt-master -y -g
 
 以下 2 个项目目前不支持 npx 安装，仍通过 rsync 同步。
 
-**核心规则**：只同步在 `~/.agents/skills/` 中**已经存在**的 skill，不新增。已经存在但源仓库中不存在该 skill → 不做任何操作（保留现有）。
+**核心规则**：只同步在 `~/.agents/skills/` 中**已经存在**的 skill，不新增。已经存在但源仓库中不存在该 skill → 不做任何操作（保留现有）。**与 `self-skills/` 同名的 skill 必须跳过**（标记 `[SELF-SKILL-SKIP]`），外部仓库不得覆盖自写 skill。
 
 工具：`rsync -r`（只覆盖已有文件和新增文件，**不删除** `~/.agents/skills/` 中的现有内容）、`cp -r` 作为备选。
 
@@ -99,3 +100,45 @@ for each rsync project:
 | 源 skill 目录 | `skills/`（直接子目录即为 skill 名） |
 
 同步前遍历 `skills/` 下所有子目录，与 `~/.agents/skills/` 做交集匹配，仅同步匹配的。
+
+## 3.3 自写 skill 部署（self-skills → 运行时）
+
+`agent-skills/self-skills/` 是用户自写 skill 的唯一真源。本步骤把它单向部署到运行时 `~/.agents/skills/`，让用户在仓库里的修改生效。
+
+**规则**：
+
+- 方向唯一：`self-skills/<name>/` → `~/.agents/skills/<name>/`；**禁止反向**（运行时不得写回 `self-skills/`）
+- **只更新、不新增**：只部署在 `~/.agents/skills/` 中**已经存在**的自写 skill；运行时没有的，本技能绝不私自加入，标记 `[SELF-DEPLOY-SKIP]` 并提示用户人工手动加入
+- 使用 `rsync -r`，**不加 `--delete`**，不删除运行时中额外的文件
+- 排在 3.1 / 3.2 之后执行：同名冲突时自写版本是最终权威
+- 自写 skill 名单 = `self-skills/` 下的实际子目录，不写死清单；非目录条目一律跳过
+- 排除 `.git/`、`.DS_Store`、`__pycache__/`、`*.pyc`、`.idea/`、`.vscode/`、`node_modules/` 等无关文件；排除 `_mideameta.json`（市场元数据以运行时为准，仓库副本不得回滚其版本）
+- 部署成功标记 `[SELF-DEPLOY]`；`self-skills/` 内容的删除、重命名只能由用户手动执行
+
+```bash
+self_skills_dir="/Users/kangll13/aiot/java-code/self/gggggggood/agent-skills/self-skills"
+
+for skill_dir in "$self_skills_dir"/*/; do
+  [ -d "$skill_dir" ] || continue
+  skill_name=$(basename "$skill_dir")
+
+  # 只更新不新增：运行时不存在的，留给用户人工手动加入
+  if [ ! -d "$HOME/.agents/skills/$skill_name" ]; then
+    printf '[SELF-DEPLOY-SKIP] %s（运行时不存在，需人工手动加入）\n' "$skill_name"
+    continue
+  fi
+
+  rsync -r \
+    --exclude '.git/' --exclude '.DS_Store' --exclude '__pycache__/' \
+    --exclude '*.pyc' --exclude '.idea/' --exclude '.vscode/' \
+    --exclude 'node_modules/' --exclude '_mideameta.json' \
+    "$skill_dir" "$HOME/.agents/skills/$skill_name/"
+  printf '[SELF-DEPLOY] %s\n' "$skill_name"
+done
+```
+
+### Sub Agent 建议
+
+1. sub agent 枚举 `self-skills/` 子目录并与 `~/.agents/skills/` 比对，生成新增/更新/一致的部署草稿
+2. 主线程执行真实 `rsync -r` 并统一计数 `[SELF-DEPLOY]`
+3. 任何“运行时内容比 self-skills 新”的差异只上报 `[SELF-SKILL-DRIFT]`，由用户决定如何处理，禁止自动反向同步

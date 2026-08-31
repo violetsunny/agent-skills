@@ -126,12 +126,21 @@ OpenSpec 可能按 profile 生成不同数量的 commands / skills，且文件�
 rsync -r --delete ~/.claude/commands/ ~/.agents/commands/
 ```
 
-然后同步当前 profile 在 `~/.claude/skills/` 下实际生成的完整 Agent Skills。`.claude` 是 OpenSpec 更新后的权威源，无论本地是否有差异，均直接覆盖：
+然后同步当前 profile 在 `~/.claude/skills/` 下实际生成的完整 Agent Skills。`.claude` 是 OpenSpec 更新后的权威源，无论本地是否有差异，均直接覆盖；**但与 `agent-skills/self-skills/` 同名的自写 skill 必须跳过**——模块 4.4 会把运行时的自写 skill 备份进 `~/.claude/skills/`，若不跳过，旧备份会在下一次迁移时把用户已更新的自写 skill 回滚：
 
 ```bash
+self_skills_dir="/Users/kangll13/aiot/java-code/self/gggggggood/agent-skills/self-skills"
+
 for skill_dir in ~/.claude/skills/*; do
   [ -d "$skill_dir" ] || continue
   skill_name=$(basename "$skill_dir")
+
+  # 自写 skill 以 self-skills/ 为唯一真源，禁止被 .claude 副本覆盖
+  if [ -d "$self_skills_dir/$skill_name" ]; then
+    printf '[SELF-SKILL-SKIP] %s\n' "$skill_name"
+    continue
+  fi
+
   target_dir="$HOME/.agents/skills/$skill_name"
 
   if diff -rq "$skill_dir" "$target_dir" >/dev/null 2>&1; then
@@ -143,7 +152,7 @@ for skill_dir in ~/.claude/skills/*; do
 done
 ```
 
-`.claude` 是权威源，当前 profile 实际生成的 skills 遇到差异时直接用 `rsync -r --delete` 覆盖 `.agents` 副本，并在汇总中报告已覆盖的 skill 名称（`[OVERWRITE]`）。两者一致时静默跳过。再次强调：这是模块 2 对运行时副本的受控覆盖例外，不得外推到 agent-skills、free-stock-line-skills 或其他用户维护目录。
+`.claude` 是权威源，当前 profile 实际生成的 skills 遇到差异时直接用 `rsync -r --delete` 覆盖 `.agents` 副本，并在汇总中报告已覆盖的 skill 名称（`[OVERWRITE]`）；被跳过的自写 skill 以 `[SELF-SKILL-SKIP]` 单独计数。两者一致时静默跳过。再次强调：这是模块 2 对运行时副本的受控覆盖例外，不得外推到 agent-skills、free-stock-line-skills 或其他用户维护目录，也不得覆盖自写 skill。
 
 **同步范围说明**：这里仅同步 OpenSpec 生成的 commands 和 skills。模块 3 负责其他 skills 的最新性，模块 4.4 负责 `~/.claude/skills/` 的运行时备份；数据流单向，不反向同步 `.agents/skills/ -> .claude/skills/`。
 

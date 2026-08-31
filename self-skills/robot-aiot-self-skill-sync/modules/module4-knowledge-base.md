@@ -2,13 +2,14 @@
 
 > 共享规则见 `modules/shared.md`
 
-**目的**：将 `~/.agents/skills/` 中经过模块 2-3 更新后的 skill 全量同步到个人知识库 `/Users/kangll13/aiot/java-code/self/gggggggood/agent-skills/skills/`，作为个人理想知识库和总结的汇聚地。
+**目的**：将 `~/.agents/skills/` 中经过模块 2-3 更新后的 skill 全量同步到个人知识库 `/Users/kangll13/aiot/java-code/self/gggggggood/agent-skills/skills/`，作为个人理想知识库和总结的汇聚地。`agent-skills/skills/` 只收录外部 skill；用户自写 skill 的真源已在 `agent-skills/self-skills/`，模块 4 同步时必须排除它们，且**禁止向 `self-skills/` 写入任何内容**。
 
 ### 保护规则例外
 
 `agent-skills/` 位于保护目录 `ggggggood/` 下，但模块 4 是用户明确要求的同步操作，适用以下例外规则：
 
 - **允许**：将 `~/.agents/skills/` 的 skill 文件覆盖到 `agent-skills/skills/`（rsync 不加 `--delete`）
+- **禁止写入 `self-skills/`**：`agent-skills/self-skills/` 是用户自写 skill 的唯一真源，只能由用户修改；模块 4 不得从运行时或任何其他来源向它同步、覆盖或补充内容
 - **禁止删除 skill**：本技能在任何模块中都不允许删除 skill 目录或文件，只能新增或更新。skill 的删除只能由用户手动执行。这是为了防止误删用户精心积累的知识库内容。
 - **禁止**：使用 `--delete` 删除 `agent-skills/skills/` 中源端没有的 skill 目录（用户可能在知识库中有额外 skill）
 - **禁止**：对 `agent-skills/` 仓库执行 `git add`、`git commit`、`git push` 等写操作
@@ -17,10 +18,21 @@
 
 ### 步骤 4.1：从 `~/.agents/skills/` 全量同步到知识库
 
+自写 skill（`self-skills/` 下的子目录）不进入外部库 `agent-skills/skills/`，同步前先构建排除清单：
+
 ```bash
-# 全量同步，不加 --delete，保留知识库中独有的 skill
-rsync -r ~/.agents/skills/ /Users/kangll13/aiot/java-code/self/gggggggood/agent-skills/skills/
+# 全量同步，不加 --delete，保留知识库中独有的 skill；排除自写 skill
+self_skills_dir="/Users/kangll13/aiot/java-code/self/gggggggood/agent-skills/self-skills"
+excludes=()
+for d in "$self_skills_dir"/*/; do
+  [ -d "$d" ] || continue
+  excludes+=(--exclude "/$(basename "$d")")
+done
+
+rsync -r "${excludes[@]}" ~/.agents/skills/ /Users/kangll13/aiot/java-code/self/gggggggood/agent-skills/skills/
 ```
+
+> 排除项用 `/名称` 锚定顶层目录，避免误伤 skill 内部同名文件；被排除的自写 skill 名单在汇总中单独列出。
 
 ### 步骤 4.1A：同步 `self/skills/` 下更新后的 skill 项目内容到当前项目
 
@@ -36,12 +48,13 @@ rsync -r ~/.agents/skills/ /Users/kangll13/aiot/java-code/self/gggggggood/agent-
 执行规则：
 
 - **排除 npx 管理型项目**：superpowers / matt-skills / ui-ux-pro-max-skill / baoyu-skills / ppt-master 这 5 个项目的 skill 由模块 3.1 通过 `npx skills@latest update` 安装到 `~/.agents/skills/` 后，经步骤 4.1 全量 rsync 同步到知识库，4.1A 不再处理，避免其 git 源结构被误判
+- **gstack 特例必须最先判断**：gstack 根目录同时存在 `SKILL.md`（路由入口）和 `.agents/skills/`（54 个实际子技能），必须走 `.agents/skills/` 分支逐个同步子技能，**禁止按单 skill 项目整目录同步**（会把 1G+ 的项目本体和 `node_modules/` 带入知识库）
 - 若 `self/skills/<project>/SKILL.md` 存在，则按单 skill 项目处理，同步到 `agent-skills/skills/<project>/`
 - 若 `self/skills/<project>/skills/` 存在，则遍历其下每个子目录，分别同步到 `agent-skills/skills/<skill_name>/`
 - 若 `self/skills/<project>/.claude/skills/` 存在，则遍历其下每个子目录，分别同步到 `agent-skills/skills/<skill_name>/`
 - 若 `self/skills/<project>/.agents/skills/` 存在（如 gstack），则遍历其下每个子目录，分别同步到 `agent-skills/skills/<skill_name>/`
 - 同步到当前项目时仍然**不加 `--delete`**，只覆盖已有文件与新增文件
-- 同步 skill 根目录时，**必须排除** `.git/`、`.gitignore`、`.gitmodules`、`.DS_Store`、`__pycache__/`、`*.pyc`、`.idea/`、`.vscode/` 等与 skill 运行/文档无关的版本控制或本地缓存文件，不要把这些内容带入知识库
+- 同步 skill 根目录时，**必须排除** `.git/`、`.gitignore`、`.gitmodules`、`.DS_Store`、`__pycache__/`、`*.pyc`、`.idea/`、`.vscode/`、`node_modules/` 等与 skill 运行/文档无关的版本控制、依赖或本地缓存文件，不要把这些内容带入知识库
 - 只同步当前项目里已经存在或明确需要保留的 skill 目录；不要删除知识库中的额外 skill
 
 ### 步骤 4.1B：统一发现（非默认逻辑，仅作补充校验或疑难场景兜底）
@@ -90,8 +103,20 @@ for project in /Users/kangll13/aiot/java-code/self/skills/*; do
     superpowers|matt-skills|ui-ux-pro-max-skill|baoyu-skills|ppt-master) continue ;;
   esac
 
+  # gstack 特例：根目录 SKILL.md 只是路由入口，必须走 .agents/skills/ 分支，
+  # 且必须在根 SKILL.md 分支之前判断，禁止整目录同步
+  if [ "$project_name" = "gstack" ] && [ -d "$project/.agents/skills" ]; then
+    for skill_dir in "$project"/.agents/skills/*; do
+      [ -d "$skill_dir" ] || continue
+      rsync -r --exclude '.git/' --exclude '.DS_Store' --exclude 'node_modules/' \
+        "$skill_dir/" "/Users/kangll13/aiot/java-code/self/gggggggood/agent-skills/skills/$(basename "$skill_dir")/"
+    done
+    continue
+  fi
+
   if [ -f "$project/SKILL.md" ]; then
-    rsync -r "$project/" "/Users/kangll13/aiot/java-code/self/gggggggood/agent-skills/skills/$project_name/"
+    rsync -r --exclude '.git/' --exclude '.DS_Store' --exclude 'node_modules/' \
+      "$project/" "/Users/kangll13/aiot/java-code/self/gggggggood/agent-skills/skills/$project_name/"
     continue
   fi
 
@@ -125,7 +150,7 @@ done
 
 **作用域说明**：这里的 `.claude/skills/` 与 `.agents/skills/` 都是指项目目录内部的 skill 源路径，不是用户主目录下的 `~/.claude/skills/` 或 `~/.agents/skills/`。模块 4.1A / 4.1B 都只从 `self/skills/<project>/...` 读取，不跨到用户根目录查找。
 
-**gstack 特别说明**：gstack 的 skill 位于项目内的 `.agents/skills/` 目录下（完整路径 `/Users/kangll13/aiot/java-code/self/skills/gstack/.agents/skills/`），不是常见的 `skills/` 目录。上述脚本的第四种结构专门处理此情况，避免路径歧义。
+**gstack 特别说明**：gstack 的 skill 位于项目内的 `.agents/skills/` 目录下（完整路径 `/Users/kangll13/aiot/java-code/self/skills/gstack/.agents/skills/`），不是常见的 `skills/` 目录。上述脚本的 gstack 特例分支专门处理此情况。**注意**：gstack 根目录也有一个 `SKILL.md`（路由入口），若不先判断 gstack 特例，会被单 skill 分支命中，把整个项目（含 `node_modules/`，1G+）误同步进知识库。
 
 ### 步骤 4.2：同步完整 commands（如模块 2 有更新）
 
@@ -170,6 +195,7 @@ rsync -r ~/.agents/skills/ ~/.claude/skills/
 
 **注意事项**：
 - 使用 `rsync -r`（**不加 `--delete`**），只覆盖已有文件和新增文件，不删除 `.claude/skills/` 中的额外内容
+- 备份内容包含已部署的自写 skill，属正常现象；下一次模块 2 的覆盖循环会对自写 skill 输出 `[SELF-SKILL-SKIP]` 并跳过，因此备份不会导致自写 skill 被回滚
 - 目的是运行时备份，不改变模块 2 中 `.claude/` 作为 OpenSpec 权威源的关系
 - 下次 `openspec update` 有权覆盖 `.claude/skills/` 中的任何内容
 - 在汇总中报告备份同步的 skill 数量（`[BACKUP-SYNC]`）

@@ -26,6 +26,24 @@
 
 ---
 
+## 自写 skill 真源规则（self-skills）
+
+`agent-skills/` 下区分两个性质不同的库：
+
+- `agent-skills/skills/`：**外部 skill 副本**——别人写的或 git 上获取的 skill，禁止私自修改，只能通过本技能的同步流程覆盖更新
+- `agent-skills/self-skills/`：**用户自写 skill 的唯一真源**（路径 `/Users/kangll13/aiot/java-code/self/gggggggood/agent-skills/self-skills/`），用户可自由修改；本技能只负责把它部署到运行时，绝不反向覆盖
+
+硬性规则：
+
+- 同步方向单向：`self-skills/<name>/` → `~/.agents/skills/<name>/`（模块 3.3），使用 `rsync -r` 且**不加 `--delete`**
+- **只更新、不新增**：`~/.agents/` 下没有的 skill，本技能一律不得私自加入（包括自写 skill），只能由用户人工手动加入；模块 3.3 只部署运行时已存在的自写 skill，缺失的标记 `[SELF-DEPLOY-SKIP]` 并提示
+- 禁止任何模块从 `~/.agents/skills/`、`~/.claude/skills/`、`self/skills/` 或其他任何来源反向写入 `self-skills/`；发现运行时与 `self-skills/` 存在差异时只报告，不自动处理
+- 模块 2 的 `.claude -> .agents` 覆盖循环、模块 3 的 npx/rsync 外部同步，遇到与 `self-skills/` 同名的 skill 必须跳过（标记 `[SELF-SKILL-SKIP]`），禁止用外部内容或 `.claude` 备份副本覆盖、回滚自写 skill
+- 模块 4 步骤 4.1 的 `~/.agents/skills/ -> agent-skills/skills/` 全量同步必须排除 `self-skills/` 中已存在的 skill 名，禁止把自写 skill 混入外部库 `agent-skills/skills/`
+- `self-skills/` 中 skill 的删除、重命名只能由用户手动执行，本技能不删除其中任何内容
+
+---
+
 ## Dirty 仓库分类：`[SAFE-UNTRACKED]` vs `[SKIP-DIRTY]`
 
 执行批量更新时，不是所有有本地变化的仓库都应该跳过。必须区分两类情况：
@@ -54,9 +72,10 @@
 - 分批执行，每批不超过 15 个项目，每批超时 **180s**
 - 扫描深度为 **3 层**（`self/` 下第一层子目录，再往下两层）
 - Skill 同步（模块 3）分两类：npx 管理型 5 个（superpowers / matt-skills / ui-ux-pro-max-skill / baoyu-skills / ppt-master）通过 `npx skills@latest update -y -g` 统一更新（在用户主目录执行，`-y` 跳过确认，`-g` 全局安装并 Copy to all agents）；rsync 管理型 2 个（claude-code-java / anthropics-skills）使用 `rsync -r`（**不加 `--delete`**）做交集匹配同步；模块 3.5 和模块 4 同步到 `free-stock-line-skills/` 和 `agent-skills/skills/` 时同样使用 `rsync -r`（**不加 `--delete`**），保留用户自定义文件
+- 模块 3.3 负责自写 skill 部署：`agent-skills/self-skills/<name>/` → `~/.agents/skills/<name>/`，`rsync -r` 不加 `--delete`，排在外部同步之后执行（同名时自写版本为最终权威）；**只更新运行时已存在的自写 skill，运行时没有的绝不私自新增**（`[SELF-DEPLOY-SKIP]`，人工手动加入）；自写 skill 名单以 `self-skills/` 下的实际子目录为准，不写死清单
 - 模块 4 可使用“查找 `SKILL.md` 并倒推其父目录”为统一发现补充手段，但**不是默认逻辑**；仅允许在 `self/skills/<project>/` 项目目录内部查找，禁止回退到用户根目录 `~/.claude/skills/` / `~/.agents/skills/`
 - 模块 4 若发现同一项目内多个 `SKILL.md` 映射到同一个 `skill_name`，必须标记 `[DUPLICATE-SKILL]` 并跳过该 skill，禁止自动覆盖
-- 同步 skill 目录时必须排除 `.git/`、`.gitignore`、`.gitmodules`、`.DS_Store`、`__pycache__/`、`*.pyc`、`.idea/`、`.vscode/` 等无关文件或本地缓存
+- 同步 skill 目录时必须排除 `.git/`、`.gitignore`、`.gitmodules`、`.DS_Store`、`__pycache__/`、`*.pyc`、`.idea/`、`.vscode/`、`node_modules/` 等无关文件或本地缓存
 - 模块 5 更新 `docs/skills-overview.md` 时，必须分别扫描 `~/.agents/skills/` 与 `agent-skills/skills/`，只读取各自目录内的 `SKILL.md`，不得混扫或跨目录回退
 - 模块 5 生成的技能总览应以实际扫描结果为准，不依赖手工维护的静态技能分组列表；`description` 多行内容需折叠为单行摘要
 - claude-code-java 的 skill 在 `.claude/skills/` 下（而非 `skills/`），详见模块 3.2.1

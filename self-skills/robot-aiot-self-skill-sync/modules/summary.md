@@ -49,6 +49,7 @@
 | commands 迁移结果 | 仅针对模块 2 的 `.claude -> .agents` 运行时镜像迁移：`rsync -r --delete ~/.claude/commands/ ~/.agents/commands/` 执行后，两目录文件集合是否一致 |
 | skills 迁移结果 | `~/.claude/skills/` 下每个 skill 同步到 `~/.agents/skills/` 的结果，差异时 `[OVERWRITE]` 覆盖 |
 | `[OVERWRITE]` 覆盖的 skills 列表 | 仅针对模块 2：有差异并被 `rsync -r --delete` 覆盖的运行时 skill 名称；不代表模块 3.5 / 4 可以删除目标端文件 |
+| `[SELF-SKILL-SKIP]` 跳过的自写 skills | 与 `agent-skills/self-skills/` 同名而被跳过覆盖的 skill 名称及数量（自写 skill 只由模块 3.3 部署） |
 | 其他工具目录迁移说明 | 明确说明其他工具目录（`.codebuddy/`、`.cursor/` 等）仅记录生成状态，不参与 `.agents` 迁移 |
 
 ## Skill 同步汇总
@@ -76,7 +77,17 @@
 | claude-code-java | N | N |
 | anthropics-skills | N | N |
 
-同步数 = 源中有且 `~/.agents/skills/` 中也有匹配的 skill 数（交集），新增数 = 源中有但 `~/.agents/skills/` 中无匹配的 skill 数（拒绝同步）。
+同步数 = 源中有且 `~/.agents/skills/` 中也有匹配的 skill 数（交集），新增数 = 源中有但 `~/.agents/skills/` 中无匹配的 skill 数（拒绝同步）。与 `self-skills/` 同名的项跳过并计入 `[SELF-SKILL-SKIP]`。
+
+### (3) 自写 skill 部署（模块 3.3）
+
+`agent-skills/self-skills/` 单向部署到 `~/.agents/skills/`（`rsync -r`，不加 `--delete`）。
+
+| 字段 | 说明 |
+|------|------|
+| `[SELF-DEPLOY]` 部署数量 | 本次部署的自写 skill 数量及名单（仅限运行时已存在的） |
+| `[SELF-DEPLOY-SKIP]` 未部署数量 | 运行时不存在的自写 skill 名单；本技能不私自新增，提示用户人工手动加入 |
+| `[SELF-SKILL-DRIFT]` 差异提示 | 运行时内容与 `self-skills/` 不一致且疑似运行时被单独修改的项；只报告，禁止反向同步 |
 
 ## free-stock-line-skills 同步汇总（模块 3.5）
 
@@ -98,7 +109,7 @@
 
 | 字段 | 说明 |
 |------|------|
-| `~/.agents/skills/` 全量同步 | 步骤 4.1 从 `~/.agents/skills/` 同步到 `agent-skills/skills/` 的变更数量 |
+| `~/.agents/skills/` 全量同步 | 步骤 4.1 从 `~/.agents/skills/` 同步到 `agent-skills/skills/` 的变更数量；`self-skills/` 中的自写 skill 被排除，排除名单单独列出 |
 | `self/skills/` 项目源补充同步 | 步骤 4.1A 从 `self/skills/<project>/` 内部结构同步到 `agent-skills/skills/` 的变更数量；仅允许读取项目根目录、`skills/`、项目内 `.claude/skills/`、项目内 `.agents/skills/` |
 | 统一发现补充检查 | 步骤 4.1B 基于 `SKILL.md` 倒推 skill 根目录时发现的补充 skill 数量、跳过数量和冲突数量 |
 | `[DUPLICATE-SKILL]` 冲突列表 | 同一项目内多个 `SKILL.md` 映射到同一个 `skill_name` 的冲突项；必须报告路径并跳过该 skill |
@@ -116,6 +127,7 @@
 | 文档路径 | `/Users/kangll13/aiot/java-code/self/gggggggood/agent-skills/docs/skills-overview.md` |
 | `~/.agents/skills/` 技能数 | 第一部分实际扫描到的 skill 数量 |
 | `agent-skills/skills/` 技能数 | 第二部分实际扫描到的 skill 数量 |
+| `agent-skills/self-skills/` 技能数 | 第三部分实际扫描到的自写 skill 数量 |
 | 缺失 `name` 数量 | frontmatter 未提供 `name:`，需回退到目录名的 skill 数量 |
 | 缺失 `description` 数量 | frontmatter 未提供 `description:` 或为空的 skill 数量 |
 | 文档写入结果 | 成功 / 跳过 / 失败，以及失败原因 |
