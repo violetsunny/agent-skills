@@ -250,14 +250,7 @@
 
 **描述：** 扫地机器人俯视图标，包含圆形机身、顶部激光雷达模块、两侧边刷、中间控制按钮
 
-**使用方式：**
-```xml
-<mxCell id="robot_png" value="" style="shape=image;verticalLabelPosition=bottom;labelBackgroundColor=default;verticalAlign=top;aspect=fixed;imageAspect=0;image=https://your-oss-url/robot-vacuum-icon.png;" vertex="1" parent="1">
-  <mxGeometry x="100" y="100" width="80" height="80" as="geometry" />
-</mxCell>
-```
-
-**本地使用（draw.io桌面版）：**
+**使用方式（base64 内嵌）：**
 ```xml
 <mxCell id="robot_png_local" value="" style="shape=image;verticalLabelPosition=bottom;labelBackgroundColor=default;verticalAlign=top;aspect=fixed;imageAspect=0;image=data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAA..." vertex="1" parent="1">
   <mxGeometry x="100" y="100" width="80" height="80" as="geometry" />
@@ -265,7 +258,6 @@
 ```
 
 **注意事项：**
-- 使用OSS链接时，需要先通过 `midea_oss_tool` 上传 `assets/robot-vacuum-icon.png`
-- 本地使用时，需要将PNG转为base64编码嵌入XML
+- 使用时将 `assets/robot-vacuum-icon.png` 转为 base64 编码嵌入 XML
 - 调整 `width` 和 `height` 保持等比例缩放
 - 可通过 `rotation` 属性旋转图标（如 `rotation=45`）

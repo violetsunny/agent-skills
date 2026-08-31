@@ -209,7 +209,7 @@ metadata:
 2. 加载 robot-icons / color-schemes / flowchart-patterns（/ layered-architecture）/ style-consistency
 3. 按 `mxfile → diagram → mxGraphModel → root` 生成结构
 4. 应用统一样式，添加标题、图例、机器人图标
-5. 交付：独立使用写 `doc-ppt/*.xml` 并上传 OSS；被 leadership-ppt-workflow 调用只返回本地路径
+5. 交付：写 `doc-ppt/*.xml` 并返回本地路径
 6. 交付前自审：结构完整性 + 样式一致性（`references/generation-workflow.md` 清单）
 
 ### 路径 B：直绘 SVG/HTML（固定顺序）

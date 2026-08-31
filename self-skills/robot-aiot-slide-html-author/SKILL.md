@@ -1,20 +1,20 @@
 ---
 name: robot-aiot-slide-html-author
 description: >
-  为领导汇报类 PPT/母稿生成固定画布的逐页 HTML 页面：执行时引用 `ui-ux-pro-max` 的设计系统与审查能力，标准上直接重写并内化 Material 3 语义 token、Apple HIG 的清晰/克制/层次原则，以及 taste-skill 系列的高级感设计标准（反模板化排版、色彩/形状一致性锁定、AI 痕迹清单、审查修复工作流）。适用于"PPT 母稿转单页 HTML""领导汇报页落成 HTML""逐页生成 slide HTML""给 ppt-master 准备逐页 HTML""修复汇报页布局/样式/信息层级""把图表 HTML 嵌入汇报页"等场景。也适用于已有 Markdown 母稿、页面草图或图表 HTML，需要产出 1920x1080 固定画布 HTML，并保持图表真源与页面视觉体系一致的任务。当图表 HTML 存在问题时，可调用 `robot-aiot-xml-html-bridge` 进行审查和修复。
+  为领导汇报类 PPT/母稿生成固定画布的逐页 HTML 页面：执行时引用 `ui-ux-pro-max` 的设计系统与审查能力，标准上内化语义化设计 token、清晰/克制/层次原则与高级感设计标准（反模板化排版、色彩/形状一致性锁定、AI 痕迹清单、审查修复工作流）。适用于"PPT 母稿转单页 HTML""领导汇报页落成 HTML""逐页生成 slide HTML""给 ppt-master 准备逐页 HTML""修复汇报页布局/样式/信息层级""把图表 HTML 嵌入汇报页"等场景。也适用于已有 Markdown 母稿、页面草图或图表 HTML，需要产出 1920x1080 固定画布 HTML，并保持图表真源与页面视觉体系一致的任务。当图表 HTML 存在问题时，可调用 `robot-aiot-xml-html-bridge` 进行审查和修复。
 ---
 
 # Robot AIoT Slide HTML Author
 
 本技能负责把汇报母稿或页面草图落成可审查、可交付给 `ppt-master` 的逐页 HTML。
-它在执行上引用 `ui-ux-pro-max` 的能力，在标准上直接重写 `material-3` 与 `apple-hig-designer` 中对本场景真正有用的规则，并把 taste-skill 系列（反模板化前端设计）本地化为汇报页专用的高级感标准：
+它在执行上引用 `ui-ux-pro-max` 的能力，在标准上把语义化设计 token、清晰/克制/层次原则与反模板化高级感标准直接重写为汇报页专用规则：
 
 1. 用内容优先和可读性驱动版面，而不是追求花哨样式
 2. 用语义化 token、字级、间距和容器层次做统一治理
 3. 用克制的深度、留白和视觉节奏强化领导视角的信息获取效率
 4. 用设计解读、一致性锁定和 AI 痕迹清单消除模板感，让页面具备高级感
 
-除非用户明确要求单独做某套规范审计，否则不要在运行时再额外依赖 `material-3` 或 `apple-hig-designer`；这两套标准已经在本技能内化。taste-skill 系列标准同样已本地化到 `references/taste-design-standards.md` 与 `references/taste-review-fix.md`，不作为运行时依赖。`ui-ux-pro-max` 则作为执行能力依赖保留。
+设计规范已全部内化到本技能 `references/` 下（`design-system-standards.md`、`premium-design-standards.md`、`premium-review-fix.md`），运行时不再额外依赖任何外部设计规范技能。`ui-ux-pro-max` 作为执行能力依赖保留。
 
 ## 执行前依赖检查
 
@@ -76,11 +76,11 @@ done
 2. 布局与可读性复核：扫描路径、信息密度、视觉主次、可访问性风险
 3. 页面交付前审查：是否存在装饰过度、对比不足、仅依赖颜色传达语义等问题
 
-若 `ui-ux-pro-max` 的建议与本技能已内化的 Material 3 / Apple HIG / Taste 规则冲突，以本技能规则和首页图表真源约束为准。
+若 `ui-ux-pro-max` 的建议与本技能已内化的设计标准冲突，以本技能规则和首页图表真源约束为准。
 
 ### 2. 先做设计解读，再定风格基调
 
-动手前按 `references/taste-design-standards.md` 完成：
+动手前按 `references/premium-design-standards.md` 完成：
 
 1. 输出一行设计解读：页面类型、受众、视觉语气、风格基调
 2. 设定三档刻度：DESIGN_VARIANCE（4-5）、MOTION_INTENSITY（1，静态页）、VISUAL_DENSITY（4-6）
@@ -138,21 +138,21 @@ done
 
 **边界**：`robot-aiot-slide-html-author` 负责页面级 HTML，不直接修改图表内部结构；图表级审查修复由 `robot-aiot-xml-html-bridge` 负责。
 
-### 7. 做 Taste 交付前审查
+### 7. 做高级感交付前审查
 
-每页完成后按 `references/taste-review-fix.md` 执行审查：
+每页完成后按 `references/premium-review-fix.md` 执行审查：
 
 1. 基础检查：画布尺寸、布局不重叠、内容不溢出
 2. 层级检查：标题层级、结论显著性、数字字号、页脚品牌位
 3. 内容检查：页面不残留技术表名、类名、API 路径或未经解释的缩写
 4. 图表检查：图表与页面 token 语义一致，但图表事实未被改写
-5. Taste 预检：逐项过 `taste-review-fix.md` 的阻塞项与非阻塞项清单，输出审查报告
+5. 高级感预检：逐项过 `references/premium-review-fix.md` 的阻塞项与非阻塞项清单，输出审查报告
 
 ## 设计原则
 
-### 内容优先
+以下原则的完整细则（token 角色配对、字级具体值、同心圆角、对比度判据）见 `references/design-system-standards.md`。
 
-吸收 Apple HIG 的 `Clarity` 和 `Deference`：
+### 内容优先
 
 1. 每个视觉元素都要为结论服务
 2. 页面 chrome 保持克制，避免堆叠装饰
@@ -160,15 +160,11 @@ done
 
 ### 语义一致
 
-吸收 Material 3 的 token 体系：
-
 1. 用语义色而不是散落的十六进制常量
 2. 用 surface/container 层级表达主次关系
 3. 用 headline/title/body/label 管理字级，不为每页重新发明字号
 
 ### 适度层次
-
-吸收 Apple HIG 的 `Depth` 与 Material 3 的 tonal surface：
 
 1. 通过浅深背景、容器层级、轻阴影制造层次
 2. 默认使用实色或轻渐变背景
@@ -182,9 +178,9 @@ done
 2. 页面版式允许变化，但不打断整体扫描节奏
 3. 不依赖 hover，不用只靠颜色传达意义
 
-### 反模板感（Taste 内化）
+### 反模板感
 
-吸收 taste-skill 系列的反模板化标准（完整规则见 `references/taste-design-standards.md`）：
+完整规则见 `references/premium-design-standards.md`：
 
 1. 先做设计解读再动手，不做无意识的默认审美
 2. 一致性锁定：强调色、圆角档位、灰阶基调、风格基调全套汇报统一
@@ -201,7 +197,7 @@ done
 6. 不做滚动动画、入场动画、循环动效；幻灯片是静态单页
 7. 不伪造精确数字；占位数据必须显式标注"示意"
 8. 不使用 AI 紫/霓虹渐变、纯黑硬阴影、纯黑大面积背景（品牌色本身为紫色时例外，且须整套汇报一致）
-9. 不出现编号眉标、装饰状态点、版本号页脚等 AI 痕迹（完整清单见 `references/taste-design-standards.md` 第 9 节）
+9. 不出现编号眉标、装饰状态点、版本号页脚等 AI 痕迹（完整清单见 `references/premium-design-standards.md` 第 9 节）
 10. 每页 HTML 必须完整可运行，禁止占位注释和"同上"省略
 
 ## 何时读取引用文档
@@ -210,8 +206,9 @@ done
 2. 需要页面类型、token 表、模板骨架和布局清单时，读 `references/page-html-template.md`
 3. 需要运行时设计系统建议和页面审查能力时，加载 `ui-ux-pro-max`
 4. 需要审查或修复图表 HTML 时，加载 `robot-aiot-xml-html-bridge`
-5. 需要高级感设计标准（设计解读、刻度、风格基调、排版/色彩/布局纪律、AI 痕迹清单）时，读 `references/taste-design-standards.md`
-6. 需要执行交付前审查或修复既有页面时，读 `references/taste-review-fix.md`
+5. 需要高级感设计标准（设计解读、刻度、风格基调、排版/色彩/布局纪律、AI 痕迹清单）时，读 `references/premium-design-standards.md`
+6. 需要执行交付前审查或修复既有页面时，读 `references/premium-review-fix.md`
+7. 需要设计系统细则（色彩角色配对、tonal surface 层次、字级、同心圆角、对比度判据）时，读 `references/design-system-standards.md`
 
 ## 交付口径
 
@@ -221,4 +218,4 @@ done
 2. 采用了哪套主色/语义 token 规则
 3. 哪些图表 HTML 被引用
 4. 是否存在仍需人工确认的布局或内容风险
-5. Taste 审查结论：阻塞项是否全部通过、`[UI-WARN]` 列表、风格基调与刻度声明
+5. 高级感审查结论：阻塞项是否全部通过、`[UI-WARN]` 列表、风格基调与刻度声明
