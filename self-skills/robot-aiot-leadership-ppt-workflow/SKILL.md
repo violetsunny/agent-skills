@@ -34,6 +34,26 @@ Sub agent 原则：
 
 ---
 
+## 执行前依赖检查
+
+开始执行前，先检查依赖 skill 是否已安装在运行时 `~/.agents/skills/`：
+
+```bash
+for s in robot-aiot-draw-flowchart robot-aiot-xml-html-bridge robot-aiot-slide-html-author ppt-master; do
+  [ -d "$HOME/.agents/skills/$s" ] || printf '[DEP-MISSING] %s\n' "$s"
+done
+```
+
+| 依赖 skill | 级别 | 用途 |
+|------|------|------|
+| robot-aiot-draw-flowchart | 必需 | 阶段三绘制图表 XML（图表真源） |
+| robot-aiot-xml-html-bridge | 必需 | 阶段四将图表 XML 转换为 HTML |
+| robot-aiot-slide-html-author | 必需 | 阶段四逐页汇报页 HTML 绘制 |
+| ppt-master | 必需 | 阶段五依据逐页 HTML 生成 PPTX |
+
+- 全部存在 → 略过，进入主流程
+- 出现 `[DEP-MISSING]` → **暂停执行**，列出缺失清单并提示用户手动安装（本技能不私自安装），安装完成后再继续
+
 ## 输出目录约定
 
 所有输出产物统一放在当前运行项目的 `doc-ppt/` 目录下，不散落到其他位置。

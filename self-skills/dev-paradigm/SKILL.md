@@ -15,6 +15,20 @@ description: >
 
 不要为了“走完整流程”而引入无意义步骤。任务小就走短路径，任务大才补齐规格、票据、架构和治理。
 
+## 执行前依赖检查
+
+本 skill 按需把工作路由到其他 skill，依赖检查发生在**路由时**：路由到某个目标 skill 前，先确认它已安装在运行时 `~/.agents/skills/`：
+
+```bash
+s=<路由目标 skill>
+[ -d "$HOME/.agents/skills/$s" ] || printf '[DEP-MISSING] %s\n' "$s"
+```
+
+路由目标（按需依赖，matt-skills 系列）：`setup-matt-pocock-skills`、`triage`、`grill-me`、`to-spec`、`to-tickets`、`domain-modeling`、`codebase-design`、`implement`、`tdd`、`diagnosing-bugs`、`code-review`、`java-code-review`、`improve-codebase-architecture`、`spring-boot-patterns`、`wayfinder`、`handoff`、`retro`。
+
+- 目标存在 → 略过，正常路由
+- 出现 `[DEP-MISSING]` → 不私自安装，提示用户手动安装该 skill，或经用户确认改走其他可用路径
+
 ## 总图
 
 ```text

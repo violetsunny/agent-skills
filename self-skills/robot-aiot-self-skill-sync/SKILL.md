@@ -25,6 +25,23 @@ Sub agent 原则：
 - 涉及保护目录、覆盖式同步、是否跳过、是否继续执行下一模块等决定，只能由主线程拍板
 - tiny 单文件说明修正或单条汇总补充可直接主线程处理，不必起 sub agent
 
+## 执行前依赖检查
+
+开始执行前，先检查依赖 skill 是否已安装在运行时 `~/.agents/skills/`：
+
+```bash
+for s in opsx-workflow-hooks; do
+  [ -d "$HOME/.agents/skills/$s" ] || printf '[DEP-MISSING] %s\n' "$s"
+done
+```
+
+| 依赖 skill | 级别 | 用途 |
+|------|------|------|
+| opsx-workflow-hooks | 必需 | 模块 2 同步后立即恢复 `/opsx` 的 Hook A / Hook B |
+
+- 存在 → 略过，进入主流程
+- 出现 `[DEP-MISSING]` → **暂停执行**，列出缺失清单并提示用户手动安装（本技能不私自安装），安装完成后再继续
+
 ## 模块索引
 
 | 模块 | 文件 | 说明 |

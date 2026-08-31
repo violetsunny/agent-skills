@@ -12,6 +12,10 @@ license: MIT
 
 # Easy Crawler
 
+## 执行前依赖检查
+
+无外部 skill 依赖，可在运行时 `~/.agents/skills/` 独立执行。
+
 ## 目标
 
 这个 skill 提供一个可独立部署的抓取目录，统一描述三类能力：

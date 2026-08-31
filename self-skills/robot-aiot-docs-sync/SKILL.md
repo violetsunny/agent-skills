@@ -25,6 +25,10 @@ metadata:
 4. **说明层**：让 `docs/project-map.md` 和 `docs/architecture.md` 分担 reference / explanation 角色
 5. **润色层**：统一中文技术文档表达、术语、格式和一致性
 
+## 执行前依赖检查
+
+无外部 skill 依赖，可在运行时 `~/.agents/skills/` 独立执行。
+
 ## 输出范围
 
 本技能只负责以下五个文件：

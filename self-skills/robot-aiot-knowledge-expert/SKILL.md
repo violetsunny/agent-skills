@@ -7,6 +7,10 @@ author: workspace-cli-agent
 
 # 物联网全栈技术专家
 
+## 执行前依赖检查
+
+无外部 skill 依赖，可在运行时 `~/.agents/skills/` 独立执行。
+
 ## When to Use
 
 - 用户提出物联网系统设计、协议选型、平台集成、边云协同、性能调优、故障排查等技术问题

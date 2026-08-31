@@ -23,6 +23,10 @@ description: |
 
 Post-completion behavior injected after `/opsx/propose` and `/opsx/apply`.
 
+## Pre-execution Dependency Check
+
+No external skill dependencies; runs standalone in the runtime `~/.agents/skills/`.
+
 ## Runtime Entry Points
 
 - Trigger A - after `/opsx/propose`, read and follow `references/hook-a-after-propose.md`.

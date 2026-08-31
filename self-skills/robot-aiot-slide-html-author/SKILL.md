@@ -16,6 +16,25 @@ description: >
 
 除非用户明确要求单独做某套规范审计，否则不要在运行时再额外依赖 `material-3` 或 `apple-hig-designer`；这两套标准已经在本技能内化。taste-skill 系列标准同样已本地化到 `references/taste-design-standards.md` 与 `references/taste-review-fix.md`，不作为运行时依赖。`ui-ux-pro-max` 则作为执行能力依赖保留。
 
+## 执行前依赖检查
+
+开始执行前，先检查依赖 skill 是否已安装在运行时 `~/.agents/skills/`：
+
+```bash
+for s in ui-ux-pro-max robot-aiot-xml-html-bridge ppt-master; do
+  [ -d "$HOME/.agents/skills/$s" ] || printf '[DEP-MISSING] %s\n' "$s"
+done
+```
+
+| 依赖 skill | 级别 | 用途 |
+|------|------|------|
+| ui-ux-pro-max | 必需 | 执行时引用其设计系统与审查能力 |
+| robot-aiot-xml-html-bridge | 可选 | 图表 HTML 存在问题时用于审查和修复 |
+| ppt-master | 可选 | 下游消费方：逐页 HTML 交付其生成 PPTX |
+
+- 必需依赖存在 → 略过，进入主流程；可选依赖缺失 → 提示但不阻塞
+- 必需依赖出现 `[DEP-MISSING]` → **暂停执行**，列出缺失清单并提示用户手动安装（本技能不私自安装），安装完成后再继续
+
 ## 上游工作流定位
 
 本技能位于图表转换的下游，分工如下：

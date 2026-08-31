@@ -12,6 +12,23 @@ description: >
 
 将模糊方案收敛成结构化文档，并在需要时发布到 Confluence。
 
+## 执行前依赖检查
+
+开始执行前，先检查依赖 skill 是否已安装在运行时 `~/.agents/skills/`：
+
+```bash
+for s in confluence-cli; do
+  [ -d "$HOME/.agents/skills/$s" ] || printf '[DEP-MISSING] %s\n' "$s"
+done
+```
+
+| 依赖 skill | 级别 | 用途 |
+|------|------|------|
+| confluence-cli | 可选 | Confluence 发布；缺失时优雅降级为本地 Markdown 交付，不硬失败 |
+
+- 存在 → 略过，进入主流程
+- 出现 `[DEP-MISSING]` → 提示缺失并按既定降级策略只输出 Markdown，不阻塞成文流程；如用户需要发布，再提示其手动安装
+
 ## 核心定位
 
 本技能整合了四类能力：

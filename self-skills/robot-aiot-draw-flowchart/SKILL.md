@@ -12,6 +12,10 @@ metadata:
 
 # 机器人 AIoT 图表绘制 Skill
 
+## 执行前依赖检查
+
+无外部 skill 依赖（archify 渲染引擎内置于本 skill 目录，零运行时依赖），可在运行时 `~/.agents/skills/` 独立执行。
+
 ## 概述
 
 本 Skill 是机器人/IoT 业务图表的统一绘制能力，由 draw.io XML 绘制规范、diagram-design 编辑级设计系统、fireworks-tech-graph 工程制图管线三者融合而成：

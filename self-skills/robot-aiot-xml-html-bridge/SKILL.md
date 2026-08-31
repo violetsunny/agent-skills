@@ -25,6 +25,10 @@ description: >
 
 ---
 
+## 执行前依赖检查
+
+无外部 skill 依赖（输入为 XML 文件，上游 `robot-aiot-draw-flowchart` 是协作关系而非运行时依赖），可在运行时 `~/.agents/skills/` 独立执行。
+
 ## 适用输入
 
 - `robot-aiot-draw-flowchart` 生成的 `.xml`

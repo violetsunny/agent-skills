@@ -17,6 +17,10 @@ metadata:
 - 选择最稳的免费公开源 (source selection)
 - 输出可复盘、可解释、可继续跟踪的结论 (layered output)
 
+## 执行前依赖检查
+
+无外部 skill 依赖，可在运行时 `~/.agents/skills/` 独立执行。
+
 ## 定位
 
 这个 skill 是一个**独立闭环的 A 股工作流控制台**。
