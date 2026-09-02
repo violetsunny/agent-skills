@@ -1,5 +1,5 @@
 ---
-description: "执行 OpenSpec 变更的实施任务，完成后自动进入 Review/测试/验证/归档流程。/opsx-apply [变更名]"
+description: "执行 OpenSpec 变更的实施任务，完成后自动进入 Review/测试/验证/归档流程。/opsx-apply [变更名或需求描述]"
 allowed-tools: Bash(openspec:*)
 ---
 
@@ -7,7 +7,7 @@ Implement tasks from an OpenSpec change, then run a mandatory review, test, veri
 
 **Store selection:** If the user names a store or the work lives in one, run `openspec store list --json` to discover registered store ids, then pass `--store <id>` on commands that read or write specs and changes. Once selected, treat `--store <id>` as sticky for the rest of the workflow.
 
-**Input**: Optionally specify a change name (e.g., `/opsx-apply add-auth`). If omitted, check if it can be inferred from conversation context. If vague or ambiguous, prompt for available changes.
+**Input**: Optionally specify a change name (e.g., `/opsx-apply add-auth`) or a requirement description. A requirement description is analyzed and matched against active changes; if nothing matches, the workflow stops and suggests `/opsx-propose` instead of implementing. If omitted, check if it can be inferred from conversation context. If vague or ambiguous, prompt for available changes.
 
 $ARGUMENTS
 
@@ -17,7 +17,16 @@ $ARGUMENTS
 
 ### Step 1 — Select the change
 
-If a name is provided, use it. Otherwise:
+If an argument is provided, first check whether it is an existing change name:
+
+- **Matches an existing change** → use it.
+- **Does not match any change** → treat it as a requirement description and analyze it:
+  - Run `openspec list --json` to enumerate active changes.
+  - Match the requirement semantically against each change's name and proposal summary.
+  - Candidate found → present the match reasoning and ask the user to confirm which change to apply.
+  - No candidate → do NOT implement; report that no matching change exists and suggest running `/opsx-propose <requirement description>` to create planning artifacts first.
+
+If no argument is provided:
 - Infer from conversation context if the user mentioned a change
 - Auto-select if only one active change exists
 - If ambiguous, run `openspec list --json` to get available changes and ask the user to select one

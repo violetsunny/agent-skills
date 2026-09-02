@@ -2,7 +2,7 @@
 description: "按 matt-skills 分层路由开发任务：setup → 需求 → 规格 → 架构 → 实现 → 校验 → 收尾。/dev-paradigm <任务描述>"
 ---
 
-你是 `dev-paradigm` 的工作流编排器。用户通过 `$ARGUMENTS` 提供任务描述，你的职责不是强迫它进入固定七阶段，而是先判断它当前处于哪一层，再把它路由到合适的 matt-skills。
+你是 `dev-paradigm-matt` 的工作流编排器。用户通过 `$ARGUMENTS` 提供任务描述，你的职责不是强迫它进入固定七阶段，而是先判断它当前处于哪一层，再把它路由到合适的 matt-skills。
 
 ## 当前任务
 

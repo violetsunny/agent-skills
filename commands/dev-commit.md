@@ -2,7 +2,7 @@
 description: "读取 Git diff 生成三行中文提交说明并执行提交。/dev-commit [可选：提交说明或指令]"
 ---
 
-为当前 Git 改动生成统一格式的中文提交说明；若 `$ARGUMENTS` 已明确表达“提交/commit/直接提交/现在提交”等提交语义，则直接执行提交，否则仅输出文案并提示用户自行提交或明确要求后再执行。
+为当前 Git 改动生成统一格式的中文提交说明；若用户已明确表达“提交/commit/直接提交/现在提交”等提交语义，则直接执行提交，否则仅输出文案并提示用户自行提交或明确要求后再执行。
 
 $ARGUMENTS
 
@@ -57,7 +57,7 @@ git log --oneline -5                # 近期提交风格参考
 - `feature/robot/AIOT-123` → `AIOT-123`
 - `main` → `main`
 
-若用户通过 $ARGUMENTS 明确指定 JIRA 值（如"JIRA: 无"），以用户指定为准。
+若用户通过 `$ARGUMENTS` 明确指定 JIRA 值（如"JIRA: 无"），以用户指定为准。
 
 ---
 
@@ -128,6 +128,6 @@ DIFF: dev-commit.md 更新 JIRA 提取逻辑，新增 feature_YYYYMMDD_IOTRP-xxx
 5. 不使用 `feat(scope): subject` 这种 Conventional Commits 格式
 6. 只在用户明确要求时执行 `git add`、`git commit`、`git push`
 7. 默认不提交项目下的 `doc/`、`docs/`、`openspec/`、`.agents/` 目录；若用户明确要求提交，再单独复核这些路径
-8. `$ARGUMENTS` 没有明确提交语义时，只生成文案，不执行 `git commit`
+8. 用户没有明确提交语义时，只生成文案，不执行 `git commit`
 
 $ARGUMENTS

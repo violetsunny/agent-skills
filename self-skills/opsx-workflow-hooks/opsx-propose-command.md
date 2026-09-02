@@ -9,7 +9,7 @@ Propose a new change — create the change and generate all artifacts in one ste
 
 **Store selection:** If the user names a store or the work lives in one, run `openspec store list --json` to discover registered store ids, then pass `--store <id>` on commands that read or write specs and changes. Once selected, treat `--store <id>` as sticky for the rest of the workflow.
 
-**Input**: The argument after `/opsx-propose` is the change name (kebab-case), OR a description of what the user wants to build.
+**Input**: The argument after `/opsx-propose` is the change name (kebab-case), OR a description of what the user wants to build. A requirement description is analyzed (goal, scope, ambiguities, suggested name) and confirmed with the user before the change is created.
 
 $ARGUMENTS
 
@@ -17,16 +17,27 @@ $ARGUMENTS
 
 ## Phase 1: Create Artifacts
 
-### Step 1 — Understand the request and clarify material ambiguity
+### Step 1 — Analyze the requirement in $ARGUMENTS
 
-If no input is provided, ask the user (open-ended, no preset options):
-> "What change do you want to work on? Describe what you want to build or fix."
+Classify the input first:
 
-From their description, derive a kebab-case name (e.g., "add user authentication" → `add-user-auth`).
+- **Empty** → ask the user (open-ended, no preset options):
+  > "What change do you want to work on? Describe what you want to build or fix."
+- **Kebab-case identifier** (e.g., `add-user-auth`) → treat it as the change name and skip the requirement analysis below.
+- **Anything else** → treat it as a requirement description and analyze it before creating the change.
+
+Requirement analysis for a requirement description:
+
+- **Goal** — the core outcome the user wants to achieve
+- **Scope** — what is included, and what is explicitly out of scope
+- **Material ambiguities** — points that would affect scope, externally observable behavior, compatibility, or acceptance criteria
+- **Suggested change name** — derive a kebab-case name (e.g., "add user authentication" → `add-user-auth`)
+
+Present a short analysis summary to the user and confirm before creating the change.
 
 **IMPORTANT**: Do NOT proceed without understanding what the user wants to build.
 
-If the request contains ambiguity that would materially affect scope, externally observable behavior, compatibility, or acceptance criteria, ask the user before creating the change. For minor details, make a reasonable assumption and record it in the planning artifacts.
+If the analysis surfaces ambiguity that would materially affect scope, externally observable behavior, compatibility, or acceptance criteria, ask the user before creating the change. For minor details, make a reasonable assumption and record it in the planning artifacts.
 
 ### Step 2 — Determine the workflow schema
 
