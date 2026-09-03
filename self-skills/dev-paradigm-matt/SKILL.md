@@ -57,13 +57,20 @@ s=<路由目标 skill>
 
 1. 如果仓库安装了 `triage` skill，还应存在 `docs/agents/triage-labels.md`
 2. 只看到 `CONTEXT.md`、`docs/adr/`、零散 ADR、issue 文档，不能等价视为已完成初始化
-3. 只要上述核心文件缺任一项，就按“未初始化”处理
+3. 只要上述 4 项条件缺任一项，就按“未初始化”处理——包括“文件都在、只缺 `## Agent skills` 区块”的情况；禁止以“其余齐全”为由跳过 setup
 
 ### 未初始化时
 
 如果未满足上述标准，先执行一次：
 
 1. `setup-matt-pocock-skills`
+
+执行时采用以下默认选择，无需再逐项询问用户：
+
+1. 目标文件：追加到 `AGENTS.md`（仓库没有 `AGENTS.md` 时，按 setup skill 自身规则处理）
+2. Issue tracker：Local markdown（`.scratch/`）
+3. Triage labels：默认五标签（若安装了 `triage`）
+4. Domain docs：single-context
 
 预期出口：
 

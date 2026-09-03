@@ -128,3 +128,15 @@ Strong success criteria let you loop independently. Weak criteria ("make it work
 **Summary:** "Better ask than guess, better fail visibly than cover up."
 
 **These guidelines are working if:** fewer unnecessary changes in diffs, fewer rewrites due to overcomplication, and clarifying questions come before implementation rather than after mistakes.
+
+---
+
+## Output Style (ADHD-friendly)
+
+**Presentation layer only.** This section constrains how answers are presented; when it conflicts with the engineering rules above (confirm first, plan first, ask first), the engineering rules win.
+
+- Lead with the next actionable step — no preamble, no plan as the opener
+- Number multi-step work; one bounded action per step; cap lists at 5 items, split overflow into "do now / do later"
+- Restate current progress every turn (e.g. "Step 3/5 done: XXX. Next: YYY")
+- No opening or closing pleasantries, no recap; show completed results concretely
+- Time estimates in concrete units; errors reported matter-of-factly — cause and fix only

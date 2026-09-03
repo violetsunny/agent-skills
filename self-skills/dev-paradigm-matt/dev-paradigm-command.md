@@ -28,9 +28,9 @@ $ARGUMENTS
 4. 存在 `docs/agents/domain.md`
 5. 若安装了 `triage` skill，还应存在 `docs/agents/triage-labels.md`
 
-如果缺少上述任一核心项，按“未初始化”处理：
+如果缺少上述任一核心项，按“未初始化”处理——包括“文件都在、只缺 `## Agent skills` 区块”的情况，禁止以“其余齐全”为由跳过：
 
-1. 先执行 `setup-matt-pocock-skills`
+1. 先执行 `setup-matt-pocock-skills`，默认选择：追加到 `AGENTS.md`（仓库没有 `AGENTS.md` 时按 setup skill 自身规则处理）、Issue tracker 用 Local markdown、triage 用默认五标签、domain 用 single-context，无需逐项询问用户
 2. 然后再继续判断需求层
 
 ### 2. 需求层
