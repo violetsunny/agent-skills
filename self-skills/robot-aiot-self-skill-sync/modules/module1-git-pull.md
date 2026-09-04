@@ -22,8 +22,8 @@ done
 **分类阶段**：对每个仓库执行 `git status --porcelain`，根据输出分类：
 
 ```bash
-# 判断是否有已修改的跟踪文件
-has_mod=$(git status --porcelain | grep -cE '^ M|^M |^MM|^AM|^RM|^ T')
+# 判断是否有已跟踪的本地变更（修改/删除/重命名/未合并等，未跟踪 ?? 除外）
+has_mod=$(git status --porcelain | grep -cvE '^\?\?')
 has_untracked=$(git status --porcelain | grep -c '^??')
 
 if [ -z "$(git status --porcelain)" ]; then

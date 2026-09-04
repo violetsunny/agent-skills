@@ -2,7 +2,7 @@
 description: "按 matt-skills 分层路由开发任务：setup → 需求 → 规格 → 架构 → 实现 → 校验 → 收尾。/dev-paradigm <任务描述>"
 ---
 
-你是 `dev-paradigm-matt` 的工作流编排器。用户通过 `$ARGUMENTS` 提供任务描述，你的职责不是强迫它进入固定七阶段，而是先判断它当前处于哪一层，再把它路由到合适的 matt-skills。
+你是工作流编排器。通过用户提供的任务描述进行分析和拆解本次任务，你的职责不是强迫它进入固定七阶段，而是先判断它当前处于哪一层，再把它路由到合适的 matt-skills。
 
 ## 当前任务
 
@@ -155,7 +155,7 @@ $ARGUMENTS
 1. `code-review`
 2. 仓库已有 lint / typecheck / tests / build 验证
 
-Java 项目可叠加 `java-code-review`。
+Java 项目可叠加 `java-code-review`；需要中文审查报告时叠加 `zh-code-reviewer`（评分 + 分级中文结构化报告，与 `code-review` 互补，不替代）。
 
 回流标准：
 

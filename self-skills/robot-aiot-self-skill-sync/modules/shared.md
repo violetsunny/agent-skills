@@ -85,13 +85,13 @@ done
 - 快进合并只更新已跟踪文件的提交历史，不影响未跟踪文件
 - **应该正常执行 `git pull --ff-only`，不跳过**
 
-**`[SKIP-DIRTY]`** — 仓库有已修改的跟踪文件（`git status --porcelain` 输出中包含 ` M`、`M `、`MM`、`AM`、`RM` 等状态码）：
+**`[SKIP-DIRTY]`** — 仓库有已跟踪的本地变更（`git status --porcelain` 输出中包含除未跟踪 `??` 外的条目，如修改 `M`、删除 `D`、重命名 `R`、未合并 `UU` 等状态码）：
 - `git pull` 可能与本地修改冲突，导致合并失败或数据丢失
 - **必须跳过，不执行 `git pull`**
 - 这是保护性跳过，不是网络失败、认证失败或命令报错
 - 需要与 `[AUTH]`、`[NETWORK]`、`[FAILED]` 分开统计和解释
 
-**分类方法**：对每个非干净仓库执行 `git status --porcelain`，检查输出中是否包含已修改跟踪文件的状态码（`^ M`、`^M `、`^MM`、`^AM`、`^RM`、`^ T`）。不包含 → `[SAFE-UNTRACKED]`，可安全拉取；包含 → `[SKIP-DIRTY]`，跳过。
+**分类方法**：对每个非干净仓库执行 `git status --porcelain`，检查输出中除未跟踪（`??`）外是否还有其他条目（修改 `M`、删除 `D`、重命名 `R`、复制 `C`、未合并 `U`、类型变更 `T`）。不包含 → `[SAFE-UNTRACKED]`，可安全拉取；包含 → `[SKIP-DIRTY]`，跳过。
 
 ---
 
@@ -100,7 +100,7 @@ done
 - **必须用 `/usr/bin/git` 绝对路径**
 - 模块 1 的 git pull 使用重试机制（3次，间隔递增）；模块 3 依赖模块 1 的拉取结果，不重复 git pull
 - 模块 1 必须设置 `GIT_TERMINAL_PROMPT=0` 防止认证交互挂起；设置 `-c http.timeout=10 -c http.lowSpeedLimit=500 -c http.lowSpeedTime=10` 防止单仓库网络超时阻塞整批
-- 模块 1 的 dirty 分类：只有未跟踪文件（`git status --porcelain` 无 ` M`/`M ` 等已修改跟踪文件状态码）的仓库可安全执行 `git pull --ff-only`，不跳过
+- 模块 1 的 dirty 分类：只有未跟踪文件（`git status --porcelain` 输出除 `??` 外无其他条目）的仓库可安全执行 `git pull --ff-only`，不跳过
 - 分批执行，每批不超过 15 个项目，每批超时 **180s**
 - 扫描深度为 **3 层**（`self/` 下第一层子目录，再往下两层）
 - Skill 同步（模块 3）分两类：npx 管理型 5 个（superpowers / matt-skills / ui-ux-pro-max-skill / baoyu-skills / ppt-master）通过 `npx skills@latest update -y -g` 统一更新（在用户主目录执行，`-y` 跳过确认，`-g` 全局安装并 Copy to all agents）；rsync 管理型 2 个（claude-code-java / anthropics-skills）使用 `rsync -rtu`（**不加 `--delete`**）做交集匹配同步；模块 3.5 和模块 4 同步到 `free-stock-line-skills/` 和 `agent-skills/skills/` 时同样使用 `rsync -rtu`（**不加 `--delete`**），保留用户自定义文件

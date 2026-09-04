@@ -75,6 +75,14 @@ draw.io 的 `shape=` 属性决定节点的基本渲染形态：
 | `strokeWidth`（edge） | `stroke-width` | 取数值 |
 | `exitX/exitY` | 连线起点偏移 | `起点 = (src.abs_x + exitX × src.w, src.abs_y + exitY × src.h)` |
 | `entryX/entryY` | 连线终点偏移 | `终点 = (tgt.abs_x + entryX × tgt.w, tgt.abs_y + entryY × tgt.h)` |
+| `labelBackgroundColor` | 标签背景 `<rect>` | 标签文字下垫背景矩形防止连线贯穿文字；未指定时默认 `#FFFFFF` |
+
+**箭头 marker 渲染说明**：
+
+- 箭头 marker 按边的 `strokeColor` **分色生成**（id 形如 `arrow-end-0078d4`），`fill` 硬编码为该颜色，**不使用 `context-stroke`**（Safari 兼容性差，可能退回黑色箭头）。
+- 只为边实际用到的颜色生成 marker，避免冗余定义。
+- `markerUnits="userSpaceOnUse"` 固定箭头尺寸（约 11×8），**不随线宽放大**（默认 `strokeWidth` 单位会让 3px 线产生约 30px 大箭头）。
+- 所有坐标统一取整到 1 位小数（整数去掉小数尾），避免浮点噪声（如 `743.5999999999999`）。
 
 **连接点偏移计算说明**：
 

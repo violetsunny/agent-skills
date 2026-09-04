@@ -148,6 +148,19 @@ def map_style_to_css(style_dict):
     if style_dict.get("dashed") == "1":
         edge_info["dashed"] = True
 
+    # edge label styling（标签背景色/字号/字色/粗体）
+    if "labelBackgroundColor" in style_dict:
+        edge_info["label_bg"] = style_dict["labelBackgroundColor"]
+    if "fontColor" in style_dict:
+        edge_info["font_color"] = style_dict["fontColor"]
+    if "fontSize" in style_dict:
+        edge_info["font_size"] = style_dict["fontSize"]
+    try:
+        if int(style_dict.get("fontStyle", "0")) & 1:
+            edge_info["font_bold"] = True
+    except ValueError:
+        pass
+
     # edge connection point offsets
     for coord_key in ("exitX", "exitY", "entryX", "entryY"):
         if coord_key in style_dict:
@@ -191,6 +204,42 @@ def warn(msg):
     print(f"[WARN] {msg}", file=sys.stderr)
 
 
+def _fmt(n):
+    """坐标取整到 1 位小数；整数则去掉小数尾，避免浮点噪声（如 743.5999999999999）。"""
+    r = round(n, 1)
+    return str(int(r)) if r == int(r) else str(r)
+
+
+def _color_slug(color):
+    """把颜色转成合法的 CSS id 片段：'#0078D4' -> '0078d4'。"""
+    return color.replace("#", "").lower() if color else "000000"
+
+
+def _estimate_text_width(text, font_size):
+    """估算文本像素宽度：CJK ≈ fontSize，ASCII ≈ 0.62 × fontSize。"""
+    width = 0.0
+    for ch in text:
+        width += font_size if ord(ch) > 0x2E80 else font_size * 0.62
+    return width
+
+
+def _point_at_half(points):
+    """返回折线路径总长一半处的坐标，用于多拐点边的标签定位。"""
+    segs = []
+    total = 0.0
+    for (ax, ay), (bx, by) in zip(points, points[1:]):
+        d = ((bx - ax) ** 2 + (by - ay) ** 2) ** 0.5
+        segs.append((ax, ay, bx, by, d))
+        total += d
+    half = total / 2
+    for ax, ay, bx, by, d in segs:
+        if half <= d:
+            t = half / d if d else 0
+            return ax + (bx - ax) * t, ay + (by - ay) * t
+        half -= d
+    return points[-1]
+
+
 # ── XML 解析 ────────────────────────────────────────────────
 
 
@@ -209,25 +258,30 @@ class Vertex:
         self.abs_y = y
 
     def to_html(self):
-        text = self.value if self.value else ""
+        text = escape(self.value) if self.value else ""
         return (
             f'    <div class="vertex" id="v-{self.cell_id}" '
-            f'style="position:absolute; left:{self.abs_x}px; top:{self.abs_y}px; '
-            f'width:{self.w}px; height:{self.h}px; {self.style_css}">'
+            f'style="position:absolute; left:{_fmt(self.abs_x)}px; top:{_fmt(self.abs_y)}px; '
+            f'width:{_fmt(self.w)}px; height:{_fmt(self.h)}px; {self.style_css}">'
             f"{text}</div>\n"
         )
 
 
 class Edge:
-    def __init__(self, cell_id, value, source_id, target_id, edge_info):
+    def __init__(self, cell_id, value, source_id, target_id, edge_info, waypoints=None):
         self.cell_id = cell_id
         self.value = value
         self.source_id = source_id
         self.target_id = target_id
         self.edge_info = edge_info
+        self.waypoints = waypoints or []
 
     def to_svg(self, vertices):
-        """生成 SVG line，支持 exitX/exitY/entryX/entryY 连接点偏移，无偏移时回退中心到中心。"""
+        """生成 SVG line，支持 exitX/exitY/entryX/entryY 连接点偏移，无偏移时回退中心到中心。
+
+        标签渲染：文字下垫背景 rect（labelBackgroundColor，默认白）防止连线贯穿文字；
+        箭头按颜色引用 per-color marker（arrow-end-{slug}），坐标统一取整。
+        """
         src = vertices.get(self.source_id)
         tgt = vertices.get(self.target_id)
         if not src or not tgt:
@@ -239,33 +293,55 @@ class Edge:
         y1 = src.abs_y + ei.get("exitY", 0.5) * src.h
         x2 = tgt.abs_x + ei.get("entryX", 0.5) * tgt.w
         y2 = tgt.abs_y + ei.get("entryY", 0.5) * tgt.h
+        path_points = [(x1, y1)] + list(self.waypoints) + [(x2, y2)]
 
-        stroke = self.edge_info.get("stroke", "#000000")
-        sw = self.edge_info.get("stroke_width", "1.5")
-        dash = ' stroke-dasharray="8,4"' if self.edge_info.get("dashed") else ""
+        stroke = ei.get("stroke", "#000000")
+        sw = ei.get("stroke_width", "1.5")
+        dash = ' stroke-dasharray="8,4"' if ei.get("dashed") else ""
+        slug = _color_slug(stroke)
 
-        # arrow markers
+        # arrow markers（per-color，硬编码 fill，userSpaceOnUse 固定尺寸）
         marker_end = (
-            ' marker-end="url(#arrow-end)"'
-            if self.edge_info.get("end_arrow", True)
-            else ""
+            f' marker-end="url(#arrow-end-{slug})"' if ei.get("end_arrow", True) else ""
         )
         marker_start = (
-            ' marker-start="url(#arrow-start)"'
-            if self.edge_info.get("start_arrow", False)
+            f' marker-start="url(#arrow-start-{slug})"'
+            if ei.get("start_arrow", False)
             else ""
         )
 
-        # label at midpoint
+        # label at midpoint with background rect
         label_svg = ""
         if self.value:
-            mx = (x1 + x2) / 2
-            my = (y1 + y2) / 2
-            label_text = self.value
-            label_svg = f'<text x="{mx}" y="{my - 6}" text-anchor="middle" font-size="12" fill="{stroke}">{label_text}</text>'
+            fs = float(ei.get("font_size", "12"))
+            if self.waypoints:
+                mx, my = _point_at_half(path_points)
+            else:
+                mx = (x1 + x2) / 2
+                my = (y1 + y2) / 2
+            label_text = escape(self.value)
+            text_w = _estimate_text_width(self.value, fs)
+            pad_x = 4
+            pad_y = 2
+            bg = ei.get("label_bg", "#FFFFFF")
+            font_color = ei.get("font_color", stroke)
+            weight = ' font-weight="bold"' if ei.get("font_bold") else ""
+            label_svg = (
+                f'<rect x="{_fmt(mx - text_w / 2 - pad_x)}" y="{_fmt(my - fs / 2 - pad_y)}" '
+                f'width="{_fmt(text_w + pad_x * 2)}" height="{_fmt(fs + pad_y * 2)}" fill="{bg}" />\n'
+                f'    <text x="{_fmt(mx)}" y="{_fmt(my + fs * 0.35)}" text-anchor="middle" '
+                f'font-size="{_fmt(fs)}" fill="{font_color}"{weight}>{label_text}</text>'
+            )
 
+        if self.waypoints:
+            pts = " ".join(f"{_fmt(px)},{_fmt(py)}" for px, py in path_points)
+            return (
+                f'    <polyline points="{pts}" fill="none" '
+                f'stroke="{stroke}" stroke-width="{sw}"{dash}{marker_end}{marker_start} />\n'
+                f"    {label_svg}"
+            )
         return (
-            f'    <line x1="{x1}" y1="{y1}" x2="{x2}" y2="{y2}" '
+            f'    <line x1="{_fmt(x1)}" y1="{_fmt(y1)}" x2="{_fmt(x2)}" y2="{_fmt(y2)}" '
             f'stroke="{stroke}" stroke-width="{sw}"{dash}{marker_end}{marker_start} />\n'
             f"    {label_svg}"
         )
@@ -325,7 +401,14 @@ def parse_xml(xml_path):
         if is_edge:
             source_id = cell.get("source", "")
             target_id = cell.get("target", "")
-            edges.append(Edge(cell_id, value, source_id, target_id, edge_info))
+            waypoints = []
+            arr = geom.find("Array[@as='points']")
+            if arr is not None:
+                for pt in arr.findall("mxPoint"):
+                    waypoints.append((float(pt.get("x", "0")), float(pt.get("y", "0"))))
+            edges.append(
+                Edge(cell_id, value, source_id, target_id, edge_info, waypoints)
+            )
         elif is_vertex:
             x = float(geom.get("x", "0"))
             y = float(geom.get("y", "0"))
@@ -359,6 +442,36 @@ def generate_html(vertices, edges, canvas_w, canvas_h):
 
     # edge SVG
     edge_svg_lines = "".join(e.to_svg(vertices) for e in edges)
+
+    # arrow markers：只为边实际用到的颜色生成，硬编码 fill（不依赖 context-stroke），
+    # markerUnits="userSpaceOnUse" 固定尺寸，避免箭头随线宽放大。
+    end_colors = set()
+    start_colors = set()
+    for e in edges:
+        stroke = e.edge_info.get("stroke", "#000000")
+        if e.edge_info.get("end_arrow", True):
+            end_colors.add(stroke)
+        if e.edge_info.get("start_arrow", False):
+            start_colors.add(stroke)
+
+    marker_defs = []
+    for color in sorted(end_colors):
+        slug = _color_slug(color)
+        marker_defs.append(
+            f'        <marker id="arrow-end-{slug}" markerWidth="11" markerHeight="8" '
+            f'refX="11" refY="4" orient="auto" markerUnits="userSpaceOnUse">\n'
+            f'          <path d="M0,0 L0,8 L11,4 Z" fill="{color}" />\n'
+            f"        </marker>"
+        )
+    for color in sorted(start_colors):
+        slug = _color_slug(color)
+        marker_defs.append(
+            f'        <marker id="arrow-start-{slug}" markerWidth="11" markerHeight="8" '
+            f'refX="0" refY="4" orient="auto" markerUnits="userSpaceOnUse">\n'
+            f'          <path d="M11,0 L11,8 L0,4 Z" fill="{color}" />\n'
+            f"        </marker>"
+        )
+    marker_defs_str = "\n".join(marker_defs)
 
     html = f"""<!DOCTYPE html>
 <html lang="zh-CN">
@@ -419,12 +532,7 @@ def generate_html(vertices, edges, canvas_w, canvas_h):
       <div class="diagram-canvas">
 {vertex_html}    <svg class="edge-layer" width="{canvas_w}" height="{canvas_h}" xmlns="http://www.w3.org/2000/svg">
       <defs>
-        <marker id="arrow-end" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
-          <path d="M0,0 L0,6 L9,3 Z" fill="context-stroke" />
-        </marker>
-        <marker id="arrow-start" markerWidth="10" markerHeight="10" refX="0" refY="3" orient="auto">
-          <path d="M9,0 L9,6 L0,3 Z" fill="context-stroke" />
-        </marker>
+{marker_defs_str}
       </defs>
 {edge_svg_lines}    </svg>
       </div>
@@ -473,23 +581,24 @@ def verify_fidelity(vertices, edges, html_content, unmapped_all):
     else:
         print(f"[OK] Vertices: {vertex_count} match {html_vertex_count} HTML elements")
 
-    # 2. Edge 数量校验
+    # 2. Edge 数量校验（直线 line + 折线 polyline）
     edge_count = len(edges)
-    html_edge_count = html_content.count("<line ")
+    html_edge_count = html_content.count("<line ") + html_content.count("<polyline ")
     if edge_count != html_edge_count:
         errors.append(
             f"Edge count mismatch: XML has {edge_count} edges, "
-            f"HTML has {html_edge_count} SVG lines"
+            f"HTML has {html_edge_count} SVG lines/polylines"
         )
     else:
-        print(f"[OK] Edges: {edge_count} match {html_edge_count} SVG lines")
+        print(f"[OK] Edges: {edge_count} match {html_edge_count} SVG lines/polylines")
 
     # 3. 文本内容校验
     text_missing = []
     for vid, vtx in vertices.items():
         if not vtx.value:
             continue
-        if vtx.value not in html_content:
+        escaped_text = escape(vtx.value)
+        if escaped_text not in html_content:
             text_missing.append(f"  vertex {vid}: expected '{vtx.value}'")
     if text_missing:
         print(f"[WARN] Text content: {len(text_missing)} vertex text(s) missing:")
