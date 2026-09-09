@@ -37,6 +37,21 @@ fi
 
 **拉取阶段**：每批 10–15 个项目，超时 180s。对 `[SAFE-UNTRACKED]` 和干净仓库统一执行 `git pull --ff-only`。
 
+### 已知跳过清单（豁免项，不重试）
+
+以下仓库失败原因已知且无法在本机自动修复，分类阶段直接跳过：**不发起 pull、不重试、不计入网络/认证失败**，汇总中单独计数：
+
+| 仓库 | 原因 | 标记 |
+|---|---|---|
+| `inventory/scm-plan-bff` | `gitlab.enncloud.cn` 为内网地址，非内网/VPN 环境 DNS 必然解析失败 | `[SKIP-INTRANET]` |
+| `inventory/scm-plan-management` | 同上 | `[SKIP-INTRANET]` |
+| `ggggggood/llk-java-bible` | GitHub 私有仓库，本机无凭据 | `[AUTH-PRIVATE]` |
+| `ggggggood/llkang-ai-agent-prompt` | GitHub 私有仓库，本机无凭据 | `[AUTH-PRIVATE]` |
+| `ggggggood/pllm` | GitHub 私有仓库，本机无凭据 | `[AUTH-PRIVATE]` |
+| `ggggggood/LLMentor` | GUI 客户端（Fork 类）维护，CLI 无 codeup.aliyun.com 凭据；工作流为 fetch master 后合并进 `feature_kll` 功能分支，不适用 `pull --ff-only` | `[SKIP-GUI]` |
+
+用户配置好凭据或处于内网环境后，可从本清单移除恢复正常拉取。清单外的认证/网络失败仍按步骤 1.4 处理。
+
 ### Sub Agent 建议
 
 1. 先用 fresh sub agent 扫描三层仓库并生成候选仓库清单

@@ -20,7 +20,8 @@ description: >
 本 skill 按需把工作路由到其他 skill，依赖检查发生在**路由时**：路由到某个目标 skill 前，先确认它已安装在运行时 `~/.agents/skills/`：
 
 ```bash
-s=<路由目标 skill>
+# 路由前把 s 替换为实际目标 skill 名，例如 s='to-spec'
+s='<路由目标 skill>'
 [ -d "$HOME/.agents/skills/$s" ] || printf '[DEP-MISSING] %s\n' "$s"
 ```
 

@@ -240,6 +240,24 @@ def _point_at_half(points):
     return points[-1]
 
 
+def _clip_to_boundary(cx, cy, w, h, tx, ty):
+    """从矩形中心 (cx,cy) 朝目标点 (tx,ty) 方向求与矩形边界的交点。
+
+    用于无 exit/entry 锚点的边：draw.io 会自动把连线裁剪到节点边界，
+    桥接层需同样处理，否则中心到中心的线段会穿越节点（edge-layer 渲染在节点上层）。
+    """
+    dx = tx - cx
+    dy = ty - cy
+    if dx == 0 and dy == 0:
+        return cx, cy
+    scale = float("inf")
+    if dx != 0:
+        scale = min(scale, (w / 2) / abs(dx))
+    if dy != 0:
+        scale = min(scale, (h / 2) / abs(dy))
+    return cx + dx * scale, cy + dy * scale
+
+
 # ── XML 解析 ────────────────────────────────────────────────
 
 
@@ -258,7 +276,9 @@ class Vertex:
         self.abs_y = y
 
     def to_html(self):
-        text = escape(self.value) if self.value else ""
+        # draw.io html=1 语义：value 本身是 HTML（<b>/<br>/<font> 等），须原样渲染；
+        # 仅转义引号（与历史输出一致）。整体 escape 会把标签变成明文，破坏展示。
+        text = self.value.replace('"', "&quot;") if self.value else ""
         return (
             f'    <div class="vertex" id="v-{self.cell_id}" '
             f'style="position:absolute; left:{_fmt(self.abs_x)}px; top:{_fmt(self.abs_y)}px; '
@@ -277,8 +297,10 @@ class Edge:
         self.waypoints = waypoints or []
 
     def to_svg(self, vertices):
-        """生成 SVG line，支持 exitX/exitY/entryX/entryY 连接点偏移，无偏移时回退中心到中心。
+        """生成 SVG line，支持 exitX/exitY/entryX/entryY 连接点偏移。
 
+        无锚点时按节点边界裁剪（与 draw.io 行为一致）：起点取源节点朝向目标的边界交点，
+        终点取目标节点朝向起点的边界交点，避免线段穿越节点内部。
         标签渲染：文字下垫背景 rect（labelBackgroundColor，默认白）防止连线贯穿文字；
         箭头按颜色引用 per-color marker（arrow-end-{slug}），坐标统一取整。
         """
@@ -289,10 +311,32 @@ class Edge:
             return ""
 
         ei = self.edge_info
+        has_exit = "exitX" in ei or "exitY" in ei
+        has_entry = "entryX" in ei or "entryY" in ei
         x1 = src.abs_x + ei.get("exitX", 0.5) * src.w
         y1 = src.abs_y + ei.get("exitY", 0.5) * src.h
         x2 = tgt.abs_x + ei.get("entryX", 0.5) * tgt.w
         y2 = tgt.abs_y + ei.get("entryY", 0.5) * tgt.h
+        if not has_exit:
+            aim = self.waypoints[0] if self.waypoints else (x2, y2)
+            x1, y1 = _clip_to_boundary(
+                src.abs_x + src.w / 2,
+                src.abs_y + src.h / 2,
+                src.w,
+                src.h,
+                aim[0],
+                aim[1],
+            )
+        if not has_entry:
+            aim = self.waypoints[-1] if self.waypoints else (x1, y1)
+            x2, y2 = _clip_to_boundary(
+                tgt.abs_x + tgt.w / 2,
+                tgt.abs_y + tgt.h / 2,
+                tgt.w,
+                tgt.h,
+                aim[0],
+                aim[1],
+            )
         path_points = [(x1, y1)] + list(self.waypoints) + [(x2, y2)]
 
         stroke = ei.get("stroke", "#000000")
@@ -597,8 +641,8 @@ def verify_fidelity(vertices, edges, html_content, unmapped_all):
     for vid, vtx in vertices.items():
         if not vtx.value:
             continue
-        escaped_text = escape(vtx.value)
-        if escaped_text not in html_content:
+        expected_text = vtx.value.replace('"', "&quot;")
+        if expected_text not in html_content:
             text_missing.append(f"  vertex {vid}: expected '{vtx.value}'")
     if text_missing:
         print(f"[WARN] Text content: {len(text_missing)} vertex text(s) missing:")
