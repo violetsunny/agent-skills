@@ -115,6 +115,8 @@ font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
 
 ## 7. 模板骨架
 
+### 静态版模板骨架
+
 ```html
 <!DOCTYPE html>
 <html lang="zh-CN">
@@ -166,6 +168,209 @@ font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
     <!-- 说明区 -->
     <!-- 品牌区 -->
   </div>
+</body>
+</html>
+```
+
+### 交互版模板骨架
+
+```html
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>汇报演示</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    :root {
+      --primary-color: #0078D4;
+      --secondary-color: #4F6BED;
+      --tertiary-color: #00A389;
+      --surface-color: #FFFFFF;
+      --surface-muted: #F5F7FB;
+      --outline-color: #D7DFEA;
+      --text-primary: #16324F;
+      --text-secondary: #5B6B7F;
+      --space-sm: 8px;
+      --space-md: 16px;
+      --space-lg: 24px;
+      --space-xl: 32px;
+      --space-2xl: 48px;
+      --radius-md: 12px;
+      --radius-lg: 16px;
+      --radius-full: 9999px;
+      --shadow-soft: 0 6px 24px rgba(18, 52, 86, 0.08);
+      --transition-duration: 500ms;
+      --transition-easing: cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    body {
+      background: #EEF2F7;
+      font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
+      overflow: hidden;
+    }
+    .deck {
+      position: relative;
+      width: 1920px;
+      height: 1080px;
+      margin: 0 auto;
+    }
+    .slide {
+      position: absolute;
+      top: 0; left: 0;
+      width: 1920px;
+      height: 1080px;
+      background: var(--surface-color);
+      overflow: hidden;
+      visibility: hidden;
+      opacity: 0;
+      transition: opacity var(--transition-duration) var(--transition-easing);
+    }
+    .slide.active {
+      visibility: visible;
+      opacity: 1;
+    }
+    /* 入场动画 */
+    [data-enter-order] {
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 500ms var(--transition-easing), transform 500ms var(--transition-easing);
+    }
+    .slide.active [data-enter-order].entered {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    /* 导航控件 */
+    .nav-progress {
+      position: absolute;
+      bottom: 16px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 6px;
+      z-index: 10;
+    }
+    .nav-dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: var(--outline-color);
+      cursor: pointer;
+      transition: background 200ms;
+    }
+    .nav-dot.active { background: var(--primary-color); }
+    .page-counter {
+      position: absolute;
+      bottom: 16px; right: 24px;
+      font-size: 14px;
+      color: var(--text-secondary);
+      z-index: 10;
+    }
+    /* reduced motion */
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+    /* View Transition */
+    ::view-transition-old(slide),
+    ::view-transition-new(slide) {
+      animation-duration: var(--transition-duration);
+      animation-timing-function: var(--transition-easing);
+    }
+  </style>
+</head>
+<body>
+  <div class="deck">
+    <section class="slide active" data-index="0">
+      <!-- 第一页内容，元素加 data-enter-order="1/2/3..." -->
+    </section>
+    <section class="slide" data-index="1">
+      <!-- 第二页内容 -->
+    </section>
+  </div>
+  <div class="nav-progress"></div>
+  <div class="page-counter"></div>
+  <script>
+    (function() {
+      const slides = document.querySelectorAll('.slide');
+      const total = slides.length;
+      let current = 0;
+      const counter = document.querySelector('.page-counter');
+      const progress = document.querySelector('.nav-progress');
+
+      // 生成进度点
+      for (let i = 0; i < total; i++) {
+        const dot = document.createElement('div');
+        dot.className = 'nav-dot' + (i === 0 ? ' active' : '');
+        dot.addEventListener('click', () => goTo(i));
+        progress.appendChild(dot);
+      }
+
+      function updateUI() {
+        counter.textContent = (current + 1) + ' / ' + total;
+        progress.querySelectorAll('.nav-dot').forEach((d, i) => {
+          d.classList.toggle('active', i === current);
+        });
+      }
+
+      function triggerEnterAnim(slide) {
+        const els = slide.querySelectorAll('[data-enter-order]');
+        els.forEach(el => el.classList.remove('entered'));
+        requestAnimationFrame(() => {
+          const groups = {};
+          els.forEach(el => {
+            const order = el.dataset.enterOrder;
+            (groups[order] = groups[order] || []).push(el);
+          });
+          Object.keys(groups).sort((a, b) => a - b).forEach((order, idx) => {
+            setTimeout(() => {
+              groups[order].forEach(el => el.classList.add('entered'));
+            }, idx * 150);
+          });
+        });
+      }
+
+      function swapSlide(index) {
+        slides[current].classList.remove('active');
+        current = index;
+        slides[current].classList.add('active');
+        triggerEnterAnim(slides[current]);
+        updateUI();
+      }
+
+      function goTo(index) {
+        if (index < 0 || index >= total || index === current) return;
+        if (document.startViewTransition) {
+          document.startViewTransition(() => swapSlide(index));
+        } else {
+          swapSlide(index);
+        }
+      }
+
+      document.addEventListener('keydown', e => {
+        switch(e.key) {
+          case 'ArrowRight': case ' ': case 'PageDown': goTo(current + 1); break;
+          case 'ArrowLeft': case 'PageUp': goTo(current - 1); break;
+          case 'Home': goTo(0); break;
+          case 'End': goTo(total - 1); break;
+          case 'f': case 'F':
+            document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen();
+            break;
+        }
+      });
+
+      document.addEventListener('click', e => {
+        if (e.target.closest('.nav-dot') || e.target.closest('[data-interactive]')) return;
+        const x = e.clientX / window.innerWidth;
+        if (x > 0.5) goTo(current + 1);
+        else goTo(current - 1);
+      });
+
+      updateUI();
+      triggerEnterAnim(slides[0]);
+    })();
+  </script>
 </body>
 </html>
 ```

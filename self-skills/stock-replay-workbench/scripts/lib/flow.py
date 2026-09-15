@@ -1,5 +1,10 @@
 from __future__ import annotations
 
+from datetime import datetime
+import json
+
+import requests
+
 from .common import (
     clean_symbol,
     detect_exchange,
@@ -65,6 +70,76 @@ def _market_flow_from_akshare(limit: int) -> tuple[dict, dict]:
         },
         source("akshare_stock_market_fund_flow", True),
     )
+
+
+def _market_flow_from_eastmoney(limit: int) -> tuple[dict, dict]:
+    payload = em_json_get(
+        "https://push2his.eastmoney.com/api/qt/stock/fflow/daykline/get",
+        params={
+            "lmt": str(max(1, min(limit, 20))),
+            "klt": "101",
+            "secid": "1.000001",
+            "secid2": "0.399001",
+            "fields1": "f1,f2,f3,f7",
+            "fields2": "f51,f52,f53,f54,f55,f56,f57,f58,f59,f60,f61,f62,f63,f64,f65",
+            "ut": "b2884a393a59ad64002292a3e90d46a5",
+        },
+    )
+    klines = (payload.get("data") or {}).get("klines") or []
+    rows = klines[-max(1, min(limit, 20)) :]
+    items = []
+    # reversed() puts the most-recent row first (items[0] = latest).
+    for index, line in enumerate(reversed(rows), start=1):
+        parts = line.split(",")
+        if len(parts) < 15:
+            continue
+        items.append(
+            {
+                "rank": index,
+                "date": parts[0],
+                "sh_close": safe_float(parts[11]),
+                "sh_change_percent": safe_float(parts[12]),
+                "sz_close": safe_float(parts[13]),
+                "sz_change_percent": safe_float(parts[14]),
+                "main_net_inflow": safe_float(parts[1]),
+                "main_net_inflow_percent": safe_float(parts[6]),
+                "super_large_net_inflow": safe_float(parts[5]),
+                "super_large_net_inflow_percent": safe_float(parts[10]),
+                "large_net_inflow": safe_float(parts[4]),
+                "large_net_inflow_percent": safe_float(parts[9]),
+                "medium_net_inflow": safe_float(parts[3]),
+                "medium_net_inflow_percent": safe_float(parts[8]),
+                "small_net_inflow": safe_float(parts[2]),
+                "small_net_inflow_percent": safe_float(parts[7]),
+            }
+        )
+    if not items:
+        raise ValueError("eastmoney market flow daykline returned empty rows")
+    latest = items[0]
+    return (
+        {
+            "scope": "market",
+            "symbol": None,
+            "limit": limit,
+            "items": items,
+            "summary": {
+                "date": latest.get("date"),
+                "main_net_inflow": latest.get("main_net_inflow"),
+                "main_net_inflow_percent": latest.get("main_net_inflow_percent"),
+                "sh_close": latest.get("sh_close"),
+                "sz_close": latest.get("sz_close"),
+            },
+            "source_note": "akshare 失败后直连东财 push2his 沪深两市资金流日K（走 em_get 限流重试）。",
+        },
+        source("eastmoney_market_flow_daykline", True),
+    )
+
+
+def _format_unix_hhmmss(value: object) -> str | None:
+    number = safe_int(value)
+    if number is None or number <= 0:
+        return None
+    return datetime.fromtimestamp(number).strftime("%H:%M:%S")
 
 
 def _parse_stock_kline(line: str) -> dict | None:
@@ -230,6 +305,80 @@ def _stock_flow_from_akshare(symbol: str, limit: int) -> tuple[dict, dict]:
     )
 
 
+def _stock_flow_from_sina(symbol: str, limit: int) -> tuple[dict, dict]:
+    code = clean_symbol(symbol)
+    if code.startswith(("4", "8", "92")):
+        prefix = f"bj{code}"
+    elif code.startswith(("5", "6", "9")):
+        prefix = f"sh{code}"
+    else:
+        prefix = f"sz{code}"
+    response = requests.get(
+        "https://vip.stock.finance.sina.com.cn/quotes_service/api/json_v2.php/MoneyFlow.ssl_qsfx_zjlrqs",
+        params={
+            "page": "1",
+            "num": str(max(1, min(limit, 60))),
+            "sort": "opendate",
+            "asc": "0",
+            "daima": prefix,
+        },
+        headers={
+            "User-Agent": "Mozilla/5.0",
+            "Referer": "https://finance.sina.com.cn/",
+        },
+        timeout=15,
+    )
+    response.raise_for_status()
+    text = response.text
+    rows = json.loads(text[text.index("[") : text.rindex("]") + 1])
+    if not rows:
+        raise ValueError("sina stock money flow returned empty rows")
+    items = []
+    # Sina returns newest-first; reverse to keep oldest-first like other sources.
+    for row in reversed(rows[-max(1, min(limit, 20)) :]):
+        change_ratio = safe_float(row.get("changeratio"))
+        main_ratio = safe_float(row.get("ratioamount"))
+        super_ratio = safe_float(row.get("r0_ratio"))
+        items.append(
+            {
+                "date": row.get("opendate"),
+                "close": safe_float(row.get("trade")),
+                "change_percent": change_ratio * 100
+                if change_ratio is not None
+                else None,
+                "main_net_inflow": safe_float(row.get("netamount")),
+                "main_net_inflow_percent": main_ratio * 100
+                if main_ratio is not None
+                else None,
+                "super_large_net_inflow": safe_float(row.get("r0_net")),
+                "super_large_net_inflow_percent": super_ratio * 100
+                if super_ratio is not None
+                else None,
+                "turnover": safe_float(row.get("turnover")),
+            }
+        )
+    if not items:
+        raise ValueError("sina stock money flow returned empty rows")
+    return (
+        {
+            "scope": "stock",
+            "symbol": code,
+            "limit": limit,
+            "items": items,
+            "summary": {
+                "main_net_inflow": sum(
+                    item.get("main_net_inflow") or 0 for item in items
+                ),
+                "main_net_inflow_percent": items[-1].get("main_net_inflow_percent"),
+                "close": items[-1].get("close"),
+                "date": items[-1].get("date"),
+            },
+            "source_note": "新浪日度资金流备胎：主力=netamount，超大单=r0_net，占比由新浪小数口径×100；无大/中/小单分档。",
+        },
+        source("sina_stock_money_flow", True),
+    )
+
+
 def _sector_flow_from_akshare(scope: str, limit: int) -> tuple[dict, dict]:
     import akshare as ak  # type: ignore
 
@@ -281,6 +430,67 @@ def _sector_flow_from_akshare(scope: str, limit: int) -> tuple[dict, dict]:
             },
         },
         source(f"akshare_stock_sector_fund_flow_rank_{scope}", True),
+    )
+
+
+def _sector_flow_from_eastmoney(scope: str, limit: int) -> tuple[dict, dict]:
+    board_fs = "m:90+t:2" if scope == "industry" else "m:90+t:3"
+    payload = em_json_get(
+        "https://push2delay.eastmoney.com/api/qt/clist/get",
+        params={
+            "fid": "f62",
+            "po": "1",
+            "pz": str(max(1, min(limit, 50))),
+            "pn": "1",
+            "np": "1",
+            "fltt": "2",
+            "invt": "2",
+            "ut": "b2884a393a59ad64002292a3e90d46a5",
+            "fs": board_fs,
+            "fields": "f12,f14,f3,f62,f184,f66,f69,f72,f75,f78,f81,f84,f87,f124,f128,f136",
+        },
+    )
+    rows = (payload.get("data") or {}).get("diff") or []
+    if not rows:
+        raise ValueError(f"eastmoney {scope} flow clist returned empty rows")
+    items = []
+    for index, row in enumerate(rows[: max(1, min(limit, 20))], start=1):
+        items.append(
+            {
+                "rank": index,
+                "name": row.get("f14"),
+                "change_percent": safe_float(row.get("f3")),
+                "main_net_inflow": safe_float(row.get("f62")),
+                "main_net_inflow_percent": safe_float(row.get("f184")),
+                "super_large_net_inflow": safe_float(row.get("f66")),
+                "super_large_net_inflow_percent": safe_float(row.get("f69")),
+                "large_net_inflow": safe_float(row.get("f72")),
+                "large_net_inflow_percent": safe_float(row.get("f75")),
+                "medium_net_inflow": safe_float(row.get("f78")),
+                "medium_net_inflow_percent": safe_float(row.get("f81")),
+                "small_net_inflow": safe_float(row.get("f84")),
+                "small_net_inflow_percent": safe_float(row.get("f87")),
+                "leader": row.get("f128"),
+                "leader_change_percent": safe_float(row.get("f136")),
+                "timestamp": _format_unix_hhmmss(row.get("f124")),
+            }
+        )
+    latest = items[0]
+    return (
+        {
+            "scope": scope,
+            "symbol": None,
+            "limit": limit,
+            "items": items,
+            "summary": {
+                "leader_sector": latest.get("name"),
+                "leader_stock": latest.get("leader"),
+                "main_net_inflow": latest.get("main_net_inflow"),
+                "main_net_inflow_percent": latest.get("main_net_inflow_percent"),
+            },
+            "source_note": "akshare 失败后直连东财 push2delay 板块资金流（leader 口径为领涨股，非主力净流入最大股）。",
+        },
+        source(f"eastmoney_sector_flow_clist_{scope}", True),
     )
 
 
@@ -343,9 +553,19 @@ def money_flow(
             source_chain.append(chain_item)
             return success("money_flow", data, source_chain, warnings)
         except Exception as exc:
-            warnings.append(f"市场资金流主源失败: {exc}")
+            warnings.append(f"市场资金流主源失败，回退中东财直连: {exc}")
             source_chain.append(
                 source("akshare_stock_market_fund_flow", False, str(exc))
+            )
+        try:
+            data, chain_item = _market_flow_from_eastmoney(limit)
+            source_chain.append(chain_item)
+            warnings.append("市场资金流已回退到东财 push2his 直连（金额单位元）。")
+            return success("money_flow", data, source_chain, warnings)
+        except Exception as exc:
+            warnings.append(f"市场资金流东财直连回退失败: {exc}")
+            source_chain.append(
+                source("eastmoney_market_flow_daykline", False, str(exc))
             )
             return success(
                 "money_flow",
@@ -356,7 +576,7 @@ def money_flow(
                     "items": [],
                     "summary": {
                         "status": "unavailable",
-                        "note": "市场资金流主源失败，当前返回空样本，请结合其他盘面指标交叉确认。",
+                        "note": "市场资金流主源与回退源均失败，当前返回空样本，请结合其他盘面指标交叉确认。",
                     },
                 },
                 source_chain,
@@ -370,9 +590,21 @@ def money_flow(
             source_chain.append(chain_item)
             return success("money_flow", data, source_chain, warnings)
         except Exception as exc:
-            warnings.append(f"{scope} 资金流主源失败: {exc}")
+            warnings.append(f"{scope} 资金流主源失败，回退中东财直连: {exc}")
             source_chain.append(
                 source(f"akshare_stock_sector_fund_flow_rank_{scope}", False, str(exc))
+            )
+        try:
+            data, chain_item = _sector_flow_from_eastmoney(scope, limit)
+            source_chain.append(chain_item)
+            warnings.append(
+                f"{scope} 资金流已回退到东财 push2delay 直连（金额单位元）。"
+            )
+            return success("money_flow", data, source_chain, warnings)
+        except Exception as exc:
+            warnings.append(f"{scope} 资金流东财直连回退失败，继续尝试板块信号: {exc}")
+            source_chain.append(
+                source(f"eastmoney_sector_flow_clist_{scope}", False, str(exc))
             )
         try:
             data, fallback_chain, fallback_warnings = _sector_flow_from_sector_signal(
@@ -436,10 +668,19 @@ def money_flow(
         warnings.append("个股资金流为公开源 best-effort 数据。")
         return success("money_flow", data, source_chain, warnings)
     except Exception as exc:
-        warnings.append(f"个股资金流公开源暂不可用: {exc}")
+        warnings.append(f"个股资金流公开源失败，继续尝试新浪备胎: {exc}")
         source_chain.append(
             source("akshare_stock_individual_fund_flow", False, str(exc))
         )
+
+    try:
+        data, chain_item = _stock_flow_from_sina(cleaned_symbol, limit)
+        source_chain.append(chain_item)
+        warnings.append("个股资金流已回退到新浪日度备胎（无大/中/小单分档）。")
+        return success("money_flow", data, source_chain, warnings)
+    except Exception as exc:
+        warnings.append(f"个股资金流新浪备胎暂不可用: {exc}")
+        source_chain.append(source("sina_stock_money_flow", False, str(exc)))
         return success(
             "money_flow",
             {

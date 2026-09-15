@@ -1,7 +1,7 @@
 ---
 name: robot-aiot-slide-html-author
 description: >
-  为领导汇报类 PPT/母稿生成固定画布的逐页 HTML 页面：执行时引用 `ui-ux-pro-max` 的设计系统与审查能力，标准上内化语义化设计 token、清晰/克制/层次原则与高级感设计标准（反模板化排版、色彩/形状一致性锁定、AI 痕迹清单、审查修复工作流）。适用于"PPT 母稿转单页 HTML""领导汇报页落成 HTML""逐页生成 slide HTML""给 ppt-master 准备逐页 HTML""修复汇报页布局/样式/信息层级""把图表 HTML 嵌入汇报页"等场景。也适用于已有 Markdown 母稿、页面草图或图表 HTML，需要产出 1920x1080 固定画布 HTML，并保持图表真源与页面视觉体系一致的任务。当图表 HTML 存在问题时，可调用 `robot-aiot-xml-html-bridge` 进行审查和修复。
+  为领导汇报类 PPT/母稿生成固定画布的逐页 HTML 页面：支持静态版（PPT 单页真源）和交互版（可翻页、带动画、数据动效、特效演示，纯原生零依赖双击即用）。执行时引用 `ui-ux-pro-max` 的设计系统与审查能力，标准上内化语义化设计 token、清晰/克制/层次原则与高级感设计标准。适用于"PPT 母稿转单页 HTML""领导汇报页落成 HTML""逐页生成 slide HTML""给 ppt-master 准备逐页 HTML""修复汇报页布局/样式/信息层级""把图表 HTML 嵌入汇报页""生成交互演示版""带动画的汇报页""可翻页演示 HTML"等场景。当图表 HTML 存在问题时，可调用 `robot-aiot-xml-html-bridge` 进行审查和修复。
 ---
 
 # Robot AIoT Slide HTML Author
@@ -57,12 +57,25 @@ done
 
 ## 输出
 
+### 静态版（默认）
+
 输出必须满足：
 
 1. 一页一个 HTML 文件，路径通常为 `doc-ppt/pages/<页码>-<slug>.html`
 2. 固定 `1920x1080` 画布，作为 PPT 单页真源
 3. 页面主题单一，30 秒内可读懂核心结论
 4. 图表优先引用既有图表 HTML，不重画事实表达
+
+### 交互版（用户明确要求时生成）
+
+当用户要求"交互版""演示版""带动画""可翻页"等时，额外生成交互版 HTML：
+
+1. 路径为 `doc-ppt/interactive/<页码>-<slug>.html`，与静态版并行存在
+2. 同样固定 `1920x1080` 画布，但支持键盘/点击翻页、过渡动画、元素入场、数据动效、交互图表、背景与按钮特效
+3. 纯原生 HTML/CSS/JS，零外部依赖，双击即可在浏览器运行
+4. 所有页面合并为单个 HTML 文件（多页幻灯片模式），或按用户要求逐页生成
+5. 设计 token、配色、排版与静态版完全一致，仅增加交互层
+6. 完整规则见 `references/interactive-mode-rules.md`
 
 ## 执行流程
 
@@ -194,7 +207,7 @@ done
 3. 不在组件里散落硬编码颜色，优先引用根变量
 4. 正文默认不小于 `16px`，说明/标签默认不小于 `12px`
 5. 可选视觉增强不得改动已验证的布局坐标
-6. 不做滚动动画、入场动画、循环动效；幻灯片是静态单页
+6. 静态版不做滚动动画、入场动画、循环动效；交互版动画规则见 `references/interactive-mode-rules.md`
 7. 不伪造精确数字；占位数据必须显式标注"示意"
 8. 不使用 AI 紫/霓虹渐变、纯黑硬阴影、纯黑大面积背景（品牌色本身为紫色时例外，且须整套汇报一致）
 9. 不出现编号眉标、装饰状态点、版本号页脚等 AI 痕迹（完整清单见 `references/premium-design-standards.md` 第 9 节）
@@ -209,6 +222,7 @@ done
 5. 需要高级感设计标准（设计解读、刻度、风格基调、排版/色彩/布局纪律、AI 痕迹清单）时，读 `references/premium-design-standards.md`
 6. 需要执行交付前审查或修复既有页面时，读 `references/premium-review-fix.md`
 7. 需要设计系统细则（色彩角色配对、tonal surface 层次、字级、同心圆角、对比度判据）时，读 `references/design-system-standards.md`
+8. 生成交互版时，读 `references/interactive-mode-rules.md`
 
 ## 交付口径
 

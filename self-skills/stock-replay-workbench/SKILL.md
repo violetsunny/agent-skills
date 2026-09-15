@@ -2,7 +2,7 @@
 name: stock-replay-workbench
 description: Use when the user asks for A-share 盘后复盘、收盘简报、主线题材梳理、强势股/观察池、个股为何走强、题材与资金联动、龙虎榜/公告/研报/财务交叉分析, or when a stock query must expand from a simple quote into a structured workflow with task routing, source priority, timestamps, warnings, and layered conclusions. Covers 打板情绪(涨停/炸板/跌停/昨涨停四池+连板分析+涨停揭秘)、ETF期权(T型报价+希腊字母+IV)、舆情互动(热榜/人气榜/互动易)等能力. 多股对比/复盘多维度分析通过 sub-agent 并行编排, 深度报告强制经 cross-check-reviewer 第二意见复查校对.
 metadata:
-  version: "0.4.0"
+  version: "0.4.1"
   origin: custom
 ---
 
@@ -16,10 +16,6 @@ metadata:
 - 判断涉及的数据域 (data-domain routing)
 - 选择最稳的免费公开源 (source selection)
 - 输出可复盘、可解释、可继续跟踪的结论 (layered output)
-
-## 执行前依赖检查
-
-无外部 skill 依赖，可在运行时 `~/.agents/skills/` 独立执行。
 
 ## 定位
 
@@ -350,7 +346,9 @@ python3 scripts/stock_replay_cli.py render-replay --input .analysis/2026-06-29-A
 Best-effort (less stable / public-web dependent)：
 
 - 个股/行业/概念资金流、筹码分布、股东户数、分钟级流向、研报与新闻字段完整性
-- 个股资金流优先走东方财富 push2his 明细接口（price ÷1000），失败时回退到东财排行快照或 akshare
+- 个股资金流优先走东方财富 push2his 明细接口（price ÷1000），失败时回退到东财排行快照 → akshare → 新浪日度备胎（独立风控面）
+- 市场/行业/概念资金流 akshare 失败时直连东财 push2his/push2delay（走 `em_get` 限流重试，与 akshare 底层不同链路）
+- 融资融券 akshare 失败时回退到沪深交易所官方备胎（上交所 queryMargin.do + 深交所 1837_xxpl xlsx），当日未发布自动回退最近可用交易日
 - 依赖公开网页结构的字段
 - 市场热度（同花顺热榜/东财人气榜/概念命中）为 best-effort，允许空样本+warning
 

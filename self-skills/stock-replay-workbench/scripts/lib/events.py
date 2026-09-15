@@ -1,11 +1,14 @@
 from __future__ import annotations
 
-from datetime import date
+from datetime import date, timedelta
+from io import BytesIO
 import json
 import re
 import threading
 
-from .common import clean_symbol, detect_exchange, em_get, source, success
+import requests
+
+from .common import clean_symbol, detect_exchange, em_get, safe_float, source, success
 
 
 _PUBLIC_SOURCE_TIMEOUT_SECONDS = 8.0
@@ -428,13 +431,143 @@ def block_trade(
     )
 
 
+def _margin_from_sse_official(day: date) -> list[dict]:
+    response = requests.get(
+        "https://query.sse.com.cn/marketdata/tradedata/queryMargin.do",
+        params={
+            "isPagination": "true",
+            "tabType": "mxtype",
+            "detailsDate": day.strftime("%Y%m%d"),
+            "pageHelp.pageSize": 5000,
+            "pageHelp.pageNo": 1,
+            "pageHelp.beginPage": 1,
+            "pageHelp.cacheSize": 1,
+            "pageHelp.endPage": 1,
+        },
+        headers={"User-Agent": "Mozilla/5.0", "Referer": "https://www.sse.com.cn/"},
+        timeout=20,
+    )
+    response.raise_for_status()
+    page = (response.json() or {}).get("pageHelp") or {}
+    rows = page.get("data") or []
+    items = []
+    for row in rows:
+        if str(row.get("opDate")) != day.strftime("%Y%m%d"):
+            continue
+        items.append(
+            {
+                "date": day.isoformat(),
+                "code": str(row.get("stockCode")),
+                "name": row.get("securityAbbr"),
+                "exchange": "SH",
+                "margin_balance": safe_float(row.get("rzye")),
+                "margin_buy": safe_float(row.get("rzmre")),
+                "short_balance": safe_float(row.get("rqylje")),
+                "short_volume": safe_float(row.get("rqyl")),
+                "short_sell_volume": safe_float(row.get("rqmcl")),
+            }
+        )
+    return items
+
+
+def _margin_from_szse_official(day: date) -> list[dict]:
+    import pandas as pd  # type: ignore
+
+    response = requests.get(
+        "https://www.szse.cn/api/report/ShowReport",
+        params={
+            "SHOWTYPE": "xlsx",
+            "CATALOGID": "1837_xxpl",
+            "TABKEY": "tab2",
+            "txtDate": day.isoformat(),
+        },
+        headers={"User-Agent": "Mozilla/5.0", "Referer": "https://www.szse.cn/"},
+        timeout=30,
+    )
+    response.raise_for_status()
+    import warnings as _warnings
+
+    with _warnings.catch_warnings():
+        # 深交所官方 xlsx 无默认样式，openpyxl 的 UserWarning 会污染 CLI JSON 输出。
+        _warnings.simplefilter("ignore")
+        frame = pd.read_excel(BytesIO(response.content), dtype=str)
+    frame.columns = [re.sub(r"\s+", "", str(column)) for column in frame.columns]
+    required = {
+        "证券代码",
+        "证券简称",
+        "融资余额(元)",
+        "融资买入额(元)",
+        "融券余额(元)",
+        "融券余量(股/份)",
+        "融券卖出量(股/份)",
+    }
+    if frame.empty or not required.issubset(set(frame.columns)):
+        return []
+    items = []
+    for row in frame.to_dict("records"):
+        items.append(
+            {
+                "date": day.isoformat(),
+                "code": str(row.get("证券代码")).zfill(6),
+                "name": row.get("证券简称"),
+                "exchange": "SZ",
+                "margin_balance": safe_float(row.get("融资余额(元)")),
+                "margin_buy": safe_float(row.get("融资买入额(元)")),
+                "short_balance": safe_float(row.get("融券余额(元)")),
+                "short_volume": safe_float(row.get("融券余量(股/份)")),
+                "short_sell_volume": safe_float(row.get("融券卖出量(股/份)")),
+            }
+        )
+    return items
+
+
+def _margin_from_exchange_official(
+    start: date,
+) -> tuple[list[dict], list[dict], list[str]]:
+    warnings: list[str] = []
+    source_chain: list[dict] = []
+    day = start
+    for _ in range(7):
+        if day.weekday() < 5:
+            sh_items: list[dict] = []
+            sz_items: list[dict] = []
+            try:
+                sh_items = _margin_from_sse_official(day)
+                source_chain.append(source("sse_official_margin", True))
+            except Exception as exc:
+                source_chain.append(source("sse_official_margin", False, str(exc)))
+            try:
+                sz_items = _margin_from_szse_official(day)
+                source_chain.append(source("szse_official_margin", True))
+            except Exception as exc:
+                source_chain.append(source("szse_official_margin", False, str(exc)))
+            items = sh_items + sz_items
+            if items:
+                if day != start:
+                    warnings.append(
+                        f"{start.isoformat()} 两融尚未发布，官方备胎回退到最近可用交易日 {day.isoformat()}。"
+                    )
+                if not sh_items or not sz_items:
+                    missing = "上交所" if not sh_items else "深交所"
+                    warnings.append(
+                        f"{day.isoformat()} {missing}两融官方源未返回数据，结果仅含另一交易所，不代表沪深全市场。"
+                    )
+                warnings.append(
+                    "两融官方备胎金额单位为元，融券余量/卖出量单位为股或份；上交所融券余额源值为空时保留为空。"
+                )
+                return items, source_chain, warnings
+        day = day - timedelta(days=1)
+    return [], source_chain, ["两融官方备胎近 7 天均未取到已发布数据。"]
+
+
 def margin_trading(
     symbol: str | None = None, trade_date: str | None = None, limit: int = 20
 ) -> dict:
     warnings = ["融资融券为交易所公开源 best-effort 数据，深沪字段可能不完全一致。"]
     source_chain: list[dict] = []
     items: list[dict] = []
-    date_text = (trade_date or date.today().isoformat()).replace("-", "")
+    raw_date = trade_date or date.today().isoformat()
+    date_text = raw_date.replace("-", "")
     try:
         import akshare as ak  # type: ignore
 
@@ -450,7 +583,24 @@ def margin_trading(
                 source_chain.append(source(source_name, False, str(exc)))
         items = _filter_symbol(items, symbol)[:limit]
     except Exception as exc:
-        warnings.append(f"融资融券公开源初始化失败，已返回空列表: {exc}")
+        warnings.append(f"融资融券公开源初始化失败，尝试交易所官方备胎: {exc}")
+    if not items:
+        try:
+            start = (
+                date.fromisoformat(raw_date)
+                if "-" in raw_date
+                else date(int(raw_date[:4]), int(raw_date[4:6]), int(raw_date[6:8]))
+            )
+        except ValueError:
+            start = date.today()
+        official_items, official_chain, official_warnings = (
+            _margin_from_exchange_official(start)
+        )
+        source_chain.extend(official_chain)
+        warnings.extend(official_warnings)
+        if official_items:
+            items = _filter_symbol(official_items, symbol)[:limit]
+            warnings.append("融资融券已回退到沪深交易所官方备胎。")
     return success(
         "margin_trading",
         {

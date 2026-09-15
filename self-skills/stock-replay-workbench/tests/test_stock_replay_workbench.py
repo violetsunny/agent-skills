@@ -482,6 +482,11 @@ class MoneyFlowLibTests(unittest.TestCase):
                 "_stock_flow_from_akshare",
                 side_effect=RuntimeError("tier3 down"),
             ),
+            mock.patch.object(
+                flow,
+                "_stock_flow_from_sina",
+                side_effect=RuntimeError("tier4 down"),
+            ),
         ):
             payload = flow.money_flow("stock", "002156", 5)
 
@@ -493,6 +498,157 @@ class MoneyFlowLibTests(unittest.TestCase):
         self.assertIn("tier1 down", payload["warnings"][0])
         self.assertIn("tier2 miss", payload["warnings"][1])
         self.assertIn("tier3 down", payload["warnings"][2])
+        self.assertIn("tier4 down", payload["warnings"][3])
+
+    def test_stock_money_flow_sina_backup_parses_rows(self):
+        from scripts.lib import flow
+
+        raw = (
+            '[{"opendate":"2026-09-09","trade":"1291.3100","changeratio":"-0.0137402",'
+            '"turnover":"25.2286","netamount":"-688364328.4400","ratioamount":"-0.168731",'
+            '"r0_net":"-641850339.1000","r0_ratio":"-0.15732954"},'
+            '{"opendate":"2026-09-08","trade":"1311.0200","changeratio":"-0.0037918",'
+            '"turnover":"13.6583","netamount":"-304395427.9200","ratioamount":"-0.135734",'
+            '"r0_net":"-298906528.7100","r0_ratio":"-0.13328595"}]'
+        )
+        response = mock.Mock()
+        response.text = raw
+        response.raise_for_status = mock.Mock()
+        with mock.patch.object(flow.requests, "get", return_value=response):
+            data, chain = flow._stock_flow_from_sina("600519", 5)
+
+        self.assertEqual(chain["source"], "sina_stock_money_flow")
+        self.assertTrue(chain["ok"])
+        # 新浪返回新→旧，函数应反转为旧→新与其他源一致
+        self.assertEqual(data["items"][0]["date"], "2026-09-08")
+        self.assertEqual(data["items"][-1]["date"], "2026-09-09")
+        latest = data["items"][-1]
+        self.assertAlmostEqual(latest["close"], 1291.31)
+        self.assertAlmostEqual(latest["change_percent"], -1.37402)
+        self.assertAlmostEqual(latest["main_net_inflow"], -688364328.44)
+        self.assertAlmostEqual(latest["main_net_inflow_percent"], -16.8731)
+        self.assertAlmostEqual(latest["super_large_net_inflow"], -641850339.10)
+
+    def test_market_money_flow_falls_back_to_eastmoney_daykline(self):
+        from scripts.lib import flow
+
+        kline = (
+            "2026-09-09,-7351816192.0,14926180352.0,-7574364160.0,"
+            "-12213293056.0,4861476864.0,-0.40,0.80,-0.41,-0.66,0.26,"
+            "3951.51,0.28,13723.32,0.15"
+        )
+        with (
+            mock.patch.object(
+                flow,
+                "_market_flow_from_akshare",
+                side_effect=RuntimeError("akshare down"),
+            ),
+            mock.patch.object(
+                flow,
+                "em_json_get",
+                return_value={"data": {"klines": [kline]}},
+            ),
+        ):
+            payload = flow.money_flow("market", None, 3)
+
+        self.assertTrue(payload["ok"])
+        item = payload["data"]["items"][0]
+        self.assertEqual(item["date"], "2026-09-09")
+        self.assertAlmostEqual(item["main_net_inflow"], -7351816192.0)
+        self.assertAlmostEqual(item["super_large_net_inflow"], 4861476864.0)
+        self.assertAlmostEqual(item["large_net_inflow"], -12213293056.0)
+        self.assertAlmostEqual(item["sh_close"], 3951.51)
+        self.assertAlmostEqual(item["sz_change_percent"], 0.15)
+        self.assertIn(
+            "eastmoney_market_flow_daykline",
+            [entry["source"] for entry in payload["source_chain"]],
+        )
+
+
+class MarginTradingLibTests(unittest.TestCase):
+    def test_sse_official_margin_parses_rows(self):
+        from datetime import date as date_cls
+
+        from scripts.lib import events
+
+        payload = {
+            "pageHelp": {
+                "total": 1,
+                "data": [
+                    {
+                        "opDate": "20260909",
+                        "stockCode": "510050",
+                        "securityAbbr": "50ETF",
+                        "rzye": 1453181753,
+                        "rzmre": 17190779,
+                        "rqylje": None,
+                        "rqyl": 36671540,
+                        "rqmcl": 428700,
+                    }
+                ],
+            }
+        }
+        response = mock.Mock()
+        response.json.return_value = payload
+        response.raise_for_status = mock.Mock()
+        with mock.patch.object(events.requests, "get", return_value=response):
+            items = events._margin_from_sse_official(date_cls(2026, 9, 9))
+
+        self.assertEqual(len(items), 1)
+        item = items[0]
+        self.assertEqual(item["date"], "2026-09-09")
+        self.assertEqual(item["code"], "510050")
+        self.assertEqual(item["exchange"], "SH")
+        self.assertAlmostEqual(item["margin_balance"], 1453181753.0)
+        self.assertAlmostEqual(item["margin_buy"], 17190779.0)
+        self.assertIsNone(item["short_balance"])
+        self.assertAlmostEqual(item["short_volume"], 36671540.0)
+
+    def test_margin_trading_falls_back_to_exchange_official_with_date_rollback(self):
+        from datetime import date as date_cls
+
+        from scripts.lib import events
+
+        fake_ak = mock.Mock()
+        fake_ak.stock_margin_detail_sse.side_effect = RuntimeError("akshare sse down")
+        fake_ak.stock_margin_detail_szse.side_effect = RuntimeError("akshare szse down")
+
+        def fake_sse(day):
+            if day == date_cls(2026, 9, 10):
+                return []
+            return [
+                {
+                    "date": day.isoformat(),
+                    "code": "510050",
+                    "name": "50ETF",
+                    "exchange": "SH",
+                    "margin_balance": 1453181753.0,
+                    "margin_buy": 17190779.0,
+                    "short_balance": None,
+                    "short_volume": 36671540.0,
+                    "short_sell_volume": 428700.0,
+                }
+            ]
+
+        with (
+            mock.patch.dict("sys.modules", {"akshare": fake_ak}),
+            mock.patch.object(
+                events, "_margin_from_sse_official", side_effect=fake_sse
+            ),
+            mock.patch.object(events, "_margin_from_szse_official", return_value=[]),
+        ):
+            payload = events.margin_trading(None, "2026-09-10", 5)
+
+        self.assertTrue(payload["ok"])
+        self.assertEqual(payload["data"]["returned_count"], 1)
+        self.assertEqual(payload["data"]["items"][0]["date"], "2026-09-09")
+        joined = " ".join(payload["warnings"])
+        self.assertIn("回退到最近可用交易日 2026-09-09", joined)
+        self.assertIn("不代表沪深全市场", joined)
+        self.assertIn(
+            "sse_official_margin",
+            [entry["source"] for entry in payload["source_chain"]],
+        )
 
 
 class StockDiagnoseLibTests(unittest.TestCase):

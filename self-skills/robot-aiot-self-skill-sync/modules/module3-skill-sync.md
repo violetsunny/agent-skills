@@ -4,7 +4,7 @@
 
 模块 3 分为三类同步方式：
 
-- **npx 管理型**（7 个项目）：通过 `npx skills@latest update` 统一更新，安装到 `~/.agents/skills/`；更新失败的 skill 走 rsync 兜底
+- **npx 管理型**（15 个项目）：通过 `npx skills@latest update` 统一更新，安装到 `~/.agents/skills/`；更新失败的 skill 走 rsync 兜底
 - **自写 skill 同步**（模块 3.3）：`agent-skills/self-skills/` ↔ `~/.agents/skills/`，按文件级比对结果决定方向，排在外部同步之后
 - **自写命令同步**（模块 3.4）：`agent-skills/commands/` ↔ `~/.agents/commands/`，方向判定同 3.3，排在 3.3 之后
 
@@ -12,19 +12,27 @@
 
 OpenSpec 在 `~/.claude/skills/` 下生成的完整 skills 集合只走模块 2 的专门同步流程。外部同步（npx / rsync 兜底）遇到与 `self-skills/` 同名的 skill 一律跳过，自写 skill 的真源规则见 `modules/shared.md`。
 
-## 3.1 npx 管理型项目（7 个）
+## 3.1 npx 管理型项目（15 个）
 
-以下 7 个项目通过 `npx skills@latest` 安装和更新，**不走常规 rsync 同步**（仅更新失败时走本节末尾的 rsync 兜底）。npx 安装更可靠，能正确处理 skill 依赖和元数据，大幅减少同步错误的可能性。
+以下 15 个项目通过 `npx skills@latest` 安装和更新，**不走常规 rsync 同步**（仅更新失败时走本节末尾的 rsync 兜底）。npx 安装更可靠，能正确处理 skill 依赖和元数据，大幅减少同步错误的可能性。
 
-| 项目 | GitHub 仓库 | 初始化安装命令 |
-|------|-----------|--------------|
-| superpowers | `obra/superpowers` | `npx skills@latest add obra/superpowers` |
-| matt-skills | `mattpocock/skills` | `npx skills@latest add mattpocock/skills` |
+| 项目                  | GitHub 仓库 | 初始化安装命令 |
+|---------------------|-----------|--------------|
+| superpowers         | `obra/superpowers` | `npx skills@latest add obra/superpowers` |
+| matt-skills         | `mattpocock/skills` | `npx skills@latest add mattpocock/skills` |
 | ui-ux-pro-max-skill | `nextlevelbuilder/ui-ux-pro-max-skill` | `npx skills@latest add nextlevelbuilder/ui-ux-pro-max-skill` |
-| baoyu-skills | `JimLiu/baoyu-skills` | `npx skills@latest add JimLiu/baoyu-skills` |
-| ppt-master | `hugohe3/ppt-master` | `npx skills@latest add hugohe3/ppt-master` |
-|claude-code-java|`decebals/claude-code-java`|`npx skills@latest add decebals/claude-code-java`|
-| anthropics-skills | `anthropics/skills` | `npx skills@latest add anthropics/skills` |
+| baoyu-skills        | `JimLiu/baoyu-skills` | `npx skills@latest add JimLiu/baoyu-skills` |
+| ppt-master          | `hugohe3/ppt-master` | `npx skills@latest add hugohe3/ppt-master` |
+| claude-code-java    |`decebals/claude-code-java`|`npx skills@latest add decebals/claude-code-java`|
+| anthropics-skills   | `anthropics/skills` | `npx skills@latest add anthropics/skills` |
+| ECC                 | `affaan-m/ECC` | `npx skills@latest add affaan-m/ECC` |
+| ponytail            | `DietrichGebert/ponytail` | `npx skills@latest add DietrichGebert/ponytail` |
+| archify             | `tt-a1i/archify` | `npx skills@latest add tt-a1i/archify` |
+| diagram-design      | `cathrynlavery/diagram-design` | `npx skills@latest add cathrynlavery/diagram-design` |
+| humanizer           | `blader/humanizer` | `npx skills@latest add blader/humanizer` |
+| humanizer-zh        | `op7418/Humanizer-zh` | `npx skills@latest add op7418/Humanizer-zh` |
+| andrej-karpathy-skills | `forrestchang/andrej-karpathy-skills` | `npx skills@latest add forrestchang/andrej-karpathy-skills` |
+| vercel-skills       | `vercel-labs/agent-skills` | `npx skills@latest add vercel-labs/agent-skills` |
 
 ### 更新流程
 
@@ -79,6 +87,14 @@ env -u XDG_STATE_HOME npx skills@latest add JimLiu/baoyu-skills -y -g
 env -u XDG_STATE_HOME npx skills@latest add hugohe3/ppt-master -y -g
 env -u XDG_STATE_HOME npx skills@latest add decebals/claude-code-java -y -g
 env -u XDG_STATE_HOME npx skills@latest add anthropics/skills -y -g
+env -u XDG_STATE_HOME npx skills@latest add affaan-m/ECC -y -g
+env -u XDG_STATE_HOME npx skills@latest add DietrichGebert/ponytail -y -g
+env -u XDG_STATE_HOME npx skills@latest add tt-a1i/archify -y -g
+env -u XDG_STATE_HOME npx skills@latest add cathrynlavery/diagram-design -y -g
+env -u XDG_STATE_HOME npx skills@latest add blader/humanizer -y -g
+env -u XDG_STATE_HOME npx skills@latest add op7418/Humanizer-zh -y -g
+env -u XDG_STATE_HOME npx skills@latest add forrestchang/andrej-karpathy-skills -y -g
+env -u XDG_STATE_HOME npx skills@latest add vercel-labs/agent-skills -y -g
 ```
 
 ### npx 更新失败时的 rsync 兜底（回退）
@@ -98,6 +114,14 @@ env -u XDG_STATE_HOME npx skills@latest add anthropics/skills -y -g
 | baoyu-skills | `self/skills/baoyu-skills/` | `skills/`（补充：`.claude/skills/` 下另有 release-skills） |
 | ppt-master | `self/skills/ppt-master/` | `skills/` |
 | anthropics-skills | `self/skills/anthropics-skills/` | `skills/`（直接子目录即为 skill 名） |
+| ECC | `self/skills/ECC/` | `skills/`（直接子目录即为 skill 名） |
+| ponytail | `self/skills/ponytail/` | `skills/`（直接子目录即为 skill 名） |
+| archify | `self/skills/archify/` | `archify/`（该目录自身即单个 skill，含 SKILL.md） |
+| diagram-design | `self/skills/diagram-design/` | `skills/`（单 skill：diagram-design） |
+| andrej-karpathy-skills | `self/skills/andrej-karpathy-skills/` | `skills/`（单 skill：karpathy-guidelines；克隆 remote 为 `multica-ai/andrej-karpathy-skills`，与 lock 源 `forrestchang/...` 不一致，疑上游更名/迁移） |
+| humanizer | （无本地克隆） | —（兜底按规则 5 标 `[NPX-FALLBACK-MISS]`） |
+| humanizer-zh | （无本地克隆） | —（兜底按规则 5 标 `[NPX-FALLBACK-MISS]`） |
+| vercel-skills | `self/skills/vercel-agent-skills/` | `skills/`（直接子目录即为 skill 名） |
 
 **兜底规则**（交集口径，自包含）：
 
@@ -119,11 +143,11 @@ env -u XDG_STATE_HOME npx skills@latest add anthropics/skills -y -g
   超时**不中断后续 3.3 / 3.4 的同步**
 - 安装/更新成功标记 `[NPX-AUTO]` 并报告更新的 skill 数量；失败的 skill 先走上述 rsync 兜底，兜底成功标记 `[NPX-FALLBACK]`，兜底不可用或失败标记 `[NPX-FAILED]` / `[NPX-FALLBACK-MISS]`；lock 读不到标记 `[NPX-LOCK-MISS]`，不计入成功
 - 这些项目的 skill 最终在 `~/.agents/skills/` 中，模块 4.1 全量 rsync 会同步到知识库
-- **模块 4.1A 排除全部 7 个 npx 管理型项目**（见模块 4 文档），避免其 `self/skills/` 下的 git 源结构被误判
+- **模块 4.1A 排除全部 15 个 npx 管理型项目**（见模块 4 文档），避免其 `self/skills/` 下的 git 源结构被误判
 
 ### Sub Agent 建议
 
-1. 用 fresh sub agent 预先枚举 7 个 npx 管理型项目，并核对 `~/.agents/.skill-lock.json` 中各 source 的 skill 数，生成执行清单
+1. 用 fresh sub agent 预先枚举 15 个 npx 管理型项目，并核对 `~/.agents/.skill-lock.json` 中各 source 的 skill 数，生成执行清单
 2. 若上一轮出现 `✗ Failed to update`，由 sub agent 对失败清单做兜底交集草稿：哪些 skill 运行时已存在可兜底、哪些会被拒绝新增、哪些无本地克隆
 3. 主线程执行 `env -u XDG_STATE_HOME npx skills@latest update -y -g` 和兜底时的实际 `rsync -rtu`
 4. 成功/失败计数、拒绝新增数量和项目级状态由主线程统一汇总

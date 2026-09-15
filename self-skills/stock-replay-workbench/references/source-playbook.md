@@ -50,11 +50,12 @@
 
 ### 4. 资金域
 
-- 全市场主力资金流：优先东方财富 push2his 全市场资金流向，回退到腾讯/东财排行快照
-- 个股资金流：优先东方财富 `push2his` 明细接口（分钟级），失败后回退到东财排行快照 → akshare
+- 全市场主力资金流：优先 akshare `stock_market_fund_flow`，失败后直连东财 push2his 沪深两市资金流日K（`secid=1.000001&secid2=0.399001`，fields2 f51~f65，金额单位元，走 `em_get` 限流重试）
+- 个股资金流：优先东方财富 `push2his` 明细接口（分钟级），失败后回退到东财 push2delay 排行快照 → akshare → 新浪 `MoneyFlow.ssl_qsfx_zjlrqs`（日度主力/超大单净额，独立风控面备胎，无大/中/小单分档）
   - ⚠️ 东财资金流价格字段需 ÷1000（非 ÷10000）
   - 120日资金流：东财 push2his 日级主力/大单/中单/小单净流入
-- 行业/概念资金流：优先东财 push2 行业板块资金流向，失败后回退到板块排行信号 → akshare
+- 行业/概念资金流：优先 akshare，失败后直连东财 push2delay clist（`fs=m:90+t:2` 行业 / `m:90+t:3` 概念，按 f62 主力净额降序），再失败回退到板块排行信号
+  - ⚠️ 东财 push2 与 push2his/push2delay 风控面不同：住宅 IP 间歇封锁时 push2 常先挂，push2his/push2delay 仍可直连（2026-09-10 实测）
 - 个股/行业/概念资金流都视为公开源 best-effort，要保留 warning、`source_chain` 和必要的 `source_status`
 - 龙虎榜、大宗交易、融资融券属于资金域与事件域交叉区（见下）
 
@@ -63,7 +64,7 @@
 - **公告**：优先巨潮 cninfo 公开接口，走 `_cninfo_orgid()` 动态查官方映射表 `szse_stock.json`（6198只股，模块级缓存），硬编码规则降为 fallback
 - **龙虎榜**：优先东财 datacenter 龙虎榜席位 `dragon_tiger_board`（上榜记录+买卖TOP5+机构动向）+ 全市场龙虎榜 `daily_dragon_tiger`（当日所有上榜股票+净买额排名）
 - **大宗交易**：优先东财 datacenter `block_trade`（成交价/量+买卖方营业部+溢价率）
-- **融资融券**：优先东财 datacenter `margin_trading`（日级融资余额/买入/偿还+融券），沪深两市合并
+- **融资融券**：优先 akshare（沪 `stock_margin_detail_sse` + 深 `stock_margin_detail_szse`），失败或空返回时回退到**沪深交易所官方备胎**（上交所 `queryMargin.do` JSON + 深交所 `1837_xxpl` xlsx），当日未发布自动回退最近可用交易日（最多 7 天）；单所有数据时加 warning「不代表沪深全市场」；金额单位元、融券余量/卖出量单位股或份、上交所融券余额源值为空时保留为空
 - **个股新闻**：优先东财 search-api `eastmoney_stock_news`（JSONP接口，含标题/内容/来源/时间），注意 `result.cmsArticleWebOld` 直接就是文章列表（非 `{list:[...]}` 嵌套）
 - **研报/评级**：优先东财 reportapi（个股研报 `qType=0` + 行业研报 `qType=1` + PDF下载），补同花顺一致预期EPS `ths_eps_forecast`（按列名「均值」取，非 `iloc[2]` =最小值）
 - **全球资讯**：东财 np-weblist `eastmoney_global_news`（7×24财经快讯）
@@ -158,16 +159,16 @@
 | `sentiment-heat` | 同花顺热榜 `ths_hot_list` + 东财人气榜 `em_hot_rank` + 概念命中 `em_hot_concept` | 允许空样本 + warning |
 | `rank` | 东方财富 `clist` | 返回空列表 + failure detail |
 | `sector` | 东财 push2 行业排名 + 东财 slist 个股板块归属 | 回退到 efinance/akshare |
-| `money-flow --scope market` | 东财 push2his 全市场资金流向 | 回退到东财排行快照 → akshare |
-| `money-flow --scope stock` | 东财 push2his 个股资金流（分钟级） | 回退到东财排行快照 → akshare |
-| `money-flow --scope industry` | 东财 push2 行业资金流向 | 回退到板块排行信号 → akshare |
-| `money-flow --scope concept` | 东财 push2 概念资金流向 | 回退到板块排行信号 → akshare |
+| `money-flow --scope market` | akshare 全市场资金流 | 回退到东财 push2his 日K直连 → 空样本 |
+| `money-flow --scope stock` | 东财 push2his 个股资金流（分钟级） | 回退到东财 push2delay 排行快照 → akshare → 新浪日度备胎 |
+| `money-flow --scope industry` | akshare 行业资金流 | 回退到东财 push2delay clist 直连 → 板块排行信号 |
+| `money-flow --scope concept` | akshare 概念资金流 | 回退到东财 push2delay clist 直连 → 板块排行信号 |
 | `fundamental` | 腾讯/东财估值字段 + mootdx finance（财务快照）+ 新浪财报三表 | 字段级 best-effort，保留 warnings 和 source_chain |
 | `announcement` | 巨潮 cninfo（`_cninfo_orgid` 动态映射） | 硬编码规则降为 fallback |
 | `news` | 东财 search-api 个股新闻 + 东财 np-weblist 全球资讯 | 回退到新浪/腾讯资讯 |
 | `dragon-tiger` | 东财 datacenter 龙虎榜席位 + 全市场龙虎榜 | 回退到 akshare |
 | `block-trade` | 东财 datacenter 大宗交易 | 回退到 akshare |
-| `margin-trading` | 东财 datacenter 融资融券（沪深两市合并） | 各源独立失败不影响对方 |
+| `margin-trading` | akshare 融资融券（沪+深） | 回退到沪深交易所官方备胎（支持回退最近可用交易日） |
 | `bond` | 东财/腾讯实时行情 + akshare 可转债 spot/daily | 无回退 |
 
 ## 输出时必须保留的信息

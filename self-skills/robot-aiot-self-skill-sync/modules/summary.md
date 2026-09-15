@@ -59,7 +59,7 @@
 
 ## Skill 同步汇总
 
-### (1) npx 管理型项目（7 个）
+### (1) npx 管理型项目（15 个）
 
 通过 `env -u XDG_STATE_HOME npx skills@latest update -y -g` 统一更新，安装到 `~/.agents/skills/`；更新失败的 skill 按 `self/skills/` 本地克隆走 rsync 兜底（见模块 3.1）。
 
@@ -72,6 +72,14 @@
 | baoyu-skills | `[NPX-AUTO]` / `[NPX-FALLBACK]` / `[NPX-FALLBACK-MISS]` / `[NPX-FAILED]` |
 | ppt-master | `[NPX-AUTO]` / `[NPX-FALLBACK]` / `[NPX-FALLBACK-MISS]` / `[NPX-FAILED]` |
 | anthropics-skills | `[NPX-AUTO]` / `[NPX-FALLBACK]` / `[NPX-FALLBACK-MISS]` / `[NPX-FAILED]` |
+| ECC | `[NPX-AUTO]` / `[NPX-FALLBACK]` / `[NPX-FALLBACK-MISS]` / `[NPX-FAILED]` |
+| ponytail | `[NPX-AUTO]` / `[NPX-FALLBACK]` / `[NPX-FALLBACK-MISS]` / `[NPX-FAILED]` |
+| archify | `[NPX-AUTO]` / `[NPX-FALLBACK]` / `[NPX-FALLBACK-MISS]` / `[NPX-FAILED]` |
+| diagram-design | `[NPX-AUTO]` / `[NPX-FALLBACK]` / `[NPX-FALLBACK-MISS]` / `[NPX-FAILED]` |
+| humanizer | `[NPX-AUTO]` / `[NPX-FALLBACK]` / `[NPX-FALLBACK-MISS]` / `[NPX-FAILED]` |
+| humanizer-zh | `[NPX-AUTO]` / `[NPX-FALLBACK]` / `[NPX-FALLBACK-MISS]` / `[NPX-FAILED]` |
+| andrej-karpathy-skills | `[NPX-AUTO]` / `[NPX-FALLBACK]` / `[NPX-FALLBACK-MISS]` / `[NPX-FAILED]` |
+| vercel-skills | `[NPX-AUTO]` / `[NPX-FALLBACK]` / `[NPX-FALLBACK-MISS]` / `[NPX-FAILED]` |
 
 更新成功标记 `[NPX-AUTO]` 并报告更新的 skill 数量；失败的 skill 走 rsync 兜底，兜底成功标记 `[NPX-FALLBACK]`，无本地克隆标记 `[NPX-FALLBACK-MISS]`（提示用户手动 clone），兜底也失败标记 `[NPX-FAILED]`。这些项目不参与常规 rsync 同步/新增统计。
 
@@ -80,7 +88,7 @@
 | 字段 | 说明 |
 |------|------|
 | `[NPX-LOCK-MISS]` | 输出出现 `No global skills tracked in lock file.`，说明 lock 路径被 `XDG_STATE_HOME` 劫持、命令 exit 0 静默空跑；**不得计入成功**，须补 `env -u XDG_STATE_HOME` 重跑 |
-| lock 中各 source 的 skill 数 | 用于核对 7 个项目是否都真的被 npx 跟踪；某 source 为 0 说明未注册，需跑初始化 `add` |
+| lock 中各 source 的 skill 数 | 用于核对 15 个项目是否都真的被 npx 跟踪；某 source 为 0 说明未注册，需跑初始化 `add` |
 
 ### (2) rsync 管理型项目（0 个 — 类别已取消）
 

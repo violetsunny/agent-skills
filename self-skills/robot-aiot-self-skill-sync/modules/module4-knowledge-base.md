@@ -49,7 +49,7 @@ rsync -rtu "${excludes[@]}" ~/.agents/skills/ /Users/kangll13/aiot/java-code/sel
 
 执行规则：
 
-- **排除 npx 管理型项目**：superpowers / matt-skills / ui-ux-pro-max-skill / claude-code-java / baoyu-skills / ppt-master / anthropics-skills 这 7 个项目的 skill 由模块 3.1 通过 `npx skills@latest update` 安装到 `~/.agents/skills/` 后，经步骤 4.1 全量 rsync 同步到知识库，4.1A 不再处理，避免其 git 源结构被误判
+- **排除 npx 管理型项目**：superpowers / matt-skills / ui-ux-pro-max-skill / claude-code-java / baoyu-skills / ppt-master / anthropics-skills / ECC / ponytail / archify / diagram-design / humanizer / humanizer-zh / andrej-karpathy-skills / vercel-skills 这 15 个项目的 skill 由模块 3.1 通过 `npx skills@latest update` 安装到 `~/.agents/skills/` 后，经步骤 4.1 全量 rsync 同步到知识库，4.1A 不再处理，避免其 git 源结构被误判。其中 humanizer / humanizer-zh 当前无 `self/skills/` 本地克隆，4.1A 天然扫不到；将来若补克隆，必须把对应目录名加入下方排除清单
 - **gstack 特例必须最先判断**：gstack 根目录同时存在 `SKILL.md`（路由入口）和 `.agents/skills/`（54 个实际子技能），必须走 `.agents/skills/` 分支逐个同步子技能，**禁止按单 skill 项目整目录同步**（会把 1G+ 的项目本体和 `node_modules/` 带入知识库）
 - 若 `self/skills/<project>/SKILL.md` 存在，则按单 skill 项目处理，同步到 `agent-skills/skills/<project>/`
 - 若 `self/skills/<project>/skills/` 存在，则遍历其下每个子目录，分别同步到 `agent-skills/skills/<skill_name>/`
@@ -102,7 +102,7 @@ for project in /Users/kangll13/aiot/java-code/self/skills/*; do
 
   # 排除 npx 管理型项目：走模块3.1 npx update + 步骤4.1全量同步
   case "$project_name" in
-    superpowers|matt-skills|ui-ux-pro-max-skill|claude-code-java|baoyu-skills|ppt-master|anthropics-skills) continue ;;
+    superpowers|matt-skills|ui-ux-pro-max-skill|claude-code-java|baoyu-skills|ppt-master|anthropics-skills|ECC|ponytail|archify|diagram-design|andrej-karpathy-skills|vercel-agent-skills) continue ;;
   esac
 
   # gstack 特例：根目录 SKILL.md 只是路由入口，必须走 .agents/skills/ 分支，
