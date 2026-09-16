@@ -10,9 +10,8 @@ from __future__ import annotations
 
 import math
 import unicodedata
+from collections.abc import Iterable, Sequence
 from dataclasses import dataclass
-from typing import Iterable, Optional, Sequence
-
 
 Point = tuple[float, float]
 Bounds = tuple[float, float, float, float]
@@ -22,7 +21,7 @@ EPSILON = 1e-6
 @dataclass(frozen=True)
 class SegmentInteraction:
     kind: str
-    point: Optional[Point] = None
+    point: Point | None = None
     overlap_length: float = 0.0
 
 
@@ -38,7 +37,9 @@ def almost_equal(first: float, second: float, epsilon: float = EPSILON) -> bool:
 
 
 def same_point(first: Point, second: Point, epsilon: float = EPSILON) -> bool:
-    return almost_equal(first[0], second[0], epsilon) and almost_equal(first[1], second[1], epsilon)
+    return almost_equal(first[0], second[0], epsilon) and almost_equal(
+        first[1], second[1], epsilon
+    )
 
 
 def segment_axis(first: Point, second: Point) -> str:
@@ -50,16 +51,26 @@ def segment_axis(first: Point, second: Point) -> str:
 
 
 def route_is_orthogonal(points: Sequence[Point]) -> bool:
-    return all(segment_axis(first, second) != "other" for first, second in zip(points, points[1:]))
+    return all(
+        segment_axis(first, second) != "other"
+        for first, second in zip(points, points[1:], strict=False)
+    )
 
 
 def route_length(points: Sequence[Point]) -> float:
-    return sum(math.hypot(second[0] - first[0], second[1] - first[1]) for first, second in zip(points, points[1:]))
+    return sum(
+        math.hypot(second[0] - first[0], second[1] - first[1])
+        for first, second in zip(points, points[1:], strict=False)
+    )
 
 
 def bend_count(points: Sequence[Point]) -> int:
-    axes = [segment_axis(first, second) for first, second in zip(points, points[1:]) if not same_point(first, second)]
-    return sum(first != second for first, second in zip(axes, axes[1:]))
+    axes = [
+        segment_axis(first, second)
+        for first, second in zip(points, points[1:], strict=False)
+        if not same_point(first, second)
+    ]
+    return sum(first != second for first, second in zip(axes, axes[1:], strict=False))
 
 
 def bounds_intersect(first: Bounds, second: Bounds, padding: float = 0.0) -> bool:
@@ -78,12 +89,20 @@ def expand_bounds(bounds: Bounds, padding: float) -> Bounds:
     return (left - padding, top - padding, right + padding, bottom + padding)
 
 
-def point_in_bounds(point: Point, bounds: Bounds, *, padding: float = 0.0, interior: bool = False) -> bool:
+def point_in_bounds(
+    point: Point, bounds: Bounds, *, padding: float = 0.0, interior: bool = False
+) -> bool:
     x, y = point
     left, top, right, bottom = bounds
     if interior:
-        return left + padding < x < right - padding and top + padding < y < bottom - padding
-    return left - padding <= x <= right + padding and top - padding <= y <= bottom + padding
+        return (
+            left + padding < x < right - padding
+            and top + padding < y < bottom - padding
+        )
+    return (
+        left - padding <= x <= right + padding
+        and top - padding <= y <= bottom + padding
+    )
 
 
 def bounds_inside(inner: Bounds, outer: Bounds, padding: float = 0.0) -> bool:
@@ -97,31 +116,45 @@ def bounds_inside(inner: Bounds, outer: Bounds, padding: float = 0.0) -> bool:
     )
 
 
-def route_inside_canvas(points: Sequence[Point], canvas: Bounds, margin: float = 0.0) -> bool:
+def route_inside_canvas(
+    points: Sequence[Point], canvas: Bounds, margin: float = 0.0
+) -> bool:
     left, top, right, bottom = canvas
     safe = (left + margin, top + margin, right - margin, bottom - margin)
     return all(point_in_bounds(point, safe) for point in points)
 
 
 def _orientation(first: Point, second: Point, third: Point) -> float:
-    return (second[0] - first[0]) * (third[1] - first[1]) - (second[1] - first[1]) * (third[0] - first[0])
+    return (second[0] - first[0]) * (third[1] - first[1]) - (second[1] - first[1]) * (
+        third[0] - first[0]
+    )
 
 
-def _on_segment(point: Point, first: Point, second: Point, epsilon: float = EPSILON) -> bool:
+def _on_segment(
+    point: Point, first: Point, second: Point, epsilon: float = EPSILON
+) -> bool:
     return (
-        min(first[0], second[0]) - epsilon <= point[0] <= max(first[0], second[0]) + epsilon
-        and min(first[1], second[1]) - epsilon <= point[1] <= max(first[1], second[1]) + epsilon
+        min(first[0], second[0]) - epsilon
+        <= point[0]
+        <= max(first[0], second[0]) + epsilon
+        and min(first[1], second[1]) - epsilon
+        <= point[1]
+        <= max(first[1], second[1]) + epsilon
         and abs(_orientation(first, second, point)) <= epsilon
     )
 
 
-def segment_interaction(first_a: Point, first_b: Point, second_a: Point, second_b: Point) -> Optional[SegmentInteraction]:
+def segment_interaction(
+    first_a: Point, first_b: Point, second_a: Point, second_b: Point
+) -> SegmentInteraction | None:
     """Return a proper crossing, touch, or collinear overlap for two segments."""
 
     first_axis = segment_axis(first_a, first_b)
     second_axis = segment_axis(second_a, second_b)
 
-    if first_axis == second_axis == "horizontal" and almost_equal(first_a[1], second_a[1]):
+    if first_axis == second_axis == "horizontal" and almost_equal(
+        first_a[1], second_a[1]
+    ):
         start = max(min(first_a[0], first_b[0]), min(second_a[0], second_b[0]))
         end = min(max(first_a[0], first_b[0]), max(second_a[0], second_b[0]))
         if end - start > EPSILON:
@@ -130,7 +163,9 @@ def segment_interaction(first_a: Point, first_b: Point, second_a: Point, second_
             return SegmentInteraction("touch", (start, first_a[1]))
         return None
 
-    if first_axis == second_axis == "vertical" and almost_equal(first_a[0], second_a[0]):
+    if first_axis == second_axis == "vertical" and almost_equal(
+        first_a[0], second_a[0]
+    ):
         start = max(min(first_a[1], first_b[1]), min(second_a[1], second_b[1]))
         end = min(max(first_a[1], first_b[1]), max(second_a[1], second_b[1]))
         if end - start > EPSILON:
@@ -141,13 +176,17 @@ def segment_interaction(first_a: Point, first_b: Point, second_a: Point, second_
 
     if first_axis == "horizontal" and second_axis == "vertical":
         point = (second_a[0], first_a[1])
-        if _on_segment(point, first_a, first_b) and _on_segment(point, second_a, second_b):
+        if _on_segment(point, first_a, first_b) and _on_segment(
+            point, second_a, second_b
+        ):
             return SegmentInteraction("crossing", point)
         return None
 
     if first_axis == "vertical" and second_axis == "horizontal":
         point = (first_a[0], second_a[1])
-        if _on_segment(point, first_a, first_b) and _on_segment(point, second_a, second_b):
+        if _on_segment(point, first_a, first_b) and _on_segment(
+            point, second_a, second_b
+        ):
             return SegmentInteraction("crossing", point)
         return None
 
@@ -158,24 +197,47 @@ def segment_interaction(first_a: Point, first_b: Point, second_a: Point, second_
     o2 = _orientation(first_a, first_b, second_b)
     o3 = _orientation(second_a, second_b, first_a)
     o4 = _orientation(second_a, second_b, first_b)
-    if abs(o1) <= EPSILON and abs(o2) <= EPSILON and abs(o3) <= EPSILON and abs(o4) <= EPSILON:
-        candidates = [point for point in (first_a, first_b, second_a, second_b) if _on_segment(point, first_a, first_b) and _on_segment(point, second_a, second_b)]
+    if (
+        abs(o1) <= EPSILON
+        and abs(o2) <= EPSILON
+        and abs(o3) <= EPSILON
+        and abs(o4) <= EPSILON
+    ):
+        candidates = [
+            point
+            for point in (first_a, first_b, second_a, second_b)
+            if _on_segment(point, first_a, first_b)
+            and _on_segment(point, second_a, second_b)
+        ]
         unique = unique_points(candidates)
         if len(unique) >= 2:
-            return SegmentInteraction("overlap", overlap_length=max(math.dist(a, b) for a in unique for b in unique))
+            return SegmentInteraction(
+                "overlap",
+                overlap_length=max(math.dist(a, b) for a in unique for b in unique),
+            )
         if unique:
             return SegmentInteraction("touch", unique[0])
         return None
     if o1 * o2 <= EPSILON and o3 * o4 <= EPSILON:
-        denominator = (first_a[0] - first_b[0]) * (second_a[1] - second_b[1]) - (first_a[1] - first_b[1]) * (second_a[0] - second_b[0])
+        denominator = (first_a[0] - first_b[0]) * (second_a[1] - second_b[1]) - (
+            first_a[1] - first_b[1]
+        ) * (second_a[0] - second_b[0])
         if abs(denominator) <= EPSILON:
             return None
         determinant_first = first_a[0] * first_b[1] - first_a[1] * first_b[0]
         determinant_second = second_a[0] * second_b[1] - second_a[1] * second_b[0]
-        x = (determinant_first * (second_a[0] - second_b[0]) - (first_a[0] - first_b[0]) * determinant_second) / denominator
-        y = (determinant_first * (second_a[1] - second_b[1]) - (first_a[1] - first_b[1]) * determinant_second) / denominator
+        x = (
+            determinant_first * (second_a[0] - second_b[0])
+            - (first_a[0] - first_b[0]) * determinant_second
+        ) / denominator
+        y = (
+            determinant_first * (second_a[1] - second_b[1])
+            - (first_a[1] - first_b[1]) * determinant_second
+        ) / denominator
         point = (x, y)
-        if _on_segment(point, first_a, first_b) and _on_segment(point, second_a, second_b):
+        if _on_segment(point, first_a, first_b) and _on_segment(
+            point, second_a, second_b
+        ):
             return SegmentInteraction("crossing", point)
     return None
 
@@ -189,21 +251,30 @@ def unique_points(points: Iterable[Point], tolerance: float = 0.01) -> list[Poin
     return result
 
 
-def is_shared_route_endpoint(point: Point, first: Sequence[Point], second: Sequence[Point], tolerance: float = 0.01) -> bool:
-    return any(same_point(point, endpoint, tolerance) for endpoint in (first[0], first[-1])) and any(
+def is_shared_route_endpoint(
+    point: Point,
+    first: Sequence[Point],
+    second: Sequence[Point],
+    tolerance: float = 0.01,
+) -> bool:
+    return any(
+        same_point(point, endpoint, tolerance) for endpoint in (first[0], first[-1])
+    ) and any(
         same_point(point, endpoint, tolerance) for endpoint in (second[0], second[-1])
     )
 
 
-def route_interactions(route: Sequence[Point], others: Sequence[Sequence[Point]]) -> RouteInteractions:
+def route_interactions(
+    route: Sequence[Point], others: Sequence[Sequence[Point]]
+) -> RouteInteractions:
     crossings: list[Point] = []
     overlap_count = 0
     overlap_length = 0.0
     for other in others:
         if len(other) < 2:
             continue
-        for first_a, first_b in zip(route, route[1:]):
-            for second_a, second_b in zip(other, other[1:]):
+        for first_a, first_b in zip(route, route[1:], strict=False):
+            for second_a, second_b in zip(other, other[1:], strict=False):
                 interaction = segment_interaction(first_a, first_b, second_a, second_b)
                 if interaction is None:
                     continue
@@ -211,22 +282,32 @@ def route_interactions(route: Sequence[Point], others: Sequence[Sequence[Point]]
                     overlap_count += 1
                     overlap_length += interaction.overlap_length
                     continue
-                if interaction.point is None or is_shared_route_endpoint(interaction.point, route, other):
+                if interaction.point is None or is_shared_route_endpoint(
+                    interaction.point, route, other
+                ):
                     continue
                 if interaction.kind in {"crossing", "touch"}:
                     crossings.append(interaction.point)
-    return RouteInteractions(tuple(unique_points(crossings)), overlap_count, round(overlap_length, 2))
+    return RouteInteractions(
+        tuple(unique_points(crossings)), overlap_count, round(overlap_length, 2)
+    )
 
 
-def route_crossing_count(route: Sequence[Point], others: Sequence[Sequence[Point]]) -> int:
+def route_crossing_count(
+    route: Sequence[Point], others: Sequence[Sequence[Point]]
+) -> int:
     return len(route_interactions(route, others).crossings)
 
 
-def route_overlap_length(route: Sequence[Point], others: Sequence[Sequence[Point]]) -> float:
+def route_overlap_length(
+    route: Sequence[Point], others: Sequence[Sequence[Point]]
+) -> float:
     return route_interactions(route, others).overlap_length
 
 
-def estimate_text_width(text: str, font_size: float = 12.0, weight: float = 1.0) -> float:
+def estimate_text_width(
+    text: str, font_size: float = 12.0, weight: float = 1.0
+) -> float:
     units = 0.0
     for character in text:
         if unicodedata.combining(character):
@@ -262,10 +343,15 @@ def estimate_text_bounds(
     else:
         left = x
     top = y - font_size * 0.82
-    return (left - padding, top - padding, left + width + padding, y + font_size * 0.24 + padding)
+    return (
+        left - padding,
+        top - padding,
+        left + width + padding,
+        y + font_size * 0.24 + padding,
+    )
 
 
-def parse_bridge_points(raw: Optional[str]) -> list[Point]:
+def parse_bridge_points(raw: str | None) -> list[Point]:
     if not raw:
         return []
     points: list[Point] = []
@@ -280,7 +366,9 @@ def parse_bridge_points(raw: Optional[str]) -> list[Point]:
     return points
 
 
-def bridge_declared(point: Point, bridges: Sequence[Point], tolerance: float = 1.0) -> bool:
+def bridge_declared(
+    point: Point, bridges: Sequence[Point], tolerance: float = 1.0
+) -> bool:
     return any(same_point(point, bridge, tolerance) for bridge in bridges)
 
 
@@ -291,14 +379,16 @@ def format_number(value: float) -> str:
     return str(rounded)
 
 
-def path_with_bridges(route: Sequence[Point], bridges: Sequence[Point], radius: float = 5.0) -> str:
+def path_with_bridges(
+    route: Sequence[Point], bridges: Sequence[Point], radius: float = 5.0
+) -> str:
     """Build an SVG path, adding a deterministic arc at declared crossings."""
 
     if not route:
         return ""
     commands = [f"M {format_number(route[0][0])},{format_number(route[0][1])}"]
     remaining = unique_points(bridges)
-    for start, end in zip(route, route[1:]):
+    for start, end in zip(route, route[1:], strict=False):
         axis = segment_axis(start, end)
         if axis == "horizontal":
             direction = 1.0 if end[0] >= start[0] else -1.0
@@ -306,7 +396,9 @@ def path_with_bridges(route: Sequence[Point], bridges: Sequence[Point], radius: 
                 point
                 for point in remaining
                 if almost_equal(point[1], start[1], 0.1)
-                and min(start[0], end[0]) + radius * 1.5 < point[0] < max(start[0], end[0]) - radius * 1.5
+                and min(start[0], end[0]) + radius * 1.5
+                < point[0]
+                < max(start[0], end[0]) - radius * 1.5
             ]
             candidates.sort(key=lambda point: direction * point[0])
             last_coordinate = start[0]
@@ -317,7 +409,9 @@ def path_with_bridges(route: Sequence[Point], bridges: Sequence[Point], radius: 
                 after = x + direction * radius
                 commands.append(f"L {format_number(before)},{format_number(y)}")
                 sweep = 0 if direction > 0 else 1
-                commands.append(f"A {format_number(radius)} {format_number(radius)} 0 0 {sweep} {format_number(after)},{format_number(y)}")
+                commands.append(
+                    f"A {format_number(radius)} {format_number(radius)} 0 0 {sweep} {format_number(after)},{format_number(y)}"
+                )
                 last_coordinate = after
             commands.append(f"L {format_number(end[0])},{format_number(end[1])}")
         elif axis == "vertical":
@@ -326,7 +420,9 @@ def path_with_bridges(route: Sequence[Point], bridges: Sequence[Point], radius: 
                 point
                 for point in remaining
                 if almost_equal(point[0], start[0], 0.1)
-                and min(start[1], end[1]) + radius * 1.5 < point[1] < max(start[1], end[1]) - radius * 1.5
+                and min(start[1], end[1]) + radius * 1.5
+                < point[1]
+                < max(start[1], end[1]) - radius * 1.5
             ]
             candidates.sort(key=lambda point: direction * point[1])
             last_coordinate = start[1]
@@ -337,7 +433,9 @@ def path_with_bridges(route: Sequence[Point], bridges: Sequence[Point], radius: 
                 after = y + direction * radius
                 commands.append(f"L {format_number(x)},{format_number(before)}")
                 sweep = 1 if direction > 0 else 0
-                commands.append(f"A {format_number(radius)} {format_number(radius)} 0 0 {sweep} {format_number(x)},{format_number(after)}")
+                commands.append(
+                    f"A {format_number(radius)} {format_number(radius)} 0 0 {sweep} {format_number(x)},{format_number(after)}"
+                )
                 last_coordinate = after
             commands.append(f"L {format_number(end[0])},{format_number(end[1])}")
         else:

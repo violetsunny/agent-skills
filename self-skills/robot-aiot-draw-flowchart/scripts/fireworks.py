@@ -9,9 +9,8 @@ import json
 import shutil
 import sys
 import xml.etree.ElementTree as ET
+from collections.abc import Sequence
 from pathlib import Path
-from typing import Optional, Sequence
-
 
 SCRIPT_DIR = Path(__file__).resolve().parent
 ROOT = SCRIPT_DIR.parent
@@ -20,7 +19,12 @@ if str(SCRIPT_DIR) not in sys.path:
 
 from diagram_ir import normalize_diagram  # noqa: E402
 from interactive_html import build_interactive_html  # noqa: E402
-from motion import DEFAULT_MOTION_DURATION, MOTION_PRESETS, probe_motion_runtime, render_motion_gif  # noqa: E402
+from motion import (  # noqa: E402
+    DEFAULT_MOTION_DURATION,
+    MOTION_PRESETS,
+    probe_motion_runtime,
+    render_motion_gif,
+)
 from validate_svg import run_check  # noqa: E402
 
 
@@ -207,7 +211,7 @@ def build_parser() -> argparse.ArgumentParser:
     return parser
 
 
-def main(argv: Optional[Sequence[str]] = None) -> int:
+def main(argv: Sequence[str] | None = None) -> int:
     args = build_parser().parse_args(argv)
     try:
         return int(args.func(args))

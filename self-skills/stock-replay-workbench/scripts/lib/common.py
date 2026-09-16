@@ -50,7 +50,7 @@ try:
     )
     EM_SESSION.mount("https://", HTTPAdapter(max_retries=_EM_RETRY))
     EM_SESSION.mount("http://", HTTPAdapter(max_retries=_EM_RETRY))
-except Exception:
+except (ImportError, OSError):
     _EM_RETRY = None
 
 
@@ -190,6 +190,12 @@ def detect_exchange(symbol: str) -> str:
 
 
 def clean_symbol(symbol: str) -> str:
+    """尽力提取6位代码，非法输入返回去前缀/后缀后的原始字符串。
+
+    与 parse_symbol 的严格校验不同，本函数为"best-effort"语义：
+    当输入无法通过 parse_symbol 校验时，仍尝试剥离市场标识返回纯文本，
+    供下游做模糊匹配或日志展示。若需严格校验请使用 parse_symbol。
+    """
     try:
         code, _ = parse_symbol(symbol)
         return code

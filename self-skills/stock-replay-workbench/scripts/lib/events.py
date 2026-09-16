@@ -8,7 +8,16 @@ import threading
 
 import requests
 
-from .common import clean_symbol, detect_exchange, em_get, safe_float, source, success
+from .common import (
+    EM_SESSION,
+    EM_USER_AGENT,
+    clean_symbol,
+    detect_exchange,
+    em_get,
+    safe_float,
+    source,
+    success,
+)
 
 
 _PUBLIC_SOURCE_TIMEOUT_SECONDS = 8.0
@@ -431,8 +440,32 @@ def block_trade(
     )
 
 
+def _normalize_margin_row(
+    day: date,
+    code: str,
+    name: object,
+    exchange: str,
+    rzye: object,
+    rzmre: object,
+    rqylje: object,
+    rqyl: object,
+    rqmcl: object,
+) -> dict:
+    return {
+        "date": day.isoformat(),
+        "code": code,
+        "name": name,
+        "exchange": exchange,
+        "margin_balance": safe_float(rzye),
+        "margin_buy": safe_float(rzmre),
+        "short_balance": safe_float(rqylje),
+        "short_volume": safe_float(rqyl),
+        "short_sell_volume": safe_float(rqmcl),
+    }
+
+
 def _margin_from_sse_official(day: date) -> list[dict]:
-    response = requests.get(
+    response = EM_SESSION.get(
         "https://query.sse.com.cn/marketdata/tradedata/queryMargin.do",
         params={
             "isPagination": "true",
@@ -444,7 +477,7 @@ def _margin_from_sse_official(day: date) -> list[dict]:
             "pageHelp.cacheSize": 1,
             "pageHelp.endPage": 1,
         },
-        headers={"User-Agent": "Mozilla/5.0", "Referer": "https://www.sse.com.cn/"},
+        headers={"User-Agent": EM_USER_AGENT, "Referer": "https://www.sse.com.cn/"},
         timeout=20,
     )
     response.raise_for_status()
@@ -455,25 +488,28 @@ def _margin_from_sse_official(day: date) -> list[dict]:
         if str(row.get("opDate")) != day.strftime("%Y%m%d"):
             continue
         items.append(
-            {
-                "date": day.isoformat(),
-                "code": str(row.get("stockCode")),
-                "name": row.get("securityAbbr"),
-                "exchange": "SH",
-                "margin_balance": safe_float(row.get("rzye")),
-                "margin_buy": safe_float(row.get("rzmre")),
-                "short_balance": safe_float(row.get("rqylje")),
-                "short_volume": safe_float(row.get("rqyl")),
-                "short_sell_volume": safe_float(row.get("rqmcl")),
-            }
+            _normalize_margin_row(
+                day=day,
+                code=str(row.get("stockCode")),
+                name=row.get("securityAbbr"),
+                exchange="SH",
+                rzye=row.get("rzye"),
+                rzmre=row.get("rzmre"),
+                rqylje=row.get("rqylje"),
+                rqyl=row.get("rqyl"),
+                rqmcl=row.get("rqmcl"),
+            )
         )
     return items
 
 
 def _margin_from_szse_official(day: date) -> list[dict]:
-    import pandas as pd  # type: ignore
+    try:
+        import pandas as pd  # type: ignore
+    except ImportError as exc:
+        raise RuntimeError("pandas required for SZSE margin trading data") from exc
 
-    response = requests.get(
+    response = EM_SESSION.get(
         "https://www.szse.cn/api/report/ShowReport",
         params={
             "SHOWTYPE": "xlsx",
@@ -481,7 +517,7 @@ def _margin_from_szse_official(day: date) -> list[dict]:
             "TABKEY": "tab2",
             "txtDate": day.isoformat(),
         },
-        headers={"User-Agent": "Mozilla/5.0", "Referer": "https://www.szse.cn/"},
+        headers={"User-Agent": EM_USER_AGENT, "Referer": "https://www.szse.cn/"},
         timeout=30,
     )
     response.raise_for_status()
@@ -506,17 +542,17 @@ def _margin_from_szse_official(day: date) -> list[dict]:
     items = []
     for row in frame.to_dict("records"):
         items.append(
-            {
-                "date": day.isoformat(),
-                "code": str(row.get("证券代码")).zfill(6),
-                "name": row.get("证券简称"),
-                "exchange": "SZ",
-                "margin_balance": safe_float(row.get("融资余额(元)")),
-                "margin_buy": safe_float(row.get("融资买入额(元)")),
-                "short_balance": safe_float(row.get("融券余额(元)")),
-                "short_volume": safe_float(row.get("融券余量(股/份)")),
-                "short_sell_volume": safe_float(row.get("融券卖出量(股/份)")),
-            }
+            _normalize_margin_row(
+                day=day,
+                code=str(row.get("证券代码")).zfill(6),
+                name=row.get("证券简称"),
+                exchange="SZ",
+                rzye=row.get("融资余额(元)"),
+                rzmre=row.get("融资买入额(元)"),
+                rqylje=row.get("融券余额(元)"),
+                rqyl=row.get("融券余量(股/份)"),
+                rqmcl=row.get("融券卖出量(股/份)"),
+            )
         )
     return items
 
@@ -540,6 +576,11 @@ def _margin_from_exchange_official(
                 sz_items = _margin_from_szse_official(day)
                 source_chain.append(source("szse_official_margin", True))
             except Exception as exc:
+                import logging
+
+                logging.getLogger(__name__).debug(
+                    "szse_official_margin failed", exc_info=True
+                )
                 source_chain.append(source("szse_official_margin", False, str(exc)))
             items = sh_items + sz_items
             if items:

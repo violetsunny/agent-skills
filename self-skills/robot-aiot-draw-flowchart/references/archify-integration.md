@@ -11,7 +11,7 @@ archify 渲染引擎已**内置**于本 SKILL 的 `archify/` 子目录（零运�
 | 维度 | draw.io XML（主路径） | archify HTML/SVG（高保真路径） |
 | --- | --- | --- |
 | 产物 | .drawio / .xml 可编辑文件 | 自包含 HTML（内联 SVG） |
-| 适用 | 需要二次编辑、进入 PPT 工作流（robot-aiot-xml-html-bridge）、团队协作修改 | 汇报展示、README 嵌入、需要主题切换或高分辨率导出 |
+| 适用 | 需要二次编辑、进入 PPT 工作流（draw-flowchart XML→HTML 桥接）、团队协作修改 | 汇报展示、README 嵌入、需要主题切换或高分辨率导出 |
 | 主题 | 无 | 暗/亮主题切换（localStorage + prefers-color-scheme） |
 | 导出 | 依赖 draw.io | 内置菜单：PNG 剪贴板、PNG/JPEG/WebP（最高 4x）、双主题 SVG |
 | 校验 | `generation-workflow.md` 交付前自审 | archify fail-fast 校验（重叠/标签碰撞/越界） |

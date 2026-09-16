@@ -10,9 +10,10 @@ from __future__ import annotations
 
 import json
 import math
+from collections.abc import Mapping, MutableMapping, Sequence
 from functools import lru_cache
 from pathlib import Path
-from typing import Any, Mapping, MutableMapping, Optional, Sequence
+from typing import Any
 
 
 class SemanticContractError(ValueError):
@@ -597,7 +598,7 @@ def _validate_ops(data: MutableMapping[str, Any]) -> dict[str, Any]:
     if len(span_map) != len(spans):
         _fail("OPS_SPAN_ID", "trace span ids must be unique")
     roots = 0
-    root_span: Optional[Mapping[str, Any]] = None
+    root_span: Mapping[str, Any] | None = None
     for span in spans:
         span_id = _require_text(span, "span_id", f"nodes[{span.get('id')}]")
         start = _number(span.get("start_ms"), f"spans[{span_id}].start_ms")

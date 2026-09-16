@@ -514,7 +514,7 @@ class MoneyFlowLibTests(unittest.TestCase):
         response = mock.Mock()
         response.text = raw
         response.raise_for_status = mock.Mock()
-        with mock.patch.object(flow.requests, "get", return_value=response):
+        with mock.patch.object(flow.EM_SESSION, "get", return_value=response):
             data, chain = flow._stock_flow_from_sina("600519", 5)
 
         self.assertEqual(chain["source"], "sina_stock_money_flow")
@@ -591,7 +591,7 @@ class MarginTradingLibTests(unittest.TestCase):
         response = mock.Mock()
         response.json.return_value = payload
         response.raise_for_status = mock.Mock()
-        with mock.patch.object(events.requests, "get", return_value=response):
+        with mock.patch.object(events.EM_SESSION, "get", return_value=response):
             items = events._margin_from_sse_official(date_cls(2026, 9, 9))
 
         self.assertEqual(len(items), 1)

@@ -47,16 +47,42 @@
 - 生成文档时允许整体重写 `docs/skills-overview.md`，但**不得**删除 `~/.agents/`、`agent-skills/skills/` 或 `agent-skills/self-skills/` 中任何文件
 - 如果某个 `SKILL.md` frontmatter 缺少 `name` 或 `description`，在文档中按兜底规则展示，并在汇总中计入“缺失字段数量”
 
+### 增量快照
+
+模块 5 支持 mtime 增量更新，避免每次全量翻译。快照文件固定为 `docs/.skills-overview-mtimes.json`，与 `docs/skills-overview.md` 同目录。
+
+快照结构：
+
+```json
+{
+  "<abs_path_to_SKILL.md>": {
+    "mtime": 1726480000,
+    "name": "skill-name",
+    "zh": "中文摘要..."
+  }
+}
+```
+
+增量规则：
+
+- **首次运行**（快照不存在）：全量执行，完成后写入快照
+- **后续运行**：脚本提取阶段同时读取快照，逐条比对 `SKILL.md` 的 mtime：
+  - mtime 相同且快照中有 `zh` → 复用缓存摘要，不送翻译
+  - mtime 变化或快照中无该条目 → 标记为 dirty，送 sub agent 翻译
+  - 快照中有但磁盘上已删除的条目 → 从快照和文档中移除
+- **回填后更新快照**：将本次所有条目（含复用的和新翻译的）写回快照
+- 快照文件不参与 git 提交（应加入 `.gitignore`），仅作为本地增量缓存
+
 ### 建议生成步骤
 
-说明列为中文摘要，需模型翻译压缩，不能用纯脚本完成。采用「脚本提取 + sub agent 翻译 + 脚本回填」三段式，确定性工作交脚本、语言工作交 sub agent：
+说明列为中文摘要，需模型翻译压缩，不能用纯脚本完成。采用「脚本提取 + 增量比对 + sub agent 翻译 + 脚本回填」四段式，确定性工作交脚本、语言工作交 sub agent：
 
-1. **脚本提取**：递归扫描三目录所有 `SKILL.md`，解析 frontmatter 取 `name`/`description`，折叠多行为单行，输出记录列表（每条含 `part`/`name`/`rel`/`desc`）
-2. **去重**：按 `(name, desc)` 去重得 unique 集，分配全局 id；保存「记录索引 → id」映射用于回填（同名同描述只翻译一次，省重复劳动；同名不同描述分别翻译）
-3. **分批**：unique 集按每批 ≤45 个切分，每批写 `/tmp/zh/in_NN.json`（`[{id,name,desc}]`）
+1. **脚本提取 + 增量比对**：递归扫描三目录所有 `SKILL.md`，解析 frontmatter 取 `name`/`description`，折叠多行为单行，输出记录列表（每条含 `part`/`name`/`rel`/`desc`/`abs_path`/`mtime`）；同时加载 `docs/.skills-overview-mtimes.json` 快照，逐条比对 mtime，将未变化的条目标记 `cached: true` 并携带缓存 `zh`，变化的标记 `cached: false`
+2. **去重**：仅对 `cached: false` 的条目按 `(name, desc)` 去重得 dirty unique 集，分配全局 id；`cached: true` 的条目直接保留缓存 `zh` 不参与翻译
+3. **分批**：dirty unique 集按每批 ≤45 个切分，每批写 `/tmp/zh/in_NN.json`（`[{id,name,desc}]`）；若 dirty 集为空则跳过步骤 4-5，直接用缓存生成文档
 4. **sub agent 翻译压缩**：并行派 sub agent，每个读 `in_NN.json`、生成中文摘要、写 `/tmp/zh/out_NN.json`（`[{id,zh}]`），只返回简短确认（详见下「Sub Agent 处理方式」）
-5. **脚本合并回填**：合并所有 `out_NN.json` 得 `id→zh`，按映射回填到每条记录，按部分分组、按 `name` 排序，生成三部分 Markdown 写入 `docs/skills-overview.md`
-6. **验证报告**：校验条数一致、id 无缺漏、`zh` 非空/无换行/≤500 字、表格无断行；报告总数、各部分数、缺失字段数（`name`/`description` 走兜底的数量）、说明长度分布（min/max/mean/median）、超标数
+5. **脚本合并回填**：合并所有 `out_NN.json` 得 `id→zh`，与缓存 `zh` 合并，按映射回填到每条记录，按部分分组、按 `name` 排序，生成三部分 Markdown 写入 `docs/skills-overview.md`；同时将全量结果写回 `docs/.skills-overview-mtimes.json` 快照
+6. **验证报告**：校验条数一致、id 无缺漏、`zh` 非空/无换行/≤500 字、表格无断行；报告总数、各部分数、缓存命中数、新翻译数、删除数、缺失字段数（`name`/`description` 走兜底的数量）、说明长度分布（min/max/mean/median）、超标数
 
 ### Sub Agent 处理方式
 

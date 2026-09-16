@@ -16,23 +16,23 @@ OpenSpec 在 `~/.claude/skills/` 下生成的完整 skills 集合只走模块 2 
 
 以下 15 个项目通过 `npx skills@latest` 安装和更新，**不走常规 rsync 同步**（仅更新失败时走本节末尾的 rsync 兜底）。npx 安装更可靠，能正确处理 skill 依赖和元数据，大幅减少同步错误的可能性。
 
-| 项目                  | GitHub 仓库 | 初始化安装命令 |
-|---------------------|-----------|--------------|
-| superpowers         | `obra/superpowers` | `npx skills@latest add obra/superpowers` |
-| matt-skills         | `mattpocock/skills` | `npx skills@latest add mattpocock/skills` |
-| ui-ux-pro-max-skill | `nextlevelbuilder/ui-ux-pro-max-skill` | `npx skills@latest add nextlevelbuilder/ui-ux-pro-max-skill` |
-| baoyu-skills        | `JimLiu/baoyu-skills` | `npx skills@latest add JimLiu/baoyu-skills` |
-| ppt-master          | `hugohe3/ppt-master` | `npx skills@latest add hugohe3/ppt-master` |
-| claude-code-java    |`decebals/claude-code-java`|`npx skills@latest add decebals/claude-code-java`|
-| anthropics-skills   | `anthropics/skills` | `npx skills@latest add anthropics/skills` |
-| ECC                 | `affaan-m/ECC` | `npx skills@latest add affaan-m/ECC` |
-| ponytail            | `DietrichGebert/ponytail` | `npx skills@latest add DietrichGebert/ponytail` |
-| archify             | `tt-a1i/archify` | `npx skills@latest add tt-a1i/archify` |
-| diagram-design      | `cathrynlavery/diagram-design` | `npx skills@latest add cathrynlavery/diagram-design` |
-| humanizer           | `blader/humanizer` | `npx skills@latest add blader/humanizer` |
-| humanizer-zh        | `op7418/Humanizer-zh` | `npx skills@latest add op7418/Humanizer-zh` |
-| andrej-karpathy-skills | `forrestchang/andrej-karpathy-skills` | `npx skills@latest add forrestchang/andrej-karpathy-skills` |
-| vercel-skills       | `vercel-labs/agent-skills` | `npx skills@latest add vercel-labs/agent-skills` |
+| 项目                     | GitHub 仓库 | 初始化安装命令 |
+|------------------------|-----------|--------------|
+| superpowers            | `obra/superpowers` | `npx skills@latest add obra/superpowers` |
+| **matt-skills**            | `mattpocock/skills` | `npx skills@latest add mattpocock/skills` |
+| **ui-ux-pro-max-skill**  | `nextlevelbuilder/ui-ux-pro-max-skill` | `npx skills@latest add nextlevelbuilder/ui-ux-pro-max-skill` |
+| baoyu-skills           | `JimLiu/baoyu-skills` | `npx skills@latest add JimLiu/baoyu-skills` |
+| **ppt-master**             | `hugohe3/ppt-master` | `npx skills@latest add hugohe3/ppt-master` |
+| **claude-code-java**       |`decebals/claude-code-java`|`npx skills@latest add decebals/claude-code-java`|
+| **anthropics-skills**      | `anthropics/skills` | `npx skills@latest add anthropics/skills` |
+| ECC                    | `affaan-m/ECC` | `npx skills@latest add affaan-m/ECC` |
+| ponytail               | `DietrichGebert/ponytail` | `npx skills@latest add DietrichGebert/ponytail` |
+| **archify**                | `tt-a1i/archify` | `npx skills@latest add tt-a1i/archify` |
+| **diagram-design**         | `cathrynlavery/diagram-design` | `npx skills@latest add cathrynlavery/diagram-design` |
+| humanizer              | `blader/humanizer` | `npx skills@latest add blader/humanizer` |
+| humanizer-zh           | `op7418/Humanizer-zh` | `npx skills@latest add op7418/Humanizer-zh` |
+| **andrej-karpathy-skills** | `forrestchang/andrej-karpathy-skills` | `npx skills@latest add forrestchang/andrej-karpathy-skills` |
+| vercel-skills          | `vercel-labs/agent-skills` | `npx skills@latest add vercel-labs/agent-skills` |
 
 ### 更新流程
 

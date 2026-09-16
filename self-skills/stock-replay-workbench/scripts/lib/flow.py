@@ -6,6 +6,8 @@ import json
 import requests
 
 from .common import (
+    EM_SESSION,
+    EM_USER_AGENT,
     clean_symbol,
     detect_exchange,
     em_json_get,
@@ -73,19 +75,22 @@ def _market_flow_from_akshare(limit: int) -> tuple[dict, dict]:
 
 
 def _market_flow_from_eastmoney(limit: int) -> tuple[dict, dict]:
+    sh_secid = f"{em_market_code('000001')}.000001"
+    sz_secid = f"{em_market_code('399001')}.399001"
     payload = em_json_get(
         "https://push2his.eastmoney.com/api/qt/stock/fflow/daykline/get",
         params={
             "lmt": str(max(1, min(limit, 20))),
             "klt": "101",
-            "secid": "1.000001",
-            "secid2": "0.399001",
+            "secid": sh_secid,
+            "secid2": sz_secid,
             "fields1": "f1,f2,f3,f7",
             "fields2": "f51,f52,f53,f54,f55,f56,f57,f58,f59,f60,f61,f62,f63,f64,f65",
             "ut": "b2884a393a59ad64002292a3e90d46a5",
         },
     )
-    klines = (payload.get("data") or {}).get("klines") or []
+    data = payload.get("data")
+    klines = data.get("klines") if isinstance(data, dict) else []
     rows = klines[-max(1, min(limit, 20)) :]
     items = []
     # reversed() puts the most-recent row first (items[0] = latest).
@@ -307,13 +312,9 @@ def _stock_flow_from_akshare(symbol: str, limit: int) -> tuple[dict, dict]:
 
 def _stock_flow_from_sina(symbol: str, limit: int) -> tuple[dict, dict]:
     code = clean_symbol(symbol)
-    if code.startswith(("4", "8", "92")):
-        prefix = f"bj{code}"
-    elif code.startswith(("5", "6", "9")):
-        prefix = f"sh{code}"
-    else:
-        prefix = f"sz{code}"
-    response = requests.get(
+    exchange = detect_exchange(code)
+    prefix = f"{exchange.lower()}{code}"
+    response = EM_SESSION.get(
         "https://vip.stock.finance.sina.com.cn/quotes_service/api/json_v2.php/MoneyFlow.ssl_qsfx_zjlrqs",
         params={
             "page": "1",
@@ -323,14 +324,19 @@ def _stock_flow_from_sina(symbol: str, limit: int) -> tuple[dict, dict]:
             "daima": prefix,
         },
         headers={
-            "User-Agent": "Mozilla/5.0",
+            "User-Agent": EM_USER_AGENT,
             "Referer": "https://finance.sina.com.cn/",
         },
         timeout=15,
     )
     response.raise_for_status()
     text = response.text
-    rows = json.loads(text[text.index("[") : text.rindex("]") + 1])
+    try:
+        rows = json.loads(text[text.index("[") : text.rindex("]") + 1])
+    except (ValueError, IndexError) as exc:
+        raise ValueError(
+            f"sina money flow response not valid JSON array: {text[:200]}"
+        ) from exc
     if not rows:
         raise ValueError("sina stock money flow returned empty rows")
     items = []

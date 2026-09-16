@@ -14,11 +14,9 @@ import tempfile
 import uuid
 import xml.etree.ElementTree as ET
 from pathlib import Path
-from typing import Optional
 
 from interactive_html import sanitize_svg
 from validate_svg import run_check
-
 
 SCRIPT_DIR = Path(__file__).resolve().parent
 MOTION_WORKER = SCRIPT_DIR / "svg2gif.js"
@@ -40,15 +38,47 @@ PRESET_STYLES = {preset: style for style, preset in STYLE_PRESETS.items()}
 MOTION_PRESETS = tuple(STYLE_PRESETS.values())
 REVIEWED_STYLE_IDS = frozenset(range(1, 13))
 STYLE_MOTION_ROLES = {
-    1: {"ingress", "reason", "extract", "transform", "resolve", "memory-write", "memory-read", "response-context"},
+    1: {
+        "ingress",
+        "reason",
+        "extract",
+        "transform",
+        "resolve",
+        "memory-write",
+        "memory-read",
+        "response-context",
+    },
     2: {"ingress", "delegate", "tool-call", "inspect", "index", "grounding", "answer"},
     3: {"ingress", "policy", "fanout", "data-write", "event", "telemetry"},
     4: {"sample", "attend", "invoke", "remember", "consolidate", "recall"},
-    5: {"ingress", "delegate", "evidence", "artifact", "context", "deliver", "approval"},
+    5: {
+        "ingress",
+        "delegate",
+        "evidence",
+        "artifact",
+        "context",
+        "deliver",
+        "approval",
+    },
     6: {"ingress", "dispatch", "runtime-branch", "foundation", "promote"},
-    7: {"connect", "prepare", "invoke", "tool-call", "token-stream", "govern", "measure", "promote"},
+    7: {
+        "connect",
+        "prepare",
+        "invoke",
+        "tool-call",
+        "token-stream",
+        "govern",
+        "measure",
+        "promote",
+    },
     8: {"primary", "memory-read", "tool-call", "data", "trace", "feedback"},
-    9: {"review-entry", "review-request", "review-async", "review-state", "review-external"},
+    9: {
+        "review-entry",
+        "review-request",
+        "review-async",
+        "review-state",
+        "review-external",
+    },
     10: {"global-route", "regional-write", "cross-region"},
     11: {"topic-rail", "dead-letter", "state-project"},
     12: {"critical-request", "telemetry-export"},
@@ -56,7 +86,12 @@ STYLE_MOTION_ROLES = {
 CHECKS = ("xml", "markers", "geometry", "composition")
 MAX_INPUT_BYTES = 20 * 1024 * 1024
 MAX_RENDERED_PIXELS = 600_000_000
-MOTION_FORMAT = {"suffix": ".gif", "name": "gif", "mime": "image/gif", "loop_playback": "embedded-infinite"}
+MOTION_FORMAT = {
+    "suffix": ".gif",
+    "name": "gif",
+    "mime": "image/gif",
+    "loop_playback": "embedded-infinite",
+}
 MOTION_TIMEOUTS = {"runtime_probe": 15, "render": 120, "encode": 120, "media_probe": 30}
 MOTION_SIZE_TARGET_BYTES = 500_000
 DEFAULT_MOTION_DURATION = 5.75
@@ -111,35 +146,76 @@ SCENE_SIGNATURES = {
     },
     5: {
         "name": "glassmorphism-multi-agent-task-capsules",
-        "distinctive_primitives": ["semantic-route-build", "glass-handoff-rail", "glass-task-capsule", "coordinator-halo"],
+        "distinctive_primitives": [
+            "semantic-route-build",
+            "glass-handoff-rail",
+            "glass-task-capsule",
+            "coordinator-halo",
+        ],
     },
     6: {
         "name": "claude-official-governed-runtime-policy-seals",
-        "distinctive_primitives": ["semantic-route-build", "governance-thread", "policy-seal"],
+        "distinctive_primitives": [
+            "semantic-route-build",
+            "governance-thread",
+            "policy-seal",
+        ],
     },
     7: {
         "name": "openai-official-api-token-train",
-        "distinctive_primitives": ["semantic-route-build", "api-token-rail", "token-train"],
+        "distinctive_primitives": [
+            "semantic-route-build",
+            "api-token-rail",
+            "token-train",
+        ],
     },
     8: {
         "name": "dark-luxury-golden-gem-circuit",
-        "distinctive_primitives": ["semantic-route-build", "luxury-circuit-rail", "gem-tracer"],
+        "distinctive_primitives": [
+            "semantic-route-build",
+            "luxury-circuit-rail",
+            "gem-tracer",
+        ],
     },
     9: {
         "name": "c4-review-canvas-moving-review-cursors",
-        "distinctive_primitives": ["semantic-route-build", "review-trace-rail", "review-cursor"],
+        "distinctive_primitives": [
+            "semantic-route-build",
+            "review-trace-rail",
+            "review-cursor",
+        ],
     },
     10: {
         "name": "cloud-fabric-active-active-synchronized-regions",
-        "distinctive_primitives": ["semantic-route-build", "cloud-flow-rail", "region-chevron-pair", "replication-capsule", "availability-pulse"],
+        "distinctive_primitives": [
+            "semantic-route-build",
+            "cloud-flow-rail",
+            "region-chevron-pair",
+            "replication-capsule",
+            "availability-pulse",
+        ],
     },
     11: {
         "name": "event-transit-three-car-event-trains",
-        "distinctive_primitives": ["semantic-route-build", "event-transit-rail", "event-train", "exception-car", "projection-car", "station-dwell-ring"],
+        "distinctive_primitives": [
+            "semantic-route-build",
+            "event-transit-rail",
+            "event-train",
+            "exception-car",
+            "projection-car",
+            "station-dwell-ring",
+        ],
     },
     12: {
         "name": "ops-pulse-incident-path-waterfall-scanner",
-        "distinctive_primitives": ["semantic-route-build", "incident-pulse-rail", "ecg-head", "telemetry-export-packet", "trace-span-reveal", "waterfall-scanner"],
+        "distinctive_primitives": [
+            "semantic-route-build",
+            "incident-pulse-rail",
+            "ecg-head",
+            "telemetry-export-packet",
+            "trace-span-reveal",
+            "waterfall-scanner",
+        ],
     },
 }
 STYLE_1_DRAW_SCHEDULE = [
@@ -339,7 +415,17 @@ STYLE_SCENE_CONTRACTS = {
     5: {
         "preset": "agent-orchestration",
         "draw_schedule": STYLE_5_DRAW_SCHEDULE,
-        "schedule_keys": [("ingress", 0), ("delegate", 0), ("delegate", 1), ("delegate", 2), ("evidence", 0), ("artifact", 1), ("context", 0), ("deliver", 0), ("approval", 1)],
+        "schedule_keys": [
+            ("ingress", 0),
+            ("delegate", 0),
+            ("delegate", 1),
+            ("delegate", 2),
+            ("evidence", 0),
+            ("artifact", 1),
+            ("context", 0),
+            ("deliver", 0),
+            ("approval", 1),
+        ],
         "expected_stages": [1, 2, 2, 2, 3, 3, 4, 5, 5],
         "stream_primitive": "glass-handoff-rail",
         "signature_primitive": "glass-task-capsule",
@@ -351,7 +437,17 @@ STYLE_SCENE_CONTRACTS = {
     6: {
         "preset": "governed-runtime",
         "draw_schedule": STYLE_6_DRAW_SCHEDULE,
-        "schedule_keys": [("ingress", 0), ("dispatch", 0), ("runtime-branch", 0), ("runtime-branch", 1), ("runtime-branch", 2), ("foundation", 0), ("foundation", 1), ("foundation", 2), ("promote", 0)],
+        "schedule_keys": [
+            ("ingress", 0),
+            ("dispatch", 0),
+            ("runtime-branch", 0),
+            ("runtime-branch", 1),
+            ("runtime-branch", 2),
+            ("foundation", 0),
+            ("foundation", 1),
+            ("foundation", 2),
+            ("promote", 0),
+        ],
         "expected_stages": [1, 2, 3, 3, 3, 4, 4, 4, 5],
         "stream_primitive": "governance-thread",
         "signature_primitive": "policy-seal",
@@ -363,7 +459,16 @@ STYLE_SCENE_CONTRACTS = {
     7: {
         "preset": "token-stream",
         "draw_schedule": STYLE_7_DRAW_SCHEDULE,
-        "schedule_keys": [("connect", 0), ("prepare", 0), ("invoke", 0), ("tool-call", 0), ("token-stream", 1), ("govern", 0), ("measure", 1), ("promote", 0)],
+        "schedule_keys": [
+            ("connect", 0),
+            ("prepare", 0),
+            ("invoke", 0),
+            ("tool-call", 0),
+            ("token-stream", 1),
+            ("govern", 0),
+            ("measure", 1),
+            ("promote", 0),
+        ],
         "expected_stages": [1, 2, 3, 4, 4, 5, 5, 6],
         "stream_primitive": "api-token-rail",
         "signature_primitive": "token-train",
@@ -375,7 +480,15 @@ STYLE_SCENE_CONTRACTS = {
     8: {
         "preset": "golden-circuit",
         "draw_schedule": STYLE_8_DRAW_SCHEDULE,
-        "schedule_keys": [("primary", 1, 0), ("primary", 2, 0), ("memory-read", 3, 0), ("tool-call", 3, 1), ("data", 4, 0), ("trace", 5, 0), ("feedback", 6, 0)],
+        "schedule_keys": [
+            ("primary", 1, 0),
+            ("primary", 2, 0),
+            ("memory-read", 3, 0),
+            ("tool-call", 3, 1),
+            ("data", 4, 0),
+            ("trace", 5, 0),
+            ("feedback", 6, 0),
+        ],
         "expected_stages": [1, 2, 3, 3, 4, 5, 6],
         "stage_aware_schedule_key": True,
         "stream_primitive": "luxury-circuit-rail",
@@ -388,7 +501,13 @@ STYLE_SCENE_CONTRACTS = {
     9: {
         "preset": "review-trace",
         "draw_schedule": STYLE_9_DRAW_SCHEDULE,
-        "schedule_keys": [("review-entry", 0), ("review-request", 0), ("review-async", 0), ("review-state", 0), ("review-external", 1)],
+        "schedule_keys": [
+            ("review-entry", 0),
+            ("review-request", 0),
+            ("review-async", 0),
+            ("review-state", 0),
+            ("review-external", 1),
+        ],
         "expected_stages": [1, 2, 3, 4, 4],
         "stream_primitive": "review-trace-rail",
         "signature_primitive": "review-cursor",
@@ -400,7 +519,13 @@ STYLE_SCENE_CONTRACTS = {
     10: {
         "preset": "cloud-flow",
         "draw_schedule": STYLE_10_DRAW_SCHEDULE,
-        "schedule_keys": [("global-route", 0), ("global-route", 1), ("regional-write", 0), ("regional-write", 1), ("cross-region", 0)],
+        "schedule_keys": [
+            ("global-route", 0),
+            ("global-route", 1),
+            ("regional-write", 0),
+            ("regional-write", 1),
+            ("cross-region", 0),
+        ],
         "expected_stages": [1, 1, 2, 2, 3],
         "stream_primitive": "cloud-flow-rail",
         "signature_primitive": "region-chevron-pair-or-replication-capsule",
@@ -412,7 +537,14 @@ STYLE_SCENE_CONTRACTS = {
     11: {
         "preset": "event-transit",
         "draw_schedule": STYLE_11_DRAW_SCHEDULE,
-        "schedule_keys": [("topic-rail", 1, 0), ("topic-rail", 2, 0), ("topic-rail", 3, 0), ("topic-rail", 4, 0), ("dead-letter", 5, 0), ("state-project", 5, 1)],
+        "schedule_keys": [
+            ("topic-rail", 1, 0),
+            ("topic-rail", 2, 0),
+            ("topic-rail", 3, 0),
+            ("topic-rail", 4, 0),
+            ("dead-letter", 5, 0),
+            ("state-project", 5, 1),
+        ],
         "expected_stages": [1, 2, 3, 4, 5, 5],
         "stage_aware_schedule_key": True,
         "stream_primitive": "event-transit-rail",
@@ -425,7 +557,12 @@ STYLE_SCENE_CONTRACTS = {
     12: {
         "preset": "ops-pulse",
         "draw_schedule": STYLE_12_DRAW_SCHEDULE,
-        "schedule_keys": [("critical-request", 1, 0), ("critical-request", 2, 0), ("critical-request", 3, 0), ("telemetry-export", 4, 0)],
+        "schedule_keys": [
+            ("critical-request", 1, 0),
+            ("critical-request", 2, 0),
+            ("critical-request", 3, 0),
+            ("telemetry-export", 4, 0),
+        ],
         "expected_stages": [1, 2, 3, 4],
         "stage_aware_schedule_key": True,
         "stream_primitive": "incident-pulse-rail-or-telemetry-export-rail",
@@ -439,18 +576,34 @@ STYLE_SCENE_CONTRACTS = {
 
 STYLE_SPECIALIZED_LIVE_SPECS: dict[int, dict[str, object]] = {
     5: {
-        "body_primitive": "glass-handoff-rail", "signature_primitive": "glass-task-capsule",
-        "dash_pattern": [13, 30], "dash_period": 43, "step": 6, "body_opacity": 0.88,
-        "maximum_live_width": 2.2, "endpoint_clearance": 8,
+        "body_primitive": "glass-handoff-rail",
+        "signature_primitive": "glass-task-capsule",
+        "dash_pattern": [13, 30],
+        "dash_period": 43,
+        "step": 6,
+        "body_opacity": 0.88,
+        "maximum_live_width": 2.2,
+        "endpoint_clearance": 8,
         "phase_policy": "(motionStage * 7 + motionOrder * 3) mod 43",
         "expected_initial_phases": [7, 14, 17, 20, 21, 24, 28, 35, 38],
         "resolved_widths": [2.2] * 9,
         "geometry": {
-            "shape": "rounded-translucent-plate", "width": 14, "height": 9, "rx": 3,
-            "highlight_stroke_width": 1, "work_item_dot_radius": 2, "work_item_dot_count": 2,
+            "shape": "rounded-translucent-plate",
+            "width": 14,
+            "height": 9,
+            "rx": 3,
+            "highlight_stroke_width": 1,
+            "work_item_dot_radius": 2,
+            "work_item_dot_count": 2,
             "tangent_aware_rotation": True,
         },
-        "auxiliary": {"primitive": "coordinator-halo", "node_id": "coordinator", "period_frames": 16, "opacity_range": [0.12, 0.32], "movement": "opacity-only"},
+        "auxiliary": {
+            "primitive": "coordinator-halo",
+            "node_id": "coordinator",
+            "period_frames": 16,
+            "opacity_range": [0.12, 0.32],
+            "movement": "opacity-only",
+        },
         "direction_sentinels": [
             {"key": "ingress/0", "directions": ["right"]},
             {"key": "delegate/0", "directions": ["down", "left", "down"]},
@@ -460,105 +613,246 @@ STYLE_SPECIALIZED_LIVE_SPECS: dict[int, dict[str, object]] = {
         ],
     },
     6: {
-        "body_primitive": "governance-thread", "signature_primitive": "policy-seal",
-        "dash_pattern": [11, 36], "dash_period": 47, "step": 6, "body_opacity": 0.82,
-        "maximum_live_width": 2.8, "endpoint_clearance": 8,
+        "body_primitive": "governance-thread",
+        "signature_primitive": "policy-seal",
+        "dash_pattern": [11, 36],
+        "dash_period": 47,
+        "step": 6,
+        "body_opacity": 0.82,
+        "maximum_live_width": 2.8,
+        "endpoint_clearance": 8,
         "phase_policy": "(motionStage * 7 + motionOrder * 3) mod 47",
         "expected_initial_phases": [7, 14, 21, 24, 27, 28, 31, 34, 35],
         "resolved_widths": [2.0] * 9,
-        "geometry": {"shape": "warm-white-hexagonal-outline", "width": 12, "height": 12, "center_dot_diameter": 3, "approval_bar_width": 4, "shadow": False, "glow": False},
+        "geometry": {
+            "shape": "warm-white-hexagonal-outline",
+            "width": 12,
+            "height": 12,
+            "center_dot_diameter": 3,
+            "approval_bar_width": 4,
+            "shadow": False,
+            "glow": False,
+        },
         "direction_sentinels": [
-            {"key": "ingress/0", "directions": ["right"]}, {"key": "dispatch/0", "directions": ["down"]},
-            {"key": "runtime-branch/0", "directions": ["left"]}, {"key": "runtime-branch/1", "directions": ["right"]},
-            {"key": "foundation/0", "directions": ["down"]}, {"key": "promote/0", "directions": ["right"]},
+            {"key": "ingress/0", "directions": ["right"]},
+            {"key": "dispatch/0", "directions": ["down"]},
+            {"key": "runtime-branch/0", "directions": ["left"]},
+            {"key": "runtime-branch/1", "directions": ["right"]},
+            {"key": "foundation/0", "directions": ["down"]},
+            {"key": "promote/0", "directions": ["right"]},
         ],
     },
     7: {
-        "body_primitive": "api-token-rail", "signature_primitive": "token-train",
-        "dash_pattern": [10, 33], "dash_period": 43, "step": 6, "body_opacity": 0.86,
-        "maximum_live_width": 2.5, "endpoint_clearance": 10,
+        "body_primitive": "api-token-rail",
+        "signature_primitive": "token-train",
+        "dash_pattern": [10, 33],
+        "dash_period": 43,
+        "step": 6,
+        "body_opacity": 0.86,
+        "maximum_live_width": 2.5,
+        "endpoint_clearance": 10,
         "phase_policy": "(motionStage * 7 + motionOrder * 3) mod 43",
         "expected_initial_phases": [7, 14, 21, 28, 31, 35, 38, 42],
         "resolved_widths": [2.0] * 8,
-        "geometry": {"shape": "three-cell-token-train", "group_width": 18, "group_height": 8, "cell_width": 4, "cell_height": 4, "cell_gap": 2, "cell_opacities": [1.0, 0.72, 0.44], "tangent_aware_rotation": True},
+        "geometry": {
+            "shape": "three-cell-token-train",
+            "group_width": 18,
+            "group_height": 8,
+            "cell_width": 4,
+            "cell_height": 4,
+            "cell_gap": 2,
+            "cell_opacities": [1.0, 0.72, 0.44],
+            "tangent_aware_rotation": True,
+        },
         "direction_sentinels": [
-            {"key": "connect/0", "directions": ["right"]}, {"key": "prepare/0", "directions": ["down", "left", "down"]},
-            {"key": "tool-call/0", "directions": ["right"]}, {"key": "token-stream/1", "directions": ["down", "left", "down"]},
-            {"key": "govern/0", "directions": ["down"]}, {"key": "promote/0", "directions": ["right"]},
+            {"key": "connect/0", "directions": ["right"]},
+            {"key": "prepare/0", "directions": ["down", "left", "down"]},
+            {"key": "tool-call/0", "directions": ["right"]},
+            {"key": "token-stream/1", "directions": ["down", "left", "down"]},
+            {"key": "govern/0", "directions": ["down"]},
+            {"key": "promote/0", "directions": ["right"]},
         ],
     },
     8: {
-        "body_primitive": "luxury-circuit-rail", "signature_primitive": "gem-tracer",
-        "dash_pattern": [14, 33], "dash_period": 47, "step": 6, "body_opacity": 0.86,
-        "maximum_live_width": 2.8, "endpoint_clearance": 8,
+        "body_primitive": "luxury-circuit-rail",
+        "signature_primitive": "gem-tracer",
+        "dash_pattern": [14, 33],
+        "dash_period": 47,
+        "step": 6,
+        "body_opacity": 0.86,
+        "maximum_live_width": 2.8,
+        "endpoint_clearance": 8,
         "phase_policy": "(motionStage * 7 + motionOrder * 3) mod 47",
         "expected_initial_phases": [7, 14, 21, 24, 28, 35, 42],
         "resolved_widths": [2.0, 2.0, 1.7, 1.7, 1.7, 2.0, 1.7],
-        "geometry": {"shape": "diamond-with-tapered-tail", "diamond_width": 7, "diamond_height": 7, "diamond_rotation": 45, "specular_diameter": 2, "tail_length": 12, "filtered_elements_per_tracer": 1},
+        "geometry": {
+            "shape": "diamond-with-tapered-tail",
+            "diamond_width": 7,
+            "diamond_height": 7,
+            "diamond_rotation": 45,
+            "specular_diameter": 2,
+            "tail_length": 12,
+            "filtered_elements_per_tracer": 1,
+        },
         "direction_sentinels": [
-            {"key": "primary/1/0", "directions": ["right"]}, {"key": "primary/2/0", "directions": ["right"]},
+            {"key": "primary/1/0", "directions": ["right"]},
+            {"key": "primary/2/0", "directions": ["right"]},
             {"key": "memory-read/3/0", "directions": ["down", "left", "down"]},
             {"key": "feedback/6/0", "directions": ["up", "left", "up"]},
         ],
     },
     9: {
-        "body_primitive": "review-trace-rail", "signature_primitive": "review-cursor",
-        "dash_pattern": [8, 33], "dash_period": 41, "step": 5, "body_opacity": 0.82,
-        "maximum_live_width": 2.6, "endpoint_clearance": 9,
+        "body_primitive": "review-trace-rail",
+        "signature_primitive": "review-cursor",
+        "dash_pattern": [8, 33],
+        "dash_period": 41,
+        "step": 5,
+        "body_opacity": 0.82,
+        "maximum_live_width": 2.6,
+        "endpoint_clearance": 9,
         "phase_policy": "(motionStage * 7 + motionOrder * 3) mod 41",
         "expected_initial_phases": [7, 14, 21, 28, 31],
         "resolved_widths": [2.0] * 5,
-        "geometry": {"shape": "review-mark", "outline_circle_diameter": 11, "diagonal_handle_length": 5, "internal_check_extent": 3, "shadow": False, "glow": False},
+        "geometry": {
+            "shape": "review-mark",
+            "outline_circle_diameter": 11,
+            "diagonal_handle_length": 5,
+            "internal_check_extent": 3,
+            "shadow": False,
+            "glow": False,
+        },
         "direction_sentinels": [
-            {"key": "review-entry/0", "directions": ["right"]}, {"key": "review-request/0", "directions": ["right"]},
-            {"key": "review-async/0", "directions": ["down"]}, {"key": "review-state/0", "directions": ["left"]},
+            {"key": "review-entry/0", "directions": ["right"]},
+            {"key": "review-request/0", "directions": ["right"]},
+            {"key": "review-async/0", "directions": ["down"]},
+            {"key": "review-state/0", "directions": ["left"]},
             {"key": "review-external/1", "directions": ["right"]},
         ],
     },
     10: {
-        "body_primitive": "cloud-flow-rail", "signature_primitive": "region-chevron-pair-or-replication-capsule",
-        "dash_pattern": [12, 31], "dash_period": 43, "step": 6, "body_opacity": 0.82,
-        "maximum_live_width": 2.7, "endpoint_clearance": 8,
+        "body_primitive": "cloud-flow-rail",
+        "signature_primitive": "region-chevron-pair-or-replication-capsule",
+        "dash_pattern": [12, 31],
+        "dash_period": 43,
+        "step": 6,
+        "body_opacity": 0.82,
+        "maximum_live_width": 2.7,
+        "endpoint_clearance": 8,
         "phase_policy": "motionStage * 7 mod 43; A/B orders are phase-locked",
         "expected_initial_phases": [7, 7, 14, 14, 21],
         "resolved_widths": [2.2] * 5,
-        "geometry": {"routing_write": {"shape": "region-chevron-pair", "chevron_width": 6, "chevron_height": 5, "separation": 5}, "replication": {"shape": "replication-capsule", "width": 14, "height": 7, "data_cell_count": 2, "direction": "left-to-right"}},
-        "auxiliary": {"primitive": "availability-pulse", "container_ids": ["region-a", "region-b"], "movement": "opacity-only", "phase_locked": True},
+        "geometry": {
+            "routing_write": {
+                "shape": "region-chevron-pair",
+                "chevron_width": 6,
+                "chevron_height": 5,
+                "separation": 5,
+            },
+            "replication": {
+                "shape": "replication-capsule",
+                "width": 14,
+                "height": 7,
+                "data_cell_count": 2,
+                "direction": "left-to-right",
+            },
+        },
+        "auxiliary": {
+            "primitive": "availability-pulse",
+            "container_ids": ["region-a", "region-b"],
+            "movement": "opacity-only",
+            "phase_locked": True,
+        },
         "direction_sentinels": [
-            {"key": "global-route/0", "directions": ["down"]}, {"key": "global-route/1", "directions": ["down"]},
-            {"key": "regional-write/0", "directions": ["down"]}, {"key": "regional-write/1", "directions": ["down"]},
+            {"key": "global-route/0", "directions": ["down"]},
+            {"key": "global-route/1", "directions": ["down"]},
+            {"key": "regional-write/0", "directions": ["down"]},
+            {"key": "regional-write/1", "directions": ["down"]},
             {"key": "cross-region/0", "directions": ["right"]},
         ],
     },
     11: {
-        "body_primitive": "event-transit-rail", "signature_primitive": "event-train-or-branch-car",
-        "dash_pattern": [8, 33], "dash_period": 41, "step": 5, "body_opacity": 0.78,
-        "maximum_live_width": 2.2, "endpoint_clearance": 7,
+        "body_primitive": "event-transit-rail",
+        "signature_primitive": "event-train-or-branch-car",
+        "dash_pattern": [8, 33],
+        "dash_period": 41,
+        "step": 5,
+        "body_opacity": 0.78,
+        "maximum_live_width": 2.2,
+        "endpoint_clearance": 7,
         "phase_policy": "(motionStage * 5 + motionOrder * 3) mod 41",
         "expected_initial_phases": [5, 10, 15, 20, 25, 28],
         "resolved_widths": [2.2] * 6,
-        "geometry": {"main": {"shape": "three-car-event-train", "car_diameter": 5, "car_gap": 3, "car_count": 3}, "dead_letter": {"shape": "red-outlined-exception-car"}, "state_project": {"shape": "teal-two-cell-projection-car", "cell_count": 2}},
-        "auxiliary": {"primitive": "station-dwell-ring", "period_frames": 10, "movement": "opacity-only", "geometry_expansion": 0, "count": 4},
+        "geometry": {
+            "main": {
+                "shape": "three-car-event-train",
+                "car_diameter": 5,
+                "car_gap": 3,
+                "car_count": 3,
+            },
+            "dead_letter": {"shape": "red-outlined-exception-car"},
+            "state_project": {"shape": "teal-two-cell-projection-car", "cell_count": 2},
+        },
+        "auxiliary": {
+            "primitive": "station-dwell-ring",
+            "period_frames": 10,
+            "movement": "opacity-only",
+            "geometry_expansion": 0,
+            "count": 4,
+        },
         "direction_sentinels": [
-            {"key": "topic-rail/1/0", "directions": ["right"]}, {"key": "topic-rail/2/0", "directions": ["right"]},
-            {"key": "topic-rail/3/0", "directions": ["right"]}, {"key": "topic-rail/4/0", "directions": ["right"]},
-            {"key": "dead-letter/5/0", "directions": ["down"]}, {"key": "state-project/5/1", "directions": ["down"]},
+            {"key": "topic-rail/1/0", "directions": ["right"]},
+            {"key": "topic-rail/2/0", "directions": ["right"]},
+            {"key": "topic-rail/3/0", "directions": ["right"]},
+            {"key": "topic-rail/4/0", "directions": ["right"]},
+            {"key": "dead-letter/5/0", "directions": ["down"]},
+            {"key": "state-project/5/1", "directions": ["down"]},
         ],
     },
     12: {
-        "body_primitive": "incident-pulse-rail-or-telemetry-export-rail", "signature_primitive": "ecg-head-or-telemetry-export-packet",
-        "dash_pattern": [12, 31], "dash_period": 43, "step": 5, "body_opacity": 0.84,
-        "maximum_live_width": 2.2, "endpoint_clearance": 8,
+        "body_primitive": "incident-pulse-rail-or-telemetry-export-rail",
+        "signature_primitive": "ecg-head-or-telemetry-export-packet",
+        "dash_pattern": [12, 31],
+        "dash_period": 43,
+        "step": 5,
+        "body_opacity": 0.84,
+        "maximum_live_width": 2.2,
+        "endpoint_clearance": 8,
         "phase_policy": "motionStage * 5 mod 43",
         "expected_initial_phases": [5, 10, 15, 20],
         "resolved_widths": [2.2] * 4,
-        "geometry": {"critical": {"shape": "compact-ecg-head", "stroke_width": 1.6}, "telemetry": {"shape": "cyan-three-dot-export-packet", "dot_count": 3, "dot_diameter": 4}},
-        "trace_reveal": {"primitive": "trace-span-reveal", "span_ids": ["span-root", "span-api", "span-checkout", "span-payment"], "rendered_frames": [[24, 27], [27, 30], [30, 33], [33, 36]], "source_geometry_mutated": False},
-        "scanner": {"primitive": "waterfall-scanner", "width": 2, "tail_width": 12, "period_frames": 34, "movement": "horizontal-within-trace-plot"},
-        "auxiliary": {"primitive": "checkout-degraded-halo", "node_id": "checkout-service", "period_frames": 18, "opacity_range": [0.10, 0.28], "movement": "opacity-only"},
+        "geometry": {
+            "critical": {"shape": "compact-ecg-head", "stroke_width": 1.6},
+            "telemetry": {
+                "shape": "cyan-three-dot-export-packet",
+                "dot_count": 3,
+                "dot_diameter": 4,
+            },
+        },
+        "trace_reveal": {
+            "primitive": "trace-span-reveal",
+            "span_ids": ["span-root", "span-api", "span-checkout", "span-payment"],
+            "rendered_frames": [[24, 27], [27, 30], [30, 33], [33, 36]],
+            "source_geometry_mutated": False,
+        },
+        "scanner": {
+            "primitive": "waterfall-scanner",
+            "width": 2,
+            "tail_width": 12,
+            "period_frames": 34,
+            "movement": "horizontal-within-trace-plot",
+        },
+        "auxiliary": {
+            "primitive": "checkout-degraded-halo",
+            "node_id": "checkout-service",
+            "period_frames": 18,
+            "opacity_range": [0.10, 0.28],
+            "movement": "opacity-only",
+        },
         "direction_sentinels": [
-            {"key": "critical-request/1/0", "directions": ["right"]}, {"key": "critical-request/2/0", "directions": ["right"]},
-            {"key": "critical-request/3/0", "directions": ["right"]}, {"key": "telemetry-export/4/0", "directions": ["down"]},
+            {"key": "critical-request/1/0", "directions": ["right"]},
+            {"key": "critical-request/2/0", "directions": ["right"]},
+            {"key": "critical-request/3/0", "directions": ["right"]},
+            {"key": "telemetry-export/4/0", "directions": ["down"]},
         ],
     },
 }
@@ -616,7 +910,8 @@ def _style_1_persistent_stream_contract(frame_count: int) -> dict[str, object]:
         "expected_initial_phases": [7, 14, 21, 28, 31, 35, 1, 8],
         "period_step_coprime": math.gcd(dash_period, dash_step) == 1,
         "stream_interval_frame_count": stream_interval_frame_count,
-        "phase_repeat_within_stream_interval": stream_interval_frame_count > dash_period,
+        "phase_repeat_within_stream_interval": stream_interval_frame_count
+        > dash_period,
         "direction": "source-to-target",
         "direction_sentinels": {
             "ingress": ["right"],
@@ -704,7 +999,8 @@ def _style_2_persistent_stream_contract(frame_count: int) -> dict[str, object]:
         "expected_initial_phases": [6, 12, 18, 24, 30, 36, 39, 1],
         "period_step_coprime": math.gcd(dash_period, dash_step) == 1,
         "stream_interval_frame_count": stream_interval_frame_count,
-        "phase_repeat_within_stream_interval": stream_interval_frame_count > dash_period,
+        "phase_repeat_within_stream_interval": stream_interval_frame_count
+        > dash_period,
         "direction": "source-to-target",
         "direction_sentinels": {
             "ingress/0": ["right"],
@@ -799,11 +1095,16 @@ def _style_3_persistent_stream_contract(frame_count: int) -> dict[str, object]:
         "expected_initial_phases": [7, 14, 21, 21, 21, 28, 28, 28, 35, 42],
         "stage_locks": {
             "fanout": {"orders": [0, 1, 2], "phase": 21},
-            "data-write": {"orders": [0, 1, 2], "phase": 28, "equal_length_paths": True},
+            "data-write": {
+                "orders": [0, 1, 2],
+                "phase": 28,
+                "equal_length_paths": True,
+            },
         },
         "period_step_coprime": math.gcd(dash_period, dash_step) == 1,
         "stream_interval_frame_count": stream_interval_frame_count,
-        "phase_repeat_within_stream_interval": stream_interval_frame_count > dash_period,
+        "phase_repeat_within_stream_interval": stream_interval_frame_count
+        > dash_period,
         "direction": "source-to-target",
         "direction_sentinels": {
             "ingress/0": ["right"],
@@ -928,7 +1229,8 @@ def _style_4_persistent_stream_contract(frame_count: int) -> dict[str, object]:
         "initial_normalized_progress_by_stage": progress_vector,
         "period_step_coprime": math.gcd(dash_period, dash_step) == 1,
         "stream_interval_frame_count": stream_interval_frame_count,
-        "phase_repeat_within_stream_interval": stream_interval_frame_count > dash_period,
+        "phase_repeat_within_stream_interval": stream_interval_frame_count
+        > dash_period,
         "direction": "source-to-target",
         "direction_sentinels": {
             "sample/0": {"directions": ["right"], "tangent_rotation": 0},
@@ -975,7 +1277,9 @@ def _terminal_signature_contract(frame_count: int) -> dict[str, object]:
     }
 
 
-def _specialized_persistent_stream_contract(frame_count: int, style_id: int) -> dict[str, object]:
+def _specialized_persistent_stream_contract(
+    frame_count: int, style_id: int
+) -> dict[str, object]:
     spec = STYLE_SPECIALIZED_LIVE_SPECS[style_id]
     scene = STYLE_SCENE_CONTRACTS[style_id]
     reset_start = frame_count - len(RESET_OPACITY_SAMPLES)
@@ -1047,7 +1351,9 @@ def _specialized_persistent_stream_contract(frame_count: int, style_id: int) -> 
     return contract
 
 
-def _persistent_stream_contract(frame_count: int, style_id: int = 1) -> dict[str, object]:
+def _persistent_stream_contract(
+    frame_count: int, style_id: int = 1
+) -> dict[str, object]:
     if style_id == 1:
         return _style_1_persistent_stream_contract(frame_count)
     if style_id == 2:
@@ -1058,7 +1364,9 @@ def _persistent_stream_contract(frame_count: int, style_id: int = 1) -> dict[str
         return _style_4_persistent_stream_contract(frame_count)
     if style_id in STYLE_SPECIALIZED_LIVE_SPECS:
         return _specialized_persistent_stream_contract(frame_count, style_id)
-    raise ValueError(f"MOTION_STYLE_REVIEW: Style {style_id} has no reviewed stream contract")
+    raise ValueError(
+        f"MOTION_STYLE_REVIEW: Style {style_id} has no reviewed stream contract"
+    )
 
 
 def _draw_on_contract(frame_count: int, style_id: int = 1) -> dict[str, object]:
@@ -1077,10 +1385,21 @@ def _draw_on_contract(frame_count: int, style_id: int = 1) -> dict[str, object]:
         "draw_easing": "linear",
         "settled_markers": "original marker appears only after route arrival",
         "persistent_data_flow": _persistent_stream_contract(frame_count, style_id),
-        "route_label_opacity_states": STYLE_SCENE_CONTRACTS[style_id]["route_label_count"],
+        "route_label_opacity_states": STYLE_SCENE_CONTRACTS[style_id][
+            "route_label_count"
+        ],
         "text_geometry_motion": 0,
-        "maximum_concurrent_draws": STYLE_SCENE_CONTRACTS[style_id].get("maximum_concurrent_draws", 2),
-        "forbidden": ["node-motion", "text-motion", "halo", "ripple", "zoom", "breathing"],
+        "maximum_concurrent_draws": STYLE_SCENE_CONTRACTS[style_id].get(
+            "maximum_concurrent_draws", 2
+        ),
+        "forbidden": [
+            "node-motion",
+            "text-motion",
+            "halo",
+            "ripple",
+            "zoom",
+            "breathing",
+        ],
     }
     if style_id == 2:
         contract["schedule_key"] = "(data-motion-role, data-motion-order)"
@@ -1151,11 +1470,17 @@ def _draw_on_contract(frame_count: int, style_id: int = 1) -> dict[str, object]:
 
 PERSISTENT_STREAM_CONTRACT = _persistent_stream_contract(DEFAULT_MOTION_FRAME_COUNT)
 DRAW_ON_CONTRACT = _draw_on_contract(DEFAULT_MOTION_FRAME_COUNT)
-STYLE_2_PERSISTENT_STREAM_CONTRACT = _persistent_stream_contract(DEFAULT_MOTION_FRAME_COUNT, 2)
+STYLE_2_PERSISTENT_STREAM_CONTRACT = _persistent_stream_contract(
+    DEFAULT_MOTION_FRAME_COUNT, 2
+)
 STYLE_2_DRAW_ON_CONTRACT = _draw_on_contract(DEFAULT_MOTION_FRAME_COUNT, 2)
-STYLE_3_PERSISTENT_STREAM_CONTRACT = _persistent_stream_contract(DEFAULT_MOTION_FRAME_COUNT, 3)
+STYLE_3_PERSISTENT_STREAM_CONTRACT = _persistent_stream_contract(
+    DEFAULT_MOTION_FRAME_COUNT, 3
+)
 STYLE_3_DRAW_ON_CONTRACT = _draw_on_contract(DEFAULT_MOTION_FRAME_COUNT, 3)
-STYLE_4_PERSISTENT_STREAM_CONTRACT = _persistent_stream_contract(DEFAULT_MOTION_FRAME_COUNT, 4)
+STYLE_4_PERSISTENT_STREAM_CONTRACT = _persistent_stream_contract(
+    DEFAULT_MOTION_FRAME_COUNT, 4
+)
 STYLE_4_DRAW_ON_CONTRACT = _draw_on_contract(DEFAULT_MOTION_FRAME_COUNT, 4)
 STYLE_5_DRAW_ON_CONTRACT = _draw_on_contract(DEFAULT_MOTION_FRAME_COUNT, 5)
 STYLE_6_DRAW_ON_CONTRACT = _draw_on_contract(DEFAULT_MOTION_FRAME_COUNT, 6)
@@ -1168,7 +1493,9 @@ STYLE_12_DRAW_ON_CONTRACT = _draw_on_contract(DEFAULT_MOTION_FRAME_COUNT, 12)
 TERMINAL_SIGNATURE_CONTRACT = _terminal_signature_contract(DEFAULT_MOTION_FRAME_COUNT)
 
 
-def _motion_grammar(duration: float, fps: int, frame_count: int, style_id: int = 1) -> dict[str, object]:
+def _motion_grammar(
+    duration: float, fps: int, frame_count: int, style_id: int = 1
+) -> dict[str, object]:
     reset_start = frame_count - len(RESET_OPACITY_SAMPLES)
     phase_ranges = {
         "empty": (0, 0),
@@ -1249,7 +1576,9 @@ def _sha256_bytes(value: bytes) -> str:
 
 
 def _elements(root: ET.Element, role: str) -> list[ET.Element]:
-    return [element for element in root.iter() if element.get("data-graph-role") == role]
+    return [
+        element for element in root.iter() if element.get("data-graph-role") == role
+    ]
 
 
 def _parse_viewbox(root: ET.Element) -> tuple[float, float, float, float]:
@@ -1261,12 +1590,18 @@ def _parse_viewbox(root: ET.Element) -> tuple[float, float, float, float]:
     except ValueError as error:
         raise ValueError("MOTION_VIEWBOX: viewBox values must be numeric") from error
     if len(values) != 4 or values[2] <= 0 or values[3] <= 0:
-        raise ValueError("MOTION_VIEWBOX: viewBox must contain four positive dimensions")
+        raise ValueError(
+            "MOTION_VIEWBOX: viewBox must contain four positive dimensions"
+        )
     return values  # type: ignore[return-value]
 
 
 def _validate_settings(duration: float, fps: int, width: int) -> int:
-    if isinstance(duration, bool) or not isinstance(duration, (int, float)) or not math.isfinite(duration):
+    if (
+        isinstance(duration, bool)
+        or not isinstance(duration, (int, float))
+        or not math.isfinite(duration)
+    ):
         raise ValueError("MOTION_DURATION: duration must be a finite number")
     if duration < 0.5 or duration > 20:
         raise ValueError("MOTION_DURATION: duration must be between 0.5 and 20 seconds")
@@ -1281,7 +1616,9 @@ def _validate_settings(duration: float, fps: int, width: int) -> int:
     requested_frames = duration * fps
     frame_count = round(requested_frames)
     if abs(requested_frames - frame_count) > 1e-9:
-        raise ValueError("MOTION_TIMELINE: duration multiplied by fps must be a whole number of frames")
+        raise ValueError(
+            "MOTION_TIMELINE: duration multiplied by fps must be a whole number of frames"
+        )
     if frame_count < MINIMUM_MOTION_FRAME_COUNT:
         raise ValueError(
             f"MOTION_TIMELINE: semantic GIF motion requires at least {MINIMUM_MOTION_FRAME_COUNT} rendered frames"
@@ -1317,11 +1654,17 @@ def _input_kind(path: Path, source: bytes) -> str:
     raise ValueError("MOTION_INPUT_TYPE: input must be a generated .svg file")
 
 
-def _validate_semantics(style_id: int, edges: list[ET.Element], nodes: list[ET.Element]) -> dict[str, object]:
+def _validate_semantics(
+    style_id: int, edges: list[ET.Element], nodes: list[ET.Element]
+) -> dict[str, object]:
     if style_id not in REVIEWED_STYLE_IDS:
-        raise ValueError(f"MOTION_STYLE: Style {style_id} does not have a motion preset yet")
+        raise ValueError(
+            f"MOTION_STYLE: Style {style_id} does not have a motion preset yet"
+        )
     if not edges or not nodes:
-        raise ValueError(f"MOTION_METADATA: Style {style_id} requires semantic nodes and edges")
+        raise ValueError(
+            f"MOTION_METADATA: Style {style_id} requires semantic nodes and edges"
+        )
     incomplete = [
         edge.get("data-edge-id", "unknown")
         for edge in edges
@@ -1351,7 +1694,8 @@ def _validate_semantics(style_id: int, edges: list[ET.Element], nodes: list[ET.E
                 unknown_roles.add(values[0])
     if partial:
         raise ValueError(
-            "MOTION_METADATA: motion role, stage, and order must be provided together: " + ", ".join(partial)
+            "MOTION_METADATA: motion role, stage, and order must be provided together: "
+            + ", ".join(partial)
         )
     if unknown_roles:
         raise ValueError(
@@ -1375,32 +1719,46 @@ def _validate_semantics(style_id: int, edges: list[ET.Element], nodes: list[ET.E
         flows = [edge.get("data-flow", "") for edge in edges]
         missing = sorted({"read", "write", "async"} - set(flows))
         if missing:
-            raise ValueError(f'MOTION_METADATA: Style 10 is missing flow metadata: {", ".join(missing)}')
+            raise ValueError(
+                f"MOTION_METADATA: Style 10 is missing flow metadata: {', '.join(missing)}"
+            )
         result["flows"] = {flow: flows.count(flow) for flow in sorted(set(flows))}
     elif style_id == 11:
         stations = [node for node in nodes if node.get("data-station-order", "")]
         rails = [edge for edge in edges if edge.get("data-edge-kind") == "rail"]
         branch_kinds = {edge.get("data-edge-kind") for edge in edges}
         if len(stations) < 2 or not rails:
-            raise ValueError("MOTION_METADATA: Style 11 requires ordered stations and rail edges")
+            raise ValueError(
+                "MOTION_METADATA: Style 11 requires ordered stations and rail edges"
+            )
         if not {"dead_letter", "state"}.issubset(branch_kinds):
-            raise ValueError("MOTION_METADATA: Style 11 requires dead-letter and state branches")
+            raise ValueError(
+                "MOTION_METADATA: Style 11 requires dead-letter and state branches"
+            )
         orders = sorted(int(node.get("data-station-order", "-1")) for node in stations)
         if orders != list(range(len(orders))):
-            raise ValueError("MOTION_METADATA: Style 11 station order must be contiguous from zero")
+            raise ValueError(
+                "MOTION_METADATA: Style 11 station order must be contiguous from zero"
+            )
         result.update({"stations": len(stations), "rails": len(rails), "branches": 2})
     elif style_id == 12:
         critical = [edge for edge in edges if edge.get("data-critical") == "true"]
         spans = [node for node in nodes if node.get("data-span-id")]
         if not critical or any(not edge.get("data-critical-hop") for edge in critical):
-            raise ValueError("MOTION_METADATA: Style 12 critical edges require hop metadata")
+            raise ValueError(
+                "MOTION_METADATA: Style 12 critical edges require hop metadata"
+            )
         if not spans or any(not node.get("data-duration-ms") for node in spans):
-            raise ValueError("MOTION_METADATA: Style 12 trace spans require timing metadata")
+            raise ValueError(
+                "MOTION_METADATA: Style 12 trace spans require timing metadata"
+            )
         result.update({"critical_hops": len(critical), "trace_spans": len(spans)})
     return result
 
 
-def _validate_scene_schedule(style_id: int, edges: list[ET.Element]) -> list[dict[str, object]]:
+def _validate_scene_schedule(
+    style_id: int, edges: list[ET.Element]
+) -> list[dict[str, object]]:
     scene_contract = STYLE_SCENE_CONTRACTS[style_id]
     expected_keys = list(scene_contract["schedule_keys"])
     expected_stages = list(scene_contract["expected_stages"])
@@ -1413,7 +1771,7 @@ def _validate_scene_schedule(style_id: int, edges: list[ET.Element]) -> list[dic
             order = int(edge.get("data-motion-order", ""))
         except ValueError as error:
             raise ValueError(
-                f'MOTION_METADATA: edge {edge.get("data-edge-id", "unknown")} has a non-integer motion stage or order'
+                f"MOTION_METADATA: edge {edge.get('data-edge-id', 'unknown')} has a non-integer motion stage or order"
             ) from error
         key: tuple[object, ...] = (role, stage, order) if stage_aware else (role, order)
         keyed_edges.setdefault(key, []).append(edge)
@@ -1421,7 +1779,11 @@ def _validate_scene_schedule(style_id: int, edges: list[ET.Element]) -> list[dic
     actual_keys = set(keyed_edges)
     expected_key_set = set(expected_keys)
     duplicate_keys = [key for key, values in keyed_edges.items() if len(values) != 1]
-    if len(edges) != len(expected_keys) or actual_keys != expected_key_set or duplicate_keys:
+    if (
+        len(edges) != len(expected_keys)
+        or actual_keys != expected_key_set
+        or duplicate_keys
+    ):
         missing = sorted(expected_key_set - actual_keys)
         unexpected = sorted(actual_keys - expected_key_set)
         raise ValueError(
@@ -1431,11 +1793,15 @@ def _validate_scene_schedule(style_id: int, edges: list[ET.Element]) -> list[dic
         )
 
     resolved: list[dict[str, object]] = []
-    for expected_key, expected_stage in zip(expected_keys, expected_stages):
+    for expected_key, expected_stage in zip(
+        expected_keys, expected_stages, strict=True
+    ):
         if stage_aware:
             role, key_stage, order = expected_key
             if key_stage != expected_stage:
-                raise ValueError(f"MOTION_CONTRACT: Style {style_id} stage-aware schedule is internally inconsistent")
+                raise ValueError(
+                    f"MOTION_CONTRACT: Style {style_id} stage-aware schedule is internally inconsistent"
+                )
         else:
             role, order = expected_key
         edge = keyed_edges[expected_key][0]
@@ -1455,9 +1821,9 @@ def _validate_scene_schedule(style_id: int, edges: list[ET.Element]) -> list[dic
         )
 
     if style_id in {2, 3, 4}:
-        expected_colors = _persistent_stream_contract(DEFAULT_MOTION_FRAME_COUNT, style_id)["body"][
-            "source_colors_in_schedule_order"
-        ]
+        expected_colors = _persistent_stream_contract(
+            DEFAULT_MOTION_FRAME_COUNT, style_id
+        )["body"]["source_colors_in_schedule_order"]
         actual_colors = [entry["source_stroke"] for entry in resolved]
         if actual_colors != expected_colors:
             raise ValueError(
@@ -1465,10 +1831,10 @@ def _validate_scene_schedule(style_id: int, edges: list[ET.Element]) -> list[dic
                 f"expected {expected_colors}, got {actual_colors}"
             )
     if style_id == 4:
-        semantic_colors = _persistent_stream_contract(DEFAULT_MOTION_FRAME_COUNT, 4)["body"][
-            "semantic_colors_in_schedule_order"
-        ]
-        for entry, semantic_color in zip(resolved, semantic_colors):
+        semantic_colors = _persistent_stream_contract(DEFAULT_MOTION_FRAME_COUNT, 4)[
+            "body"
+        ]["semantic_colors_in_schedule_order"]
+        for entry, semantic_color in zip(resolved, semantic_colors, strict=True):
             entry["semantic_color"] = semantic_color
     return resolved
 
@@ -1478,7 +1844,7 @@ def build_motion_plan(
     preset: str = "auto",
     duration: float = DEFAULT_MOTION_DURATION,
     fps: int = DEFAULT_MOTION_FPS,
-    width: Optional[int] = None,
+    width: int | None = None,
 ) -> tuple[dict[str, object], object]:
     """Validate a semantic SVG and return its focused GIF motion plan."""
 
@@ -1493,7 +1859,9 @@ def build_motion_plan(
     safe_svg = sanitize_svg(source_text)
     root = ET.fromstring(safe_svg)
     if root.get("data-generator") != "fireworks-tech-graph":
-        raise ValueError("MOTION_INPUT: only fireworks-tech-graph generated SVGs are supported")
+        raise ValueError(
+            "MOTION_INPUT: only fireworks-tech-graph generated SVGs are supported"
+        )
     if root.get("data-semantic-valid") != "true":
         raise ValueError("MOTION_INPUT: SVG must carry a valid semantic contract")
     try:
@@ -1518,12 +1886,16 @@ def build_motion_plan(
     nodes = _elements(root, "node")
     semantics = _validate_semantics(style_id, edges, nodes)
     if semantics.get("motion_metadata") != "explicit":
-        raise ValueError("MOTION_METADATA: reviewed styles require explicit motion metadata on every edge")
+        raise ValueError(
+            "MOTION_METADATA: reviewed styles require explicit motion metadata on every edge"
+        )
     resolved_schedule = _validate_scene_schedule(style_id, edges)
     if style_id in set(range(2, 13)):
         semantics["schedule_key"] = "(data-motion-role, data-motion-order)"
         if scene_contract.get("stage_aware_schedule_key"):
-            semantics["schedule_key"] = "(data-motion-role, data-motion-stage, data-motion-order)"
+            semantics["schedule_key"] = (
+                "(data-motion-role, data-motion-stage, data-motion-order)"
+            )
         semantics["resolved_schedule"] = resolved_schedule
     check_results: dict[str, object] = {}
     for check in CHECKS:
@@ -1535,7 +1907,9 @@ def build_motion_plan(
     viewbox = _parse_viewbox(root)
     height = max(1, round(resolved_width * viewbox[3] / viewbox[2]))
     if height > 4096 or resolved_width * height > 16_777_216:
-        raise ValueError("MOTION_DIMENSIONS: output must stay within 4096px per side and 16 megapixels")
+        raise ValueError(
+            "MOTION_DIMENSIONS: output must stay within 4096px per side and 16 megapixels"
+        )
     rendered_pixels = _validate_render_budget(resolved_width, height, frame_count)
     timing_revision = _timing_revision(duration, fps, frame_count)
     style_contract: dict[str, object] = {
@@ -1582,7 +1956,10 @@ def build_motion_plan(
         "frame_uniqueness_contract": {
             "strict_all_unique_through_frame_count": APPROVED_BASELINE_FRAME_COUNT,
             "minimum_unique_rasters_for_long_timeline": APPROVED_BASELINE_FRAME_COUNT,
-            "long_timeline_repeat_scope": [38, frame_count - len(RESET_OPACITY_SAMPLES) - 1],
+            "long_timeline_repeat_scope": [
+                38,
+                frame_count - len(RESET_OPACITY_SAMPLES) - 1,
+            ],
             "intentional_reset_boundary_repeat_frame": (
                 frame_count - len(RESET_OPACITY_SAMPLES)
             ),
@@ -1622,11 +1999,19 @@ def probe_motion_runtime() -> dict[str, object]:
         result["error"] = "MOTION_RUNTIME_TIMEOUT: renderer probe exceeded 15 seconds"
         return result
     try:
-        worker = json.loads(process.stdout.strip().splitlines()[-1]) if process.stdout.strip() else {}
+        worker = (
+            json.loads(process.stdout.strip().splitlines()[-1])
+            if process.stdout.strip()
+            else {}
+        )
     except (IndexError, json.JSONDecodeError):
-        worker = {"ok": False, "error": process.stderr.strip() or "motion runtime probe returned invalid JSON"}
+        worker = {
+            "ok": False,
+            "error": process.stderr.strip()
+            or "motion runtime probe returned invalid JSON",
+        }
     encoders: set[str] = set()
-    encoder_error: Optional[str] = None
+    encoder_error: str | None = None
     if ffmpeg:
         try:
             encoder_process = subprocess.run(
@@ -1642,9 +2027,13 @@ def probe_motion_runtime() -> dict[str, object]:
                     if match:
                         encoders.add(match.group(1))
             else:
-                encoder_error = encoder_process.stderr.strip() or "FFmpeg encoder discovery failed"
+                encoder_error = (
+                    encoder_process.stderr.strip() or "FFmpeg encoder discovery failed"
+                )
         except subprocess.TimeoutExpired:
-            encoder_error = "MOTION_RUNTIME_TIMEOUT: FFmpeg encoder probe exceeded 15 seconds"
+            encoder_error = (
+                "MOTION_RUNTIME_TIMEOUT: FFmpeg encoder probe exceeded 15 seconds"
+            )
     result["renderer"] = worker
     result["encoders"] = sorted(encoders.intersection({"gif"}))
     result["format"] = {"gif": bool(ffmpeg and "gif" in encoders)}
@@ -1661,7 +2050,11 @@ def probe_motion_runtime() -> dict[str, object]:
         result["error"] = (
             worker.get("error")
             or process.stderr.strip()
-            or ("FFprobe is unavailable" if not ffprobe else "motion dependencies are incomplete")
+            or (
+                "FFprobe is unavailable"
+                if not ffprobe
+                else "motion dependencies are incomplete"
+            )
         )
     return result
 
@@ -1683,7 +2076,10 @@ def _stage_json(path: Path, value: dict[str, object]) -> Path:
         raise ValueError("MOTION_REPORT: report target must be a file path")
     temporary = path.with_name(f".{path.name}.{uuid.uuid4().hex}.tmp")
     try:
-        temporary.write_text(json.dumps(value, ensure_ascii=False, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+        temporary.write_text(
+            json.dumps(value, ensure_ascii=False, indent=2, sort_keys=True) + "\n",
+            encoding="utf-8",
+        )
         return temporary
     except Exception:
         temporary.unlink(missing_ok=True)
@@ -1695,16 +2091,20 @@ def _commit_artifacts(staged_targets: list[tuple[Path, Path]]) -> None:
 
     for staged, target in staged_targets:
         if not staged.is_file():
-            raise RuntimeError(f"MOTION_COMMIT: staged artifact is unavailable: {staged}")
+            raise RuntimeError(
+                f"MOTION_COMMIT: staged artifact is unavailable: {staged}"
+            )
         target.parent.mkdir(parents=True, exist_ok=True)
         if os.path.lexists(target) and target.is_dir():
-            raise ValueError(f"MOTION_COMMIT: artifact target must be a file path: {target}")
+            raise ValueError(
+                f"MOTION_COMMIT: artifact target must be a file path: {target}"
+            )
 
-    backups: dict[Path, Optional[Path]] = {}
+    backups: dict[Path, Path | None] = {}
     installed: set[Path] = set()
     try:
         for staged, target in staged_targets:
-            backup: Optional[Path] = None
+            backup: Path | None = None
             if os.path.lexists(target):
                 backup = target.with_name(f".{target.name}.{uuid.uuid4().hex}.rollback")
                 backups[target] = backup
@@ -1742,7 +2142,9 @@ def _commit_artifacts(staged_targets: list[tuple[Path, Path]]) -> None:
 def _probe_media(path: Path) -> dict[str, object]:
     ffprobe = shutil.which("ffprobe")
     if not ffprobe:
-        raise RuntimeError("MOTION_MEDIA_PROBE: FFprobe is required to validate encoded motion")
+        raise RuntimeError(
+            "MOTION_MEDIA_PROBE: FFprobe is required to validate encoded motion"
+        )
     try:
         process = subprocess.run(
             [
@@ -1766,7 +2168,9 @@ def _probe_media(path: Path) -> dict[str, object]:
             timeout=MOTION_TIMEOUTS["media_probe"],
         )
     except subprocess.TimeoutExpired as error:
-        raise RuntimeError("MOTION_MEDIA_PROBE_TIMEOUT: FFprobe exceeded 30 seconds") from error
+        raise RuntimeError(
+            "MOTION_MEDIA_PROBE_TIMEOUT: FFprobe exceeded 30 seconds"
+        ) from error
     if process.returncode != 0:
         return {"error": process.stderr.strip()}
     try:
@@ -1792,23 +2196,33 @@ def _validate_encoded_gif(
     expected_duration: float,
 ) -> None:
     if media_probe.get("error"):
-        raise RuntimeError(f'MOTION_MEDIA_PROBE: {media_probe["error"]}')
+        raise RuntimeError(f"MOTION_MEDIA_PROBE: {media_probe['error']}")
     if media_probe.get("codec_name") != "gif":
         raise RuntimeError(
-            f'MOTION_CODEC: expected gif, encoded {media_probe.get("codec_name", "unknown")}'
+            f"MOTION_CODEC: expected gif, encoded {media_probe.get('codec_name', 'unknown')}"
         )
     if int(str(media_probe.get("width", -1))) != expected_width:
-        raise RuntimeError("MOTION_DIMENSIONS: encoded media width differs from the motion plan")
+        raise RuntimeError(
+            "MOTION_DIMENSIONS: encoded media width differs from the motion plan"
+        )
     if int(str(media_probe.get("height", -1))) != expected_height:
-        raise RuntimeError("MOTION_DIMENSIONS: encoded media height differs from the motion plan")
+        raise RuntimeError(
+            "MOTION_DIMENSIONS: encoded media height differs from the motion plan"
+        )
     encoded_frames = media_probe.get("nb_read_frames") or media_probe.get("nb_frames")
     if encoded_frames is None:
-        raise RuntimeError("MOTION_FRAMES: media probe did not report an encoded frame count")
+        raise RuntimeError(
+            "MOTION_FRAMES: media probe did not report an encoded frame count"
+        )
     encoded_frame_count = int(str(encoded_frames))
     if encoded_frame_count != expected_frames:
-        raise RuntimeError("MOTION_FRAMES: encoded media frame count differs from the motion plan")
+        raise RuntimeError(
+            "MOTION_FRAMES: encoded media frame count differs from the motion plan"
+        )
     if media_probe.get("duration") is None:
-        raise RuntimeError("MOTION_DURATION: media probe did not report encoded duration")
+        raise RuntimeError(
+            "MOTION_DURATION: media probe did not report encoded duration"
+        )
     encoded_duration = float(str(media_probe["duration"]))
     if abs(encoded_duration - expected_duration) > 0.03:
         raise RuntimeError(
@@ -1816,7 +2230,7 @@ def _validate_encoded_gif(
         )
 
 
-def _read_gif_loop_count(path: Path) -> Optional[int]:
+def _read_gif_loop_count(path: Path) -> int | None:
     """Return the Netscape/ANIMEXTS repeat count embedded in a GIF."""
 
     data = path.read_bytes()
@@ -1855,14 +2269,21 @@ def _run_encoder(command: list[str], label: str) -> subprocess.CompletedProcess[
             timeout=MOTION_TIMEOUTS["encode"],
         )
     except subprocess.TimeoutExpired as error:
-        raise RuntimeError(f"MOTION_ENCODE_TIMEOUT: {label} exceeded 120 seconds") from error
+        raise RuntimeError(
+            f"MOTION_ENCODE_TIMEOUT: {label} exceeded 120 seconds"
+        ) from error
     if process.returncode != 0:
-        raise RuntimeError(f"MOTION_ENCODE: {process.stderr.strip() or process.stdout.strip()}")
+        raise RuntimeError(
+            f"MOTION_ENCODE: {process.stderr.strip() or process.stdout.strip()}"
+        )
     return process
 
 
 def _signalstats_values(output: str) -> list[float]:
-    return [float(value) for value in re.findall(r"lavfi\.signalstats\.YAVG=([0-9.eE+-]+)", output)]
+    return [
+        float(value)
+        for value in re.findall(r"lavfi\.signalstats\.YAVG=([0-9.eE+-]+)", output)
+    ]
 
 
 def _summarize_delta_quality(
@@ -1871,7 +2292,10 @@ def _summarize_delta_quality(
     changed_area_yavg: float,
 ) -> dict[str, object]:
     values = sorted(adjacent_yavg)
-    if not values or any(not math.isfinite(value) or value < 0 for value in (*values, seam_yavg, changed_area_yavg)):
+    if not values or any(
+        not math.isfinite(value) or value < 0
+        for value in (*values, seam_yavg, changed_area_yavg)
+    ):
         raise RuntimeError("MOTION_DELTA: frame-delta metrics are missing or invalid")
     p95 = values[max(0, math.ceil(len(values) * 0.95) - 1)]
     median = values[len(values) // 2]
@@ -1888,11 +2312,15 @@ def _summarize_delta_quality(
         "changed_area_method": "accumulated adjacent luma delta greater than 2 percent",
     }
     if not seam_within_p95:
-        raise RuntimeError("MOTION_LOOP: loop seam exceeds the p95 adjacent-frame delta")
+        raise RuntimeError(
+            "MOTION_LOOP: loop seam exceeds the p95 adjacent-frame delta"
+        )
     return result
 
 
-def _probe_frame_deltas(ffmpeg: str, frames: Path, fps: int, frame_count: int) -> dict[str, object]:
+def _probe_frame_deltas(
+    ffmpeg: str, frames: Path, fps: int, frame_count: int
+) -> dict[str, object]:
     pattern = str(frames / "frame-%06d.png")
     adjacent = _run_encoder(
         [
@@ -1917,7 +2345,9 @@ def _probe_frame_deltas(ffmpeg: str, frames: Path, fps: int, frame_count: int) -
     )
     adjacent_values = _signalstats_values(adjacent.stdout)
     if len(adjacent_values) != frame_count - 1:
-        raise RuntimeError("MOTION_DELTA: adjacent frame-delta probe returned an unexpected sample count")
+        raise RuntimeError(
+            "MOTION_DELTA: adjacent frame-delta probe returned an unexpected sample count"
+        )
 
     seam = _run_encoder(
         [
@@ -1942,7 +2372,9 @@ def _probe_frame_deltas(ffmpeg: str, frames: Path, fps: int, frame_count: int) -
     )
     seam_values = _signalstats_values(seam.stdout)
     if len(seam_values) != 1:
-        raise RuntimeError("MOTION_DELTA: loop-seam probe returned an unexpected sample count")
+        raise RuntimeError(
+            "MOTION_DELTA: loop-seam probe returned an unexpected sample count"
+        )
 
     delta_frames = frame_count - 1
     weights = " ".join("1" for _ in range(delta_frames))
@@ -1974,8 +2406,12 @@ def _probe_frame_deltas(ffmpeg: str, frames: Path, fps: int, frame_count: int) -
     )
     coverage_values = _signalstats_values(coverage.stdout)
     if len(coverage_values) != delta_frames:
-        raise RuntimeError("MOTION_DELTA: changed-area probe returned an unexpected sample count")
-    return _summarize_delta_quality(adjacent_values, seam_values[0], coverage_values[-1])
+        raise RuntimeError(
+            "MOTION_DELTA: changed-area probe returned an unexpected sample count"
+        )
+    return _summarize_delta_quality(
+        adjacent_values, seam_values[0], coverage_values[-1]
+    )
 
 
 def _summarize_frame_hashes(
@@ -2024,9 +2460,8 @@ def _summarize_frame_hashes(
         indices = evidence["frame_indices"]
         if all(repeat_scope_start <= index <= repeat_scope_end for index in indices):
             classification = "steady_state_periodic_repeat"
-        elif (
-            reset_boundary_frame in indices
-            and all(repeat_scope_start <= index <= reset_boundary_frame for index in indices)
+        elif reset_boundary_frame in indices and all(
+            repeat_scope_start <= index <= reset_boundary_frame for index in indices
         ):
             classification = "intentional_reset_boundary_repeat"
         else:
@@ -2069,7 +2504,9 @@ def _summarize_frame_hashes(
         ),
         "repeated_frame_group_count": len(classified_repeats),
         "repeated_frame_index_evidence": classified_repeats,
-        "intentional_reset_boundary_repeat_count": len(intentional_reset_boundary_repeats),
+        "intentional_reset_boundary_repeat_count": len(
+            intentional_reset_boundary_repeats
+        ),
         "intentional_reset_boundary_repeat_evidence": intentional_reset_boundary_repeats,
         "repeats_confined_to_full_opacity": repeats_confined_to_full_opacity,
         "repeats_confined_to_permitted_scope": True,
@@ -2104,7 +2541,9 @@ def _probe_encoded_frame_hashes(
     )
     hashes = re.findall(r",\s*([0-9a-f]{32})\s*$", process.stdout, flags=re.MULTILINE)
     if len(hashes) != expected_frames:
-        raise RuntimeError("MOTION_FRAMES: encoded frame-hash probe returned an unexpected frame count")
+        raise RuntimeError(
+            "MOTION_FRAMES: encoded frame-hash probe returned an unexpected frame count"
+        )
     return _summarize_frame_hashes(
         hashes,
         full_opacity_frames,
@@ -2152,7 +2591,9 @@ def _size_guidance(
 ) -> dict[str, object]:
     warnings: list[str] = []
     if artifact_bytes > MOTION_SIZE_TARGET_BYTES:
-        warnings.append("GIF exceeds 500 KB; reduce width, duration, or frame rate before distribution.")
+        warnings.append(
+            "GIF exceeds 500 KB; reduce width, duration, or frame rate before distribution."
+        )
     return {
         "artifact_target_bytes": MOTION_SIZE_TARGET_BYTES,
         "artifact_within_target": artifact_bytes <= MOTION_SIZE_TARGET_BYTES,
@@ -2163,11 +2604,11 @@ def _size_guidance(
 def render_motion_gif(
     svg_path: Path,
     output_path: Path,
-    report_path: Optional[Path] = None,
+    report_path: Path | None = None,
     preset: str = "auto",
     duration: float = DEFAULT_MOTION_DURATION,
     fps: int = DEFAULT_MOTION_FPS,
-    width: Optional[int] = None,
+    width: int | None = None,
     dry_run: bool = False,
 ) -> dict[str, object]:
     """Render one generated semantic SVG to one validated, atomic GIF artifact."""
@@ -2179,7 +2620,9 @@ def render_motion_gif(
     if output_path.suffix.lower() != MOTION_FORMAT["suffix"]:
         raise ValueError("MOTION_OUTPUT: output path must end in .gif")
     if report_path and report_path.resolve() in {source_target, gif_target}:
-        raise ValueError("MOTION_REPORT: report path must differ from the input and GIF paths")
+        raise ValueError(
+            "MOTION_REPORT: report path must differ from the input and GIF paths"
+        )
 
     plan, prepared_source = build_motion_plan(
         svg_path,
@@ -2206,15 +2649,19 @@ def render_motion_gif(
 
     runtime = probe_motion_runtime()
     if not runtime.get("ok"):
-        raise RuntimeError(f'MOTION_RUNTIME: {runtime.get("error", "motion dependencies are unavailable")}')
+        raise RuntimeError(
+            f"MOTION_RUNTIME: {runtime.get('error', 'motion dependencies are unavailable')}"
+        )
     available = runtime.get("format")
     if not isinstance(available, dict) or not available.get("gif"):
         raise RuntimeError("MOTION_FORMAT_UNAVAILABLE: GIF encoder is unavailable")
 
     node = str(runtime["node"])
     output_path.parent.mkdir(parents=True, exist_ok=True)
-    temporary_gif = output_path.with_name(f".{output_path.stem}.{uuid.uuid4().hex}.tmp.gif")
-    temporary_report: Optional[Path] = None
+    temporary_gif = output_path.with_name(
+        f".{output_path.stem}.{uuid.uuid4().hex}.tmp.gif"
+    )
+    temporary_report: Path | None = None
     source_hash = str(plan["source_sha256"])
 
     try:
@@ -2250,19 +2697,28 @@ def render_motion_gif(
                     timeout=MOTION_TIMEOUTS["render"],
                 )
             except subprocess.TimeoutExpired as error:
-                raise RuntimeError("MOTION_RENDER_TIMEOUT: frame rendering exceeded 120 seconds") from error
+                raise RuntimeError(
+                    "MOTION_RENDER_TIMEOUT: frame rendering exceeded 120 seconds"
+                ) from error
             if render_process.returncode != 0:
-                raise RuntimeError(f"MOTION_RENDER: {render_process.stderr.strip() or render_process.stdout.strip()}")
+                raise RuntimeError(
+                    f"MOTION_RENDER: {render_process.stderr.strip() or render_process.stdout.strip()}"
+                )
             worker = _last_json_line(render_process.stdout, "motion renderer")
             frame_files = sorted(frames.glob("frame-*.png"))
             if len(frame_files) != plan["frame_count"]:
-                raise RuntimeError(f'MOTION_FRAMES: expected {plan["frame_count"]} frames, rendered {len(frame_files)}')
+                raise RuntimeError(
+                    f"MOTION_FRAMES: expected {plan['frame_count']} frames, rendered {len(frame_files)}"
+                )
             frame_hashes = [_sha256(frame) for frame in frame_files]
             first_hash = frame_hashes[0]
             last_hash = frame_hashes[-1]
             stream_contract = plan["animation_contract"]["persistent_data_flow"]
             full_opacity_values = stream_contract["full_opacity_frames"]
-            full_opacity_frames = (int(full_opacity_values[0]), int(full_opacity_values[1]))
+            full_opacity_frames = (
+                int(full_opacity_values[0]),
+                int(full_opacity_values[1]),
+            )
             raw_frame_hashes = _summarize_frame_hashes(
                 frame_hashes,
                 full_opacity_frames,
@@ -2278,7 +2734,9 @@ def render_motion_gif(
 
             encoder = _encode_gif(frames, fps, temporary_gif, runtime)
             if not temporary_gif.is_file() or temporary_gif.stat().st_size == 0:
-                raise RuntimeError("MOTION_ENCODE: encoder produced an empty GIF artifact")
+                raise RuntimeError(
+                    "MOTION_ENCODE: encoder produced an empty GIF artifact"
+                )
             media_probe = _probe_media(temporary_gif)
             _validate_encoded_gif(
                 media_probe,
@@ -2297,7 +2755,9 @@ def render_motion_gif(
 
         source_hash_after = _sha256(svg_path)
         if source_hash_after != source_hash:
-            raise RuntimeError("MOTION_SOURCE_MUTATED: source SVG changed during GIF rendering")
+            raise RuntimeError(
+                "MOTION_SOURCE_MUTATED: source SVG changed during GIF rendering"
+            )
         artifact_bytes = temporary_gif.stat().st_size
         result = dict(plan)
         result.update(
@@ -2315,9 +2775,13 @@ def render_motion_gif(
                     "first_frame_sha256": first_hash,
                     "last_frame_sha256": last_hash,
                     "unique_frame_count": raw_frame_hashes["unique_frame_count"],
-                    "minimum_unique_frame_count": raw_frame_hashes["minimum_unique_frame_count"],
+                    "minimum_unique_frame_count": raw_frame_hashes[
+                        "minimum_unique_frame_count"
+                    ],
                     "all_frames_unique": raw_frame_hashes["all_frames_unique"],
-                    "adjacent_duplicate_count": raw_frame_hashes["adjacent_duplicate_count"],
+                    "adjacent_duplicate_count": raw_frame_hashes[
+                        "adjacent_duplicate_count"
+                    ],
                     "repeat_scope": raw_frame_hashes["repeat_scope"],
                     "repeat_scope_policy": raw_frame_hashes["repeat_scope_policy"],
                     "repeated_frame_index_evidence": raw_frame_hashes[

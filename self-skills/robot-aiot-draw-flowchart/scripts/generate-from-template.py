@@ -21,21 +21,21 @@ import math
 import os
 import re
 import sys
+from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
-from typing import Dict, List, Mapping, Optional, Sequence, Tuple
 from xml.sax.saxutils import escape
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 if SCRIPT_DIR not in sys.path:
     sys.path.insert(0, SCRIPT_DIR)
 
-import fireworks_geometry as geometry  # noqa: E402
 import composition_quality as quality  # noqa: E402
+import fireworks_geometry as geometry  # noqa: E402
 from diagram_ir import normalize_diagram  # noqa: E402
 from semantic_contracts import STYLE_NAMES, resolve_style_index  # noqa: E402
 
-Point = Tuple[float, float]
-Bounds = Tuple[float, float, float, float]
+Point = tuple[float, float]
+Bounds = tuple[float, float, float, float]
 
 TEMPLATE_DIR = os.path.join(SCRIPT_DIR, "..", "templates")
 DEFAULT_VIEWBOX = {
@@ -77,7 +77,7 @@ MARKER_IDS = {
     "neutral": "arrowH",
 }
 
-STYLE_PROFILES: Dict[int, Dict[str, object]] = {
+STYLE_PROFILES: dict[int, dict[str, object]] = {
     1: {
         "name": "Flat Icon",
         "font_family": "'Helvetica Neue', Helvetica, Arial, 'PingFang SC', 'Microsoft YaHei', 'Microsoft JhengHei', 'SimHei', sans-serif",
@@ -542,7 +542,7 @@ class Node:
     node_id: str
     kind: str
     shape: str
-    data: Dict[str, object]
+    data: dict[str, object]
     bounds: Bounds
     cx: float
     cy: float
@@ -553,12 +553,12 @@ class ArrowRender:
     edge_id: str
     path_svg: str
     label_svg: str
-    label_bounds: Optional[Bounds]
-    route: List[Point]
-    report: Dict[str, object]
+    label_bounds: Bounds | None
+    route: list[Point]
+    report: dict[str, object]
 
 
-def style_value(style: Dict[str, object], key: str) -> object:
+def style_value(style: dict[str, object], key: str) -> object:
     return style[key]
 
 
@@ -618,12 +618,17 @@ _EDGE_DOM_SUFFIXES = (
 )
 
 
-def allocate_dom_identifier(base: str, used: set[str], suffixes: Sequence[str] = ()) -> str:
+def allocate_dom_identifier(
+    base: str, used: set[str], suffixes: Sequence[str] = ()
+) -> str:
     """Allocate one deterministic SVG id while preserving readable ids when safe."""
 
     candidate = safe_identifier(base, "element")
     sequence = 2
-    while any(identifier in used for identifier in (candidate, *(candidate + suffix for suffix in suffixes))):
+    while any(
+        identifier in used
+        for identifier in (candidate, *(candidate + suffix for suffix in suffixes))
+    ):
         candidate = f"{safe_identifier(base, 'element')}-{sequence}"
         sequence += 1
     used.add(candidate)
@@ -633,14 +638,14 @@ def allocate_dom_identifier(base: str, used: set[str], suffixes: Sequence[str] =
 
 # Style 8 is AI-authored: the AI reads references/style-8-dark-luxury.md and hand-crafts
 # the SVG directly. It cannot be driven by this template generator.
-_AI_AUTHORED_STYLES: Dict[int, str] = {8: "Style 8 (Dark Luxury)"}
+_AI_AUTHORED_STYLES: dict[int, str] = {8: "Style 8 (Dark Luxury)"}
 _AI_AUTHORED_MSG = (
     "{name} is an AI-authored style and cannot be used with generate-from-template.py. "
     "Load references/style-8-dark-luxury.md for the full spec and hand-craft the SVG directly."
 )
 
 
-def parse_style(raw: object) -> Tuple[int, Dict[str, object]]:
+def parse_style(raw: object) -> tuple[int, dict[str, object]]:
     index = resolve_style_index({"style": raw}) if raw is not None else 1
     if index in _AI_AUTHORED_STYLES:
         raise ValueError(_AI_AUTHORED_MSG.format(name=_AI_AUTHORED_STYLES[index]))
@@ -649,10 +654,10 @@ def parse_style(raw: object) -> Tuple[int, Dict[str, object]]:
     return index, copy.deepcopy(STYLE_PROFILES[index])
 
 
-def parse_template_viewbox(template_type: str) -> Tuple[float, float]:
+def parse_template_viewbox(template_type: str) -> tuple[float, float]:
     template_path = os.path.join(TEMPLATE_DIR, f"{template_type}.svg")
     if os.path.exists(template_path):
-        with open(template_path, "r", encoding="utf-8") as handle:
+        with open(template_path, encoding="utf-8") as handle:
             content = handle.read()
         match = re.search(r'viewBox="0 0 ([0-9.]+) ([0-9.]+)"', content)
         if match:
@@ -660,7 +665,7 @@ def parse_template_viewbox(template_type: str) -> Tuple[float, float]:
     return DEFAULT_VIEWBOX.get(template_type, (960, 600))
 
 
-def render_defs(style_index: int, style: Dict[str, object]) -> str:
+def render_defs(style_index: int, style: dict[str, object]) -> str:
     marker_size = "8" if style_index == 4 else "12" if style_index == 11 else "10"
     marker_height = "6" if style_index == 4 else "9" if style_index == 11 else "7"
     ref_x = "7" if style_index == 4 else "11" if style_index == 11 else "9"
@@ -675,11 +680,17 @@ def render_defs(style_index: int, style: Dict[str, object]) -> str:
             f'refX="{ref_x}" refY="{ref_y}" orient="auto"{marker_units}>'
         )
         if style_index == 4:
-            marker_lines.append(f'      <polygon points="0 0, 8 3, 0 6" fill="{color}"/>')
+            marker_lines.append(
+                f'      <polygon points="0 0, 8 3, 0 6" fill="{color}"/>'
+            )
         elif style_index == 11:
-            marker_lines.append(f'      <polygon points="0 0, 12 4.5, 0 9" fill="{color}"/>')
+            marker_lines.append(
+                f'      <polygon points="0 0, 12 4.5, 0 9" fill="{color}"/>'
+            )
         else:
-            marker_lines.append(f'      <polygon points="0 0, 10 3.5, 0 7" fill="{color}"/>')
+            marker_lines.append(
+                f'      <polygon points="0 0, 10 3.5, 0 7" fill="{color}"/>'
+            )
         marker_lines.append("    </marker>")
 
     filters = []
@@ -784,14 +795,23 @@ def render_defs(style_index: int, style: Dict[str, object]) -> str:
         f"    .metric-value {{ font-size: 9.5px; font-weight: 700; fill: {style_value(style, 'text_primary')}; }}",
     ]
     return "\n".join(
-        ["  <defs>"] + marker_lines + filters + ["    <style>"] + styles + ["    </style>", "  </defs>"]
+        ["  <defs>"]
+        + marker_lines
+        + filters
+        + ["    <style>"]
+        + styles
+        + ["    </style>", "  </defs>"]
     )
 
 
-def render_canvas(style_index: int, style: Dict[str, object], width: float, height: float) -> str:
+def render_canvas(
+    style_index: int, style: dict[str, object], width: float, height: float
+) -> str:
     background = str(style_value(style, "background"))
     if style_index == 2:
-        parts = [f'  <rect data-graph-role="background" width="{width}" height="{height}" fill="url(#terminalGradient)"/>']
+        parts = [
+            f'  <rect data-graph-role="background" width="{width}" height="{height}" fill="url(#terminalGradient)"/>'
+        ]
     elif style_index == 9:
         parts = [
             f'  <rect data-graph-role="background" width="{width}" height="{height}" fill="{background}"/>',
@@ -813,33 +833,45 @@ def render_canvas(style_index: int, style: Dict[str, object], width: float, heig
             f'  <rect data-graph-role="decoration" width="{width}" height="{height}" fill="url(#opsGrid)"/>',
         ]
     else:
-        parts = [f'  <rect data-graph-role="background" width="{width}" height="{height}" fill="{background}"/>']
+        parts = [
+            f'  <rect data-graph-role="background" width="{width}" height="{height}" fill="{background}"/>'
+        ]
 
     return "\n".join(parts)
 
 
-def title_position(style: Dict[str, object], width: float) -> Tuple[float, str]:
+def title_position(style: dict[str, object], width: float) -> tuple[float, str]:
     if style_value(style, "title_align") == "left":
         return 48.0, "start"
     return width / 2.0, "middle"
 
 
-def render_title_block(style: Dict[str, object], data: Dict[str, object], width: float) -> Tuple[str, float]:
+def render_title_block(
+    style: dict[str, object], data: dict[str, object], width: float
+) -> tuple[str, float]:
     title = normalize_text(data.get("title", "Diagram"))
     subtitle = normalize_text(data.get("subtitle", ""))
     x, anchor = title_position(style, width)
     if anchor == "middle":
-        parts = [f'  <text x="{x}" y="56" text-anchor="{anchor}" class="title">{title}</text>']
+        parts = [
+            f'  <text x="{x}" y="56" text-anchor="{anchor}" class="title">{title}</text>'
+        ]
         cursor_y = 82
         if subtitle:
-            parts.append(f'  <text x="{x}" y="{cursor_y}" text-anchor="{anchor}" class="subtitle">{subtitle}</text>')
+            parts.append(
+                f'  <text x="{x}" y="{cursor_y}" text-anchor="{anchor}" class="subtitle">{subtitle}</text>'
+            )
             cursor_y += 24
         return "\n".join(parts), cursor_y + 10
 
-    parts = [f'  <text x="{x}" y="48" text-anchor="{anchor}" class="title">{title}</text>']
+    parts = [
+        f'  <text x="{x}" y="48" text-anchor="{anchor}" class="title">{title}</text>'
+    ]
     cursor_y = 72
     if subtitle:
-        parts.append(f'  <text x="{x}" y="{cursor_y}" text-anchor="{anchor}" class="subtitle">{subtitle}</text>')
+        parts.append(
+            f'  <text x="{x}" y="{cursor_y}" text-anchor="{anchor}" class="subtitle">{subtitle}</text>'
+        )
         cursor_y += 18
     if style_value(style, "title_divider"):
         parts.append(
@@ -850,7 +882,9 @@ def render_title_block(style: Dict[str, object], data: Dict[str, object], width:
     return "\n".join(parts), cursor_y + 8
 
 
-def render_window_controls(data: Dict[str, object], style_index: int, width: float) -> str:
+def render_window_controls(
+    data: dict[str, object], style_index: int, width: float
+) -> str:
     controls = data.get("window_controls")
     if not controls:
         return ""
@@ -866,7 +900,9 @@ def render_window_controls(data: Dict[str, object], style_index: int, width: flo
     return "\n".join(lines)
 
 
-def render_header_meta(data: Dict[str, object], style: Dict[str, object], width: float) -> str:
+def render_header_meta(
+    data: dict[str, object], style: dict[str, object], width: float
+) -> str:
     meta_left = normalize_text(data.get("meta_left", ""))
     meta_center = normalize_text(data.get("meta_center", ""))
     meta_right = normalize_text(data.get("meta_right", ""))
@@ -876,15 +912,23 @@ def render_header_meta(data: Dict[str, object], style: Dict[str, object], width:
     size = to_float(data.get("meta_size", 11))
     lines = []
     if meta_left:
-        lines.append(f'  <text x="28" y="24" font-size="{size}" font-weight="600" fill="{fill}">{meta_left}</text>')
+        lines.append(
+            f'  <text x="28" y="24" font-size="{size}" font-weight="600" fill="{fill}">{meta_left}</text>'
+        )
     if meta_center:
-        lines.append(f'  <text x="{width / 2}" y="24" text-anchor="middle" font-size="{size}" font-weight="600" fill="{fill}">{meta_center}</text>')
+        lines.append(
+            f'  <text x="{width / 2}" y="24" text-anchor="middle" font-size="{size}" font-weight="600" fill="{fill}">{meta_center}</text>'
+        )
     if meta_right:
-        lines.append(f'  <text x="{width - 28}" y="24" text-anchor="end" font-size="{size}" font-weight="600" fill="{fill}">{meta_right}</text>')
+        lines.append(
+            f'  <text x="{width - 28}" y="24" text-anchor="end" font-size="{size}" font-weight="600" fill="{fill}">{meta_right}</text>'
+        )
     return "\n".join(lines)
 
 
-def render_style_signature(style_index: int, data: Dict[str, object], width: float) -> str:
+def render_style_signature(
+    style_index: int, data: dict[str, object], width: float
+) -> str:
     """Expose each engineering style's domain evidence as a compact visual fingerprint."""
 
     if style_index not in {9, 10, 11, 12}:
@@ -897,11 +941,15 @@ def render_style_signature(style_index: int, data: Dict[str, object], width: flo
         level = str(data.get("c4_level", "review")).upper()
         state = str(data.get("review_state", "REVIEW READY")).upper()
         top_raw = f"C4 · {level} VIEW"
-        top_text, top_size = fit_single_line_text(top_raw, badge_width - 46, preferred=8.5, minimum=6.2)
-        state_text, state_size = fit_single_line_text(state, badge_width - 46, preferred=8, minimum=6.2)
+        top_text, top_size = fit_single_line_text(
+            top_raw, badge_width - 46, preferred=8.5, minimum=6.2
+        )
+        state_text, state_size = fit_single_line_text(
+            state, badge_width - 46, preferred=8, minimum=6.2
+        )
         return "\n".join(
             [
-            '  <g id="style-signature" data-graph-role="decoration" data-style-signature="c4-review-board">',
+                '  <g id="style-signature" data-graph-role="decoration" data-style-signature="c4-review-board">',
                 f'    <rect x="{x}" y="{y}" width="{badge_width}" height="{badge_height}" rx="7" fill="#fffdf7" stroke="#8c7d68" stroke-width="1.2" stroke-dasharray="6 4"/>',
                 f'    <path d="M {x + 12} {y + 17} l 5 5 9 -11" fill="none" stroke="#365f56" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>',
                 f'    <text data-full-text="{normalize_attribute(top_raw)}" x="{x + 34}" y="{y + 14}" font-size="{top_size}" font-weight="800" fill="#8a6f43">{normalize_text(top_text)}</text>',
@@ -915,14 +963,19 @@ def render_style_signature(style_index: int, data: Dict[str, object], width: flo
         regions = sum(
             1
             for container in data.get("containers", [])
-            if isinstance(container, Mapping) and container.get("deployment_kind") == "region"
+            if isinstance(container, Mapping)
+            and container.get("deployment_kind") == "region"
         )
         top_raw = f"{platform} · {regions} REGIONS"
-        top_text, top_size = fit_single_line_text(top_raw, badge_width - 55, preferred=8.5, minimum=6.2)
-        mode_text, mode_size = fit_single_line_text(mode, badge_width - 55, preferred=8, minimum=6.2)
+        top_text, top_size = fit_single_line_text(
+            top_raw, badge_width - 55, preferred=8.5, minimum=6.2
+        )
+        mode_text, mode_size = fit_single_line_text(
+            mode, badge_width - 55, preferred=8, minimum=6.2
+        )
         return "\n".join(
             [
-            '  <g id="style-signature" data-graph-role="decoration" data-style-signature="cloud-ownership-map">',
+                '  <g id="style-signature" data-graph-role="decoration" data-style-signature="cloud-ownership-map">',
                 f'    <rect x="{x}" y="{y}" width="{badge_width}" height="{badge_height}" rx="9" fill="#ffffff" fill-opacity="0.82" stroke="#7fa3c2" stroke-width="1.1"/>',
                 f'    <rect x="{x + 11}" y="{y + 9}" width="14" height="14" rx="4" fill="#dbeafe" stroke="#2563eb" stroke-width="1"/>',
                 f'    <rect x="{x + 20}" y="{y + 13}" width="14" height="14" rx="4" fill="#dcfce7" stroke="#059669" stroke-width="1"/>',
@@ -946,7 +999,7 @@ def render_style_signature(style_index: int, data: Dict[str, object], width: flo
         )
         return "\n".join(
             [
-            '  <g id="style-signature" data-graph-role="decoration" data-style-signature="event-metro-map">',
+                '  <g id="style-signature" data-graph-role="decoration" data-style-signature="event-metro-map">',
                 f'    <rect x="{signature_x}" y="{y}" width="{signature_width}" height="{badge_height}" rx="7" fill="#17213c" stroke="#514c43" stroke-width="1"/>',
                 f'    <line x1="{signature_x + 12}" y1="{y + 17}" x2="{signature_x + 36}" y2="{y + 17}" stroke="#e4475b" stroke-width="3"/>',
                 f'    <circle cx="{signature_x + 18}" cy="{y + 17}" r="4" fill="#fbf7ee" stroke="#e4475b" stroke-width="2"/>',
@@ -973,15 +1026,27 @@ def render_style_signature(style_index: int, data: Dict[str, object], width: flo
         for node in services:
             signals = node.get("signals")
             if isinstance(signals, Mapping):
-                first_signal = next((value for value in signals.values() if isinstance(value, Mapping)), None)
+                first_signal = next(
+                    (value for value in signals.values() if isinstance(value, Mapping)),
+                    None,
+                )
                 if first_signal:
                     window = str(first_signal.get("window", ""))
                     break
-    status_color = {"ok": "#22c55e", "warn": "#f59e0b", "critical": "#f43f5e", "unknown": "#64748b"}.get(worst, "#64748b")
-    top_raw = f'LIVE · {window.upper() or "WINDOW"}'
+    status_color = {
+        "ok": "#22c55e",
+        "warn": "#f59e0b",
+        "critical": "#f43f5e",
+        "unknown": "#64748b",
+    }.get(worst, "#64748b")
+    top_raw = f"LIVE · {window.upper() or 'WINDOW'}"
     detail_raw = f"{worst.upper()} · CORRELATED TRACE"
-    top_text, top_size = fit_single_line_text(top_raw, badge_width - 70, preferred=8.5, minimum=6.2)
-    detail_text, detail_size = fit_single_line_text(detail_raw, badge_width - 70, preferred=8, minimum=6.2)
+    top_text, top_size = fit_single_line_text(
+        top_raw, badge_width - 70, preferred=8.5, minimum=6.2
+    )
+    detail_text, detail_size = fit_single_line_text(
+        detail_raw, badge_width - 70, preferred=8, minimum=6.2
+    )
     return "\n".join(
         [
             '  <g id="style-signature" data-graph-role="decoration" data-style-signature="ops-live-investigation">',
@@ -996,12 +1061,12 @@ def render_style_signature(style_index: int, data: Dict[str, object], width: flo
 
 
 def render_blueprint_title_block(
-    data: Dict[str, object],
-    style: Dict[str, object],
+    data: dict[str, object],
+    style: dict[str, object],
     style_index: int,
     width: float,
     height: float,
-) -> Tuple[str, Optional[Bounds]]:
+) -> tuple[str, Bounds | None]:
     if style_index != 3:
         return "", None
     block = data.get("blueprint_title_block")
@@ -1029,7 +1094,9 @@ def render_blueprint_title_block(
         estimated = geometry.estimate_text_width(value, 9.5)
         return round(max(6.0, min(9.5, 9.5 * caption_width / max(estimated, 1.0))), 2)
 
-    caption_y = min(y + block_height - 4, footer_top + max(12.0, block_height - 54) / 2 + 3)
+    caption_y = min(
+        y + block_height - 4, footer_top + max(12.0, block_height - 54) / 2 + 3
+    )
     captions = (
         (left_caption, x + column_width / 2, muted_fill),
         (center_caption, x + block_width / 2, sub_fill),
@@ -1049,7 +1116,9 @@ def render_blueprint_title_block(
         f'font-weight="600" fill="{caption_fill}">{caption}</text>'
         for caption, caption_x, caption_fill in captions
     )
-    return "\n".join(lines), rectangle_bounds(x - 6, y - 6, block_width + 12, block_height + 12)
+    return "\n".join(lines), rectangle_bounds(
+        x - 6, y - 6, block_width + 12, block_height + 12
+    )
 
 
 def infer_shape(kind: str) -> str:
@@ -1070,7 +1139,7 @@ def infer_shape(kind: str) -> str:
     return mapping.get(kind, "rect")
 
 
-def node_bounds(data: Dict[str, object]) -> Bounds:
+def node_bounds(data: dict[str, object]) -> Bounds:
     kind = str(data.get("kind", data.get("shape", "rect")))
     x = to_float(data.get("x"))
     y = to_float(data.get("y"))
@@ -1082,7 +1151,7 @@ def node_bounds(data: Dict[str, object]) -> Bounds:
     return (x, y, x + width, y + height)
 
 
-def normalize_node(node_data: Dict[str, object], fallback_id: str) -> Node:
+def normalize_node(node_data: dict[str, object], fallback_id: str) -> Node:
     kind = str(node_data.get("kind", node_data.get("shape", "rect")))
     bounds = node_bounds(node_data)
     left, top, right, bottom = bounds
@@ -1122,7 +1191,9 @@ def anchor_on_side(node: Node, side: str, offset: float = 0.0) -> Point:
     return (cx, cy)
 
 
-def anchor_point(node: Node, toward: Point, port: Optional[str] = None, offset: float = 0.0) -> Point:
+def anchor_point(
+    node: Node, toward: Point, port: str | None = None, offset: float = 0.0
+) -> Point:
     if port:
         return anchor_on_side(node, port, offset)
     left, top, right, bottom = node.bounds
@@ -1189,7 +1260,7 @@ def segment_axis(p1: Point, p2: Point) -> str:
     return "other"
 
 
-def port_axis(port: Optional[str]) -> Optional[str]:
+def port_axis(port: str | None) -> str | None:
     if not port:
         return None
     port = port.lower()
@@ -1200,7 +1271,7 @@ def port_axis(port: Optional[str]) -> Optional[str]:
     return None
 
 
-def offset_point(point: Point, port: Optional[str], distance: float) -> Point:
+def offset_point(point: Point, port: str | None, distance: float) -> Point:
     if not port:
         return point
     x, y = point
@@ -1218,17 +1289,21 @@ def offset_point(point: Point, port: Optional[str], distance: float) -> Point:
 
 def clear_port_point(
     endpoint: Point,
-    port: Optional[str],
+    port: str | None,
     desired_distance: float,
     obstacles: Sequence[Bounds],
-    canvas_bounds: Optional[Bounds],
+    canvas_bounds: Bounds | None,
 ) -> Point:
     """Choose the longest safe straight lead from a node port."""
 
-    distances = [desired_distance * fraction for fraction in (1.0, 0.75, 0.5, 0.35, 0.2, 0.0)]
+    distances = [
+        desired_distance * fraction for fraction in (1.0, 0.75, 0.5, 0.35, 0.2, 0.0)
+    ]
     for distance in distances:
         candidate = offset_point(endpoint, port, distance)
-        if canvas_bounds is not None and not geometry.point_in_bounds(candidate, canvas_bounds):
+        if canvas_bounds is not None and not geometry.point_in_bounds(
+            candidate, canvas_bounds
+        ):
             continue
         if any(
             geometry.point_in_bounds(candidate, obstacle, interior=True)
@@ -1241,10 +1316,15 @@ def clear_port_point(
 
 
 def route_length(points: Sequence[Point]) -> float:
-    return sum(abs(x1 - x2) + abs(y1 - y2) for (x1, y1), (x2, y2) in zip(points, points[1:]))
+    return sum(
+        abs(x1 - x2) + abs(y1 - y2)
+        for (x1, y1), (x2, y2) in zip(points, points[1:], strict=False)
+    )
 
 
-def route_uses_lane(points: Sequence[Point], value: float, axis: str, tolerance: float = 1.0) -> bool:
+def route_uses_lane(
+    points: Sequence[Point], value: float, axis: str, tolerance: float = 1.0
+) -> bool:
     if axis == "x":
         return any(abs(x - value) <= tolerance for x, _ in points)
     return any(abs(y - value) <= tolerance for _, y in points)
@@ -1254,17 +1334,22 @@ def collision_count(points: Sequence[Point], obstacles: Sequence[Bounds]) -> int
     """Count how many (segment, obstacle) pairs collide."""
     return sum(
         1
-        for p1, p2 in zip(points, points[1:])
+        for p1, p2 in zip(points, points[1:], strict=False)
         for obs in obstacles
         if segment_hits_bounds(p1, p2, obs)
     )
 
 
 def route_is_orthogonal(points: Sequence[Point]) -> bool:
-    return all(segment_axis(p1, p2) != "other" for p1, p2 in zip(points, points[1:]))
+    return all(
+        segment_axis(p1, p2) != "other"
+        for p1, p2 in zip(points, points[1:], strict=False)
+    )
 
 
-def route_crossing_count(points: Sequence[Point], existing_routes: Sequence[Sequence[Point]]) -> int:
+def route_crossing_count(
+    points: Sequence[Point], existing_routes: Sequence[Sequence[Point]]
+) -> int:
     return geometry.route_crossing_count(points, existing_routes)
 
 
@@ -1272,8 +1357,8 @@ def route_score(
     points: Sequence[Point],
     hint_x: Sequence[float],
     hint_y: Sequence[float],
-    source_port: Optional[str],
-    target_port: Optional[str],
+    source_port: str | None,
+    target_port: str | None,
     existing_routes: Sequence[Sequence[Point]] = (),
 ) -> float:
     length = route_length(points)
@@ -1297,16 +1382,18 @@ def route_score(
     return score
 
 
-def simplify_points(points: Sequence[Point], protected: Sequence[Point] = ()) -> List[Point]:
+def simplify_points(
+    points: Sequence[Point], protected: Sequence[Point] = ()
+) -> list[Point]:
     protected_points = {(round(point[0], 2), round(point[1], 2)) for point in protected}
-    simplified: List[Point] = []
+    simplified: list[Point] = []
     for x, y in points:
         pt = (round(x, 2), round(y, 2))
         if simplified and pt == simplified[-1]:
             continue
         simplified.append(pt)
 
-    collapsed: List[Point] = []
+    collapsed: list[Point] = []
     for point in simplified:
         if len(collapsed) < 2:
             collapsed.append(point)
@@ -1321,7 +1408,10 @@ def simplify_points(points: Sequence[Point], protected: Sequence[Point] = ()) ->
         # middle point is an explicit user waypoint.
         collinear_vertical = x0 == x1 == x2
         collinear_horizontal = y0 == y1 == y2
-        if (collinear_vertical or collinear_horizontal) and (x1, y1) not in protected_points:
+        if (collinear_vertical or collinear_horizontal) and (
+            x1,
+            y1,
+        ) not in protected_points:
             collapsed[-1] = point
         else:
             collapsed.append(point)
@@ -1337,19 +1427,32 @@ def visibility_grid_route(
     end: Point,
     obstacles: Sequence[Bounds],
     *,
-    canvas_bounds: Optional[Bounds],
+    canvas_bounds: Bounds | None,
     hint_x: Sequence[float],
     hint_y: Sequence[float],
     existing_routes: Sequence[Sequence[Point]],
-) -> Optional[List[Point]]:
+) -> list[Point] | None:
     """Find a deterministic rectilinear route on an obstacle visibility grid."""
 
     if start == end:
         return [start]
     if canvas_bounds is None:
-        all_x = [start[0], end[0], *[value for bounds in obstacles for value in (bounds[0], bounds[2])]]
-        all_y = [start[1], end[1], *[value for bounds in obstacles for value in (bounds[1], bounds[3])]]
-        canvas_bounds = (min(all_x) - 64, min(all_y) - 64, max(all_x) + 64, max(all_y) + 64)
+        all_x = [
+            start[0],
+            end[0],
+            *[value for bounds in obstacles for value in (bounds[0], bounds[2])],
+        ]
+        all_y = [
+            start[1],
+            end[1],
+            *[value for bounds in obstacles for value in (bounds[1], bounds[3])],
+        ]
+        canvas_bounds = (
+            min(all_x) - 64,
+            min(all_y) - 64,
+            max(all_x) + 64,
+            max(all_y) + 64,
+        )
     canvas_left, canvas_top, canvas_right, canvas_bottom = canvas_bounds
     inset = 4.0
 
@@ -1378,27 +1481,40 @@ def visibility_grid_route(
                 x_values.add(round(x + delta, 2))
                 y_values.add(round(y + delta, 2))
 
-    x_values = {value for value in x_values if canvas_left - 1e-6 <= value <= canvas_right + 1e-6}
-    y_values = {value for value in y_values if canvas_top - 1e-6 <= value <= canvas_bottom + 1e-6}
+    x_values = {
+        value
+        for value in x_values
+        if canvas_left - 1e-6 <= value <= canvas_right + 1e-6
+    }
+    y_values = {
+        value
+        for value in y_values
+        if canvas_top - 1e-6 <= value <= canvas_bottom + 1e-6
+    }
     points = {
         (x, y)
         for x in sorted(x_values)
         for y in sorted(y_values)
-        if not any(geometry.point_in_bounds((x, y), bounds, interior=True) for bounds in obstacles)
+        if not any(
+            geometry.point_in_bounds((x, y), bounds, interior=True)
+            for bounds in obstacles
+        )
     }
     points.update((start, end))
 
-    adjacency: Dict[Point, List[Point]] = {point: [] for point in points}
-    by_y: Dict[float, List[Point]] = {}
-    by_x: Dict[float, List[Point]] = {}
+    adjacency: dict[Point, list[Point]] = {point: [] for point in points}
+    by_y: dict[float, list[Point]] = {}
+    by_x: dict[float, list[Point]] = {}
     for point in points:
         by_y.setdefault(point[1], []).append(point)
         by_x.setdefault(point[0], []).append(point)
 
     def connect(line: Sequence[Point], sort_key: int) -> None:
         ordered = sorted(line, key=lambda point: (point[sort_key], point[1 - sort_key]))
-        for first, second in zip(ordered, ordered[1:]):
-            if any(segment_hits_bounds(first, second, obstacle) for obstacle in obstacles):
+        for first, second in zip(ordered, ordered[1:], strict=False):
+            if any(
+                segment_hits_bounds(first, second, obstacle) for obstacle in obstacles
+            ):
                 continue
             adjacency[first].append(second)
             adjacency[second].append(first)
@@ -1410,15 +1526,19 @@ def visibility_grid_route(
 
     # State includes the incoming axis so bends have an explicit cost.
     start_state = (start, "")
-    distances: Dict[Tuple[Point, str], float] = {start_state: 0.0}
-    paths: Dict[Tuple[Point, str], Tuple[Point, ...]] = {start_state: (start,)}
-    queue: List[Tuple[float, Tuple[Point, ...], Point, str]] = [(0.0, (start,), start, "")]
-    best_end: Optional[Tuple[float, Tuple[Point, ...]]] = None
+    distances: dict[tuple[Point, str], float] = {start_state: 0.0}
+    paths: dict[tuple[Point, str], tuple[Point, ...]] = {start_state: (start,)}
+    queue: list[tuple[float, tuple[Point, ...], Point, str]] = [
+        (0.0, (start,), start, "")
+    ]
+    best_end: tuple[float, tuple[Point, ...]] | None = None
 
     while queue:
         cost, path_key, point, incoming = heapq.heappop(queue)
         state = (point, incoming)
-        if cost > distances.get(state, float("inf")) + 1e-6 or path_key != paths.get(state):
+        if cost > distances.get(state, float("inf")) + 1e-6 or path_key != paths.get(
+            state
+        ):
             continue
         if point == end:
             best_end = (cost, path_key)
@@ -1434,10 +1554,17 @@ def visibility_grid_route(
             if incoming and incoming != axis:
                 extra += 22.0
             extra += len(interactions.crossings) * 640.0
-            extra += interactions.overlap_count * 10000.0 + interactions.overlap_length * 30.0
-            if axis == "vertical" and any(abs(point[0] - value) <= 1 for value in hint_x):
+            extra += (
+                interactions.overlap_count * 10000.0
+                + interactions.overlap_length * 30.0
+            )
+            if axis == "vertical" and any(
+                abs(point[0] - value) <= 1 for value in hint_x
+            ):
                 extra -= min(18.0, distance * 0.08)
-            if axis == "horizontal" and any(abs(point[1] - value) <= 1 for value in hint_y):
+            if axis == "horizontal" and any(
+                abs(point[1] - value) <= 1 for value in hint_y
+            ):
                 extra -= min(18.0, distance * 0.08)
             next_state = (neighbor, axis)
             next_cost = cost + extra
@@ -1445,7 +1572,8 @@ def visibility_grid_route(
             old_cost = distances.get(next_state, float("inf"))
             old_path = paths.get(next_state)
             if next_cost < old_cost - 1e-6 or (
-                abs(next_cost - old_cost) <= 1e-6 and (old_path is None or next_path < old_path)
+                abs(next_cost - old_cost) <= 1e-6
+                and (old_path is None or next_path < old_path)
             ):
                 distances[next_state] = next_cost
                 paths[next_state] = next_path
@@ -1460,34 +1588,45 @@ def build_orthogonal_route(
     start: Point,
     end: Point,
     obstacles: Sequence[Bounds],
-    arrow_data: Dict[str, object],
+    arrow_data: dict[str, object],
     *,
-    canvas_bounds: Optional[Bounds] = None,
+    canvas_bounds: Bounds | None = None,
     existing_routes: Sequence[Sequence[Point]] = (),
-) -> List[Point]:
+) -> list[Point]:
     raw_waypoints = arrow_data.get("route_points") or []
     if raw_waypoints:
-        waypoints: List[Point] = []
+        waypoints: list[Point] = []
         for index, raw_point in enumerate(raw_waypoints):
             if not isinstance(raw_point, (list, tuple)) or len(raw_point) != 2:
                 raise ValueError(f"route waypoint {index + 1} must be [x, y]")
             waypoint = (to_float(raw_point[0]), to_float(raw_point[1]))
-            if any(geometry.point_in_bounds(waypoint, bounds, interior=True) for bounds in obstacles):
-                raise ValueError(f"route waypoint {index + 1} intersects an obstacle: {waypoint}")
-            if canvas_bounds is not None and not geometry.point_in_bounds(waypoint, canvas_bounds):
-                raise ValueError(f"route waypoint {index + 1} is outside the canvas: {waypoint}")
+            if any(
+                geometry.point_in_bounds(waypoint, bounds, interior=True)
+                for bounds in obstacles
+            ):
+                raise ValueError(
+                    f"route waypoint {index + 1} intersects an obstacle: {waypoint}"
+                )
+            if canvas_bounds is not None and not geometry.point_in_bounds(
+                waypoint, canvas_bounds
+            ):
+                raise ValueError(
+                    f"route waypoint {index + 1} is outside the canvas: {waypoint}"
+                )
             waypoints.append(waypoint)
 
         mandatory = [start, *waypoints, end]
-        assembled: List[Point] = []
-        for index, (segment_start, segment_end) in enumerate(zip(mandatory, mandatory[1:])):
+        assembled: list[Point] = []
+        for index, (segment_start, segment_end) in enumerate(
+            zip(mandatory, mandatory[1:], strict=False)
+        ):
             segment_data = dict(arrow_data)
             segment_data.pop("route_points", None)
             if index > 0:
                 segment_data.pop("source_port", None)
             if index < len(mandatory) - 2:
                 segment_data.pop("target_port", None)
-            occupied_routes: List[Sequence[Point]] = list(existing_routes)
+            occupied_routes: list[Sequence[Point]] = list(existing_routes)
             if len(assembled) >= 2:
                 occupied_routes.append(assembled)
             segment_route = build_orthogonal_route(
@@ -1504,24 +1643,34 @@ def build_orthogonal_route(
                 assembled.extend(segment_route)
         result = simplify_points(assembled, waypoints)
         if not route_is_orthogonal(result):
-            raise ValueError("explicit route waypoints could not be connected orthogonally")
+            raise ValueError(
+                "explicit route waypoints could not be connected orthogonally"
+            )
         if any(waypoint not in result for waypoint in waypoints):
             raise ValueError("explicit route waypoint was not preserved")
         if route_collides(result, obstacles):
-            raise ValueError("explicit route waypoints cannot be connected without crossing an obstacle")
+            raise ValueError(
+                "explicit route waypoints cannot be connected without crossing an obstacle"
+            )
         return result
 
     sx, sy = start
     ex, ey = end
     routing_padding = to_float(arrow_data.get("routing_padding", 24))
-    port_clearance = to_float(arrow_data.get("port_clearance", max(18, routing_padding * 0.85)))
+    port_clearance = to_float(
+        arrow_data.get("port_clearance", max(18, routing_padding * 0.85))
+    )
     source_port = str(arrow_data.get("source_port", "")).strip().lower() or None
     target_port = str(arrow_data.get("target_port", "")).strip().lower() or None
-    inner_start = clear_port_point(start, source_port, port_clearance, obstacles, canvas_bounds)
-    inner_end = clear_port_point(end, target_port, port_clearance, obstacles, canvas_bounds)
+    inner_start = clear_port_point(
+        start, source_port, port_clearance, obstacles, canvas_bounds
+    )
+    inner_end = clear_port_point(
+        end, target_port, port_clearance, obstacles, canvas_bounds
+    )
     ssx, ssy = inner_start
     eex, eey = inner_end
-    expanded: List[Bounds] = []
+    expanded: list[Bounds] = []
     for bounds in obstacles:
         padded = expand_bounds(bounds, routing_padding)
         # Mandatory waypoints are exact. If one sits inside a clearance halo,
@@ -1536,8 +1685,26 @@ def build_orthogonal_route(
             expanded.append(padded)
     hint_x = [to_float(value) for value in arrow_data.get("corridor_x", [])]
     hint_y = [to_float(value) for value in arrow_data.get("corridor_y", [])]
-    lane_x = sorted({ssx, eex, round((ssx + eex) / 2, 2), *hint_x, *[b[0] for b in expanded], *[b[2] for b in expanded]})
-    lane_y = sorted({ssy, eey, round((ssy + eey) / 2, 2), *hint_y, *[b[1] for b in expanded], *[b[3] for b in expanded]})
+    lane_x = sorted(
+        {
+            ssx,
+            eex,
+            round((ssx + eex) / 2, 2),
+            *hint_x,
+            *[b[0] for b in expanded],
+            *[b[2] for b in expanded],
+        }
+    )
+    lane_y = sorted(
+        {
+            ssy,
+            eey,
+            round((ssy + eey) / 2, 2),
+            *hint_y,
+            *[b[1] for b in expanded],
+            *[b[3] for b in expanded],
+        }
+    )
     if expanded:
         left_rail = min(b[0] for b in expanded) - 24
         right_rail = max(b[2] for b in expanded) + 24
@@ -1553,8 +1720,22 @@ def build_orthogonal_route(
         [start, inner_start, inner_end, end],
         [start, inner_start, (eex, ssy), inner_end, end],
         [start, inner_start, (ssx, eey), inner_end, end],
-        [start, inner_start, ((ssx + eex) / 2, ssy), ((ssx + eex) / 2, eey), inner_end, end],
-        [start, inner_start, (ssx, (ssy + eey) / 2), (eex, (ssy + eey) / 2), inner_end, end],
+        [
+            start,
+            inner_start,
+            ((ssx + eex) / 2, ssy),
+            ((ssx + eex) / 2, eey),
+            inner_end,
+            end,
+        ],
+        [
+            start,
+            inner_start,
+            (ssx, (ssy + eey) / 2),
+            (eex, (ssy + eey) / 2),
+            inner_end,
+            end,
+        ],
         [start, inner_start, (left_rail, ssy), (left_rail, eey), inner_end, end],
         [start, inner_start, (right_rail, ssy), (right_rail, eey), inner_end, end],
         [start, inner_start, (ssx, top_rail), (eex, top_rail), inner_end, end],
@@ -1566,7 +1747,9 @@ def build_orthogonal_route(
         candidates.append([start, inner_start, (ssx, y), (eex, y), inner_end, end])
     for x in hint_x:
         for y in hint_y:
-            candidates.append([start, inner_start, (x, ssy), (x, y), (eex, y), inner_end, end])
+            candidates.append(
+                [start, inner_start, (x, ssy), (x, y), (eex, y), inner_end, end]
+            )
 
     visibility = visibility_grid_route(
         inner_start,
@@ -1580,42 +1763,56 @@ def build_orthogonal_route(
     if visibility:
         candidates.append([start, *visibility, end])
 
-    best_route: Optional[List[Point]] = None
+    best_route: list[Point] | None = None
     best_score = float("inf")
     for candidate in candidates:
         simplified = simplify_points(candidate)
         if not route_is_orthogonal(simplified):
             continue
-        if canvas_bounds is not None and not geometry.route_inside_canvas(simplified, canvas_bounds):
+        if canvas_bounds is not None and not geometry.route_inside_canvas(
+            simplified, canvas_bounds
+        ):
             continue
         coll = collision_count(simplified, expanded)
-        score = route_score(simplified, hint_x, hint_y, source_port, target_port, existing_routes)
+        score = route_score(
+            simplified, hint_x, hint_y, source_port, target_port, existing_routes
+        )
         if coll == 0:
-            if score < best_score or (abs(score - best_score) < 1e-6 and (best_route is None or tuple(simplified) < tuple(best_route))):
+            if score < best_score or (
+                abs(score - best_score) < 1e-6
+                and (best_route is None or tuple(simplified) < tuple(best_route))
+            ):
                 best_score = score
                 best_route = simplified
 
     if best_route is not None:
         return best_route
-    raise ValueError("no collision-free orthogonal route satisfies the current constraints")
+    raise ValueError(
+        "no collision-free orthogonal route satisfies the current constraints"
+    )
 
 
 def choose_label_position(points: Sequence[Point]) -> Point:
-    segments = list(zip(points, points[1:]))
+    segments = list(zip(points, points[1:], strict=False))
     if not segments:
         return points[0]
-    best = max(segments, key=lambda seg: abs(seg[0][0] - seg[1][0]) + abs(seg[0][1] - seg[1][1]))
+    best = max(
+        segments,
+        key=lambda seg: abs(seg[0][0] - seg[1][0]) + abs(seg[0][1] - seg[1][1]),
+    )
     return ((best[0][0] + best[1][0]) / 2, (best[0][1] + best[1][1]) / 2)
 
 
-def color_for_flow(style: Dict[str, object], arrow_data: Dict[str, object]) -> str:
+def color_for_flow(style: dict[str, object], arrow_data: dict[str, object]) -> str:
     if arrow_data.get("color"):
         return str(arrow_data["color"])
     flow = FLOW_ALIASES.get(str(arrow_data.get("flow", "control")).lower(), "control")
     return str(style_value(style, "arrow_colors")[flow])
 
 
-def marker_for_color(style: Dict[str, object], color: str, arrow_data: Dict[str, object]) -> str:
+def marker_for_color(
+    style: dict[str, object], color: str, arrow_data: dict[str, object]
+) -> str:
     if arrow_data.get("marker"):
         return f"url(#{arrow_data['marker']})"
     colors = style_value(style, "arrow_colors")
@@ -1625,14 +1822,20 @@ def marker_for_color(style: Dict[str, object], color: str, arrow_data: Dict[str,
     return "url(#arrowA)"
 
 
-def render_label_badge(x: float, y: float, text: str, style: Dict[str, object], label_style: str = "offset") -> str:
+def render_label_badge(
+    x: float, y: float, text: str, style: dict[str, object], label_style: str = "offset"
+) -> str:
     width = max(36.0, geometry.estimate_text_width(text, 12) + 14)
-    parts: List[str] = []
+    parts: list[str] = []
     if label_style == "badge":
         bg = style_value(style, "arrow_label_bg")
         opacity = style_value(style, "arrow_label_opacity")
-        parts.append(f'  <rect x="{round(x - width / 2, 2)}" y="{round(y - 10, 2)}" width="{width}" height="20" rx="6" fill="{bg}" opacity="{opacity}"/>')
-    parts.append(f'  <text x="{round(x, 2)}" y="{round(y + 4, 2)}" text-anchor="middle" class="arrow-label">{normalize_text(text)}</text>')
+        parts.append(
+            f'  <rect x="{round(x - width / 2, 2)}" y="{round(y - 10, 2)}" width="{width}" height="20" rx="6" fill="{bg}" opacity="{opacity}"/>'
+        )
+    parts.append(
+        f'  <text x="{round(x, 2)}" y="{round(y + 4, 2)}" text-anchor="middle" class="arrow-label">{normalize_text(text)}</text>'
+    )
     return "\n".join(parts)
 
 
@@ -1656,7 +1859,9 @@ def estimate_label_bounds(x: float, y: float, text: str) -> Bounds:
     return rectangle_bounds(x - width / 2, y - 10, width, 20)
 
 
-def render_dual_label_badge(x: float, y: float, primary: str, secondary: str, style: Dict[str, object]) -> str:
+def render_dual_label_badge(
+    x: float, y: float, primary: str, secondary: str, style: dict[str, object]
+) -> str:
     width = max(
         42.0,
         geometry.estimate_text_width(primary, 11.5) + 16,
@@ -1673,7 +1878,9 @@ def render_dual_label_badge(x: float, y: float, primary: str, secondary: str, st
     )
 
 
-def estimate_dual_label_bounds(x: float, y: float, primary: str, secondary: str) -> Bounds:
+def estimate_dual_label_bounds(
+    x: float, y: float, primary: str, secondary: str
+) -> Bounds:
     width = max(
         42.0,
         geometry.estimate_text_width(primary, 11.5) + 16,
@@ -1682,7 +1889,7 @@ def estimate_dual_label_bounds(x: float, y: float, primary: str, secondary: str)
     return rectangle_bounds(x - width / 2, y - 16, width, 32)
 
 
-def section_header_text(container: Dict[str, object], style: Dict[str, object]) -> str:
+def section_header_text(container: dict[str, object], style: dict[str, object]) -> str:
     if container.get("header_text"):
         text = str(container.get("header_text", ""))
     else:
@@ -1695,31 +1902,39 @@ def section_header_text(container: Dict[str, object], style: Dict[str, object]) 
     return text
 
 
-def deterministic_jitter(seed: object, element_id: object, pass_index: int, amplitude: float = 1.5) -> float:
+def deterministic_jitter(
+    seed: object, element_id: object, pass_index: int, amplitude: float = 1.5
+) -> float:
     """Return stable decorative jitter without relying on process-randomized hash()."""
 
-    digest = hashlib.sha256(f"{seed}:{element_id}:{pass_index}".encode("utf-8")).digest()
+    digest = hashlib.sha256(f"{seed}:{element_id}:{pass_index}".encode()).digest()
     unit = int.from_bytes(digest[:4], "big") / float(2**32 - 1)
     return round((unit * 2.0 - 1.0) * amplitude, 3)
 
 
-def render_section(container: Dict[str, object], style: Dict[str, object]) -> str:
+def render_section(container: dict[str, object], style: dict[str, object]) -> str:
     x = to_float(container["x"])
     y = to_float(container["y"])
     width = to_float(container["width"])
     height = to_float(container["height"])
-    rx = to_float(container.get("rx", 16 if style_value(style, "name") != "Notion Clean" else 4))
+    rx = to_float(
+        container.get("rx", 16 if style_value(style, "name") != "Notion Clean" else 4)
+    )
     fill = str(container.get("fill", style_value(style, "section_fill")))
     stroke = str(container.get("stroke", style_value(style, "section_stroke")))
     dash = str(container.get("stroke_dasharray", style_value(style, "section_dash")))
     label = section_header_text(container, style)
     subtitle = str(container.get("subtitle", ""))
     side_label = str(container.get("side_label", "")).strip()
-    side_label_fill = str(container.get("side_label_fill", style_value(style, "text_secondary")))
+    side_label_fill = str(
+        container.get("side_label_fill", style_value(style, "text_secondary"))
+    )
     side_label_size = to_float(container.get("side_label_size", 14))
     side_label_weight = str(container.get("side_label_weight", "600"))
     side_label_anchor = str(container.get("side_label_anchor", "end"))
-    lines = [f'  <rect data-graph-role="container" x="{x}" y="{y}" width="{width}" height="{height}" rx="{rx}" fill="{fill}" stroke="{stroke}" stroke-width="1.4"']
+    lines = [
+        f'  <rect data-graph-role="container" x="{x}" y="{y}" width="{width}" height="{height}" rx="{rx}" fill="{fill}" stroke="{stroke}" stroke-width="1.4"'
+    ]
     if dash:
         lines[-1] += f' stroke-dasharray="{dash}"'
     lines[-1] += "/>"
@@ -1737,8 +1952,16 @@ def render_section(container: Dict[str, object], style: Dict[str, object]) -> st
     elif treatment == "cloud" and container.get("deployment_kind"):
         deployment_kind = str(container.get("deployment_kind", ""))
         badge = normalize_text(deployment_kind.upper())
-        badge_width = max(54.0, geometry.estimate_text_width(str(container.get("deployment_kind", "")), 9) + 18)
-        spine_color = {"global": "#2563eb", "region": "#0891b2", "network": "#7c3aed"}.get(deployment_kind, "#7fa3c2")
+        badge_width = max(
+            54.0,
+            geometry.estimate_text_width(str(container.get("deployment_kind", "")), 9)
+            + 18,
+        )
+        spine_color = {
+            "global": "#2563eb",
+            "region": "#0891b2",
+            "network": "#7c3aed",
+        }.get(deployment_kind, "#7fa3c2")
         lines.append(
             f'  <rect data-graph-role="decoration" x="{x + width - badge_width - 14}" y="{y + 10}" '
             f'width="{badge_width}" height="18" rx="9" fill="#dbeafe" stroke="#93c5fd" stroke-width="0.8"/>'
@@ -1779,9 +2002,13 @@ def render_section(container: Dict[str, object], style: Dict[str, object]) -> st
                     f'font-size="7" font-weight="700" fill="#6f8ba5">{index * 25}%</text>'
                 )
     if label:
-        lines.append(f'  <text x="{x + 18}" y="{y + 24}" class="section">{normalize_text(label)}</text>')
+        lines.append(
+            f'  <text x="{x + 18}" y="{y + 24}" class="section">{normalize_text(label)}</text>'
+        )
     if subtitle:
-        lines.append(f'  <text x="{x + 18}" y="{y + 44}" class="section-sub">{normalize_text(subtitle)}</text>')
+        lines.append(
+            f'  <text x="{x + 18}" y="{y + 44}" class="section-sub">{normalize_text(subtitle)}</text>'
+        )
     if side_label:
         side_x = to_float(container.get("side_label_x", max(28, x - 18)))
         side_y = to_float(container.get("side_label_y", y + height / 2))
@@ -1792,8 +2019,14 @@ def render_section(container: Dict[str, object], style: Dict[str, object]) -> st
     return "\n".join(lines)
 
 
-def container_header_bounds(container: Dict[str, object], style: Optional[Dict[str, object]] = None) -> Optional[Bounds]:
-    label = section_header_text(container, style) if style is not None else str(container.get("header_text", "") or container.get("label", ""))
+def container_header_bounds(
+    container: dict[str, object], style: dict[str, object] | None = None
+) -> Bounds | None:
+    label = (
+        section_header_text(container, style)
+        if style is not None
+        else str(container.get("header_text", "") or container.get("label", ""))
+    )
     label = label.strip()
     subtitle = str(container.get("subtitle", "")).strip()
     if not label and not subtitle:
@@ -1808,8 +2041,8 @@ def container_header_bounds(container: Dict[str, object], style: Optional[Dict[s
     return rectangle_bounds(x + 8, y + 6, reserved_width, header_height)
 
 
-def label_position_candidates(points: Sequence[Point], text: str = "") -> List[Point]:
-    segments = list(zip(points, points[1:]))
+def label_position_candidates(points: Sequence[Point], text: str = "") -> list[Point]:
+    segments = list(zip(points, points[1:], strict=False))
     if not segments:
         return [points[0]]
     ranked_segments = sorted(
@@ -1817,11 +2050,15 @@ def label_position_candidates(points: Sequence[Point], text: str = "") -> List[P
         key=lambda seg: abs(seg[0][0] - seg[1][0]) + abs(seg[0][1] - seg[1][1]),
         reverse=True,
     )
-    candidates: List[Point] = []
+    candidates: list[Point] = []
     horizontal_offset = 17.0
     vertical_offset = max(22.0, geometry.estimate_text_width(text, 12) / 2 + 10)
-    global_x = (min(point[0] for point in points) + max(point[0] for point in points)) / 2
-    global_y = (min(point[1] for point in points) + max(point[1] for point in points)) / 2
+    global_x = (
+        min(point[0] for point in points) + max(point[0] for point in points)
+    ) / 2
+    global_y = (
+        min(point[1] for point in points) + max(point[1] for point in points)
+    ) / 2
     for (x1, y1), (x2, y2) in ranked_segments:
         length = abs(x1 - x2) + abs(y1 - y2)
         if length < 34:
@@ -1833,19 +2070,44 @@ def label_position_candidates(points: Sequence[Point], text: str = "") -> List[P
         ]
         for mx, my in centers:
             if abs(y1 - y2) < 1e-6:
-                candidates.extend([(mx, my - horizontal_offset), (mx, my + horizontal_offset), (mx, my - 30), (mx, my + 30), (mx, my)])
-                candidates.extend([(global_x, my - horizontal_offset), (global_x, my + horizontal_offset)])
+                candidates.extend(
+                    [
+                        (mx, my - horizontal_offset),
+                        (mx, my + horizontal_offset),
+                        (mx, my - 30),
+                        (mx, my + 30),
+                        (mx, my),
+                    ]
+                )
+                candidates.extend(
+                    [
+                        (global_x, my - horizontal_offset),
+                        (global_x, my + horizontal_offset),
+                    ]
+                )
             elif abs(x1 - x2) < 1e-6:
-                candidates.extend([(mx - vertical_offset, my), (mx + vertical_offset, my), (mx - vertical_offset - 14, my), (mx + vertical_offset + 14, my), (mx, my)])
-                candidates.extend([(mx - vertical_offset, global_y), (mx + vertical_offset, global_y)])
+                candidates.extend(
+                    [
+                        (mx - vertical_offset, my),
+                        (mx + vertical_offset, my),
+                        (mx - vertical_offset - 14, my),
+                        (mx + vertical_offset + 14, my),
+                        (mx, my),
+                    ]
+                )
+                candidates.extend(
+                    [(mx - vertical_offset, global_y), (mx + vertical_offset, global_y)]
+                )
             else:
                 candidates.extend([(mx, my - 16), (mx, my + 16), (mx, my)])
     return candidates or [choose_label_position(points)]
 
 
-def route_clearance_bounds(points: Sequence[Point], padding: float = 3.0) -> List[Bounds]:
-    result: List[Bounds] = []
-    for first, second in zip(points, points[1:]):
+def route_clearance_bounds(
+    points: Sequence[Point], padding: float = 3.0
+) -> list[Bounds]:
+    result: list[Bounds] = []
+    for first, second in zip(points, points[1:], strict=False):
         left = min(first[0], second[0]) - padding
         right = max(first[0], second[0]) + padding
         top = min(first[1], second[1]) - padding
@@ -1860,11 +2122,13 @@ def choose_label_position_avoiding(
     occupied: Sequence[Bounds],
     *,
     routes: Sequence[Sequence[Point]] = (),
-    canvas_bounds: Optional[Bounds] = None,
+    canvas_bounds: Bounds | None = None,
     dx: float = 0.0,
     dy: float = -4.0,
 ) -> Point:
-    route_bounds = [bounds for route in routes for bounds in route_clearance_bounds(route)]
+    route_bounds = [
+        bounds for route in routes for bounds in route_clearance_bounds(route)
+    ]
     offset_options = [
         (dx, dy),
         (0.0, -4.0),
@@ -1880,7 +2144,9 @@ def choose_label_position_avoiding(
         for offset_x, offset_y in offset_options:
             adjusted = (candidate[0] + offset_x, candidate[1] + offset_y)
             label_box = estimate_label_bounds(adjusted[0], adjusted[1], text)
-            if canvas_bounds is not None and not geometry.bounds_inside(label_box, canvas_bounds, 4):
+            if canvas_bounds is not None and not geometry.bounds_inside(
+                label_box, canvas_bounds, 4
+            ):
                 continue
             if any(bounds_intersect(label_box, other, 4) for other in occupied):
                 continue
@@ -1890,17 +2156,26 @@ def choose_label_position_avoiding(
     raise ValueError(f"no collision-free label position for {text!r}")
 
 
-def legend_layout(data: Dict[str, object], legend: Sequence[Dict[str, object]], width: float, height: float) -> Optional[Tuple[float, float, Bounds]]:
+def legend_layout(
+    data: dict[str, object],
+    legend: Sequence[dict[str, object]],
+    width: float,
+    height: float,
+) -> tuple[float, float, Bounds] | None:
     if not legend:
         return None
     orientation = str(data.get("legend_orientation", "vertical")).strip().lower()
     if orientation not in {"vertical", "horizontal"}:
         raise ValueError("legend_orientation must be vertical or horizontal")
     x = to_float(data.get("_legend_x", data.get("legend_x", 42)))
-    default_y = height - 82 if orientation == "horizontal" else height - (len(legend) * 22 + 34)
+    default_y = (
+        height - 82 if orientation == "horizontal" else height - (len(legend) * 22 + 34)
+    )
     y = to_float(data.get("_legend_y", data.get("legend_y", default_y)))
     position = str(data.get("legend_position", "bottom-left"))
-    label_widths = [geometry.estimate_text_width(str(item.get("label", "")), 12) for item in legend]
+    label_widths = [
+        geometry.estimate_text_width(str(item.get("label", "")), 12) for item in legend
+    ]
     if orientation == "horizontal":
         block_width = sum(40 + label_width + 28 for label_width in label_widths) - 18
         block_height = 28
@@ -1918,39 +2193,56 @@ def legend_layout(data: Dict[str, object], legend: Sequence[Dict[str, object]], 
     return (x, y, rectangle_bounds(x - 10, y - 14, block_width + 20, block_height + 18))
 
 
-def route_hint_points(arrow: Dict[str, object], node_map: Dict[str, Node]) -> List[Point]:
+def route_hint_points(
+    arrow: dict[str, object], node_map: dict[str, Node]
+) -> list[Point]:
     source = node_map.get(str(arrow.get("source"))) if arrow.get("source") else None
     target = node_map.get(str(arrow.get("target"))) if arrow.get("target") else None
     start_hint = (to_float(arrow.get("x1")), to_float(arrow.get("y1")))
     end_hint = (to_float(arrow.get("x2")), to_float(arrow.get("y2")))
     if source is not None:
         toward = end_hint if target is None else (target.cx, target.cy)
-        start = anchor_point(source, toward, str(arrow.get("source_port")) if arrow.get("source_port") else None)
+        start = anchor_point(
+            source,
+            toward,
+            str(arrow.get("source_port")) if arrow.get("source_port") else None,
+        )
     else:
         start = start_hint
     if target is not None:
         toward = start_hint if source is None else (source.cx, source.cy)
-        end = anchor_point(target, toward, str(arrow.get("target_port")) if arrow.get("target_port") else None)
+        end = anchor_point(
+            target,
+            toward,
+            str(arrow.get("target_port")) if arrow.get("target_port") else None,
+        )
     else:
         end = end_hint
-    waypoints = [(to_float(point[0]), to_float(point[1])) for point in (arrow.get("route_points") or [])]
+    waypoints = [
+        (to_float(point[0]), to_float(point[1]))
+        for point in (arrow.get("route_points") or [])
+    ]
     return [start, *waypoints, end]
 
 
 def resolve_legend_layout(
-    data: Dict[str, object],
-    legend: Sequence[Dict[str, object]],
+    data: dict[str, object],
+    legend: Sequence[dict[str, object]],
     width: float,
     height: float,
     obstacles: Sequence[Bounds],
-    arrows: Sequence[Dict[str, object]],
-    node_map: Dict[str, Node],
-) -> Optional[Dict[str, object]]:
+    arrows: Sequence[dict[str, object]],
+    node_map: dict[str, Node],
+) -> dict[str, object] | None:
     requested = legend_layout(data, legend, width, height)
     if requested is None:
         return None
     requested_x, requested_y, requested_bounds = requested
-    hint_routes = [route_hint_points(arrow, node_map) for arrow in arrows if arrow.get("route_points")]
+    hint_routes = [
+        route_hint_points(arrow, node_map)
+        for arrow in arrows
+        if arrow.get("route_points")
+    ]
     canvas = (0.0, 0.0, width, height)
 
     def is_safe(bounds: Bounds) -> bool:
@@ -1961,7 +2253,7 @@ def resolve_legend_layout(
         return not any(
             segment_hits_bounds(first, second, bounds)
             for route in hint_routes
-            for first, second in zip(route, route[1:])
+            for first, second in zip(route, route[1:], strict=False)
         )
 
     if is_safe(requested_bounds):
@@ -1972,17 +2264,25 @@ def resolve_legend_layout(
             "bounds": requested_bounds,
         }
     if data.get("legend_locked"):
-        raise ValueError("locked legend intersects diagram content or a mandatory route")
+        raise ValueError(
+            "locked legend intersects diagram content or a mandatory route"
+        )
 
     block_width = requested_bounds[2] - requested_bounds[0]
     block_height = requested_bounds[3] - requested_bounds[1]
-    candidates: List[Tuple[float, float]] = []
+    candidates: list[tuple[float, float]] = []
     for top in range(84, max(85, int(height - block_height - 8)) + 1, 8):
         for left in range(8, max(9, int(width - block_width - 8)) + 1, 8):
             x = left + 10
             y = top + 14
             candidates.append((float(x), float(y)))
-    candidates.sort(key=lambda point: (abs(point[0] - requested_x) + abs(point[1] - requested_y), point[1], point[0]))
+    candidates.sort(
+        key=lambda point: (
+            abs(point[0] - requested_x) + abs(point[1] - requested_y),
+            point[1],
+            point[0],
+        )
+    )
     for x, y in candidates:
         bounds = (x - 10, y - 14, x - 10 + block_width, y - 14 + block_height)
         if is_safe(bounds):
@@ -1997,7 +2297,9 @@ def resolve_legend_layout(
     raise ValueError("no collision-free legend position is available")
 
 
-def footer_layout(data: Dict[str, object], width: float, height: float) -> Optional[Tuple[float, float, Bounds]]:
+def footer_layout(
+    data: dict[str, object], width: float, height: float
+) -> tuple[float, float, Bounds] | None:
     text = str(data.get("footer", "")).strip()
     if not text:
         return None
@@ -2010,7 +2312,9 @@ def footer_layout(data: Dict[str, object], width: float, height: float) -> Optio
     return (x, y, rectangle_bounds(x, y - 12, footer_width, 16))
 
 
-def render_tags(node: Dict[str, object], x: float, y: float, style: Dict[str, object]) -> List[str]:
+def render_tags(
+    node: dict[str, object], x: float, y: float, style: dict[str, object]
+) -> list[str]:
     tags = node.get("tags", [])
     if not tags:
         return []
@@ -2032,7 +2336,9 @@ def render_tags(node: Dict[str, object], x: float, y: float, style: Dict[str, ob
     return lines
 
 
-def fitted_text_size(text: str, available_width: float, *, preferred: float = 18.0, minimum: float = 12.0) -> float:
+def fitted_text_size(
+    text: str, available_width: float, *, preferred: float = 18.0, minimum: float = 12.0
+) -> float:
     """Keep a single-line node title inside its card without manual tuning."""
 
     estimated = geometry.estimate_text_width(text, preferred, weight=1.08)
@@ -2048,33 +2354,46 @@ def fit_single_line_text(
     *,
     preferred: float = 18.0,
     minimum: float = 12.0,
-) -> Tuple[str, float]:
+) -> tuple[str, float]:
     """Fit one line, then fail visually closed with an ellipsis at the minimum size."""
 
     value = " ".join(str(text or "").split())
-    size = fitted_text_size(value, available_width, preferred=preferred, minimum=minimum)
+    size = fitted_text_size(
+        value, available_width, preferred=preferred, minimum=minimum
+    )
     if geometry.estimate_text_width(value, size, weight=1.08) <= available_width:
         return value, size
     candidate = value
-    while candidate and geometry.estimate_text_width(candidate + "…", size, weight=1.08) > available_width:
+    while (
+        candidate
+        and geometry.estimate_text_width(candidate + "…", size, weight=1.08)
+        > available_width
+    ):
         candidate = candidate[:-1].rstrip()
     return (candidate + "…" if candidate else "…"), size
 
 
-def wrap_text_lines(text: object, available_width: float, *, font_size: float = 11.5, max_lines: int = 2) -> List[str]:
+def wrap_text_lines(
+    text: object, available_width: float, *, font_size: float = 11.5, max_lines: int = 2
+) -> list[str]:
     """Balance short card copy across lines and fail visually closed with an ellipsis."""
 
     value = " ".join(str(text or "").split())
     if not value:
         return []
-    if geometry.estimate_text_width(value, font_size) <= available_width or max_lines <= 1:
+    if (
+        geometry.estimate_text_width(value, font_size) <= available_width
+        or max_lines <= 1
+    ):
         return [value]
     words = value.split()
     if max_lines == 2 and len(words) > 1:
-        candidates: List[Tuple[Tuple[float, float], List[str]]] = []
+        candidates: list[tuple[tuple[float, float], list[str]]] = []
         for index in range(1, len(words)):
             candidate = [" ".join(words[:index]), " ".join(words[index:])]
-            widths = [geometry.estimate_text_width(line, font_size) for line in candidate]
+            widths = [
+                geometry.estimate_text_width(line, font_size) for line in candidate
+            ]
             overflow = sum(max(0.0, width - available_width) for width in widths)
             candidates.append(((overflow, abs(widths[0] - widths[1])), candidate))
         lines = min(candidates, key=lambda item: item[0])[1]
@@ -2083,7 +2402,10 @@ def wrap_text_lines(text: object, available_width: float, *, font_size: float = 
         current = ""
         for word in words:
             candidate = f"{current} {word}".strip()
-            if current and geometry.estimate_text_width(candidate, font_size) > available_width:
+            if (
+                current
+                and geometry.estimate_text_width(candidate, font_size) > available_width
+            ):
                 lines.append(current)
                 current = word
             else:
@@ -2093,20 +2415,26 @@ def wrap_text_lines(text: object, available_width: float, *, font_size: float = 
         if len(lines) > max_lines:
             lines = lines[: max_lines - 1] + [" ".join(lines[max_lines - 1 :])]
 
-    fitted: List[str] = []
+    fitted: list[str] = []
     for line in lines[:max_lines]:
         candidate = line
-        while len(candidate) > 1 and geometry.estimate_text_width(candidate, font_size) > available_width:
+        while (
+            len(candidate) > 1
+            and geometry.estimate_text_width(candidate, font_size) > available_width
+        ):
             candidate = candidate[:-1].rstrip()
         if candidate != line:
             candidate = candidate.rstrip(" …") + "…"
-            while len(candidate) > 1 and geometry.estimate_text_width(candidate, font_size) > available_width:
+            while (
+                len(candidate) > 1
+                and geometry.estimate_text_width(candidate, font_size) > available_width
+            ):
                 candidate = candidate[:-2].rstrip() + "…"
         fitted.append(candidate)
     return fitted
 
 
-def render_review_node(node: Dict[str, object], style: Dict[str, object]) -> str:
+def render_review_node(node: dict[str, object], style: dict[str, object]) -> str:
     x = to_float(node["x"])
     y = to_float(node["y"])
     width = to_float(node.get("width", 180))
@@ -2120,12 +2448,19 @@ def render_review_node(node: Dict[str, object], style: Dict[str, object]) -> str
     raw_c4_type = str(node.get("c4_type", node.get("type_label", "element")))
     c4_type_raw = raw_c4_type.upper().replace("_", " ")
     c4_type_text, c4_type_size = fit_single_line_text(
-        c4_type_raw, width - 28, preferred=to_float(style_value(style, "type_label_size"), 10), minimum=7.5
+        c4_type_raw,
+        width - 28,
+        preferred=to_float(style_value(style, "type_label_size"), 10),
+        minimum=7.5,
     )
     c4_type = normalize_text(c4_type_text)
-    external_dash = ' stroke-dasharray="6 4"' if raw_c4_type == "external_system" else ""
+    external_dash = (
+        ' stroke-dasharray="6 4"' if raw_c4_type == "external_system" else ""
+    )
     title_raw = str(node.get("label", ""))
-    title_text, title_size = fit_single_line_text(title_raw, width - 28, preferred=15, minimum=10.5)
+    title_text, title_size = fit_single_line_text(
+        title_raw, width - 28, preferred=15, minimum=10.5
+    )
     title = normalize_text(title_text)
     description_raw = str(node.get("description", node.get("sublabel", "")))
     technology_raw = str(node.get("technology", ""))
@@ -2134,12 +2469,14 @@ def render_review_node(node: Dict[str, object], style: Dict[str, object]) -> str
     )
     technology = normalize_text(technology_text)
     description_size = 11.5
-    description_lines = wrap_text_lines(description_raw, width - 28, font_size=description_size, max_lines=2)
+    description_lines = wrap_text_lines(
+        description_raw, width - 28, font_size=description_size, max_lines=2
+    )
     lines = [
         f'  <rect x="{x}" y="{y}" width="{width}" height="{height}" rx="7" fill="{fill}" stroke="{stroke}" '
         f'stroke-width="1.8"{external_dash}/>',
         f'  <path data-graph-role="decoration" d="M {x + 7 + dx} {y + 2 + dy} H {x + width - 7 + dx} '
-        f'Q {x + width - 2 + dx} {y + 2 + dy} {x + width - 2 + dx} {y + 8 + dy} '
+        f"Q {x + width - 2 + dx} {y + 2 + dy} {x + width - 2 + dx} {y + 8 + dy} "
         f'V {y + height - 7 + dy}" fill="none" stroke="{stroke}" stroke-width="0.8" opacity="0.42"/>',
         f'  <text data-text-role="type" data-full-text="{normalize_attribute(c4_type_raw)}" '
         f'data-text-max-width="{width - 28}" x="{x + 14}" y="{y + 18}" class="node-type" '
@@ -2167,7 +2504,7 @@ def render_review_node(node: Dict[str, object], style: Dict[str, object]) -> str
     return "\n".join(lines)
 
 
-def render_cloud_glyph(glyph: str, cx: float, cy: float, color: str) -> List[str]:
+def render_cloud_glyph(glyph: str, cx: float, cy: float, color: str) -> list[str]:
     """Render manifest-backed neutral geometry without bundling vendor logos."""
 
     common = f'fill="none" stroke="{color}" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"'
@@ -2203,7 +2540,7 @@ def render_cloud_glyph(glyph: str, cx: float, cy: float, color: str) -> List[str
     ]
 
 
-def render_cloud_node(node: Dict[str, object], style: Dict[str, object]) -> str:
+def render_cloud_node(node: dict[str, object], style: dict[str, object]) -> str:
     x = to_float(node["x"])
     y = to_float(node["y"])
     width = to_float(node.get("width", 160))
@@ -2212,12 +2549,18 @@ def render_cloud_node(node: Dict[str, object], style: Dict[str, object]) -> str:
     stroke = str(node.get("stroke", style_value(style, "node_stroke")))
     icon_color = str(node.get("icon_color", "#2563eb"))
     glyph = str(node.get("glyph", "compute"))
-    provider = normalize_text(str(node.get("provider", node.get("platform", "cloud"))).upper())
+    provider = normalize_text(
+        str(node.get("provider", node.get("platform", "cloud"))).upper()
+    )
     title_raw = str(node.get("label", ""))
     subtitle_raw = str(node.get("sublabel", node.get("service", "")))
     available_text_width = max(28.0, width - 78)
-    title_text, title_size = fit_single_line_text(title_raw, available_text_width, preferred=13.5, minimum=10.5)
-    subtitle_text, subtitle_size = fit_single_line_text(subtitle_raw, available_text_width, preferred=11.5, minimum=9.5)
+    title_text, title_size = fit_single_line_text(
+        title_raw, available_text_width, preferred=13.5, minimum=10.5
+    )
+    subtitle_text, subtitle_size = fit_single_line_text(
+        subtitle_raw, available_text_width, preferred=11.5, minimum=9.5
+    )
     title = normalize_text(title_text)
     subtitle = normalize_text(subtitle_text)
     icon_box_size = min(42.0, max(28.0, height - 16.0))
@@ -2236,21 +2579,30 @@ def render_cloud_node(node: Dict[str, object], style: Dict[str, object]) -> str:
     return "\n".join(lines)
 
 
-def render_transit_node(node: Dict[str, object], style: Dict[str, object]) -> str:
+def render_transit_node(node: dict[str, object], style: dict[str, object]) -> str:
     x = to_float(node["x"])
     y = to_float(node["y"])
     width = to_float(node.get("width", 140))
     height = to_float(node.get("height", 72))
     role = str(node.get("transit_role", "station"))
-    color = str(node.get("rail_color", node.get("stroke", style_value(style, "arrow_colors")["control"])))
+    color = str(
+        node.get(
+            "rail_color",
+            node.get("stroke", style_value(style, "arrow_colors")["control"]),
+        )
+    )
     if role == "dlq":
         color = str(node.get("stroke", style_value(style, "arrow_colors")["feedback"]))
     fill = str(node.get("fill", style_value(style, "node_fill")))
     title_raw = str(node.get("label", ""))
     subtitle_raw = str(node.get("sublabel", node.get("operation", "")))
     text_width = max(36.0, width - 50)
-    title_text, title_size = fit_single_line_text(title_raw, text_width, preferred=13.5, minimum=10.5)
-    subtitle_text, subtitle_size = fit_single_line_text(subtitle_raw, text_width, preferred=11.5, minimum=9.2)
+    title_text, title_size = fit_single_line_text(
+        title_raw, text_width, preferred=13.5, minimum=10.5
+    )
+    subtitle_text, subtitle_size = fit_single_line_text(
+        subtitle_raw, text_width, preferred=11.5, minimum=9.2
+    )
     title = normalize_text(title_text)
     subtitle = normalize_text(subtitle_text)
     badge = normalize_text(node.get("badge", node.get("partition_badge", "")))
@@ -2263,11 +2615,13 @@ def render_transit_node(node: Dict[str, object], style: Dict[str, object]) -> st
         f'  <text data-text-role="subtitle" data-full-text="{normalize_attribute(subtitle_raw)}" x="{x + 36}" y="{y + 58}" text-anchor="start" class="node-sub" font-size="{subtitle_size}">{subtitle}</text>',
     ]
     if role == "junction":
-        lines.append(f'  <circle cx="{marker_x}" cy="{y + height / 2}" r="3" fill="{color}"/>')
+        lines.append(
+            f'  <circle cx="{marker_x}" cy="{y + height / 2}" r="3" fill="{color}"/>'
+        )
     elif role == "dlq":
         lines.append(
             f'  <path data-graph-role="decoration" d="M {marker_x - 3} {y + height / 2 - 3} '
-            f'L {marker_x + 3} {y + height / 2 + 3} M {marker_x + 3} {y + height / 2 - 3} '
+            f"L {marker_x + 3} {y + height / 2 + 3} M {marker_x + 3} {y + height / 2 - 3} "
             f'L {marker_x - 3} {y + height / 2 + 3}" stroke="{color}" stroke-width="1.7" stroke-linecap="round"/>'
         )
     elif role == "state_store":
@@ -2282,7 +2636,13 @@ def render_transit_node(node: Dict[str, object], style: Dict[str, object]) -> st
             f'text-anchor="middle" font-size="7" font-weight="800" fill="{color}">{station_number:02d}</text>'
         )
     if badge:
-        badge_width = max(34.0, geometry.estimate_text_width(str(node.get("badge", node.get("partition_badge", ""))), 9) + 12)
+        badge_width = max(
+            34.0,
+            geometry.estimate_text_width(
+                str(node.get("badge", node.get("partition_badge", ""))), 9
+            )
+            + 12,
+        )
         lines.extend(
             [
                 f'  <rect x="{x + width - badge_width - 10}" y="{y + 6}" width="{badge_width}" height="15" rx="7.5" fill="{color}" opacity="0.13"/>',
@@ -2292,22 +2652,33 @@ def render_transit_node(node: Dict[str, object], style: Dict[str, object]) -> st
     return "\n".join(lines)
 
 
-def render_ops_service(node: Dict[str, object], style: Dict[str, object]) -> str:
+def render_ops_service(node: dict[str, object], style: dict[str, object]) -> str:
     x = to_float(node["x"])
     y = to_float(node["y"])
     width = to_float(node.get("width", 180))
     height = to_float(node.get("height", 108))
     status = str(node.get("status", "ok"))
-    status_colors = {"ok": "#22c55e", "warn": "#f59e0b", "critical": "#f43f5e", "unknown": "#64748b"}
+    status_colors = {
+        "ok": "#22c55e",
+        "warn": "#f59e0b",
+        "critical": "#f43f5e",
+        "unknown": "#64748b",
+    }
     status_color = status_colors.get(status, status_colors["unknown"])
     title_raw = str(node.get("label", ""))
     status_raw = str(node.get("status_label", status.upper()))
     status_preferred = 8.5
-    status_needed = geometry.estimate_text_width(status_raw, status_preferred, weight=1.08) + 4
+    status_needed = (
+        geometry.estimate_text_width(status_raw, status_preferred, weight=1.08) + 4
+    )
     status_budget = min(width * 0.38, max(36.0, status_needed))
     title_budget = max(28.0, width - 46.0 - status_budget)
-    title_text, title_size = fit_single_line_text(title_raw, title_budget, preferred=13.5, minimum=9.5)
-    status_text, status_size = fit_single_line_text(status_raw, status_budget, preferred=status_preferred, minimum=6.8)
+    title_text, title_size = fit_single_line_text(
+        title_raw, title_budget, preferred=13.5, minimum=9.5
+    )
+    status_text, status_size = fit_single_line_text(
+        status_raw, status_budget, preferred=status_preferred, minimum=6.8
+    )
     title = normalize_text(title_text)
     status_label = normalize_text(status_text)
     lines = [
@@ -2330,10 +2701,12 @@ def render_ops_service(node: Dict[str, object], style: Dict[str, object]) -> str
         row = index // 2
         chip_x = x + 10 + column * (chip_width + chip_gap)
         chip_y = y + 38 + row * (chip_height + 5)
-        metric_status = status_colors.get(str(metric.get("status", "unknown")), status_colors["unknown"])
+        metric_status = status_colors.get(
+            str(metric.get("status", "unknown")), status_colors["unknown"]
+        )
         metric_name = normalize_text(str(metric.get("name", ""))[:3].upper())
-        metric_value_raw = f'{metric.get("value", "")}{metric.get("unit", "")}'
-        metric_window_raw = f'@{metric.get("window", "")}'
+        metric_value_raw = f"{metric.get('value', '')}{metric.get('unit', '')}"
+        metric_window_raw = f"@{metric.get('window', '')}"
         metric_value_budget = max(20.0, chip_width - 16.0)
         metric_window_budget = max(18.0, chip_width - 44.0)
         metric_value_text, metric_value_size = fit_single_line_text(
@@ -2361,20 +2734,26 @@ def render_ops_service(node: Dict[str, object], style: Dict[str, object]) -> str
     return "\n".join(lines)
 
 
-def render_trace_span(node: Dict[str, object], style: Dict[str, object]) -> str:
+def render_trace_span(node: dict[str, object], style: dict[str, object]) -> str:
     x = to_float(node["x"])
     y = to_float(node["y"])
     width = to_float(node.get("width", 300))
     height = to_float(node.get("height", 28))
     status = str(node.get("status", "ok"))
-    color = {"ok": "#38bdf8", "warn": "#f59e0b", "critical": "#f43f5e"}.get(status, "#64748b")
+    color = {"ok": "#38bdf8", "warn": "#f59e0b", "critical": "#f43f5e"}.get(
+        status, "#64748b"
+    )
     title_raw = str(node.get("label", node.get("span_id", "span")))
-    duration_raw = f'{node.get("duration_ms", "")} ms'
+    duration_raw = f"{node.get('duration_ms', '')} ms"
     duration_needed = geometry.estimate_text_width(duration_raw, 10, weight=1.08) + 4
     duration_budget = min(width * 0.3, max(34.0, duration_needed))
     title_budget = max(30.0, width - 34.0 - duration_budget)
-    title_text, title_size = fit_single_line_text(title_raw, title_budget, preferred=11.5, minimum=8.0)
-    duration_text, duration_size = fit_single_line_text(duration_raw, duration_budget, preferred=10, minimum=7.0)
+    title_text, title_size = fit_single_line_text(
+        title_raw, title_budget, preferred=11.5, minimum=8.0
+    )
+    duration_text, duration_size = fit_single_line_text(
+        duration_raw, duration_budget, preferred=10, minimum=7.0
+    )
     title = normalize_text(title_text)
     duration = normalize_text(duration_text)
     return "\n".join(
@@ -2391,14 +2770,16 @@ def render_trace_span(node: Dict[str, object], style: Dict[str, object]) -> str:
     )
 
 
-def render_otel_collector(node: Dict[str, object], style: Dict[str, object]) -> str:
+def render_otel_collector(node: dict[str, object], style: dict[str, object]) -> str:
     x = to_float(node["x"])
     y = to_float(node["y"])
     width = to_float(node.get("width", 180))
     height = to_float(node.get("height", 60))
     title_raw = str(node.get("label", "OTel Collector"))
     title_budget = max(24.0, width - 24.0)
-    title_text, title_size = fit_single_line_text(title_raw, title_budget, preferred=13, minimum=8.5)
+    title_text, title_size = fit_single_line_text(
+        title_raw, title_budget, preferred=13, minimum=8.5
+    )
     title = normalize_text(title_text)
     return "\n".join(
         [
@@ -2411,7 +2792,9 @@ def render_otel_collector(node: Dict[str, object], style: Dict[str, object]) -> 
     )
 
 
-def render_special_node(node: Dict[str, object], style: Dict[str, object], kind: str) -> Optional[str]:
+def render_special_node(
+    node: dict[str, object], style: dict[str, object], kind: str
+) -> str | None:
     if kind == "review_card":
         return render_review_node(node, style)
     if kind == "cloud_service":
@@ -2427,7 +2810,9 @@ def render_special_node(node: Dict[str, object], style: Dict[str, object], kind:
     return None
 
 
-def render_rect_node(node: Dict[str, object], style: Dict[str, object], kind: str) -> str:
+def render_rect_node(
+    node: dict[str, object], style: dict[str, object], kind: str
+) -> str:
     special = render_special_node(node, style, kind)
     if special is not None:
         return special
@@ -2479,7 +2864,9 @@ def render_rect_node(node: Dict[str, object], style: Dict[str, object], kind: st
         )
         header_colors = node.get("header_dots", ["#ef4444", "#f59e0b", "#10b981"])
         for idx, color in enumerate(header_colors):
-            lines.append(f'  <circle cx="{x + 16 + idx * 14}" cy="{y + 9}" r="4" fill="{color}"/>')
+            lines.append(
+                f'  <circle cx="{x + 16 + idx * 14}" cy="{y + 9}" r="4" fill="{color}"/>'
+            )
         lines.append(
             f'  <text x="{x + 18}" y="{y + 44}" font-size="28" font-weight="700" fill="{node.get("prompt_fill", "#10b981")}">$</text>'
         )
@@ -2524,7 +2911,9 @@ def render_rect_node(node: Dict[str, object], style: Dict[str, object], kind: st
             f"M {x + inset} {y} L {x + width - inset} {y} L {x + width} {y + height / 2} "
             f"L {x + width - inset} {y + height} L {x + inset} {y + height} L {x} {y + height / 2} Z"
         )
-        lines.append(f'  <path d="{path}" fill="{fill}" stroke="{stroke}" stroke-width="{stroke_width}"{filter_attr}/>')
+        lines.append(
+            f'  <path d="{path}" fill="{fill}" stroke="{stroke}" stroke-width="{stroke_width}"{filter_attr}/>'
+        )
     elif kind == "speech":
         tail = 18
         path = (
@@ -2534,7 +2923,9 @@ def render_rect_node(node: Dict[str, object], style: Dict[str, object], kind: st
             f"L {x + rx} {y + height} Q {x} {y + height} {x} {y + height - rx} "
             f"L {x} {y + rx} Q {x} {y} {x + rx} {y} Z"
         )
-        lines.append(f'  <path d="{path}" fill="{fill}" stroke="{stroke}" stroke-width="{stroke_width}"{filter_attr}/>')
+        lines.append(
+            f'  <path d="{path}" fill="{fill}" stroke="{stroke}" stroke-width="{stroke_width}"{filter_attr}/>'
+        )
     else:
         lines.append(
             f'  <rect x="{x}" y="{y}" width="{width}" height="{height}" rx="{rx}" fill="{fill}" stroke="{stroke}" stroke-width="{stroke_width}"{filter_attr}/>'
@@ -2550,31 +2941,51 @@ def render_rect_node(node: Dict[str, object], style: Dict[str, object], kind: st
         icon_stroke = node.get("icon_stroke", stroke)
         cx = x + 26
         cy = y + height / 2
-        lines.append(f'  <circle cx="{cx}" cy="{cy}" r="18" fill="{circle_fill}" stroke="{icon_stroke}" stroke-width="1.6"/>')
+        lines.append(
+            f'  <circle cx="{cx}" cy="{cy}" r="18" fill="{circle_fill}" stroke="{icon_stroke}" stroke-width="1.6"/>'
+        )
         lines.append(f'  <circle cx="{cx}" cy="{cy - 6}" r="5" fill="{icon_stroke}"/>')
-        lines.append(f'  <path d="M {cx - 10} {cy + 11} Q {cx} {cy + 2} {cx + 10} {cy + 11}" fill="none" stroke="{icon_stroke}" stroke-width="2"/>')
+        lines.append(
+            f'  <path d="M {cx - 10} {cy + 11} Q {cx} {cy + 2} {cx + 10} {cy + 11}" fill="none" stroke="{icon_stroke}" stroke-width="2"/>'
+        )
 
     if kind == "bot":
         cx = x + width / 2
         cy = y + height / 2 + 2
         body_fill = node.get("body_fill", "#1e293b")
         accent = node.get("accent_fill", "#34d399")
-        lines.append(f'  <rect x="{cx - 42}" y="{cy - 32}" width="84" height="84" rx="18" fill="{body_fill}" stroke="#334155" stroke-width="1.8"{filter_attr}/>')
-        lines.append(f'  <rect x="{cx - 26}" y="{cy - 16}" width="52" height="22" rx="6" fill="#0f172a" stroke="#475569" stroke-width="1.2"/>')
+        lines.append(
+            f'  <rect x="{cx - 42}" y="{cy - 32}" width="84" height="84" rx="18" fill="{body_fill}" stroke="#334155" stroke-width="1.8"{filter_attr}/>'
+        )
+        lines.append(
+            f'  <rect x="{cx - 26}" y="{cy - 16}" width="52" height="22" rx="6" fill="#0f172a" stroke="#475569" stroke-width="1.2"/>'
+        )
         lines.append(f'  <circle cx="{cx - 12}" cy="{cy - 5}" r="5" fill="{accent}"/>')
         lines.append(f'  <circle cx="{cx + 12}" cy="{cy - 5}" r="5" fill="{accent}"/>')
-        lines.append(f'  <rect x="{cx - 14}" y="{cy + 14}" width="28" height="6" rx="3" fill="#334155"/>')
-        lines.append(f'  <line x1="{cx}" y1="{cy - 36}" x2="{cx}" y2="{cy - 50}" stroke="{accent}" stroke-width="3"/>')
+        lines.append(
+            f'  <rect x="{cx - 14}" y="{cy + 14}" width="28" height="6" rx="3" fill="#334155"/>'
+        )
+        lines.append(
+            f'  <line x1="{cx}" y1="{cy - 36}" x2="{cx}" y2="{cy - 50}" stroke="{accent}" stroke-width="3"/>'
+        )
         lines.append(f'  <circle cx="{cx}" cy="{cy - 54}" r="5" fill="{accent}"/>')
 
     if kind == "circle_cluster":
         r = min(width, height) / 4.0
-        centers = [(x + width * 0.36, y + height * 0.56), (x + width * 0.58, y + height * 0.45), (x + width * 0.74, y + height * 0.58)]
+        centers = [
+            (x + width * 0.36, y + height * 0.56),
+            (x + width * 0.58, y + height * 0.45),
+            (x + width * 0.74, y + height * 0.58),
+        ]
         for cx, cy in centers:
-            lines.append(f'  <circle cx="{cx}" cy="{cy}" r="{r}" fill="{fill}" stroke="{stroke}" stroke-width="{stroke_width}"/>')
+            lines.append(
+                f'  <circle cx="{cx}" cy="{cy}" r="{r}" fill="{fill}" stroke="{stroke}" stroke-width="{stroke_width}"/>'
+            )
 
     type_offset = y + 18 if kind not in {"terminal", "bot"} else y + 18
-    title_y = y + height / 2 - (4 if type_label and kind not in {"terminal", "bot"} else 0)
+    title_y = (
+        y + height / 2 - (4 if type_label and kind not in {"terminal", "bot"} else 0)
+    )
     if kind in {"document", "folder"}:
         title_y = y + height + 26
     elif kind == "circle_cluster":
@@ -2585,8 +2996,12 @@ def render_rect_node(node: Dict[str, object], style: Dict[str, object], kind: st
         title_y = y + height / 2 + 6
 
     if type_label:
-        lines.append(f'  <text x="{x + (54 if kind == "user_avatar" else width / 2)}" y="{type_offset}" text-anchor="middle" class="node-type">{type_label}</text>')
-        title_y += 10 if kind not in {"document", "folder", "circle_cluster", "bot"} else 0
+        lines.append(
+            f'  <text x="{x + (54 if kind == "user_avatar" else width / 2)}" y="{type_offset}" text-anchor="middle" class="node-type">{type_label}</text>'
+        )
+        title_y += (
+            10 if kind not in {"document", "folder", "circle_cluster", "bot"} else 0
+        )
 
     title_x = x + width / 2
     text_anchor = "middle"
@@ -2622,7 +3037,9 @@ def render_rect_node(node: Dict[str, object], style: Dict[str, object], kind: st
             sub_y = y + height + 20
         if kind == "user_avatar":
             sub_y = title_y + 22
-        lines.append(f'  <text x="{title_x}" y="{sub_y}" text-anchor="{text_anchor}" class="node-sub">{subtitle}</text>')
+        lines.append(
+            f'  <text x="{title_x}" y="{sub_y}" text-anchor="{text_anchor}" class="node-sub">{subtitle}</text>'
+        )
 
     tag_lines = []
     if node.get("tags"):
@@ -2636,7 +3053,7 @@ def render_rect_node(node: Dict[str, object], style: Dict[str, object], kind: st
     return "\n".join(lines)
 
 
-def render_node(node: Dict[str, object], style: Dict[str, object]) -> str:
+def render_node(node: dict[str, object], style: dict[str, object]) -> str:
     kind = str(node.get("kind", node.get("shape", "rect")))
     if kind == "cylinder":
         x = to_float(node["x"])
@@ -2661,7 +3078,9 @@ def render_node(node: Dict[str, object], style: Dict[str, object]) -> str:
             f'font-size="{to_float(node.get("title_size"), fitted_text_size(label_text, width - 24))}">{label}</text>',
         ]
         if subtitle:
-            lines.append(f'  <text x="{x + width / 2}" y="{y + height / 2 + 18}" text-anchor="middle" class="node-sub">{subtitle}</text>')
+            lines.append(
+                f'  <text x="{x + width / 2}" y="{y + height / 2 + 18}" text-anchor="middle" class="node-sub">{subtitle}</text>'
+            )
         return "\n".join(lines)
     return render_rect_node(node, style, kind)
 
@@ -2677,14 +3096,18 @@ def inferred_port(node: Node, toward: Point) -> str:
     return "bottom" if dy >= 0 else "top"
 
 
-def prepare_arrows(arrows: Sequence[Dict[str, object]], node_map: Dict[str, Node]) -> List[Dict[str, object]]:
+def prepare_arrows(
+    arrows: Sequence[dict[str, object]], node_map: dict[str, Node]
+) -> list[dict[str, object]]:
     prepared = [copy.deepcopy(arrow) for arrow in arrows]
-    endpoint_groups: Dict[Tuple[str, str], List[Tuple[int, str, str]]] = {}
+    endpoint_groups: dict[tuple[str, str], list[tuple[int, str, str]]] = {}
 
     for index, arrow in enumerate(prepared):
         edge_id = str(arrow.get("id") or f"edge-{index:03d}")
         arrow["_edge_id"] = edge_id
-        arrow["_edge_dom_id"] = str(arrow.get("_dom_id") or safe_identifier(edge_id, f"edge-{index:03d}"))
+        arrow["_edge_dom_id"] = str(
+            arrow.get("_dom_id") or safe_identifier(edge_id, f"edge-{index:03d}")
+        )
         source = node_map.get(str(arrow.get("source"))) if arrow.get("source") else None
         target = node_map.get(str(arrow.get("target"))) if arrow.get("target") else None
         start_hint = (to_float(arrow.get("x1")), to_float(arrow.get("y1")))
@@ -2692,23 +3115,37 @@ def prepare_arrows(arrows: Sequence[Dict[str, object]], node_map: Dict[str, Node
 
         if source is not None:
             toward = end_hint if target is None else (target.cx, target.cy)
-            source_port = str(arrow.get("source_port") or inferred_port(source, toward)).lower()
+            source_port = str(
+                arrow.get("source_port") or inferred_port(source, toward)
+            ).lower()
             arrow["_resolved_source_port"] = source_port
-            endpoint_groups.setdefault((source.node_id, source_port), []).append((index, "source", edge_id))
+            endpoint_groups.setdefault((source.node_id, source_port), []).append(
+                (index, "source", edge_id)
+            )
         if target is not None:
             toward = start_hint if source is None else (source.cx, source.cy)
-            target_port = str(arrow.get("target_port") or inferred_port(target, toward)).lower()
+            target_port = str(
+                arrow.get("target_port") or inferred_port(target, toward)
+            ).lower()
             arrow["_resolved_target_port"] = target_port
-            endpoint_groups.setdefault((target.node_id, target_port), []).append((index, "target", edge_id))
+            endpoint_groups.setdefault((target.node_id, target_port), []).append(
+                (index, "target", edge_id)
+            )
 
     for (node_id, port), endpoints in sorted(endpoint_groups.items()):
         node = node_map[node_id]
-        span = (node.bounds[3] - node.bounds[1]) if port in {"left", "right"} else (node.bounds[2] - node.bounds[0])
+        span = (
+            (node.bounds[3] - node.bounds[1])
+            if port in {"left", "right"}
+            else (node.bounds[2] - node.bounds[0])
+        )
         ordered = sorted(endpoints, key=lambda item: item[2])
         count = len(ordered)
         usable_span = max(0.0, span - 24.0)
         if count > 1 and usable_span / (count - 1) < 6.0:
-            raise ValueError(f"PORT_CAPACITY: {node_id}.{port} cannot fit {count} distinct endpoints")
+            raise ValueError(
+                f"PORT_CAPACITY: {node_id}.{port} cannot fit {count} distinct endpoints"
+            )
         spacing = 0.0 if count <= 1 else min(18.0, usable_span / (count - 1))
         for position, (arrow_index, endpoint, _) in enumerate(ordered):
             offset = (position - (count - 1) / 2.0) * spacing
@@ -2717,9 +3154,9 @@ def prepare_arrows(arrows: Sequence[Dict[str, object]], node_map: Dict[str, Node
 
 
 def render_arrow(
-    arrow: Dict[str, object],
-    style: Dict[str, object],
-    node_map: Dict[str, Node],
+    arrow: dict[str, object],
+    style: dict[str, object],
+    node_map: dict[str, Node],
     route_obstacles: Sequence[Bounds],
     label_obstacles: Sequence[Bounds],
     *,
@@ -2730,8 +3167,12 @@ def render_arrow(
     edge_dom_id = str(arrow.get("_edge_dom_id") or safe_identifier(edge_id, "edge"))
     start_hint = (to_float(arrow.get("x1")), to_float(arrow.get("y1")))
     end_hint = (to_float(arrow.get("x2")), to_float(arrow.get("y2")))
-    source_node = node_map.get(str(arrow.get("source"))) if arrow.get("source") else None
-    target_node = node_map.get(str(arrow.get("target"))) if arrow.get("target") else None
+    source_node = (
+        node_map.get(str(arrow.get("source"))) if arrow.get("source") else None
+    )
+    target_node = (
+        node_map.get(str(arrow.get("target"))) if arrow.get("target") else None
+    )
     source_port = arrow.get("_resolved_source_port") or arrow.get("source_port")
     target_port = arrow.get("_resolved_target_port") or arrow.get("target_port")
 
@@ -2790,7 +3231,9 @@ def render_arrow(
     marker = marker_for_color(style, color, arrow)
     source_id = normalize_attribute(arrow.get("source", ""))
     target_id = normalize_attribute(arrow.get("target", ""))
-    bridge_attr = ";".join(f"{geometry.format_number(x)},{geometry.format_number(y)}" for x, y in bridges)
+    bridge_attr = ";".join(
+        f"{geometry.format_number(x)},{geometry.format_number(y)}" for x, y in bridges
+    )
     edge_kind = str(arrow.get("edge_kind", arrow.get("transit_type", "flow")))
     topic_id = str(arrow.get("topic_id", ""))
     protocol = str(arrow.get("protocol", ""))
@@ -2816,7 +3259,7 @@ def render_arrow(
         f'data-critical-hops="{normalize_attribute(critical_hops)}" '
         f'data-critical="{critical}" data-bends="{bends}" data-route-stretch="{round(stretch, 3)}"'
     )
-    rendered_paths: List[str] = []
+    rendered_paths: list[str] = []
     if bridges:
         background = str(style_value(style, "background"))
         rendered_paths.append(
@@ -2828,7 +3271,9 @@ def render_arrow(
     if style_index == 9:
         # A second, deliberately imperfect pencil stroke is decorative only;
         # the routable edge remains the single semantic connector below.
-        rough_offset = deterministic_jitter(arrow.get("_rough_seed", 0), edge_id, 7, amplitude=1.2)
+        rough_offset = deterministic_jitter(
+            arrow.get("_rough_seed", 0), edge_id, 7, amplitude=1.2
+        )
         rendered_paths.append(
             f'  <path id="{normalize_attribute(edge_dom_id)}-review-stroke" data-graph-role="decoration" '
             f'data-owner="{normalize_attribute(edge_id)}" d="{path_d}" fill="none" stroke="{color}" '
@@ -2860,7 +3305,11 @@ def render_arrow(
         path += f' opacity="{arrow["opacity"]}"'
     path += "/>"
     rendered_paths.append(path)
-    if style_index == 11 and str(arrow.get("transit_type", "")) == "rail" and len(route) >= 2:
+    if (
+        style_index == 11
+        and str(arrow.get("transit_type", "")) == "rail"
+        and len(route) >= 2
+    ):
         direction_x = (route[0][0] + route[-1][0]) / 2
         direction_y = (route[0][1] + route[-1][1]) / 2
         rendered_paths.append(
@@ -2894,7 +3343,9 @@ def render_arrow(
         label = via.strip()
     if label:
         label_proxy = label
-        if secondary_label and geometry.estimate_text_width(secondary_label, 12) > geometry.estimate_text_width(label, 12):
+        if secondary_label and geometry.estimate_text_width(
+            secondary_label, 12
+        ) > geometry.estimate_text_width(label, 12):
             label_proxy = secondary_label
         label_x, label_y = choose_label_position_avoiding(
             route,
@@ -2906,26 +3357,39 @@ def render_arrow(
             dy=to_float(arrow.get("label_dy", -4)),
         )
         if secondary_label:
-            label_content = render_dual_label_badge(label_x, label_y, label, secondary_label, style)
-            label_bounds = estimate_dual_label_bounds(label_x, label_y, label, secondary_label)
+            label_content = render_dual_label_badge(
+                label_x, label_y, label, secondary_label, style
+            )
+            label_bounds = estimate_dual_label_bounds(
+                label_x, label_y, label, secondary_label
+            )
         else:
-            label_content = render_label_badge(label_x, label_y, label, style, label_style=str(arrow.get("label_style", "badge")))
+            label_content = render_label_badge(
+                label_x,
+                label_y,
+                label,
+                style,
+                label_style=str(arrow.get("label_style", "badge")),
+            )
             label_bounds = estimate_label_bounds(label_x, label_y, label)
         label_svg = (
             f'  <g id="{normalize_attribute(edge_dom_id)}-label" data-graph-role="label" '
             f'data-owner="{normalize_attribute(edge_id)}" data-graph-bounds="'
-            f'{geometry.format_number(label_bounds[0])},{geometry.format_number(label_bounds[1])},'
+            f"{geometry.format_number(label_bounds[0])},{geometry.format_number(label_bounds[1])},"
             f'{geometry.format_number(label_bounds[2])},{geometry.format_number(label_bounds[3])}">\n'
-            f'{label_content}\n  </g>'
+            f"{label_content}\n  </g>"
         )
 
-    report: Dict[str, object] = {
+    report: dict[str, object] = {
         "id": edge_id,
         "source": str(arrow.get("source", "")),
         "target": str(arrow.get("target", "")),
         "source_port": [round(start[0], 2), round(start[1], 2)],
         "target_port": [round(end[0], 2), round(end[1], 2)],
-        "waypoints": [[to_float(point[0]), to_float(point[1])] for point in (arrow.get("route_points") or [])],
+        "waypoints": [
+            [to_float(point[0]), to_float(point[1])]
+            for point in (arrow.get("route_points") or [])
+        ],
         "route": [[round(x, 2), round(y, 2)] for x, y in route],
         "length": round(geometry.route_length(route), 2),
         "bends": bends,
@@ -2933,15 +3397,17 @@ def render_arrow(
         "crossings": [[round(x, 2), round(y, 2)] for x, y in interactions.crossings],
         "bridges": [[round(x, 2), round(y, 2)] for x, y in bridges],
     }
-    return ArrowRender(edge_id, "\n".join(rendered_paths), label_svg, label_bounds, route, report)
+    return ArrowRender(
+        edge_id, "\n".join(rendered_paths), label_svg, label_bounds, route, report
+    )
 
 
 def render_legend(
-    legend: Sequence[Dict[str, object]],
-    style: Dict[str, object],
+    legend: Sequence[dict[str, object]],
+    style: dict[str, object],
     width: float,
     height: float,
-    data: Dict[str, object],
+    data: dict[str, object],
 ) -> str:
     layout = legend_layout(data, legend, width, height)
     if not layout:
@@ -2960,13 +3426,23 @@ def render_legend(
         y = legend_y if orientation == "horizontal" else legend_y + idx * 22
         color = item.get("color")
         if not color:
-            color = style_value(style, "arrow_colors")[FLOW_ALIASES.get(str(item.get("flow", "control")).lower(), "control")]
-        marker = marker_for_color(style, str(color), {"flow": item.get("flow", "control")})
+            color = style_value(style, "arrow_colors")[
+                FLOW_ALIASES.get(str(item.get("flow", "control")).lower(), "control")
+            ]
+        marker = marker_for_color(
+            style, str(color), {"flow": item.get("flow", "control")}
+        )
         item_x = cursor_x if orientation == "horizontal" else legend_x
-        lines.append(f'    <line data-graph-role="decoration" x1="{item_x}" y1="{y}" x2="{item_x + 30}" y2="{y}" stroke="{color}" stroke-width="{style_value(style, "arrow_width")}" marker-end="{marker}"/>')
-        lines.append(f'    <text data-graph-role="decoration" x="{item_x + 40}" y="{y + 4}" class="legend">{normalize_text(item.get("label", ""))}</text>')
+        lines.append(
+            f'    <line data-graph-role="decoration" x1="{item_x}" y1="{y}" x2="{item_x + 30}" y2="{y}" stroke="{color}" stroke-width="{style_value(style, "arrow_width")}" marker-end="{marker}"/>'
+        )
+        lines.append(
+            f'    <text data-graph-role="decoration" x="{item_x + 40}" y="{y + 4}" class="legend">{normalize_text(item.get("label", ""))}</text>'
+        )
         if orientation == "horizontal":
-            cursor_x += 40 + geometry.estimate_text_width(str(item.get("label", "")), 12) + 28
+            cursor_x += (
+                40 + geometry.estimate_text_width(str(item.get("label", "")), 12) + 28
+            )
     if data.get("legend_box"):
         bg = data.get("legend_box_fill", style_value(style, "arrow_label_bg"))
         opacity = data.get("legend_box_opacity", 0.88)
@@ -2980,7 +3456,9 @@ def render_legend(
     return "\n".join(lines)
 
 
-def render_footer(data: Dict[str, object], style: Dict[str, object], width: float, height: float) -> str:
+def render_footer(
+    data: dict[str, object], style: dict[str, object], width: float, height: float
+) -> str:
     layout = footer_layout(data, width, height)
     if not layout:
         return ""
@@ -2993,7 +3471,9 @@ def bounds_metadata(bounds: Bounds) -> str:
     return ",".join(geometry.format_number(value) for value in bounds)
 
 
-def build_svg_with_report(template_type: str, data: Dict[str, object]) -> Tuple[str, Dict[str, object]]:
+def build_svg_with_report(
+    template_type: str, data: dict[str, object]
+) -> tuple[str, dict[str, object]]:
     diagram = normalize_diagram(data, template_type)
     source_data = diagram.as_dict()
     mode = diagram.mode
@@ -3017,7 +3497,12 @@ def build_svg_with_report(template_type: str, data: Dict[str, object]) -> Tuple[
         if match:
             width = float(match.group(1))
             height = float(match.group(2))
-    if not math.isfinite(width) or not math.isfinite(height) or width <= 0 or height <= 0:
+    if (
+        not math.isfinite(width)
+        or not math.isfinite(height)
+        or width <= 0
+        or height <= 0
+    ):
         raise ValueError("canvas width and height must be finite positive numbers")
 
     containers = list(source_data.get("containers", []))
@@ -3046,7 +3531,9 @@ def build_svg_with_report(template_type: str, data: Dict[str, object]) -> Tuple[
         if "y" not in node_data and node_data.get("auto_place"):
             node_data["y"] = content_start_y + to_float(node_data.get("offset_y", 0))
 
-    normalized_nodes = [normalize_node(node, f"node-{idx}") for idx, node in enumerate(nodes_data)]
+    normalized_nodes = [
+        normalize_node(node, f"node-{idx}") for idx, node in enumerate(nodes_data)
+    ]
     if len({node.node_id for node in normalized_nodes}) != len(normalized_nodes):
         raise ValueError("node ids must be unique")
     node_map = {node.node_id: node for node in normalized_nodes}
@@ -3058,21 +3545,31 @@ def build_svg_with_report(template_type: str, data: Dict[str, object]) -> Tuple[
     for index, container in enumerate(containers):
         raw_id = str(container.get("id") or f"container-{index:03d}")
         container["_dom_id"] = allocate_dom_identifier(
-            safe_identifier(raw_id, f"container-{index:03d}"), used_dom_ids, ("-header",)
+            safe_identifier(raw_id, f"container-{index:03d}"),
+            used_dom_ids,
+            ("-header",),
         )
     for index, arrow in enumerate(arrows_data):
         raw_id = str(arrow.get("id") or f"edge-{index:03d}")
         arrow["_dom_id"] = allocate_dom_identifier(
-            safe_identifier(raw_id, f"edge-{index:03d}"), used_dom_ids, _EDGE_DOM_SUFFIXES
+            safe_identifier(raw_id, f"edge-{index:03d}"),
+            used_dom_ids,
+            _EDGE_DOM_SUFFIXES,
         )
-    for node, node_data in zip(normalized_nodes, nodes_data):
+    for node, node_data in zip(normalized_nodes, nodes_data, strict=True):
         node_data["_dom_id"] = allocate_dom_identifier(
             f"node-{safe_identifier(node.node_id, 'node')}", used_dom_ids
         )
 
-    section_obstacles = [bounds for container in containers if (bounds := container_header_bounds(container, style)) is not None]
+    section_obstacles = [
+        bounds
+        for container in containers
+        if (bounds := container_header_bounds(container, style)) is not None
+    ]
     footer_reserved = footer_layout(source_data, width, height)
-    blueprint_block_svg, blueprint_block_bounds = render_blueprint_title_block(source_data, style, style_index, width, height)
+    blueprint_block_svg, blueprint_block_bounds = render_blueprint_title_block(
+        source_data, style, style_index, width, height
+    )
     node_obstacles = [node.bounds for node in normalized_nodes]
     placement_obstacles = list(node_obstacles) + list(section_obstacles)
     if footer_reserved:
@@ -3101,13 +3598,16 @@ def build_svg_with_report(template_type: str, data: Dict[str, object]) -> Tuple[
     route_obstacles = node_obstacles + reserved_bounds
     label_obstacles = node_obstacles + reserved_bounds
     prepared_arrows = prepare_arrows(arrows_data, node_map)
-    rendered_by_index: Dict[int, ArrowRender] = {}
-    existing_routes: List[Sequence[Point]] = []
+    rendered_by_index: dict[int, ArrowRender] = {}
+    existing_routes: list[Sequence[Point]] = []
     routing_order = sorted(
         range(len(prepared_arrows)),
-        key=lambda index: (0 if prepared_arrows[index].get("route_points") else 1, index),
+        key=lambda index: (
+            0 if prepared_arrows[index].get("route_points") else 1,
+            index,
+        ),
     )
-    issues: List[Dict[str, object]] = []
+    issues: list[dict[str, object]] = []
     for index in routing_order:
         rendered = render_arrow(
             prepared_arrows[index],
@@ -3167,7 +3667,10 @@ def build_svg_with_report(template_type: str, data: Dict[str, object]) -> Tuple[
         lines.append(style_signature)
 
     for index, container in enumerate(containers):
-        container_id = str(container.get("_dom_id") or safe_identifier(container.get("id"), f"container-{index:03d}"))
+        container_id = str(
+            container.get("_dom_id")
+            or safe_identifier(container.get("id"), f"container-{index:03d}")
+        )
         container_bounds = rectangle_bounds(
             to_float(container["x"]),
             to_float(container["y"]),
@@ -3196,11 +3699,19 @@ def build_svg_with_report(template_type: str, data: Dict[str, object]) -> Tuple[
     # edge before the bridge owner is painted on top.
     lines.extend(rendered_by_index[index].path_svg for index in routing_order)
 
-    for node, node_data in zip(normalized_nodes, nodes_data):
-        node_id = str(node_data.get("_dom_id") or f"node-{safe_identifier(node.node_id, 'node')}")
+    for node, node_data in zip(normalized_nodes, nodes_data, strict=True):
+        node_id = str(
+            node_data.get("_dom_id") or f"node-{safe_identifier(node.node_id, 'node')}"
+        )
         semantic_role = node_data.get(
             "c4_type",
-            node_data.get("deployment_kind", node_data.get("transit_role", node_data.get("ops_role", node_data.get("kind", "node")))),
+            node_data.get(
+                "deployment_kind",
+                node_data.get(
+                    "transit_role",
+                    node_data.get("ops_role", node_data.get("kind", "node")),
+                ),
+            ),
         )
         lines.append(
             f'  <g id="{normalize_attribute(node_id)}" data-graph-role="node" '
@@ -3270,17 +3781,19 @@ def build_svg_with_report(template_type: str, data: Dict[str, object]) -> Tuple[
             )
             for index, container in enumerate(containers)
         ],
-        edges=[rendered_by_index[index].report for index in range(len(prepared_arrows))],
+        edges=[
+            rendered_by_index[index].report for index in range(len(prepared_arrows))
+        ],
         contract=composition_contract,
     )
     if not composition["ok"]:
         summary = "; ".join(
-            f'{item["code"]}:{item["element"]}={item["actual"]}>{item["limit"]}'
+            f"{item['code']}:{item['element']}={item['actual']}>{item['limit']}"
             for item in composition["violations"]
         )
         raise ValueError(f"COMPOSITION_QUALITY: {summary}")
 
-    report: Dict[str, object] = {
+    report: dict[str, object] = {
         "schema_version": 1,
         "input_schema": diagram.input_schema,
         "mode": mode,
@@ -3297,23 +3810,28 @@ def build_svg_with_report(template_type: str, data: Dict[str, object]) -> Tuple[
             if legend_placement
             else None
         },
-        "edges": [rendered_by_index[index].report for index in range(len(prepared_arrows))],
+        "edges": [
+            rendered_by_index[index].report for index in range(len(prepared_arrows))
+        ],
         "composition": composition,
         "issues": issues,
         "summary": {
             "nodes": len(nodes_data),
             "edges": len(prepared_arrows),
-            "bridged_crossings": sum(len(rendered.report["bridges"]) for rendered in rendered_by_index.values()),
+            "bridged_crossings": sum(
+                len(rendered.report["bridges"])
+                for rendered in rendered_by_index.values()
+            ),
         },
     }
     return "\n".join(line for line in lines if line), report
 
 
-def build_svg(template_type: str, data: Dict[str, object]) -> str:
+def build_svg(template_type: str, data: dict[str, object]) -> str:
     return build_svg_with_report(template_type, data)[0]
 
 
-def parse_args(argv: Optional[Sequence[str]] = None) -> argparse.Namespace:
+def parse_args(argv: Sequence[str] | None = None) -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("template_type")
     parser.add_argument("output_path")
@@ -3322,7 +3840,7 @@ def parse_args(argv: Optional[Sequence[str]] = None) -> argparse.Namespace:
     return parser.parse_args(argv)
 
 
-def main(argv: Optional[Sequence[str]] = None) -> None:
+def main(argv: Sequence[str] | None = None) -> None:
     args = parse_args(argv)
     try:
         if args.data_json is not None:
@@ -3334,7 +3852,9 @@ def main(argv: Optional[Sequence[str]] = None) -> None:
         with open(args.output_path, "w", encoding="utf-8") as handle:
             handle.write(svg_content)
         if args.layout_report:
-            os.makedirs(os.path.dirname(os.path.abspath(args.layout_report)), exist_ok=True)
+            os.makedirs(
+                os.path.dirname(os.path.abspath(args.layout_report)), exist_ok=True
+            )
             with open(args.layout_report, "w", encoding="utf-8") as handle:
                 json.dump(report, handle, ensure_ascii=False, indent=2, sort_keys=True)
                 handle.write("\n")
@@ -3349,18 +3869,24 @@ def main(argv: Optional[Sequence[str]] = None) -> None:
         sys.exit(1)
     except ValueError as exc:
         if args.layout_report:
-            os.makedirs(os.path.dirname(os.path.abspath(args.layout_report)), exist_ok=True)
+            os.makedirs(
+                os.path.dirname(os.path.abspath(args.layout_report)), exist_ok=True
+            )
             failure_report = {
                 "schema_version": 1,
                 "ok": False,
-                "issues": [{"severity": "error", "code": "LAYOUT_ERROR", "message": str(exc)}],
+                "issues": [
+                    {"severity": "error", "code": "LAYOUT_ERROR", "message": str(exc)}
+                ],
             }
             with open(args.layout_report, "w", encoding="utf-8") as handle:
-                json.dump(failure_report, handle, ensure_ascii=False, indent=2, sort_keys=True)
+                json.dump(
+                    failure_report, handle, ensure_ascii=False, indent=2, sort_keys=True
+                )
                 handle.write("\n")
         print(f"Error: {exc}")
         sys.exit(1)
-    except Exception as exc:  # pragma: no cover
+    except Exception as exc:  # noqa: BLE001 — top-level catch-all for CLI entry point
         print(f"Unexpected error: {exc}")
         sys.exit(1)
 

@@ -12,24 +12,32 @@ import math
 import re
 import sys
 import xml.etree.ElementTree as ET
+from collections.abc import Iterator, Sequence
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Iterator, Optional, Sequence
-
 
 SCRIPT_DIR = Path(__file__).resolve().parent
 if str(SCRIPT_DIR) not in sys.path:
     sys.path.insert(0, str(SCRIPT_DIR))
 
-import fireworks_geometry as geometry  # noqa: E402
 import composition_quality as quality  # noqa: E402
-
+import fireworks_geometry as geometry  # noqa: E402
 
 NUMBER_RE = re.compile(r"[-+]?(?:\d*\.\d+|\d+\.?)(?:[eE][-+]?\d+)?")
-PATH_TOKEN_RE = re.compile(r"[AaCcHhLlMmQqSsTtVvZz]|[-+]?(?:\d*\.\d+|\d+\.?)(?:[eE][-+]?\d+)?")
+PATH_TOKEN_RE = re.compile(
+    r"[AaCcHhLlMmQqSsTtVvZz]|[-+]?(?:\d*\.\d+|\d+\.?)(?:[eE][-+]?\d+)?"
+)
 URL_REF_RE = re.compile(r"url\(\s*#([^\s)]+)\s*\)")
 MARKER_ATTRIBUTES = ("marker-start", "marker-mid", "marker-end")
-EXCLUDED_ROLES = {"background", "bridge-mask", "container", "decoration", "label", "legend", "reserved"}
+EXCLUDED_ROLES = {
+    "background",
+    "bridge-mask",
+    "container",
+    "decoration",
+    "label",
+    "legend",
+    "reserved",
+}
 IDENTITY = (1.0, 0.0, 0.0, 1.0, 0.0, 0.0)
 
 Point = tuple[float, float]
@@ -54,7 +62,7 @@ class Collision:
 class ElementContext:
     element: ET.Element
     matrix: Matrix
-    role: Optional[str]
+    role: str | None
     in_defs: bool
 
 
@@ -62,7 +70,7 @@ def local_name(tag: str) -> str:
     return tag.split("}", 1)[-1]
 
 
-def parse_number(value: Optional[str], default: Optional[float] = 0.0) -> Optional[float]:
+def parse_number(value: str | None, default: float | None = 0.0) -> float | None:
     if value is None:
         return default
     match = NUMBER_RE.match(value.strip())
@@ -90,7 +98,7 @@ def transform_point(matrix: Matrix, point: Point) -> Point:
     return (a * x + c * y + e, b * x + d * y + f)
 
 
-def parse_transform(value: Optional[str]) -> Matrix:
+def parse_transform(value: str | None) -> Matrix:
     result = IDENTITY
     if not value:
         return result
@@ -103,10 +111,24 @@ def parse_transform(value: Optional[str]) -> Matrix:
         elif name == "translate" and values:
             current = (1, 0, 0, 1, values[0], values[1] if len(values) > 1 else 0)
         elif name == "scale" and values:
-            current = (values[0], 0, 0, values[1] if len(values) > 1 else values[0], 0, 0)
+            current = (
+                values[0],
+                0,
+                0,
+                values[1] if len(values) > 1 else values[0],
+                0,
+                0,
+            )
         elif name == "rotate" and values:
             angle = math.radians(values[0])
-            rotation = (math.cos(angle), math.sin(angle), -math.sin(angle), math.cos(angle), 0, 0)
+            rotation = (
+                math.cos(angle),
+                math.sin(angle),
+                -math.sin(angle),
+                math.cos(angle),
+                0,
+                0,
+            )
             if len(values) >= 3:
                 cx, cy = values[1], values[2]
                 current = multiply(
@@ -123,7 +145,7 @@ def parse_transform(value: Optional[str]) -> Matrix:
     return result
 
 
-def infer_role(element: ET.Element, inherited: Optional[str]) -> Optional[str]:
+def infer_role(element: ET.Element, inherited: str | None) -> str | None:
     explicit = element.get("data-graph-role")
     if explicit:
         return explicit.strip().lower()
@@ -131,18 +153,40 @@ def infer_role(element: ET.Element, inherited: Optional[str]) -> Optional[str]:
     if any(token in identity for token in ("legend", "key-box", "key_box")):
         return "legend"
     if local_name(element.tag) == "g":
-        text = " ".join("".join(child.itertext()) for child in element if local_name(child.tag) == "text").lower()
+        text = " ".join(
+            "".join(child.itertext())
+            for child in element
+            if local_name(child.tag) == "text"
+        ).lower()
         if "legend" in text:
             return "legend"
     return inherited
 
 
-def walk(element: ET.Element, matrix: Matrix = IDENTITY, role: Optional[str] = None, in_defs: bool = False) -> Iterator[ElementContext]:
+def walk(
+    element: ET.Element,
+    matrix: Matrix = IDENTITY,
+    role: str | None = None,
+    in_defs: bool = False,
+) -> Iterator[ElementContext]:
     current_matrix = multiply(matrix, parse_transform(element.get("transform")))
     current_role = infer_role(element, role)
     current_in_defs = in_defs or local_name(element.tag) == "defs"
     yield ElementContext(element, current_matrix, current_role, current_in_defs)
-    child_role = current_role if current_role in {"background", "bridge-mask", "decoration", "label", "legend", "node", "reserved"} else None
+    child_role = (
+        current_role
+        if current_role
+        in {
+            "background",
+            "bridge-mask",
+            "decoration",
+            "label",
+            "legend",
+            "node",
+            "reserved",
+        }
+        else None
+    )
     for child in element:
         yield from walk(child, current_matrix, child_role, current_in_defs)
 
@@ -157,12 +201,19 @@ def canvas_size(root: ET.Element) -> Point:
     )
 
 
-def metadata_bounds(context: ElementContext) -> Optional[Bounds]:
-    values = [float(item) for item in NUMBER_RE.findall(context.element.get("data-graph-bounds", ""))]
+def metadata_bounds(context: ElementContext) -> Bounds | None:
+    values = [
+        float(item)
+        for item in NUMBER_RE.findall(context.element.get("data-graph-bounds", ""))
+    ]
     if len(values) != 4:
         return None
     left, top, right, bottom = values
-    if not all(math.isfinite(value) for value in values) or right < left or bottom < top:
+    if (
+        not all(math.isfinite(value) for value in values)
+        or right < left
+        or bottom < top
+    ):
         return None
     return transformed_bounds(
         context.matrix,
@@ -170,7 +221,7 @@ def metadata_bounds(context: ElementContext) -> Optional[Bounds]:
     )
 
 
-def bounds_from_points(points: Sequence[Point]) -> Optional[Bounds]:
+def bounds_from_points(points: Sequence[Point]) -> Bounds | None:
     if not points:
         return None
     xs = [point[0] for point in points]
@@ -178,11 +229,11 @@ def bounds_from_points(points: Sequence[Point]) -> Optional[Bounds]:
     return Bounds(min(xs), min(ys), max(xs), max(ys))
 
 
-def transformed_bounds(matrix: Matrix, points: Sequence[Point]) -> Optional[Bounds]:
+def transformed_bounds(matrix: Matrix, points: Sequence[Point]) -> Bounds | None:
     return bounds_from_points([transform_point(matrix, point) for point in points])
 
 
-def shape_bounds(context: ElementContext, canvas: Point) -> Optional[Bounds]:
+def shape_bounds(context: ElementContext, canvas: Point) -> Bounds | None:
     element = context.element
     tag = local_name(element.tag)
     role = context.role
@@ -206,10 +257,18 @@ def shape_bounds(context: ElementContext, canvas: Point) -> Optional[Bounds]:
                 return None
             if height <= 28 or width <= 8:
                 return None
-            nearly_canvas = canvas_width > 0 and canvas_height > 0 and width >= canvas_width * 0.9 and height >= canvas_height * 0.9
+            nearly_canvas = (
+                canvas_width > 0
+                and canvas_height > 0
+                and width >= canvas_width * 0.9
+                and height >= canvas_height * 0.9
+            )
             if nearly_canvas:
                 return None
-            container_like = bool(element.get("stroke-dasharray")) or element.get("fill", "").strip().lower() == "none"
+            container_like = (
+                bool(element.get("stroke-dasharray"))
+                or element.get("fill", "").strip().lower() == "none"
+            )
             if container_like and (
                 (canvas_width > 0 and width >= canvas_width * 0.45)
                 or (canvas_height > 0 and height >= canvas_height * 0.45)
@@ -229,12 +288,17 @@ def shape_bounds(context: ElementContext, canvas: Point) -> Optional[Bounds]:
             return None
         return transformed_bounds(
             context.matrix,
-            ((cx - rx, cy - ry), (cx + rx, cy - ry), (cx + rx, cy + ry), (cx - rx, cy + ry)),
+            (
+                (cx - rx, cy - ry),
+                (cx + rx, cy - ry),
+                (cx + rx, cy + ry),
+                (cx - rx, cy + ry),
+            ),
         )
 
     if tag in {"polygon", "polyline"} and not has_marker(element):
         values = [float(item) for item in NUMBER_RE.findall(element.get("points", ""))]
-        points = list(zip(values[::2], values[1::2]))
+        points = list(zip(values[::2], values[1::2], strict=False))
         if len(points) < 3:
             return None
         return transformed_bounds(context.matrix, points)
@@ -259,7 +323,9 @@ def marker_references(root: ET.Element) -> tuple[set[str], set[str]]:
     return definitions, references
 
 
-def sample_quadratic(start: Point, control: Point, end: Point, steps: int = 12) -> list[Point]:
+def sample_quadratic(
+    start: Point, control: Point, end: Point, steps: int = 12
+) -> list[Point]:
     return [
         (
             (1 - t) ** 2 * start[0] + 2 * (1 - t) * t * control[0] + t**2 * end[0],
@@ -269,11 +335,19 @@ def sample_quadratic(start: Point, control: Point, end: Point, steps: int = 12) 
     ]
 
 
-def sample_cubic(start: Point, first: Point, second: Point, end: Point, steps: int = 16) -> list[Point]:
+def sample_cubic(
+    start: Point, first: Point, second: Point, end: Point, steps: int = 16
+) -> list[Point]:
     return [
         (
-            (1 - t) ** 3 * start[0] + 3 * (1 - t) ** 2 * t * first[0] + 3 * (1 - t) * t**2 * second[0] + t**3 * end[0],
-            (1 - t) ** 3 * start[1] + 3 * (1 - t) ** 2 * t * first[1] + 3 * (1 - t) * t**2 * second[1] + t**3 * end[1],
+            (1 - t) ** 3 * start[0]
+            + 3 * (1 - t) ** 2 * t * first[0]
+            + 3 * (1 - t) * t**2 * second[0]
+            + t**3 * end[0],
+            (1 - t) ** 3 * start[1]
+            + 3 * (1 - t) ** 2 * t * first[1]
+            + 3 * (1 - t) * t**2 * second[1]
+            + t**3 * end[1],
         )
         for t in (index / steps for index in range(1, steps + 1))
     ]
@@ -315,14 +389,22 @@ def sample_arc(
         coefficient = -coefficient
     center_x_prime = coefficient * (rx * y_prime / ry)
     center_y_prime = coefficient * (-ry * x_prime / rx)
-    center_x = cos_phi * center_x_prime - sin_phi * center_y_prime + (start[0] + end[0]) / 2
-    center_y = sin_phi * center_x_prime + cos_phi * center_y_prime + (start[1] + end[1]) / 2
+    center_x = (
+        cos_phi * center_x_prime - sin_phi * center_y_prime + (start[0] + end[0]) / 2
+    )
+    center_y = (
+        sin_phi * center_x_prime + cos_phi * center_y_prime + (start[1] + end[1]) / 2
+    )
 
     def angle(vector: Point) -> float:
         return math.atan2(vector[1], vector[0])
 
-    start_angle = angle(((x_prime - center_x_prime) / rx, (y_prime - center_y_prime) / ry))
-    end_angle = angle(((-x_prime - center_x_prime) / rx, (-y_prime - center_y_prime) / ry))
+    start_angle = angle(
+        ((x_prime - center_x_prime) / rx, (y_prime - center_y_prime) / ry)
+    )
+    end_angle = angle(
+        ((-x_prime - center_x_prime) / rx, (-y_prime - center_y_prime) / ry)
+    )
     delta = end_angle - start_angle
     if sweep and delta < 0:
         delta += math.tau
@@ -330,9 +412,11 @@ def sample_arc(
         delta -= math.tau
     return [
         (
-            center_x + rx * math.cos(start_angle + delta * index / steps) * cos_phi
+            center_x
+            + rx * math.cos(start_angle + delta * index / steps) * cos_phi
             - ry * math.sin(start_angle + delta * index / steps) * sin_phi,
-            center_y + rx * math.cos(start_angle + delta * index / steps) * sin_phi
+            center_y
+            + rx * math.cos(start_angle + delta * index / steps) * sin_phi
             + ry * math.sin(start_angle + delta * index / steps) * cos_phi,
         )
         for index in range(1, steps + 1)
@@ -347,12 +431,14 @@ def path_routes(path_data: str, *, arc_chords: bool = False) -> list[list[Point]
     command = ""
     current = (0.0, 0.0)
     start = current
-    previous_cubic: Optional[Point] = None
-    previous_quadratic: Optional[Point] = None
+    previous_cubic: Point | None = None
+    previous_quadratic: Point | None = None
 
-    def read(count: int) -> Optional[list[float]]:
+    def read(count: int) -> list[float] | None:
         nonlocal index
-        if index + count > len(tokens) or any(re.fullmatch(r"[A-Za-z]", token) for token in tokens[index : index + count]):
+        if index + count > len(tokens) or any(
+            re.fullmatch(r"[A-Za-z]", token) for token in tokens[index : index + count]
+        ):
             return None
         values = [float(token) for token in tokens[index : index + count]]
         index += count
@@ -376,7 +462,17 @@ def path_routes(path_data: str, *, arc_chords: bool = False) -> list[list[Point]
             previous_cubic = previous_quadratic = None
             command = ""
             continue
-        count = {"M": 2, "L": 2, "H": 1, "V": 1, "C": 6, "S": 4, "Q": 4, "T": 2, "A": 7}.get(op)
+        count = {
+            "M": 2,
+            "L": 2,
+            "H": 1,
+            "V": 1,
+            "C": 6,
+            "S": 4,
+            "Q": 4,
+            "T": 2,
+            "A": 7,
+        }.get(op)
         if count is None:
             return []
         values = read(count)
@@ -394,10 +490,18 @@ def path_routes(path_data: str, *, arc_chords: bool = False) -> list[list[Point]
             current = absolute(values[0], values[1], relative)
             points.append(current)
         elif op == "H":
-            current = (current[0] + values[0], current[1]) if relative else (values[0], current[1])
+            current = (
+                (current[0] + values[0], current[1])
+                if relative
+                else (values[0], current[1])
+            )
             points.append(current)
         elif op == "V":
-            current = (current[0], current[1] + values[0]) if relative else (current[0], values[0])
+            current = (
+                (current[0], current[1] + values[0])
+                if relative
+                else (current[0], values[0])
+            )
             points.append(current)
         elif op == "C":
             first = absolute(values[0], values[1], relative)
@@ -407,7 +511,11 @@ def path_routes(path_data: str, *, arc_chords: bool = False) -> list[list[Point]
             current, previous_cubic = end, second
             previous_quadratic = None
         elif op == "S":
-            first = (2 * current[0] - previous_cubic[0], 2 * current[1] - previous_cubic[1]) if previous_cubic else current
+            first = (
+                (2 * current[0] - previous_cubic[0], 2 * current[1] - previous_cubic[1])
+                if previous_cubic
+                else current
+            )
             second = absolute(values[0], values[1], relative)
             end = absolute(values[2], values[3], relative)
             points.extend(sample_cubic(current, first, second, end))
@@ -420,7 +528,14 @@ def path_routes(path_data: str, *, arc_chords: bool = False) -> list[list[Point]
             current, previous_quadratic = end, control
             previous_cubic = None
         elif op == "T":
-            control = (2 * current[0] - previous_quadratic[0], 2 * current[1] - previous_quadratic[1]) if previous_quadratic else current
+            control = (
+                (
+                    2 * current[0] - previous_quadratic[0],
+                    2 * current[1] - previous_quadratic[1],
+                )
+                if previous_quadratic
+                else current
+            )
             end = absolute(values[0], values[1], relative)
             points.extend(sample_quadratic(current, control, end))
             current, previous_quadratic = end, control
@@ -456,18 +571,35 @@ def edge_routes(context: ElementContext) -> list[list[Point]]:
     explicit_edge = context.role == "edge"
     if (
         context.in_defs
-        or context.role in {"background", "bridge-mask", "decoration", "label", "legend", "node", "reserved"}
+        or context.role
+        in {
+            "background",
+            "bridge-mask",
+            "decoration",
+            "label",
+            "legend",
+            "node",
+            "reserved",
+        }
         or (not explicit_edge and not has_marker(element))
     ):
         return []
     if tag == "line":
-        routes = [[
-            (float(parse_number(element.get("x1"), 0.0) or 0.0), float(parse_number(element.get("y1"), 0.0) or 0.0)),
-            (float(parse_number(element.get("x2"), 0.0) or 0.0), float(parse_number(element.get("y2"), 0.0) or 0.0)),
-        ]]
+        routes = [
+            [
+                (
+                    float(parse_number(element.get("x1"), 0.0) or 0.0),
+                    float(parse_number(element.get("y1"), 0.0) or 0.0),
+                ),
+                (
+                    float(parse_number(element.get("x2"), 0.0) or 0.0),
+                    float(parse_number(element.get("y2"), 0.0) or 0.0),
+                ),
+            ]
+        ]
     elif tag == "polyline":
         values = [float(item) for item in NUMBER_RE.findall(element.get("points", ""))]
-        routes = [list(zip(values[::2], values[1::2]))]
+        routes = [list(zip(values[::2], values[1::2], strict=False))]
     elif tag == "path":
         routes = path_routes(
             element.get("d", ""),
@@ -476,12 +608,13 @@ def edge_routes(context: ElementContext) -> list[list[Point]]:
     else:
         return []
     return [
-        [transform_point(context.matrix, point) for point in route]
-        for route in routes
+        [transform_point(context.matrix, point) for point in route] for route in routes
     ]
 
 
-def segment_hits_bounds(start: Point, end: Point, bounds: Bounds, epsilon: float = 1e-5) -> bool:
+def segment_hits_bounds(
+    start: Point, end: Point, bounds: Bounds, epsilon: float = 1e-5
+) -> bool:
     left, right = bounds.left + epsilon, bounds.right - epsilon
     top, bottom = bounds.top + epsilon, bounds.bottom - epsilon
     if left >= right or top >= bottom:
@@ -489,7 +622,12 @@ def segment_hits_bounds(start: Point, end: Point, bounds: Bounds, epsilon: float
     x1, y1 = start
     dx, dy = end[0] - x1, end[1] - y1
     low, high = 0.0, 1.0
-    for p, q in ((-dx, x1 - left), (dx, right - x1), (-dy, y1 - top), (dy, bottom - y1)):
+    for p, q in (
+        (-dx, x1 - left),
+        (dx, right - x1),
+        (-dy, y1 - top),
+        (dy, bottom - y1),
+    ):
         if abs(p) < epsilon:
             if q < 0:
                 return False
@@ -504,7 +642,9 @@ def segment_hits_bounds(start: Point, end: Point, bounds: Bounds, epsilon: float
     return high - low > epsilon and high > epsilon and low < 1 - epsilon
 
 
-def points_within_bounds(points: Sequence[Point], bounds: Bounds, epsilon: float = 1e-5) -> bool:
+def points_within_bounds(
+    points: Sequence[Point], bounds: Bounds, epsilon: float = 1e-5
+) -> bool:
     return bool(points) and all(
         bounds.left - epsilon <= x <= bounds.right + epsilon
         and bounds.top - epsilon <= y <= bounds.bottom + epsilon
@@ -543,7 +683,7 @@ def find_collisions(root: ET.Element) -> list[Collision]:
             if any(
                 segment_hits_bounds(first, second, bounds)
                 for route in routes
-                for first, second in zip(route, route[1:])
+                for first, second in zip(route, route[1:], strict=False)
             ):
                 collisions.append(
                     Collision(
@@ -569,7 +709,7 @@ def describe_element(element: ET.Element) -> str:
     return f"{tag}[{' '.join(attributes)}]" if attributes else tag
 
 
-def role_bounds(context: ElementContext) -> Optional[Bounds]:
+def role_bounds(context: ElementContext) -> Bounds | None:
     """Return explicit node/reserved/label bounds for the strict geometry gate."""
 
     declared = metadata_bounds(context)
@@ -592,7 +732,9 @@ def role_bounds(context: ElementContext) -> Optional[Bounds]:
         y = float(parse_number(element.get("y"), 0.0) or 0.0)
         font_size = float(parse_number(element.get("font-size"), 12.0) or 12.0)
         anchor = element.get("text-anchor", "start")
-        local = geometry.estimate_text_bounds(x, y, "".join(element.itertext()), font_size=font_size, anchor=anchor)
+        local = geometry.estimate_text_bounds(
+            x, y, "".join(element.itertext()), font_size=font_size, anchor=anchor
+        )
         return transformed_bounds(
             context.matrix,
             (
@@ -633,13 +775,20 @@ def geometry_check(root: ET.Element) -> list[str]:
         if context.in_defs:
             continue
         if context.role in {"node", "reserved"}:
-            if context.role == "node" and context.element.get("data-graph-role") != "node" and metadata_bounds(context) is None:
+            if (
+                context.role == "node"
+                and context.element.get("data-graph-role") != "node"
+                and metadata_bounds(context) is None
+            ):
                 continue
             bounds = role_bounds(context)
             if bounds is not None:
                 obstacles.append((context, bounds))
         elif context.role == "label":
-            if context.element.get("data-graph-role") != "label" and metadata_bounds(context) is None:
+            if (
+                context.element.get("data-graph-role") != "label"
+                and metadata_bounds(context) is None
+            ):
                 continue
             bounds = role_bounds(context)
             if bounds is not None:
@@ -655,21 +804,23 @@ def geometry_check(root: ET.Element) -> list[str]:
 
     for context, bounds in [*obstacles, *labels]:
         if not bounds_inside_canvas(bounds, canvas):
-            details.append(f"canvas_clip: {describe_element(context.element)} exceeds viewBox")
+            details.append(
+                f"canvas_clip: {describe_element(context.element)} exceeds viewBox"
+            )
 
     for edge_context, routes in edges:
         edge = edge_context.element
         edge_name = describe_element(edge)
         if not all(
-            geometry.route_inside_canvas(route, (canvas.left, canvas.top, canvas.right, canvas.bottom))
+            geometry.route_inside_canvas(
+                route, (canvas.left, canvas.top, canvas.right, canvas.bottom)
+            )
             for route in routes
             if len(route) >= 2
         ):
             details.append(f"canvas_clip: {edge_name} exceeds viewBox")
         if root.get("data-generator") == "fireworks-tech-graph" and not all(
-            geometry.route_is_orthogonal(route)
-            for route in routes
-            if len(route) >= 2
+            geometry.route_is_orthogonal(route) for route in routes if len(route) >= 2
         ):
             details.append(f"non_orthogonal: {edge_name}")
         for obstacle_context, bounds in obstacles:
@@ -682,7 +833,7 @@ def geometry_check(root: ET.Element) -> list[str]:
             if any(
                 segment_hits_bounds(first, second, bounds)
                 for route in routes
-                for first, second in zip(route, route[1:])
+                for first, second in zip(route, route[1:], strict=False)
             ):
                 role = obstacle_context.role or "obstacle"
                 details.append(
@@ -706,35 +857,50 @@ def geometry_check(root: ET.Element) -> list[str]:
             if any(item.overlap_count for item in interactions):
                 details.append(f"edge_overlap: {first_name} overlaps {second_name}")
             for point in [point for item in interactions for point in item.crossings]:
-                first_bridges = geometry.parse_bridge_points(first_element.get("data-bridges"))
-                second_bridges = geometry.parse_bridge_points(second_element.get("data-bridges"))
-                first_owner = first_element.get("data-edge-id") or first_element.get("id", "")
-                second_owner = second_element.get("data-edge-id") or second_element.get("id", "")
+                first_bridges = geometry.parse_bridge_points(
+                    first_element.get("data-bridges")
+                )
+                second_bridges = geometry.parse_bridge_points(
+                    second_element.get("data-bridges")
+                )
+                first_owner = first_element.get("data-edge-id") or first_element.get(
+                    "id", ""
+                )
+                second_owner = second_element.get("data-edge-id") or second_element.get(
+                    "id", ""
+                )
                 first_mask = bridge_masks.get(first_owner)
                 second_mask = bridge_masks.get(second_owner)
                 first_valid = (
                     geometry.bridge_declared(point, first_bridges)
                     and first_mask is not None
-                    and paint_order[id(second_element)] < paint_order[id(first_mask.element)] < paint_order[id(first_element)]
+                    and paint_order[id(second_element)]
+                    < paint_order[id(first_mask.element)]
+                    < paint_order[id(first_element)]
                     and first_mask.element.get("d") == first_element.get("d")
                     and first_mask.matrix == first_context.matrix
                 )
                 second_valid = (
                     geometry.bridge_declared(point, second_bridges)
                     and second_mask is not None
-                    and paint_order[id(first_element)] < paint_order[id(second_mask.element)] < paint_order[id(second_element)]
+                    and paint_order[id(first_element)]
+                    < paint_order[id(second_mask.element)]
+                    < paint_order[id(second_element)]
                     and second_mask.element.get("d") == second_element.get("d")
                     and second_mask.matrix == second_context.matrix
                 )
                 # Backwards compatibility for authored SVGs predating bridge masks.
                 if root.get("data-generator") != "fireworks-tech-graph":
-                    first_valid = first_valid or geometry.bridge_declared(point, first_bridges)
-                    second_valid = second_valid or geometry.bridge_declared(point, second_bridges)
-                if not (first_valid or second_valid):
-                    declared = (
-                        geometry.bridge_declared(point, first_bridges)
-                        or geometry.bridge_declared(point, second_bridges)
+                    first_valid = first_valid or geometry.bridge_declared(
+                        point, first_bridges
                     )
+                    second_valid = second_valid or geometry.bridge_declared(
+                        point, second_bridges
+                    )
+                if not (first_valid or second_valid):
+                    declared = geometry.bridge_declared(
+                        point, first_bridges
+                    ) or geometry.bridge_declared(point, second_bridges)
                     code = "bridge_paint_order" if declared else "edge_crossing"
                     details.append(
                         f"{code}: {first_name} crosses {second_name} at {point[0]:.2f},{point[1]:.2f}"
@@ -747,11 +913,23 @@ def geometry_check(root: ET.Element) -> list[str]:
     for label_index, (label_context, label_bounds) in enumerate(labels):
         label_name = describe_element(label_context.element)
         owner = label_context.element.get("data-owner", "")
-        label_tuple = (label_bounds.left, label_bounds.top, label_bounds.right, label_bounds.bottom)
+        label_tuple = (
+            label_bounds.left,
+            label_bounds.top,
+            label_bounds.right,
+            label_bounds.bottom,
+        )
         for obstacle_context, obstacle_bounds in obstacles:
-            obstacle_tuple = (obstacle_bounds.left, obstacle_bounds.top, obstacle_bounds.right, obstacle_bounds.bottom)
+            obstacle_tuple = (
+                obstacle_bounds.left,
+                obstacle_bounds.top,
+                obstacle_bounds.right,
+                obstacle_bounds.bottom,
+            )
             if geometry.bounds_intersect(label_tuple, obstacle_tuple):
-                details.append(f"label_obstacle: {label_name} intersects {describe_element(obstacle_context.element)}")
+                details.append(
+                    f"label_obstacle: {label_name} intersects {describe_element(obstacle_context.element)}"
+                )
         for edge_context, edge_routes_for_context in edges:
             edge = edge_context.element
             edge_owner = edge.get("data-edge-id") or edge.get("id", "")
@@ -760,19 +938,32 @@ def geometry_check(root: ET.Element) -> list[str]:
             if any(
                 segment_hits_bounds(first, second, label_bounds)
                 for route in edge_routes_for_context
-                for first, second in zip(route, route[1:])
+                for first, second in zip(route, route[1:], strict=False)
             ):
-                details.append(f"label_edge: {label_name} intersects {describe_element(edge)}")
+                details.append(
+                    f"label_edge: {label_name} intersects {describe_element(edge)}"
+                )
         for other_context, other_bounds in labels[label_index + 1 :]:
-            other_tuple = (other_bounds.left, other_bounds.top, other_bounds.right, other_bounds.bottom)
+            other_tuple = (
+                other_bounds.left,
+                other_bounds.top,
+                other_bounds.right,
+                other_bounds.bottom,
+            )
             if geometry.bounds_intersect(label_tuple, other_tuple):
-                details.append(f"label_overlap: {label_name} intersects {describe_element(other_context.element)}")
+                details.append(
+                    f"label_overlap: {label_name} intersects {describe_element(other_context.element)}"
+                )
 
     for edge_context, _ in edges:
         edge = edge_context.element
         owner = edge.get("data-edge-id") or edge.get("id", "")
         bridges = geometry.parse_bridge_points(edge.get("data-bridges"))
-        if bridges and owner not in bridge_masks and root.get("data-generator") == "fireworks-tech-graph":
+        if (
+            bridges
+            and owner not in bridge_masks
+            and root.get("data-generator") == "fireworks-tech-graph"
+        ):
             details.append(f"bridge_mask_missing: {describe_element(edge)}")
         for bridge in bridges:
             if not geometry.bridge_declared(bridge, matched_bridges.get(owner, [])):
@@ -820,23 +1011,39 @@ def composition_check(root: ET.Element) -> list[str]:
             continue
         explicit = context.element.get("data-graph-role")
         bounds = role_bounds(context)
-        if context.role == "node" and bounds is not None and (explicit == "node" or metadata_bounds(context) is not None):
+        if (
+            context.role == "node"
+            and bounds is not None
+            and (explicit == "node" or metadata_bounds(context) is not None)
+        ):
             nodes.append(
                 (
-                    context.element.get("data-node-id") or context.element.get("id") or describe_element(context.element),
+                    context.element.get("data-node-id")
+                    or context.element.get("id")
+                    or describe_element(context.element),
                     (bounds.left, bounds.top, bounds.right, bounds.bottom),
                 )
             )
-        elif context.role == "container" and bounds is not None and explicit == "container":
+        elif (
+            context.role == "container"
+            and bounds is not None
+            and explicit == "container"
+        ):
             containers.append(
                 (
                     context.element.get("id") or describe_element(context.element),
                     (bounds.left, bounds.top, bounds.right, bounds.bottom),
                 )
             )
-        elif context.role == "label" and bounds is not None and (explicit == "label" or metadata_bounds(context) is not None):
+        elif (
+            context.role == "label"
+            and bounds is not None
+            and (explicit == "label" or metadata_bounds(context) is not None)
+        ):
             labels.append((context, bounds))
-        if context.role == "edge" or (context.role is None and has_marker(context.element)):
+        if context.role == "edge" or (
+            context.role is None and has_marker(context.element)
+        ):
             routes = edge_routes(context)
             if any(len(route) >= 2 for route in routes):
                 edges.append((context, routes))
@@ -850,7 +1057,9 @@ def composition_check(root: ET.Element) -> list[str]:
         for index, route in enumerate(valid_routes):
             edge_records.append(
                 {
-                    "id": edge_id if len(valid_routes) == 1 else f"{edge_id}:{index + 1}",
+                    "id": edge_id
+                    if len(valid_routes) == 1
+                    else f"{edge_id}:{index + 1}",
                     "route": route,
                     "bends": geometry.bend_count(route),
                     # Bridges are declared once per SVG edge element even when
@@ -865,8 +1074,8 @@ def composition_check(root: ET.Element) -> list[str]:
         contract=contract,
     )
     details = [
-        f'composition_{str(item["code"]).lower()}: {item["element"]} '
-        f'actual={item["actual"]} limit={item["limit"]}'
+        f"composition_{str(item['code']).lower()}: {item['element']} "
+        f"actual={item['actual']} limit={item['limit']}"
         for item in assessment["violations"]
     ]
 
@@ -897,7 +1106,7 @@ def composition_check(root: ET.Element) -> list[str]:
             if any(
                 segment_hits_bounds(first, second, expanded)
                 for route in routes
-                for first, second in zip(route, route[1:])
+                for first, second in zip(route, route[1:], strict=False)
             ):
                 details.append(
                     f"composition_label_clearance: {describe_element(label_context.element)} is too close to {describe_element(edge)}"
@@ -905,7 +1114,12 @@ def composition_check(root: ET.Element) -> list[str]:
         for other_context, other_bounds in labels[index + 1 :]:
             if geometry.bounds_intersect(
                 (expanded.left, expanded.top, expanded.right, expanded.bottom),
-                (other_bounds.left, other_bounds.top, other_bounds.right, other_bounds.bottom),
+                (
+                    other_bounds.left,
+                    other_bounds.top,
+                    other_bounds.right,
+                    other_bounds.bottom,
+                ),
             ):
                 details.append(
                     f"composition_label_clearance: {describe_element(label_context.element)} is too close to {describe_element(other_context.element)}"
@@ -935,17 +1149,18 @@ def run_check(path: Path, check: str) -> tuple[bool, list[str]]:
         details = composition_check(root)
         return not details, details
     collisions = find_collisions(root)
-    details = [
-        f"{item.edge} intersects {item.obstacle}"
-        for item in collisions
-    ]
+    details = [f"{item.edge} intersects {item.obstacle}" for item in collisions]
     return not collisions, details
 
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("svg_file", type=Path)
-    parser.add_argument("--check", choices=("xml", "markers", "collisions", "geometry", "composition"), required=True)
+    parser.add_argument(
+        "--check",
+        choices=("xml", "markers", "collisions", "geometry", "composition"),
+        required=True,
+    )
     return parser.parse_args()
 
 

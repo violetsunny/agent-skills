@@ -36,18 +36,26 @@ def _safe_int(value: str | None) -> int | None:
         return None
 
 
+def _detect_stale(
+    latest_price: float | None, prev_close: float | None, volume: int | None
+) -> tuple[bool, str | None]:
+    if (
+        latest_price is not None
+        and prev_close is not None
+        and volume == 0
+        and latest_price == prev_close
+    ):
+        return True, "成交量为0且最新价等于昨收，疑似已迁移废码或停牌（僵尸报价）"
+    return False, None
+
+
 def _parse_tencent_quote(text: str, symbol: str) -> dict:
     body = text.split('="', 1)[1].rsplit('";', 1)[0]
     parts = body.split("~")
     latest_price = _safe_float(parts[3] if len(parts) > 3 else None)
     prev_close = _safe_float(parts[4] if len(parts) > 4 else None)
     volume = _safe_int(parts[6] if len(parts) > 6 else None)
-    is_stale = (
-        latest_price is not None
-        and prev_close is not None
-        and volume == 0
-        and latest_price == prev_close
-    )
+    is_stale, stale_reason = _detect_stale(latest_price, prev_close, volume)
     return {
         "symbol": clean_symbol(symbol),
         "full_symbol": full_symbol(symbol),
@@ -63,9 +71,7 @@ def _parse_tencent_quote(text: str, symbol: str) -> dict:
         "low": _safe_float(parts[34] if len(parts) > 34 else None),
         "timestamp": parts[30] if len(parts) > 30 else None,
         "is_stale": is_stale,
-        "stale_reason": "成交量为0且最新价等于昨收，疑似已迁移废码或停牌（僵尸报价）"
-        if is_stale
-        else None,
+        "stale_reason": stale_reason,
     }
 
 

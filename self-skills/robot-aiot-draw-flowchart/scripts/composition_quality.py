@@ -10,9 +10,9 @@ crossings whenever the topology can be composed without them.
 from __future__ import annotations
 
 import math
+from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
-from typing import Any, Mapping, Optional, Sequence
-
+from typing import Any
 
 Point = tuple[float, float]
 Bounds = tuple[float, float, float, float]
@@ -114,12 +114,15 @@ def bounds_area(bounds: Bounds) -> float:
     return max(0.0, bounds[2] - bounds[0]) * max(0.0, bounds[3] - bounds[1])
 
 
-def containing_container(node: Bounds, containers: Sequence[tuple[str, Bounds]]) -> Optional[tuple[str, Bounds]]:
+def containing_container(
+    node: Bounds, containers: Sequence[tuple[str, Bounds]]
+) -> tuple[str, Bounds] | None:
     center = ((node[0] + node[2]) / 2, (node[1] + node[3]) / 2)
     matches = [
         item
         for item in containers
-        if item[1][0] <= center[0] <= item[1][2] and item[1][1] <= center[1] <= item[1][3]
+        if item[1][0] <= center[0] <= item[1][2]
+        and item[1][1] <= center[1] <= item[1][3]
     ]
     return min(matches, key=lambda item: bounds_area(item[1])) if matches else None
 
@@ -136,13 +139,19 @@ def container_gutter(node: Bounds, container: Bounds) -> float:
 def route_stretch(points: Sequence[Point]) -> float:
     if len(points) < 2:
         return 1.0
-    length = sum(abs(x2 - x1) + abs(y2 - y1) for (x1, y1), (x2, y2) in zip(points, points[1:]))
+    length = sum(
+        abs(x2 - x1) + abs(y2 - y1)
+        for (x1, y1), (x2, y2) in zip(points, points[1:], strict=False)
+    )
     direct = abs(points[-1][0] - points[0][0]) + abs(points[-1][1] - points[0][1])
     return 1.0 if direct <= 1e-9 else length / direct
 
 
 def segment_lengths(points: Sequence[Point]) -> list[float]:
-    return [abs(x2 - x1) + abs(y2 - y1) for (x1, y1), (x2, y2) in zip(points, points[1:])]
+    return [
+        abs(x2 - x1) + abs(y2 - y1)
+        for (x1, y1), (x2, y2) in zip(points, points[1:], strict=False)
+    ]
 
 
 def assess_composition(
@@ -158,7 +167,7 @@ def assess_composition(
     total_bends = 0
     total_bridges = 0
     max_stretch = 1.0
-    shortest_segment: Optional[float] = None
+    shortest_segment: float | None = None
 
     for edge in edges:
         edge_id = str(edge.get("id", "edge"))
@@ -172,77 +181,98 @@ def assess_composition(
         total_bridges += bridges
         max_stretch = max(max_stretch, stretch)
         if local_shortest is not None:
-            shortest_segment = local_shortest if shortest_segment is None else min(shortest_segment, local_shortest)
+            shortest_segment = (
+                local_shortest
+                if shortest_segment is None
+                else min(shortest_segment, local_shortest)
+            )
         if bends > contract.max_bends_per_edge:
-            violations.append({
-                "code": "EDGE_BEND_BUDGET",
-                "element": edge_id,
-                "actual": bends,
-                "limit": contract.max_bends_per_edge,
-            })
+            violations.append(
+                {
+                    "code": "EDGE_BEND_BUDGET",
+                    "element": edge_id,
+                    "actual": bends,
+                    "limit": contract.max_bends_per_edge,
+                }
+            )
         if stretch > contract.max_route_stretch + 1e-6:
-            violations.append({
-                "code": "EDGE_ROUTE_STRETCH",
-                "element": edge_id,
-                "actual": round(stretch, 3),
-                "limit": contract.max_route_stretch,
-            })
-        if local_shortest is not None and local_shortest + 1e-6 < contract.min_segment_length:
-            violations.append({
-                "code": "EDGE_MICRO_SEGMENT",
-                "element": edge_id,
-                "actual": round(local_shortest, 2),
-                "limit": contract.min_segment_length,
-            })
+            violations.append(
+                {
+                    "code": "EDGE_ROUTE_STRETCH",
+                    "element": edge_id,
+                    "actual": round(stretch, 3),
+                    "limit": contract.max_route_stretch,
+                }
+            )
+        if (
+            local_shortest is not None
+            and local_shortest + 1e-6 < contract.min_segment_length
+        ):
+            violations.append(
+                {
+                    "code": "EDGE_MICRO_SEGMENT",
+                    "element": edge_id,
+                    "actual": round(local_shortest, 2),
+                    "limit": contract.min_segment_length,
+                }
+            )
 
     if total_bends > contract.max_total_bends:
-        violations.append({
-            "code": "TOTAL_BEND_BUDGET",
-            "element": "diagram",
-            "actual": total_bends,
-            "limit": contract.max_total_bends,
-        })
+        violations.append(
+            {
+                "code": "TOTAL_BEND_BUDGET",
+                "element": "diagram",
+                "actual": total_bends,
+                "limit": contract.max_total_bends,
+            }
+        )
     if total_bridges > contract.max_bridged_crossings:
-        violations.append({
-            "code": "BRIDGE_BUDGET",
-            "element": "diagram",
-            "actual": total_bridges,
-            "limit": contract.max_bridged_crossings,
-        })
+        violations.append(
+            {
+                "code": "BRIDGE_BUDGET",
+                "element": "diagram",
+                "actual": total_bridges,
+                "limit": contract.max_bridged_crossings,
+            }
+        )
 
-    minimum_gap: Optional[float] = None
+    minimum_gap: float | None = None
     for index, (first_id, first) in enumerate(nodes):
         for second_id, second in nodes[index + 1 :]:
             gap = rectangle_gap(first, second)
             minimum_gap = gap if minimum_gap is None else min(minimum_gap, gap)
             if gap + 1e-6 < contract.min_node_gap:
-                violations.append({
-                    "code": "NODE_GAP",
-                    "element": f"{first_id},{second_id}",
-                    "actual": round(gap, 2),
-                    "limit": contract.min_node_gap,
-                })
+                violations.append(
+                    {
+                        "code": "NODE_GAP",
+                        "element": f"{first_id},{second_id}",
+                        "actual": round(gap, 2),
+                        "limit": contract.min_node_gap,
+                    }
+                )
 
-    minimum_gutter: Optional[float] = None
+    minimum_gutter: float | None = None
     for node_id, node in nodes:
         match = containing_container(node, containers)
         if not match:
             continue
         container_id, container = match
         gutter = container_gutter(node, container)
-        minimum_gutter = gutter if minimum_gutter is None else min(minimum_gutter, gutter)
+        minimum_gutter = (
+            gutter if minimum_gutter is None else min(minimum_gutter, gutter)
+        )
         if gutter + 1e-6 < contract.min_container_gutter:
-            violations.append({
-                "code": "CONTAINER_GUTTER",
-                "element": f"{node_id}@{container_id}",
-                "actual": round(gutter, 2),
-                "limit": contract.min_container_gutter,
-            })
+            violations.append(
+                {
+                    "code": "CONTAINER_GUTTER",
+                    "element": f"{node_id}@{container_id}",
+                    "actual": round(gutter, 2),
+                    "limit": contract.min_container_gutter,
+                }
+            )
 
     penalty = (
-        len(violations) * 12
-        + total_bridges * 8
-        + max(0, total_bends - len(edges)) * 2
+        len(violations) * 12 + total_bridges * 8 + max(0, total_bends - len(edges)) * 2
     )
     return {
         "profile": contract.profile,
@@ -252,9 +282,15 @@ def assess_composition(
             "total_bends": total_bends,
             "bridged_crossings": total_bridges,
             "max_route_stretch": round(max_stretch, 3),
-            "minimum_node_gap": round(minimum_gap, 2) if minimum_gap is not None else None,
-            "minimum_container_gutter": round(minimum_gutter, 2) if minimum_gutter is not None else None,
-            "shortest_segment": round(shortest_segment, 2) if shortest_segment is not None else None,
+            "minimum_node_gap": round(minimum_gap, 2)
+            if minimum_gap is not None
+            else None,
+            "minimum_container_gutter": round(minimum_gutter, 2)
+            if minimum_gutter is not None
+            else None,
+            "shortest_segment": round(shortest_segment, 2)
+            if shortest_segment is not None
+            else None,
         },
         "limits": contract.as_dict(),
         "violations": violations,

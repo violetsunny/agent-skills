@@ -1,12 +1,13 @@
 ---
 name: robot-aiot-draw-flowchart
-description: 机器人/IoT 业务图表绘制能力。三条输出路径：draw.io XML（可编辑主路径）、直绘 SVG/HTML（汇报级展示）、archify 内置渲染（主题切换+导出）。覆盖流程图、分层架构、时序、状态机、ER、UML 类/用例、网络拓扑、时间线、Agent/记忆架构等 40+ 图表类型；内置机器人视觉语言、12 套 SVG 风格皮肤与品牌 token 定制、几何/构图校验、PNG/GIF 导出与 drawio/Mermaid 导入重绘。
-version: 3.1.0
+description: >
+  机器人/IoT 业务图表绘制与页面化能力。draw.io XML 图表生成（可编辑主路径）+ XML→HTML 稳定桥接转换 + 领导汇报静态页面 HTML 生成。覆盖流程图、分层架构、时序、状态机、ER、UML 类/用例、网络拓扑、时间线、Agent/记忆架构等 39+ 图表类型；内置机器人视觉语言、配色与样式一致性体系、几何/构图校验、PNG/GIF 导出与 drawio/Mermaid 导入重绘；XML→HTML 转换保留原始样式/布局/层级/配色；静态页面固定 1920x1080 画布，内化语义 token、高级感设计标准与交付审查流程。
+version: 5.0.0
 author: kangll13
 license: MIT
 metadata:
   hermes:
-    tags: [flowchart, draw.io, robot-vacuum, diagram, xml, architecture, layered-architecture, svg, sequence, state-machine, er, uml, network-topology, timeline, png-export, gif-motion]
+    tags: [flowchart, draw.io, robot-vacuum, diagram, xml, architecture, layered-architecture, svg, sequence, state-machine, er, uml, network-topology, timeline, png-export, gif-motion, xml-to-html, slide-html, leadership-ppt]
     related_skills: []
 ---
 
@@ -14,104 +15,42 @@ metadata:
 
 ## 执行前依赖检查
 
-无外部 skill 依赖（archify 渲染引擎内置于本 skill 目录，零运行时依赖），可在运行时 `~/.agents/skills/` 独立执行。
+核心能力无外部依赖（XML→HTML 转换脚本、静态页面规则、画布图片生成规则均内置）。运行时可选协作：
+
+| 协作 skill | 级别 | 用途 |
+|------|------|------|
+| diagram-design | 可选 | 编辑级设计系统、39类视觉类型规则、Taste Gate 审查 |
+
+```bash
+[ -d "$HOME/.agents/skills/diagram-design" ] && echo '[COLLAB] diagram-design available' || echo '[INFO] diagram-design not deployed, using internal design rules'
+```
+
+协作规则见 `references/diagram-design-collaboration.md`。缺失时不影响核心功能，使用内置设计系统。
 
 ## 概述
 
-本 Skill 是机器人/IoT 业务图表的统一绘制能力，由 draw.io XML 绘制规范、diagram-design 编辑级设计系统、fireworks-tech-graph 工程制图管线三者融合而成：
+本 Skill 是机器人/IoT 业务图表的统一绘制与页面化能力，由 draw.io XML 绘制规范、XML→HTML 桥接转换、领导汇报静态页面 HTML 三者融合而成：
 
 1. **统一的机器人视觉语言** — 标准机器人图标、状态配色、语义样式（draw.io 路径权威）
-2. **40+ 图表类型** — 流程图家族、分层架构、时序、状态机、ER/数据库、UML、网络拓扑、时间线、Agent/记忆架构、数据流、决策分析图等
-3. **三条输出路径** — draw.io XML（可编辑）、直绘 SVG/HTML（汇报展示）、archify 内置渲染（主题切换+导出）
-4. **工程化质量管线** — 构图契约、几何校验、复杂度预算、视觉复查门、PNG/GIF 导出
-5. **导入重绘** — 已有 `.drawio` / Mermaid 源可提取结构后按本 SKILL 规范重绘
+2. **39+ 图表类型** — 流程图家族、分层架构、时序、状态机、ER/数据库、UML、网络拓扑、时间线、Agent/记忆架构、数据流、决策分析图等
+3. **draw.io XML 输出** — 可编辑 .drawio/.xml 文件，支持 PPT 工作流与团队协作
+4. **XML→HTML 桥接转换** — 将 XML 图表稳定转换为 HTML 预览稿，保留原始样式/布局/层级/配色，作为 PPT 前的视觉约束层
+5. **静态页面 HTML** — 固定 1920x1080 画布的领导汇报逐页 HTML，内化语义 token、高级感设计标准与交付审查
+6. **工程化质量管线** — 构图契约、几何校验、复杂度预算、视觉复查门、PNG/GIF 导出
+7. **导入重绘** — 已有 `.drawio` / Mermaid 源可提取结构后按本 SKILL 规范重绘
 
 路径解析约定：下文 `SKILL_ROOT` 指本 SKILL.md 所在目录（运行时为 `~/.agents/skills/robot-aiot-draw-flowchart`）。脚本一律用绝对路径调用，不假设当前工作目录。
-
-## 输出路径选型
-
-| 维度 | A. draw.io XML（主路径） | B. 直绘 SVG/HTML | C. archify 内置渲染 |
-| --- | --- | --- | --- |
-| 产物 | .drawio/.xml 可编辑文件 | 自包含 SVG / HTML + PNG/GIF | 自包含 HTML（内联 SVG） |
-| 适用 | 二次编辑、PPT 工作流、团队协作 | 汇报展示、README、精确几何控制、动图 | 暗/亮主题切换、内置导出菜单 |
-| 风格 | `color-schemes.md` + `style-consistency.md` | 12 套风格皮肤或品牌 token | archify 模板 |
-| 校验 | 结构完整性 + 样式一致性自审 | `validate-svg.sh` + 视觉复查门 | archify validate/check |
-
-**决策规则：**
-1. 要求可编辑、进 PPT 工作流（robot-aiot-xml-html-bridge）→ A
-2. 要求汇报展示、精确布局、PNG/GIF 导出、风格皮肤 → B
-3. 要求主题切换或已在使用 archify → C（见 `references/archify-integration.md`）
-4. 未明确时默认 A；B 与 C 不可用时降级 A 并告知用户
 
 ## 图表类型选择
 
 先判断行为语义（状态、约束、风险承载含义时读 `references/semantic-patterns.md` 选一个主模式），再选图表类型。画图前自问：*读者从这张图学到的比一段话多吗？* 否则不画。UML 14 图型映射与高频架构模式骨架见 `references/diagram-patterns.md`。
-
-### draw.io XML 路径（路径 A）
 
 | 类型 | 规范 |
 | --- | --- |
 | 线性 / 分支 / 循环 / 并行 / 子流程 / 泳道 | `references/flowchart-patterns.md` |
 | 分层架构图（L1~L5 容器、跨层连接、数据支撑区） | `references/layered-architecture.md` |
 
-> ⚠️ `mxgraph.flowchart.*` 命名空间形状在 robot-aiot-xml-html-bridge 映射表中暂无对应 CSS，转换会触发未映射警告，属已知缺口。
-
-### SVG/HTML 路径（路径 B）— 39 类视觉类型 + 工程专项
-
-画前**必须**加载对应 type reference。完整布局语法、反模式、预算在各 reference 内。
-
-| 展示内容 | 类型 | Reference |
-| --- | --- | --- |
-| 系统组件与连接 | Architecture | `references/type-architecture.md` |
-| 遗留 IT 现状（改造前状态） | IT current-state | `references/type-it-state.md` |
-| 决策逻辑分支 | Flowchart | `references/type-flowchart.md` |
-| 角色间时序消息 | Sequence | `references/type-sequence.md` |
-| 状态 + 迁移 + 守卫 | State machine | `references/type-state.md` |
-| 实体 + 字段 + 关系 | ER / data model | `references/type-er.md` |
-| 物理表/SQL/索引/外键 | Database schema | `references/type-db-schema.md` |
-| 时间定位事件 | Timeline | `references/type-timeline.md` |
-| 跨职能交接流程 | Swimlane | `references/type-swimlane.md` |
-| 双轴定位/优先级 | Quadrant | `references/type-quadrant.md` |
-| 多实体多维评分 | Radar / Spider | `references/type-radar.md` |
-| 循环类目单序列 | Polar | `references/type-polar.md` |
-| 增强循环/飞轮 | Loop | `references/type-loop.md` |
-| 包含/作用域层级 | Nested | `references/type-nested.md` |
-| 父→子层级 | Tree | `references/type-tree.md` |
-| 归属/汇报/升级 | Org chart | `references/type-org-chart.md` |
-| 堆叠抽象层级 | Layer stack | `references/type-layers.md` |
-| 集合交集 | Venn | `references/type-venn.md` |
-| 等级/转化漏斗 | Pyramid / funnel | `references/type-pyramid.md` |
-| 类目量化对比 | Bar | `references/type-bar.md` |
-| 占比构成 | Treemap | `references/type-treemap.md` |
-| 趋势/两态变化/分布/排名 | Line | `references/type-line.md` |
-| 任务与阶段排期 | Gantt | `references/type-gantt.md` |
-| 分布与相关性 | Scatter | `references/type-scatter.md` |
-| 数据栈全景 | High-Level | `references/type-high-level.md` |
-| 多角色顺序流程 | Process | `references/type-process.md` |
-| 多级存储质量分层 | Medallion | `references/type-medallion.md` |
-| 角色作用域数据流 | Data flow | `references/type-data-flow.md` |
-| 数据平台集成拓扑 | DP integration | `references/type-dp-integration.md` |
-| 角色/组件权限矩阵 | DP security matrix | `references/type-dp-security-matrix.md` |
-| 流量分合（带宽=量） | Sankey | `references/type-sankey.md` |
-| 根因分析 | Fishbone | `references/type-fishbone.md` |
-| 价值链 vs 演进 | Wardley map | `references/type-wardley.md` |
-| 在制品状态看板 | Kanban | `references/type-kanban.md` |
-| 用户体验旅程 | User journey | `references/type-journey.md` |
-| 软件部署位置 | Deployment | `references/type-deployment.md` |
-| 依赖关系（含环） | Dependency graph | `references/type-dependency.md` |
-| 类/继承/组合 | UML class | `references/type-uml-class.md` |
-| 叙事主干与发布切分 | Story map | `references/type-story-map.md` |
-
-**工程专项类型**（布局规则如下，形状按 §形状词汇表）：
-
-| 类型 | 关键布局规则 |
-| --- | --- |
-| Agent 架构图 | 五层：Input → Agent core（LLM/推理循环）→ Memory（短期/长期/情景，分形呈现）→ Tool → Output；迭代推理用环形箭头 |
-| 记忆架构图 | 写路径与读路径分色；层级 Working→Short-term→Long-term→External；标注 `store()/retrieve()/forget()/consolidate()` |
-| 网络拓扑 | 设备象形（路由器/交换机/防火墙/LB/云）；实线=有线标带宽，虚线=无线/VPN；分区用虚线容器（DMZ/内网/外网）；自上而下分层 |
-| UML 用例 | 演员小人+系统边界虚线框+用例椭圆（动宾短语）；`<<include>>`/`<<extend>>` 虚线箭头 |
-| 对比/特性矩阵 | 行高 40px，列宽 ≥120px，表头 50px；支持格 `#dcfce7`+✓；最多 5 列，超出拆图 |
-| 思维导图 | 中心节点放射布局，一级分支 360/N 均布，二级偏 30-45°，分支用三次贝塞尔曲线 |
+> ⚠️ `mxgraph.flowchart.*` 命名空间形状在 XML→HTML 映射表中暂无对应 CSS，转换会触发未映射警告，属已知缺口。
 
 ### 画前确认
 
@@ -119,39 +58,13 @@ metadata:
 
 ## 风格系统
 
-### 路径 A（draw.io XML）
-
 - 配色权威：`references/color-schemes.md`（科技蓝/暗夜黑/清新绿/告警红/升级紫 + 状态语义）
 - 样式权威：`references/style-consistency.md`（节点/容器/箭头/文本标准值；示例冲突以它为准）
 - 机器人图标：只从 `references/robot-icons.md` 复制，不手绘
 
-### 路径 B（SVG/HTML）
-
-**默认皮肤：Style 1 Flat Icon。** 精确色值与 SVG 图案按需加载对应 reference：
-
-| # | 风格 | 背景 | 适用 |
-| --- | --- | --- | --- |
-| 1 | Flat Icon（默认） | 白 | 博客、文档、汇报 |
-| 2 | Dark Terminal | `#0f0f1a` | GitHub、技术文章 |
-| 3 | Blueprint | `#0a1628` | 架构文档 |
-| 4 | Notion Clean | 白极简 | Notion/Confluence/wiki |
-| 5 | Glassmorphism | 暗渐变 | 产品站、keynote |
-| 6 | Claude Official | 暖米 `#f8f6f3` | Anthropic 风格 |
-| 7 | OpenAI Official | 纯白 | OpenAI 风格 |
-| 8 | Dark Luxury | `#0a0a0a` | 高端架构文档 |
-| 9 | C4 Review Canvas | 暖纸 `#f7f2e8` | C4 评审/ADR，强制单一抽象层 |
-| 10 | Cloud Fabric | 云蓝 `#edf5fb` | 多区域/网络/负载部署归属 |
-| 11 | Event Transit | 交通纸 `#fbf7ee` | Topic/处理器/消费组/DLQ |
-| 12 | Ops Pulse | 运维深蓝 `#07111f` | 黄金指标、关键路径、关联 trace |
-
-- 风格→图表类型推荐：`references/style-diagram-matrix.md`
-- 提示词指纹：`C4评审画布`→9；`多区域云部署`→10；`事件地铁图`→11；`可靠性脉冲/黄金指标`→12；仅在领域证据匹配时自动选用，否则用 1–7
-- 品牌定制：语义角色 token（paper/ink/muted/accent/link）定义在 `references/style-guide.md`；首次在新项目画图前按其默认值检查，未定制则询问用户是否从网站/本地设计系统/手工 token 定制，流程见 `references/onboarding.md`，多客户档案见 `references/profiles.md`
-- 机器人/IoT 场景优先把 `color-schemes.md` 的主题色注入为品牌 token，保持跨路径视觉一致
-
 ## 通用质量硬规则
 
-以下规则对所有路径生效，是"非 AI 糊图"的底线。完整细节（哲学、通用反模式表、节点 treatment 表、SVG 基元模板、4px 网格、完整预算表、摘要卡片模式、Taste Gate 清单、模板变体）承载在 `references/design-system.md`（§1/§2/§4–§10），路径 B 交付前必须逐项过 §9 Taste Gate。
+以下规则对所有图表生效，是"非 AI 糊图"的底线。完整细节（哲学、通用反模式表、节点 treatment 表、SVG 基元模板、4px 网格、完整预算表、摘要卡片模式、Taste Gate 清单、模板变体）承载在 `references/design-system.md`（§1/§2/§4–§10）。
 
 ### 哲学：删除优先
 
@@ -160,50 +73,11 @@ metadata:
 - 强调色是编辑手段不是信号系统：每张图焦点节点 ≤2 个
 - 目标密度 4/10；超过 9 节点通常是两张图
 
-### 复杂度预算（路径 B 摘要）
+### 复杂度预算
 
 节点 ≤9、箭头 ≤12、强调元素 ≤2、泳道 ≤5、时序生命线 ≤5、ER 实体 ≤8、树/组织深度 ≤4、层 ≤6。超预算拆"总览+详情"。完整预算表见 `references/design-system.md` §7。
 
-### 连接线六规则（路径 B，不可妥协）
-
-1. **正交圆角连线强制** — 不共轴节点间禁止对角线，拐弯四分之一圆弧 r=8（紧凑布局最小 r=6）
-2. **标签与连线间距 6–10px** — 标签永不压线，遮罩矩形与线之间保留可见间隙
-3. **连线不得重叠** — 交叉用 bridge/hop 弧，平行线错开 ≥12px
-4. **共边扇形锚点** — 同一边多条连线各自独立锚点，相邻 ≥12px，按 `L*k/(N+1)` 均布
-5. **不穿过非端点节点** — 唯一例外（几何不可避免）时改虚线、标签放可见端、箭头只落在真终点
-6. **标签遮罩不压后绘节点** — 标签放在开阔画布段
-
-### 网格与排版（路径 B）
-
-- 4px 网格：字号/坐标/宽高/间距全部被 4 整除；字号集 8/12/16/20/24/28/32/40
-- 字体分工：人类可读名称用 sans，技术子标签（端口/URL/命令）用 mono，mono 不做整体"开发感"字体
-- 图例放底部水平条，不进图区；viewBox 为其预留 ~60px
-
-### 箭头语义（路径 B 默认，风格皮肤可改色不改义）
-
-| 流类型 | 默认色 | 线型 | 含义 |
-| --- | --- | --- | --- |
-| 主数据流 | `#2563eb` | 2px 实线 | 主请求/响应路径 |
-| 控制/触发 | `#ea580c` | 1.5px 实线 | 系统间触发 |
-| 内存/存储读 | `#059669` | 1.5px 实线 | 检索 |
-| 内存/存储写 | `#059669` | 1.5px 虚线 `5,3` | 写入 |
-| 异步/事件 | `#6b7280` | 1.5px 虚线 `4,2` | 非阻塞 |
-| 转换/嵌入 | `#7c3aed` | 1px 实线 | 数据变换 |
-| 反馈/循环 | `#7c3aed` | 1.5px 曲线 | 迭代回路 |
-
-≥2 种箭头必须配图例。路径 A 的箭头语义以 `color-schemes.md` 状态色为准。
-
-### 形状词汇表（路径 B）
-
-用户/人形、LLM（强调色圆角矩形）、Agent/编排器（六边形或双边框）、短期记忆（虚线框=临时）、长期记忆（圆柱=持久）、向量库（带网格线圆柱）、工具（齿轮矩形）、API/网关（六边形）、队列/流（管道）、文件（折角矩形）、浏览器（三点标题栏）、决策（菱形）、外部服务（云形/虚线）、数据/IO（平行四边形）。
-
-### Z-order（画家模型，自底向上）
-
-① 画布背景 → ② 区域/容器背景 → ③ 箭头连线 → ④ 节点形状 → ⑤ 文本标签 → ⑥ 图例。箭头先于节点绘制（路径 B 模板要求），文本永远可读。
-
-## 生成工作流
-
-### 路径 A：draw.io XML
+## 生成工作流：draw.io XML
 
 1. 分析需求（类型/节点/角色/机器人状态图标），详见 `references/generation-workflow.md`
 2. 加载 robot-icons / color-schemes / flowchart-patterns（/ layered-architecture）/ style-consistency
@@ -211,27 +85,6 @@ metadata:
 4. 应用统一样式，添加标题、图例、机器人图标
 5. 交付：写 `doc-ppt/*.xml` 并返回本地路径
 6. 交付前自审：结构完整性 + 样式一致性（`references/generation-workflow.md` 清单）
-
-### 路径 B：直绘 SVG/HTML（固定顺序）
-
-1. **分类**图表类型，加载对应 type reference
-2. **提取结构** — 层、节点、边、流、语义分组
-3. **规划布局** — 读 `references/composition-quality-contract.md` 与 `references/svg-layout-best-practices.md`，应用类型布局规则
-4. **选风格** — 默认加载 `references/style-1-flat-icon.md`；指定风格则加载对应 `style-N-*.md`
-5. **语义契约** — 风格 9–12 分别默认 `c4-review`/`cloud-fabric`/`event-transit`/`ops-pulse`，布局前跑 `python3 $SKILL_ROOT/scripts/fireworks.py validate` 让缺失/矛盾的工程事实 fail closed
-6. **形状映射** + 图标（`references/icons.md`、产品图标库 `assets/icons/`）
-7. **写 SVG** — 强制 Python list 逐行生成法（防截断/语法错误）；复杂图优先 `python3 $SKILL_ROOT/scripts/generate-from-template.py <type> <out.svg> '<json>'`（内置模板在 `templates/`，自动正交布线、文本转义）
-8. **校验** — `"$SKILL_ROOT/scripts/validate-svg.sh" file.svg`（XML/marker/几何/构图预算/可渲染性）
-9. **导出** — PNG 用 `"$SKILL_ROOT/scripts/generate-diagram.sh" -t <type> -s <style> -o out.svg`；其他渲染器见 `references/png-export.md`
-10. **视觉复查门** — 运行时能读图则回读 PNG 检查（箭头穿盒/标签碰撞/图例遮内容等），最多两轮修正后报告 `visual_review: passed`；不能读图报告 `visual_review: skipped`，不得谎报
-11. **动图**（仅当用户要求"动起来/生成 GIF"）— 读 `references/motion-effects.md`，跑 `fireworks.py animate`；GIF 是唯一动图媒介，默认 5.75s/20fps/960px，须满足 12 条已批准运动契约之一
-12. **自包含 HTML** — 按 `references/output-spec.md` 与 `assets/template*.html`（minimal light/dark、full editorial、motion、terminal 变体）；无障碍 SVG 契约（`role="img"`、`<title>` 为 svg 首子元素、带前缀 ID）必须满足；交付前逐项过 `references/design-system.md` §9 Taste Gate 并跑 `python3 $SKILL_ROOT/scripts/self_check.py <file>`
-
-**错误恢复协议**：第一次错误定位根因针对性修复；第二次换方法（Python list → 分块生成）；第三次停止并报告用户，不无限重试。
-
-### 路径 C：archify 内置渲染
-
-archify 渲染引擎内置于 `$SKILL_ROOT/archify/`（零运行时依赖，node ≥ 18），入口 `$ARCHIFY` = `$SKILL_ROOT/archify/bin/archify.mjs`。选型、类型路由、6 步创作流程（schema→候选→validate showcase→deliver→visual-check）、Mermaid 方言映射、主题兼容硬约束见 `references/archify-integration.md`。
 
 ## 导入与重绘
 
@@ -244,11 +97,276 @@ archify 渲染引擎内置于 `$SKILL_ROOT/archify/`（零运行时依赖，node
 
 ## 导出与动图
 
-- **PNG**：路径 B 默认 `generate-diagram.sh`（cairosvg）；CJK/emoji 回退、浏览器产 SVG、Puppeteer 转换见 `references/png-export.md`
+- **PNG**：`generate-diagram.sh`（cairosvg）；CJK/emoji 回退、浏览器产 SVG、Puppeteer 转换见 `references/png-export.md`
+- **画布级图片**：设计哲学驱动的高品质视觉输出（封面/Banner/印刷/社交配图），规则见 `references/canvas-image-generation.md`
 - **SVG/PNG 从 HTML 导出**：`references/export.md`（只导出 `<svg>` 本体，丢编辑壳；导出必须用户明确要求）
 - **GIF**：`scripts/motion.py`（经 `fireworks.py animate`），契约见 `references/motion-effects.md`
 - **离线交互 HTML**：`python3 $SKILL_ROOT/scripts/export-interactive-html.py` / `scripts/interactive_html.py`
-- 路径 A 导出依赖 draw.io 本体；路径 C 用 archify 内置导出菜单
+
+## XML→HTML 桥接转换
+
+本章内化了原 `robot-aiot-xml-html-bridge` 的全部能力。目标不是"重新设计一张网页"，而是把既有 XML 图表稳定落成 HTML 预览稿，让后续 PPT 生成有一个**可检查、可对比、可冻结**的视觉约束层。在此基础上允许做轻量 Material 3 规范化，但它只能是保真之上的温和收口，不能把桥接稿改造成新的设计稿。
+
+核心原则：
+
+1. **先保真，后可用**：HTML 首先要忠实表达 XML 的视觉结果，而不是追求网页感
+2. **HTML 是桥接层，不是二次设计稿**：不能借转换之名改风格、改结构、改信息层级
+3. **无稳定转换就不继续**：如果当前路径只能"近似画一个差不多的网页"，则必须阻塞，而不是带着漂移结果进入 PPT 阶段
+4. **MD3 仅做轻量规范化**：只允许统一 token、间距、字体层级和容器语义，不允许借 MD3 之名重排图表结构
+
+### 适用输入
+
+- 本 skill 生成的 `.xml`
+- 标准 draw.io / diagrams.net `mxfile` XML
+- 其他结构兼容的 `mxGraphModel` 图表 XML
+
+### 标准输出
+
+每个输入 XML 至少对应两个输出物：
+
+1. `doc-ppt/<name>.xml`：原始真源，不可被 HTML 反向覆盖
+2. `doc-ppt/<name>.html`：HTML 预览稿，作为后续页面编排和 PPT 还原的视觉约束输入
+
+如需页面级整合，可继续把多个图表 HTML 嵌入到 `doc-ppt/pages/*.html`。
+
+### 不变式
+
+转换过程中必须保留以下属性：
+
+1. 节点相对位置
+2. 容器层级关系
+3. 主色、边框色、文字色
+4. 文字内容、强调关系、字号层级
+5. 连线方向、箭头关系、泳道/分层边界
+6. 图例、数据锚点、标签位置
+7. 宽高比例、留白关系、整体信息密度
+
+以下行为默认禁止：
+
+1. 把 XML 图表改造成新的卡片式网页布局
+2. 擅自增删节点、文案、数值、图例、连接线
+3. 因为 HTML 不好实现就删掉特殊样式或退化成普通文本列表
+4. 手工调整 HTML 但不回写变更来源，造成 XML/HTML 漂移
+
+### 工作流
+
+详细转换步骤见 `references/xml-html-workflow.md`。
+
+三条入口约束：
+
+1. 先判定 XML 是否属于可稳定转换的 draw.io / mxGraph 结构
+2. 默认优先运行 `scripts/xml_to_html.py`，只有在已确认无 Python 环境时才允许手工映射
+3. HTML 是桥接层，不是重新设计稿，禁止"肉眼照着重画"后直接放行
+
+### 映射表
+
+`scripts/xml_to_html.py` 使用的确定性样式映射规则（XML style 属性 → CSS 属性）见 `references/xml-html-mapping.md`。所有映射必须严格按该表执行，不允许即兴发挥或自行扩展。
+
+### 保真校验与阻塞条件
+
+校验规则、阻塞条件、协作边界与最终验证清单见 `references/xml-html-validation.md`。
+
+最终判断标准：
+
+1. 任一阻塞项不满足，就不能宣称"已可进入 PPT 阶段"
+2. XML 是图表真源，HTML 是桥接约束层
+3. XML 后续变更时，HTML 必须整稿重生
+
+### 已知坑与防回退约定
+
+`scripts/xml_to_html.py` 历史上暴露过以下 3 个缺陷，任何修改或 review 本脚本时必须作为硬约束核对，防止回退：
+
+1. **折线拐点不得丢失**：带 waypoints 的边必须按拐点渲染为 `polyline`，不得退化成首尾相连的单条直线。
+2. **无锚点边必须裁剪到节点边界**：无 exit/entry 锚点时，起点/终点须沿目标方向裁剪到节点边界（`_clip_to_boundary`），与 draw.io 行为一致；禁止中心到中心直接连线，否则线段会穿越节点内部。
+3. **富文本必须原样渲染**：draw.io `html=1` 语义下，节点 value 本身即 HTML（`<b>`/`<br>`/`<font>` 等），必须原样渲染、仅转义引号；禁止整体 `escape()`，否则标签变明文、破坏展示。
+
+校验局限补充：保真校验是结构性校验（数量 + 字符串包含），**无法发现渲染语义漂移**（如富文本被整体转义时仍会报 PASS）。凡改动渲染逻辑，除跑保真报告外，必须 headless 截图或浏览器目检确认，不得仅凭报告 PASS 放行。
+
+### 轻量 Material 3 规范化边界
+
+允许吸收 `material-3` 的最小子集，但只能用于**不改变信息结构的视觉收口**：
+
+1. 颜色 token：允许把外层背景、画布背景、辅助容器色整理为 `surface` / `surface-container` / `outline` 一类语义色
+2. 字体层级：允许把标题、标签、正文、数据值整理为接近 `Headline / Title / Body / Label` 的层级
+3. 间距基线：允许把容器内边距、区块间距整理到 `8/16/24/32px` 基线
+4. 形状 token：允许把容器圆角整理到 `small / medium / large` 一组稳定值
+5. 轻量阴影与层次：允许用更接近 tonal surface 的容器层级替换杂乱阴影，但不能抹掉原图层级差异
+
+以下行为仍然禁止：
+
+1. 改 XML 节点坐标、连接关系、泳道边界
+2. 把原图重做成 Material 3 卡片式仪表盘
+3. 因追求 MD3 效果而覆盖原图配色语义
+4. 为了响应式或组件化重排节点和文本
+
+若启用轻量 MD3 规范化，交付说明必须明确记录哪些调整只作用于外层背景、间距、圆角、字体层级，哪些颜色仍完全保留 XML 真源，且规范化只影响桥接 HTML、不回写 XML 真源。
+
+## 静态页面 HTML
+
+本章内化了原 `robot-aiot-slide-html-author` 的静态版能力。负责把汇报母稿或页面草图落成可审查、可交付给 `ppt-master` 的逐页 HTML。设计规范已全部内化到本技能 `references/` 下，运行时不再额外依赖任何外部设计规范技能。
+
+### 上游工作流定位
+
+1. 绘制图表 XML（图表真源）
+2. XML→HTML 桥接转换（前置工作，先画图再转 HTML）
+3. 以图表 HTML 为冻结输入，负责页面级 HTML 的绘制和优化
+4. 产出交付 `ppt-master` 生成 PPT
+
+不做图表 XML→HTML 转换（由上方桥接章节负责），只引用已产出的图表 HTML 做页面编排；页面壳层的绘制、配色、排版、留白和高级感优化全部由本章负责。
+
+### 输入
+
+优先读取以下材料，再开始写页面：
+
+1. 母稿或页面大纲：至少包含标题、页面结论、上屏内容、汇报话术
+2. 图表 HTML：来自 XML→HTML 桥接转换的冻结真源
+3. 品牌资源：如 `doc-ppt/assets/midea-logo.png`
+4. 页面类型与约束：见 `references/slide-page-authoring.md` 与 `references/slide-page-template.md`
+
+### 输出
+
+输出必须满足：
+
+1. 一页一个 HTML 文件，路径通常为 `doc-ppt/pages/<页码>-<slug>.html`
+2. 固定 `1920x1080` 画布，作为 PPT 单页真源
+3. 页面主题单一，30 秒内可读懂核心结论
+4. 图表优先引用既有图表 HTML，不重画事实表达
+
+### 执行流程
+
+#### 1. 先做设计解读，再定风格基调
+
+动手前按 `references/slide-premium-design.md` 完成：
+
+1. 输出一行设计解读：页面类型、受众、视觉语气、风格基调
+2. 设定三档刻度：DESIGN_VARIANCE（4-5）、MOTION_INTENSITY（1，静态页）、VISUAL_DENSITY（4-6）
+3. 锁定风格基调：克制商务 / 深底科技 / 暖调编辑，三选一并保持整套汇报一致
+
+#### 2. 先定页面契约，再写样式
+
+每页先固定四要素：
+
+1. 标题：这一页讲什么
+2. 结论：领导应该带走什么判断
+3. 上屏内容：图表、表格、关键数字、流程或案例
+4. 话术：解释含义、风险、动作，不复述屏幕文字
+
+如果四要素不完整，先补语义，不要直接开始摆版。
+
+#### 3. 先建 token，再落绝对定位
+
+页面样式先抽成变量，再放坐标：
+
+1. 主色来自首页架构图或当前图表的主语义色
+2. 其他颜色落到 `primary / secondary / tertiary / surface / outline / text` 等语义角色
+3. 间距以 `8 / 16 / 24 / 32 / 48px` 为主
+4. 圆角以 `8 / 12 / 16 / 24 / full` 为主
+5. 深度优先用明度层级和容器对比，不依赖重阴影
+
+#### 4. 保持固定画布和内容优先
+
+页面是 PPT 单页，不是响应式网页：
+
+1. 使用固定画布和绝对定位
+2. 先确定结构区块，再补视觉增强
+3. 标题、结论、主数字和图表必须形成清晰扫描路径
+4. UI 壳层服务内容，不与内容争抢注意力
+
+#### 5. 图表真源冻结与审查修复
+
+图表区遵守以下边界：
+
+1. 优先引用 `doc-ppt/<chart>.html`
+2. 不修改图表节点坐标、结构关系和数据语义
+3. 只允许调整页面容器、留白、标题、说明文字和外层 token
+4. 若页面配色与图表主色冲突，以图表主色为准
+
+当发现引用的图表 HTML 存在以下问题时，应回到上方"XML→HTML 桥接转换"章节执行保真校验和修复流程：
+
+1. 节点缺失、连线语义丢失、图例或数据锚点缺失
+2. 分层或泳道边界消失
+3. 页面比例明显变化、主色/边框色/字体层级漂移
+4. 未映射样式属性导致视觉异常
+
+**边界**：页面级 HTML 不直接修改图表内部结构；图表级审查修复由桥接转换章节负责。
+
+#### 6. 做高级感交付前审查
+
+每页完成后按 `references/slide-premium-review.md` 执行审查：
+
+1. 基础检查：画布尺寸、布局不重叠、内容不溢出
+2. 层级检查：标题层级、结论显著性、数字字号、页脚品牌位
+3. 内容检查：页面不残留技术表名、类名、API 路径或未经解释的缩写
+4. 图表检查：图表与页面 token 语义一致，但图表事实未被改写
+5. 高级感预检：逐项过 `references/slide-premium-review.md` 的阻塞项与非阻塞项清单，输出审查报告
+
+### 设计原则
+
+以下原则的完整细则（token 角色配对、字级具体值、同心圆角、对比度判据）见 `references/slide-design-system.md`。
+
+#### 内容优先
+
+1. 每个视觉元素都要为结论服务
+2. 页面 chrome 保持克制，避免堆叠装饰
+3. 大结论先于实现细节，业务影响先于技术名词
+
+#### 语义一致
+
+1. 用语义色而不是散落的十六进制常量
+2. 用 surface/container 层级表达主次关系
+3. 用 headline/title/body/label 管理字级，不为每页重新发明字号
+
+#### 适度层次
+
+1. 通过浅深背景、容器层级、轻阴影制造层次
+2. 默认使用实色或轻渐变背景
+3. 模糊玻璃效果只有在用户明确要求时才使用
+
+#### 一致又不单调
+
+1. 配色体系和字级体系统一
+2. 页面版式允许变化，但不打断整体扫描节奏
+3. 不依赖 hover，不用只靠颜色传达意义
+
+#### 反模板感
+
+完整规则见 `references/slide-premium-design.md`：
+
+1. 先做设计解读再动手，不做无意识的默认审美
+2. 一致性锁定：强调色、圆角档位、灰阶基调、风格基调全套汇报统一
+3. 消除 AI 痕迹：编号眉标、装饰状态点、假精确数字、三大卡片默认版式等一律禁止
+4. 内容真实性：数据必须可溯源，文案禁止套话，交付前逐字自查
+
+### 硬约束
+
+1. 不使用响应式断点、媒体查询或 `max-width` 页面思维
+2. 不直接复用应用型 dashboard 套壳覆盖图表真源
+3. 不在组件里散落硬编码颜色，优先引用根变量
+4. 正文默认不小于 `16px`，说明/标签默认不小于 `12px`
+5. 可选视觉增强不得改动已验证的布局坐标
+6. 静态版不做滚动动画、入场动画、循环动效
+7. 不伪造精确数字；占位数据必须显式标注"示意"
+8. 不使用 AI 紫/霓虹渐变、纯黑硬阴影、纯黑大面积背景（品牌色本身为紫色时例外，且须整套汇报一致）
+9. 不出现编号眉标、装饰状态点、版本号页脚等 AI 痕迹（完整清单见 `references/slide-premium-design.md` 第 9 节）
+10. 每页 HTML 必须完整可运行，禁止占位注释和"同上"省略
+
+### 引用文档索引
+
+1. 需要完整页面编写规则时，读 `references/slide-page-authoring.md`
+2. 需要页面类型、token 表、模板骨架和布局清单时，读 `references/slide-page-template.md`
+3. 需要高级感设计标准（设计解读、刻度、风格基调、排版/色彩/布局纪律、AI 痕迹清单）时，读 `references/slide-premium-design.md`
+4. 需要执行交付前审查或修复既有页面时，读 `references/slide-premium-review.md`
+5. 需要设计系统细则（色彩角色配对、tonal surface 层次、字级、同心圆角、对比度判据）时，读 `references/slide-design-system.md`
+
+### 交付口径
+
+输出给上游工作流时，优先报告：
+
+1. 生成了哪些页面 HTML
+2. 采用了哪套主色/语义 token 规则
+3. 哪些图表 HTML 被引用
+4. 是否存在仍需人工确认的布局或内容风险
+5. 高级感审查结论：阻塞项是否全部通过、`[UI-WARN]` 列表、风格基调与刻度声明
 
 ## 规则优先级
 
@@ -259,13 +377,14 @@ archify 渲染引擎内置于 `$SKILL_ROOT/archify/`（零运行时依赖，node
 3. 本文件的图表类型布局规则与语义流要求
 4. 通用默认与示例
 
-几何与校验门永远活跃：风格不能为不可读文本、缺失 marker、箭头穿盒辩护。路径 A 内部冲突以 `references/style-consistency.md` 为最终权威。
+几何与校验门永远活跃：风格不能为不可读文本、缺失 marker、箭头穿盒辩护。内部冲突以 `references/style-consistency.md` 为最终权威。
 
 ## 硬约束
 
-1. 进入 PPT 工作流时，XML→HTML 必须交由 `robot-aiot-xml-html-bridge`
-2. 三条路径遵守同一套配色与语义一致性要求（机器人场景以 `color-schemes.md` 为品牌基准）
-3. 交付前必须通过对应路径的校验：A=结构+样式自审；B=`validate-svg.sh`+视觉复查状态报告；C=archify validate/check
-4. 动图不改变静态语义，不提高复杂度预算；GIF 为唯一动图媒介
-5. 导入重绘不得发明或静默丢弃组件
-6. 校验失败必须显式报告，不得绕过后再宣称成功
+1. 三条能力（XML 绘制、XML→HTML 桥接、静态页面 HTML）遵守同一套配色与语义一致性要求（机器人场景以 `color-schemes.md` 为品牌基准）
+2. XML 交付前必须通过结构完整性 + 样式一致性自审
+3. XML→HTML 桥接交付前必须通过保真校验，任一阻塞项不满足不得进入 PPT 阶段
+4. 静态页面 HTML 交付前必须通过高级感审查，阻塞项全部通过方可交付
+5. 动图不改变静态语义，不提高复杂度预算；GIF 为唯一动图媒介
+6. 导入重绘不得发明或静默丢弃组件
+7. 校验失败必须显式报告，不得绕过后再宣称成功

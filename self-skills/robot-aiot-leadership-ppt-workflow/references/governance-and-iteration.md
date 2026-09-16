@@ -85,9 +85,9 @@
 本技能
 ├── 主线程: 负责阶段编排、落盘、阻塞校验、最终交付
 ├── Sub agents: 负责阶段内分析/起草/审查
-├── Phase 3: 主线程调用 robot-aiot-draw-flowchart
-├── Phase 3.5: 主线程调用 robot-aiot-xml-html-bridge
-├── Phase 4: 主线程调用 robot-aiot-slide-html-author 生成逐页 HTML
+├── Phase 3: 主线程调用 robot-aiot-draw-flowchart 生成图表 XML
+├── Phase 3.5: 主线程调用 robot-aiot-draw-flowchart 的 XML→HTML 桥接能力
+├── Phase 4: 主线程调用 robot-aiot-draw-flowchart 的静态页面 HTML 能力生成逐页 HTML
 └── Phase 5: 主线程调用 ppt-master
 ```
 

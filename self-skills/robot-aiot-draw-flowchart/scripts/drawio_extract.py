@@ -28,9 +28,9 @@ import re
 import struct
 import sys
 import zlib
-from dataclasses import dataclass, field, asdict
+from dataclasses import asdict, dataclass, field
 from pathlib import Path
-from typing import Any
+from typing import Any, NoReturn
 from urllib.parse import unquote
 from xml.etree import ElementTree as ET
 
@@ -54,7 +54,7 @@ class PayloadTooLarge(ValueError):
     """Raised when compressed metadata expands beyond the supported limit."""
 
 
-def _fail(msg: str) -> "NoReturn":  # type: ignore[valid-type]
+def _fail(msg: str) -> NoReturn:  # type: ignore[valid-type]
     print(f"drawio_extract: {msg}", file=sys.stderr)
     raise SystemExit(2)
 
@@ -94,7 +94,7 @@ def _inflate(payload: str) -> str | None:
     """Undo draw.io's base64 + raw-deflate + URL-encoding pipeline."""
     try:
         raw = base64.b64decode(payload, validate=False)
-    except Exception:
+    except Exception:  # noqa: BLE001 — base64 decode may raise on arbitrary input
         return None
     for wbits in (-15, 15, 47):
         try:
@@ -103,7 +103,7 @@ def _inflate(payload: str) -> str | None:
             _fail(
                 f"decoded diagram exceeds the {MAX_XML_BYTES // (1024 * 1024)} MiB limit"
             )
-        except Exception:
+        except Exception:  # noqa: BLE001 — try next wbits on any decompression failure
             continue
         # draw.io URL-encodes before deflating; unquote is a no-op if it didn't.
         return unquote(text)
@@ -417,9 +417,7 @@ def parse_page(diagram: ET.Element, index: int) -> Page:
             continue
         # An edge label is a vertex parented to an edge; fold it into the edge.
         parent_entry = raw.get(parent or "")
-        parent_is_edge = bool(
-            parent_entry and parent_entry["cell"].get("edge") == "1"
-        )
+        parent_is_edge = bool(parent_entry and parent_entry["cell"].get("edge") == "1")
         if parent_is_edge or "edgeLabel" in style:
             if parent:
                 text = clean_label(entry["value"])
@@ -445,9 +443,7 @@ def parse_page(diagram: ET.Element, index: int) -> Page:
             container=style.get("container") == "1" or "swimlane" in style,
             link=entry["attrs"].get("link", ""),
             attrs={
-                k: v
-                for k, v in entry["attrs"].items()
-                if k not in ("link", "tooltip")
+                k: v for k, v in entry["attrs"].items() if k not in ("link", "tooltip")
             },
         )
         page.nodes.append(node)
@@ -499,8 +495,7 @@ def parse_page(diagram: ET.Element, index: int) -> Page:
                 target=target if target in node_map else None,
                 label=label,
                 dashed=style.get("dashed") == "1",
-                bidirectional=style.get("startArrow", "none")
-                not in ("none", "0", "")
+                bidirectional=style.get("startArrow", "none") not in ("none", "0", "")
                 and style.get("endArrow", "classic") not in ("none", "0"),
                 undirected=style.get("endArrow") in ("none", "0")
                 and style.get("startArrow", "none") in ("none", "0", ""),
@@ -587,7 +582,9 @@ def _aligned(boxes: list[Node], tolerance: float = 8.0) -> bool:
 def analyze(page: Page) -> dict[str, Any]:
     nodes = page.nodes
     edges = page.edges
-    drawable = [n for n in nodes if n.shape not in ("text",) and (n.label or n.children)]
+    drawable = [
+        n for n in nodes if n.shape not in ("text",) and (n.label or n.children)
+    ]
     containers = [n for n in nodes if n.children]
     leaves = [n for n in nodes if not n.children]
     shapes: dict[str, int] = {}
@@ -595,11 +592,9 @@ def analyze(page: Page) -> dict[str, Any]:
         shapes[shape_family(node.shape)] = shapes.get(shape_family(node.shape), 0) + 1
 
     def name_of(node: Node) -> str:
-        return (node.label.replace("\n", " · ") or node.id)
+        return node.label.replace("\n", " · ") or node.id
 
-    ranked = sorted(
-        leaves, key=lambda n: (n.in_degree + n.out_degree), reverse=True
-    )
+    ranked = sorted(leaves, key=lambda n: (n.in_degree + n.out_degree), reverse=True)
     hubs = [
         {"id": n.id, "label": name_of(n), "degree": n.in_degree + n.out_degree}
         for n in ranked[:5]
@@ -768,7 +763,9 @@ def digest(path: Path, pages: list[Page], selected: list[Page], max_rows: int) -
         if info["collapsible_groups"]:
             out.append("- collapsible groups (simplify here first):")
             for group in info["collapsible_groups"]:
-                kids = ", ".join(_escape_inline(label) for label in group["child_labels"])
+                kids = ", ".join(
+                    _escape_inline(label) for label in group["child_labels"]
+                )
                 out.append(
                     f"  - {_escape_inline(group['label'])} — "
                     f"{group['children']} children: {kids}"
@@ -824,7 +821,9 @@ def to_json(path: Path, pages: list[Page], selected: list[Page]) -> str:
                 "id": p.id,
                 "name": p.name,
                 "index": p.index,
-                "bounds": dict(zip(("x0", "y0", "x1", "y1"), page_bounds(p))),
+                "bounds": dict(
+                    zip(("x0", "y0", "x1", "y1"), page_bounds(p), strict=True)
+                ),
                 "analysis": analyze(p),
                 "nodes": [asdict(n) for n in p.nodes],
                 "edges": [asdict(e) for e in p.edges],

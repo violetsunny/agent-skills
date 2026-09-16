@@ -8,9 +8,8 @@ import html
 import json
 import re
 import xml.etree.ElementTree as ET
+from collections.abc import Mapping, Sequence
 from pathlib import Path
-from typing import Mapping, Optional, Sequence
-
 
 ET.register_namespace("", "http://www.w3.org/2000/svg")
 SVG_NAMESPACE = "http://www.w3.org/2000/svg"
@@ -215,7 +214,7 @@ def sanitize_svg(svg_text: str) -> str:
 def build_interactive_html(
     svg_text: str,
     title: str,
-    metadata: Optional[Mapping[str, object]] = None,
+    metadata: Mapping[str, object] | None = None,
 ) -> str:
     safe_svg = sanitize_svg(svg_text)
     safe_title = html.escape(title, quote=True)
@@ -333,7 +332,7 @@ def build_interactive_html(
 """
 
 
-def parse_args(argv: Optional[Sequence[str]] = None) -> argparse.Namespace:
+def parse_args(argv: Sequence[str] | None = None) -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("svg_file", type=Path)
     parser.add_argument("output_html", type=Path)
@@ -342,7 +341,7 @@ def parse_args(argv: Optional[Sequence[str]] = None) -> argparse.Namespace:
     return parser.parse_args(argv)
 
 
-def main(argv: Optional[Sequence[str]] = None) -> int:
+def main(argv: Sequence[str] | None = None) -> int:
     args = parse_args(argv)
     svg_text = args.svg_file.read_text(encoding="utf-8")
     output = build_interactive_html(svg_text, args.title or args.svg_file.stem, {"slug": args.slug})

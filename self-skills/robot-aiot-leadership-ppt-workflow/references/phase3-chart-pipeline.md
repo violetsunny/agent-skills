@@ -34,11 +34,11 @@
 - 图表状态：Phase 3 已完成，待进入 Phase 3.5 转换
 ```
 
-## Phase 3.5: 调用 robot-aiot-xml-html-bridge
+## Phase 3.5: 调用 robot-aiot-draw-flowchart 的 XML→HTML 桥接能力
 
 ### 执行要求
 
-1. 使用 `skill` 工具加载 `robot-aiot-xml-html-bridge`
+1. 继续使用已加载的 `robot-aiot-draw-flowchart`，调用其 XML→HTML 桥接能力
 2. 对每个 `.xml` 生成对应 `.html`
 3. 校验 HTML 保留 XML 的样式、布局、层级、比例和关键标签关系
 4. 只有 HTML 校验通过，才能进入 Phase 4

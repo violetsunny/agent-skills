@@ -1,9 +1,9 @@
 ---
 name: robot-aiot-leadership-ppt-workflow
+version: 3.0.0
 description: >
   将项目数据和技术分析转化为结构化的领导汇报PPT，覆盖全链路五阶段工作流：
-  数据池建立 → 技术明细版+领导汇报版文档分层 → 调用 robot-aiot-draw-flowchart 生成分层架构图/流程图XML →
-  调用 robot-aiot-xml-html-bridge 将XML稳定转HTML并保留原样式 → 调用 robot-aiot-slide-html-author 完成 PPT 母稿逐页HTML化 → 调用 ppt-master 依据每页HTML样式生成最终PPTX文件。
+  数据池建立 → 技术明细版+领导汇报版文档分层 → 调用 robot-aiot-draw-flowchart 生成分层架构图/流程图XML并完成XML→HTML桥接与静态页面HTML化 → 调用 ppt-master 依据每页HTML样式生成最终PPTX文件。
   当用户要求"写领导汇报PPT"、"出PPT母稿"、"做汇报材料"、"汇报方案"、"写PPT"、
   "领导汇报"、"生成汇报PPT"时触发。也适用于用户描述了需要将技术项目数据
   转化为管理层可读的汇报格式的场景。
@@ -15,11 +15,9 @@ description: >
 **让领导一目了然，一眼看懂** — 每页必须有业务价值结论 + 数据支撑，
 不讲代码实现。
 
-本技能覆盖从原始数据到最终 PPTX 的全链路，涉及四个外部技能调用：
-- **robot-aiot-draw-flowchart** — 在文档分层完成后，生成分层架构图/流程图 XML
-- **robot-aiot-xml-html-bridge** — 在 XML 生成后，稳定转换为 HTML 预览稿，作为 PPT 前的主约束
-- **robot-aiot-slide-html-author** — 在母稿确定后，将每页结构化内容落成固定画布 HTML，并统一页面 token、层级和布局审查
-- **ppt-master** — 在母稿逐页 HTML 化后，读取逐页 HTML/MD 生成最终 PPTX 文件
+本技能覆盖从原始数据到最终 PPTX 的全链路，涉及两个外部技能调用：
+- **robot-aiot-draw-flowchart** — 生成分层架构图/流程图 XML，并完成 XML→HTML 桥接转换与静态页面 HTML 生成
+- **ppt-master** — 读取逐页 HTML/MD 生成最终 PPTX 文件
 
 Sub agent 原则：
 - 非 trivial 的阶段分析、分层提炼、图表规划、页面草拟、交叉校验，优先交给 fresh sub agent 执行，保持上下文干净
@@ -27,8 +25,8 @@ Sub agent 原则：
 - tiny wording tweak、单页局部小改、局部格式修正可直接在主线程完成，不必起 sub agent
 
 强制中间层原则：
-- **XML 先转 HTML**：凡是由 `robot-aiot-draw-flowchart` 生成的图表 XML，在进入 PPT 阶段前必须先通过 `robot-aiot-xml-html-bridge` 转成 HTML 预览文件
-- **母稿逐页转 HTML**：在调用 `ppt-master` 之前，必须把 PPT 母稿的每一页都落成单页 HTML
+- **XML 先转 HTML**：凡是由 `robot-aiot-draw-flowchart` 生成的图表 XML，在进入 PPT 阶段前必须先通过 `robot-aiot-draw-flowchart` 的 XML→HTML 桥接能力转成 HTML 预览文件
+- **母稿逐页转 HTML**：在调用 `ppt-master` 之前，必须通过 `robot-aiot-draw-flowchart` 的静态页面 HTML 能力把 PPT 母稿的每一页都落成单页 HTML
 - **按 HTML 转 PPT**：ppt-master 读取逐页 HTML/MD 生成 PPTX，HTML 是 ppt-master 的直接输入格式
 - **没有 HTML 不得生成 PPT**：只要图表 HTML 或页面 HTML 未完成，PPT 生成阶段不得开始
 
@@ -39,16 +37,14 @@ Sub agent 原则：
 开始执行前，先检查依赖 skill 是否已安装在运行时 `~/.agents/skills/`：
 
 ```bash
-for s in robot-aiot-draw-flowchart robot-aiot-xml-html-bridge robot-aiot-slide-html-author ppt-master; do
+for s in robot-aiot-draw-flowchart ppt-master; do
   [ -d "$HOME/.agents/skills/$s" ] || printf '[DEP-MISSING] %s\n' "$s"
 done
 ```
 
 | 依赖 skill | 级别 | 用途 |
 |------|------|------|
-| robot-aiot-draw-flowchart | 必需 | 阶段三绘制图表 XML（图表真源） |
-| robot-aiot-xml-html-bridge | 必需 | 阶段四将图表 XML 转换为 HTML |
-| robot-aiot-slide-html-author | 必需 | 阶段四逐页汇报页 HTML 绘制 |
+| robot-aiot-draw-flowchart | 必需 | 阶段三绘制图表 XML、XML→HTML 桥接转换、静态页面 HTML 生成 |
 | ppt-master | 必需 | 阶段五依据逐页 HTML 生成 PPTX |
 
 - 全部存在 → 略过，进入主流程
@@ -63,7 +59,7 @@ doc-ppt/
 ├── assets/                     — 品牌静态资源（Logo 等）
 │   └── midea-logo.png          — 美的品牌 Logo（从 skill assets/ 复制）
 ├── <chart-name>.xml            — 图表 XML（Phase 3，robot-aiot-draw-flowchart 产出）
-├── <chart-name>.html           — 图表 HTML（Phase 3.5，robot-aiot-xml-html-bridge 产出）
+├── <chart-name>.html           — 图表 HTML（Phase 3.5，robot-aiot-draw-flowchart XML→HTML 桥接产出）
 ├── <project>_PPT母稿.md        — 母稿（Phase 4）
 ├── pages/                      — 逐页 HTML（Phase 4）
 │   ├── 01-cover.html
@@ -91,8 +87,8 @@ doc-ppt/
 Phase 1: 方案基础     → 提取真实指标，建立统一数据池（单一数据源）
 Phase 2: 受众分层     → 技术明细版MD + 领导汇报版MD（同一数据，不同表达）
 Phase 3: 图表生成     → 调用 robot-aiot-draw-flowchart 生成分层架构图/流程图 XML
-Phase 3.5: 桥接转换  → 调用 robot-aiot-xml-html-bridge 将 XML 稳定转 HTML 并保留原样式
-Phase 4: PPT母稿     → 按页结构化：标题→结论→数据→话术，并将每页落成 HTML 页面样式
+Phase 3.5: 桥接转换  → 调用 robot-aiot-draw-flowchart 的 XML→HTML 桥接能力，将 XML 稳定转 HTML 并保留原样式
+Phase 4: PPT母稿     → 调用 robot-aiot-draw-flowchart 的静态页面 HTML 能力，按页结构化：标题→结论→数据→话术，并将每页落成 HTML 页面样式
 Phase 5: PPT生成     → 调用 ppt-master，读取逐页 HTML/MD 生成最终 PPTX
 ```
 
@@ -133,7 +129,7 @@ Phase 5: PPT生成     → 调用 ppt-master，读取逐页 HTML/MD 生成最终
 主文件保留五条硬约束：
 
 1. Phase 3 先调用 `robot-aiot-draw-flowchart` 生成图表 XML 真源
-2. Phase 3.5 必须调用 `robot-aiot-xml-html-bridge` 为每个 XML 生成对应 HTML
+2. Phase 3.5 必须调用 `robot-aiot-draw-flowchart` 的 XML→HTML 桥接能力为每个 XML 生成对应 HTML
 3. 没有图表 HTML，不得进入 Phase 4
 4. 首页架构图确定全局主色基调，后续页面保持配色统一但允许版式多样
 5. 允许在 Phase 3.5 和 Phase 4 做轻量 Material 3 规范化，但只能整理 token、字体层级、间距和容器语义，不能改图表结构和数据语义
@@ -142,15 +138,33 @@ Phase 5: PPT生成     → 调用 ppt-master，读取逐页 HTML/MD 生成最终
 
 ## Phase 4: PPT母稿 — 按页结构化
 
-Phase 4 的逐页 HTML 编写能力已拆分到 `robot-aiot-slide-html-author`。本工作流只负责阶段编排、阻塞校验与产物衔接；页面模板、token 规则、布局审查和 CSS 分层由该技能维护。
+Phase 4 的逐页 HTML 编写能力已内化到 `robot-aiot-draw-flowchart` 的静态页面 HTML 能力中。本工作流负责阶段编排、阻塞校验、产物衔接，以及页面策略层增强。
 
-主文件只保留阻塞性要求：
+### 页面策略增强
 
-1. 逐页 HTML 生成必须调用 `robot-aiot-slide-html-author`
-2. 每页必须满足“标题 / 结论 / 上屏内容 / 话术”四要素
-3. 每页对应一个独立 HTML 文件，且图表优先引用 Phase 3.5 输出的图表 HTML
-4. `robot-aiot-slide-html-author/references/page-html-template.md` 的布局审查清单 10 项全部通过，才允许进入 Phase 5
-5. 页面允许做轻量语义化规范化，但不得破坏首页图表确立的主色语义与图表 HTML 的冻结约束
+布局模式选择、Deck叙事策略、文案公式详见 `references/slide-layout-strategies.md`：
+
+1. 按页面类型选择 25 种布局模式中最匹配的一种
+2. 按汇报场景选择 15 种 Deck 策略确定叙事弧线
+3. 用 25 个文案公式框架组织每页文案（PAS/AIDA/FAB/3W 等）
+
+### 配图与封面图
+
+需要高质量配图或封面图时，规则见 `references/ppt-image-and-cover.md`：
+
+1. 封面推荐 HTML/CSS + AI 背景图组合
+2. 案例/故事页可用 AI 插图具象化场景
+3. 数据页用程序化图表，不用 AI 生图
+4. AI 图片不承载事实数据，仅作视觉增强
+
+### 阻塞性要求
+
+1. 逐页 HTML 生成必须调用 `robot-aiot-draw-flowchart` 的静态页面 HTML 能力
+2. **仅使用静态版**：禁止生成交互版（翻页/动画/特效），ppt-master 只消费静态 HTML
+3. 每页必须满足"标题 / 结论 / 上屏内容 / 话术"四要素
+4. 每页对应一个独立 HTML 文件，且图表优先引用 Phase 3.5 输出的图表 HTML
+5. `robot-aiot-draw-flowchart` 的布局审查清单 10 项全部通过，才允许进入 Phase 5
+6. 页面允许做轻量语义化规范化，但不得破坏首页图表确立的主色语义与图表 HTML 的冻结约束
 
 ---
 
@@ -165,6 +179,26 @@ Phase 4 的逐页 HTML 编写能力已拆分到 `robot-aiot-slide-html-author`�
 3. 若采用轻量语义化规范化，必须贯穿图表 HTML 与页面 HTML，而不是只在某几页单独套新风格
 
 ---
+
+## 何时读取引用文档
+
+### 核心工作流
+1. 需要数据池建立规则时，读 `references/phase1-data-pool.md`
+2. 需要受众分层规则时，读 `references/phase2-audience-layering.md`
+3. 需要图表生成与桥接转换规则时，读 `references/phase3-chart-pipeline.md`
+4. 需要逐页 HTML 编写规则时，读 `references/phase4-page-authoring.md`
+5. 需要 PPT 交付校验规则时，读 `references/phase5-ppt-delivery.md`
+
+### 品牌与页面
+6. 需要品牌资源使用规则时，读 `references/brand-assets.md`
+7. 需要页面 HTML 模板骨架时，读 `references/page-html-template.md`
+
+### 增强能力
+8. 需要布局策略/Deck叙事/文案公式时，读 `references/slide-layout-strategies.md`
+9. 需要AI图像生成/封面设计规则时，读 `references/ppt-image-and-cover.md`
+
+### 治理
+10. 需要交叉校验/重生链/协作关系时，读 `references/governance-and-iteration.md`
 
 ## 治理与迭代
 
