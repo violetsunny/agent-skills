@@ -6,7 +6,7 @@
 
 ```bash
 find /Users/kangll13/aiot/java-code/self -maxdepth 3 -mindepth 1 -type d -name ".git" | \
-  while read gitdir; do
+  while read -r gitdir; do
     dir=$(dirname "$gitdir")
     remote=$(/usr/bin/git -C "$dir" remote get-url origin 2>/dev/null)
     [ -n "$remote" ] && echo "$dir|$remote"

@@ -8,6 +8,8 @@ xml_to_html.py — draw.io / mxGraph XML 到 HTML 的确定性转换脚本
 仅使用 Python 标准库，不引入第三方依赖。
 """
 
+from __future__ import annotations
+
 import argparse
 import os
 import sys
@@ -26,7 +28,7 @@ SHAPE_MAP = {
 }
 
 
-def parse_style(style_str):
+def parse_style(style_str: str | None) -> dict[str, str]:
     """将 draw.io style 字符串解析为 dict。"""
     if not style_str:
         return {}
@@ -43,7 +45,9 @@ def parse_style(style_str):
     return result
 
 
-def map_style_to_css(style_dict):
+def map_style_to_css(
+    style_dict: dict[str, str],
+) -> tuple[str, str | None, dict[str, str], list[str]]:
     """将 draw.io style dict 映射为 CSS 字符串，返回 (css_str, shape, edge_info, unmapped_list)。"""
     css_parts = []
     shape = None
@@ -198,23 +202,23 @@ def map_style_to_css(style_dict):
     return " ".join(css_parts), shape, edge_info, unmapped_list
 
 
-def warn(msg):
+def warn(msg: str) -> None:
     """打印警告到 stderr，不阻塞转换。"""
     print(f"[WARN] {msg}", file=sys.stderr)
 
 
-def _fmt(n):
+def _fmt(n: float) -> str:
     """坐标取整到 1 位小数；整数则去掉小数尾，避免浮点噪声（如 743.5999999999999）。"""
     r = round(n, 1)
     return str(int(r)) if r == int(r) else str(r)
 
 
-def _color_slug(color):
+def _color_slug(color: str | None) -> str:
     """把颜色转成合法的 CSS id 片段：'#0078D4' -> '0078d4'。"""
     return color.replace("#", "").lower() if color else "000000"
 
 
-def _estimate_text_width(text, font_size):
+def _estimate_text_width(text: str, font_size: float) -> float:
     """估算文本像素宽度：CJK ≈ fontSize，ASCII ≈ 0.62 × fontSize。"""
     width = 0.0
     for ch in text:
@@ -222,7 +226,7 @@ def _estimate_text_width(text, font_size):
     return width
 
 
-def _point_at_half(points):
+def _point_at_half(points: list[tuple[float, float]]) -> tuple[float, float]:
     """返回折线路径总长一半处的坐标，用于多拐点边的标签定位。"""
     segs = []
     total = 0.0
@@ -239,7 +243,9 @@ def _point_at_half(points):
     return points[-1]
 
 
-def _clip_to_boundary(cx, cy, w, h, tx, ty):
+def _clip_to_boundary(
+    cx: float, cy: float, w: float, h: float, tx: float, ty: float
+) -> tuple[float, float]:
     """从矩形中心 (cx,cy) 朝目标点 (tx,ty) 方向求与矩形边界的交点。
 
     用于无 exit/entry 锚点的边：draw.io 会自动把连线裁剪到节点边界，
@@ -261,7 +267,18 @@ def _clip_to_boundary(cx, cy, w, h, tx, ty):
 
 
 class Vertex:
-    def __init__(self, cell_id, value, x, y, w, h, style_css, shape, parent_id):
+    def __init__(
+        self,
+        cell_id: str,
+        value: str,
+        x: float,
+        y: float,
+        w: float,
+        h: float,
+        style_css: str,
+        shape: str | None,
+        parent_id: str,
+    ) -> None:
         self.cell_id = cell_id
         self.value = value
         self.x = x
@@ -274,7 +291,7 @@ class Vertex:
         self.abs_x = x
         self.abs_y = y
 
-    def to_html(self):
+    def to_html(self) -> str:
         # draw.io html=1 语义：value 本身是 HTML（<b>/<br>/<font> 等），须原样渲染；
         # 仅转义引号（与历史输出一致）。整体 escape 会把标签变成明文，破坏展示。
         text = self.value.replace('"', "&quot;") if self.value else ""
@@ -287,7 +304,15 @@ class Vertex:
 
 
 class Edge:
-    def __init__(self, cell_id, value, source_id, target_id, edge_info, waypoints=None):
+    def __init__(
+        self,
+        cell_id: str,
+        value: str,
+        source_id: str,
+        target_id: str,
+        edge_info: dict[str, str],
+        waypoints: list[tuple[float, float]] | None = None,
+    ) -> None:
         self.cell_id = cell_id
         self.value = value
         self.source_id = source_id
@@ -295,7 +320,7 @@ class Edge:
         self.edge_info = edge_info
         self.waypoints = waypoints or []
 
-    def to_svg(self, vertices):
+    def to_svg(self, vertices: dict[str, Vertex]) -> str:
         """生成 SVG line，支持 exitX/exitY/entryX/entryY 连接点偏移。
 
         无锚点时按节点边界裁剪（与 draw.io 行为一致）：起点取源节点朝向目标的边界交点，
@@ -390,10 +415,25 @@ class Edge:
         )
 
 
-def parse_xml(xml_path):
+def _reject_unsafe_xml(xml: str, source: str) -> None:
+    """拒绝可能触发外部实体扩展的 DTD/ENTITY 声明（与 drawio_extract.py 同口径）。"""
+    upper = xml.upper()
+    if "<!DOCTYPE" in upper or "<!ENTITY" in upper:
+        print(
+            f"[ERROR] {source}: DTD and entity declarations are not supported",
+            file=sys.stderr,
+        )
+        sys.exit(2)
+
+
+def parse_xml(
+    xml_path: str,
+) -> tuple[dict[str, Vertex], list[Edge], int, int, list[str]]:
     """解析 draw.io XML，返回 (vertices, edges, canvas_w, canvas_h, unmapped_all)。"""
-    tree = ET.parse(xml_path)
-    root_elem = tree.getroot()
+    with open(xml_path, encoding="utf-8", errors="replace") as f:
+        raw = f.read()
+    _reject_unsafe_xml(raw, xml_path)
+    root_elem = ET.fromstring(raw)
 
     # 支持 mxfile 包装或裸 mxGraphModel
     mxgraph = root_elem.find(".//mxGraphModel")
@@ -478,7 +518,9 @@ def parse_xml(xml_path):
 # ── HTML 生成 ───────────────────────────────────────────────
 
 
-def generate_html(vertices, edges, canvas_w, canvas_h):
+def generate_html(
+    vertices: dict[str, Vertex], edges: list[Edge], canvas_w: int, canvas_h: int
+) -> str:
     """生成完整 HTML 文档。"""
     # vertex HTML
     vertex_html = "".join(v.to_html() for v in vertices.values())
@@ -609,7 +651,12 @@ def generate_html(vertices, edges, canvas_w, canvas_h):
 # ── 保真校验 (task 1.8) ─────────────────────────────────────
 
 
-def verify_fidelity(vertices, edges, html_content, unmapped_all):
+def verify_fidelity(
+    vertices: dict[str, Vertex],
+    edges: list[Edge],
+    html_content: str,
+    unmapped_all: list[str],
+) -> None:
     """多维度保真校验：vertex 数量、edge 数量、文本内容、未映射属性报告。"""
     errors = []
 
@@ -677,7 +724,7 @@ def verify_fidelity(vertices, edges, html_content, unmapped_all):
 # ── 主入口 ──────────────────────────────────────────────────
 
 
-def main():
+def main() -> None:
     parser = argparse.ArgumentParser(
         description="Convert draw.io / mxGraph XML to fixed-canvas HTML"
     )
