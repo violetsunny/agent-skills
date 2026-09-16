@@ -6,7 +6,7 @@
 
 ### 保护规则例外
 
-`agent-skills/` 位于保护目录 `ggggggood/` 下，但模块 4 是用户明确要求的同步操作，适用以下例外规则：
+`agent-skills/` 位于保护目录 `gggggggood/` 下，但模块 4 是用户明确要求的同步操作，适用以下例外规则：
 
 - **允许**：将 `~/.agents/skills/` 的 skill 文件覆盖到 `agent-skills/skills/`（`rsync -rtu` 不加 `--delete`；覆盖前执行 `modules/shared.md` 的“文件新旧比对规则”，目标端更新的文件标记 `[NEWER-TARGET]` 跳过）
 - **禁止写入 `self-skills/`**：`agent-skills/self-skills/` 是用户自写 skill 的唯一真源，只能由用户修改；模块 4 不得从运行时或任何其他来源向它同步、覆盖或补充内容

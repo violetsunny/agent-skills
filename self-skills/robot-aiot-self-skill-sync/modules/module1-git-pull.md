@@ -32,7 +32,7 @@ done
 
 ### 步骤 1.2：去重
 
-按仓库路径去重，避免同一项目在不同层级被重复拉取。注意嵌套仓库（如 `ggggggood/free-stock-line-skills/claude-trading-skills`）是独立仓库，需单独计入。
+按仓库路径去重，避免同一项目在不同层级被重复拉取。注意嵌套仓库（如 `gggggggood/free-stock-line-skills/claude-trading-skills`）是独立仓库，需单独计入。
 
 ### 步骤 1.3：分类 + 分批执行 git pull
 
@@ -135,26 +135,30 @@ find /Users/kangll13/aiot/java-code/self -maxdepth 7 -type f -name "tmp_pack_*"
 
 校验通过后删除 `tmp_pack_*`（该前缀文件不被任何 `.idx` 引用，删除不影响仓库完整性）。校验不通过 → 标记 `[REPO-CORRUPT]`，提示用户，不自动删除、不自动 gc、不自动重新 clone。
 
-**保护目录例外**：`ggggggood/` 下的 tmp_pack 残留**不自动清理**，仅列出路径和占用大小提示用户手动处理。
+**保护目录例外**：`gggggggood/` 下的 tmp_pack 残留**不自动清理**，仅列出路径和占用大小提示用户手动处理。
 
-**排除保护目录的写法（BSD find 坑，必须遵守）**：
+**排除保护目录的写法（必须遵守）**：
 
-macOS 的 BSD find 中 `-path "*/ggggggood/*"` **匹配数恒为 0**（实测：`-path "*/ggggggood/*"` → 0，`-path "*ggggggood*"` → 1，`-path "/abs/prefix/gggggggood/*"` → 1）。因此 `find ... -not -path "*/ggggggood/*" -delete` 的排除条件对所有文件恒为真，会**连带删除保护目录下的文件**，已实际发生过一次误删。
+保护目录实际名为 `gggggggood`（**7 个 g**，10 字符）。历史文档曾误写为 `ggggggood`（6 个 g，9 字符），导致所有模式匹配（`-path`、`grep -v`、`case`）全部失效，保护目录文件被误删。`ggggggood`（6g）虽是 `gggggggood`（7g）的子串，但带斜杠锚定时 `/ggggggood/` **不匹配** `/gggggggood/`（斜杠位置不对齐），因此 `grep -v "/ggggggood/"` 无法过滤保护目录路径。
 
-禁止使用 `-not -path "*/<dir>/*"` 做排除。允许以下两种写法：
+用正确 7g 模式实测：`-path "*/gggggggood/*"` → 匹配，`-not -path "*/gggggggood/*"` → 正确排除，zsh `case */gggggggood/*)` → 匹配。BSD find 和 zsh case 语义本身无问题，之前的失败纯粹是拼写错误。
+
+**修改保护目录模式前必须用 `basename | tr -cd 'g' | wc -c` 确认 g 的数量**，不得凭视觉判断。
+
+推荐写法（`grep -v` 最直观，不依赖 find 模式语义）：
 
 ```bash
-# 写法一：先打印清单，grep 过滤后逐个删除（推荐，不依赖 find 模式语义）
+# 写法一：先打印清单，grep 过滤后逐个删除（推荐）
 find /Users/kangll13/aiot/java-code/self -maxdepth 7 -type f -name "tmp_pack_*" 2>/dev/null \
-  | grep -v "/ggggggood/" \
+  | grep -v "/gggggggood/" \
   | while read -r f; do rm -f "$f"; done
 
-# 写法二：模式不带首尾斜杠（实测可匹配，但不如写法一直观）
+# 写法二：find -not -path（7g 模式实测可用）
 find /Users/kangll13/aiot/java-code/self -maxdepth 7 -type f -name "tmp_pack_*" \
-  -not -path "*ggggggood*" -delete
+  -not -path "*/gggggggood/*" -delete
 ```
 
-执行删除前必须先跑一次同条件的 `-print`（或 `grep -v` 后 `cat`）确认清单不含保护目录路径，确认后再删。zsh 的 `case */ggggggood/*)` 同样匹配失败，不得用 case 做保护目录判断。
+执行删除前必须先跑一次同条件的 `-print`（或 `grep -v` 后 `cat`）确认清单不含保护目录路径，确认后再删。
 
 误删后处置：立即对受影响仓库跑 `fsck --full --strict` + `verify-pack` + `status -sb` + `log -1` 确认完整性，如实报告违规事实与校验结果，不得隐瞒。tmp_pack 不被索引引用，删除通常不损伤仓库，但仍须逐仓库验证后才可判定无数据丢失。
 
@@ -182,10 +186,10 @@ cat /tmp/pull_pending.txt | xargs -P 4 -I{} /tmp/pull_one.sh {} 40 3
 |---|---|---|
 | `inventory/scm-plan-bff` | `gitlab.enncloud.cn` 为内网地址，非内网/VPN 环境 DNS 必然解析失败 | `[SKIP-INTRANET]` |
 | `inventory/scm-plan-management` | 同上 | `[SKIP-INTRANET]` |
-| `ggggggood/llk-java-bible` | GitHub 私有仓库，本机无凭据 | `[AUTH-PRIVATE]` |
-| `ggggggood/llkang-ai-agent-prompt` | GitHub 私有仓库，本机无凭据 | `[AUTH-PRIVATE]` |
-| `ggggggood/pllm` | GitHub 私有仓库，本机无凭据 | `[AUTH-PRIVATE]` |
-| `ggggggood/LLMentor` | GUI 客户端（Fork 类）维护，CLI 无 codeup.aliyun.com 凭据；工作流为 fetch master 后合并进 `feature_kll` 功能分支，不适用 `pull --ff-only` | `[SKIP-GUI]` |
+| `gggggggood/llk-java-bible` | GitHub 私有仓库，本机无凭据 | `[AUTH-PRIVATE]` |
+| `gggggggood/llkang-ai-agent-prompt` | GitHub 私有仓库，本机无凭据 | `[AUTH-PRIVATE]` |
+| `gggggggood/pllm` | GitHub 私有仓库，本机无凭据 | `[AUTH-PRIVATE]` |
+| `gggggggood/LLMentor` | GUI 客户端（Fork 类）维护，CLI 无 codeup.aliyun.com 凭据；工作流为 fetch master 后合并进 `feature_kll` 功能分支，不适用 `pull --ff-only` | `[SKIP-GUI]` |
 
 用户配置好凭据或处于内网环境后，可从本清单移除恢复正常拉取。清单外的认证/网络失败仍按步骤 1.5 处理。
 
