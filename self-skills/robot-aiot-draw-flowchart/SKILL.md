@@ -2,7 +2,7 @@
 name: robot-aiot-draw-flowchart
 description: >
   机器人/IoT 业务图表绘制与页面化能力。draw.io XML 图表生成（可编辑主路径）+ XML→HTML 稳定桥接转换 + 领导汇报静态页面 HTML 生成。覆盖流程图、分层架构、时序、状态机、ER、UML 类/用例、网络拓扑、时间线、Agent/记忆架构等 39+ 图表类型；内置机器人视觉语言、配色与样式一致性体系、几何/构图校验、PNG/GIF 导出与 drawio/Mermaid 导入重绘；XML→HTML 转换保留原始样式/布局/层级/配色；静态页面固定 1920x1080 画布，内化语义 token、高级感设计标准与交付审查流程。
-version: 5.0.0
+version: 5.0.1
 author: kangll13
 license: MIT
 metadata:
@@ -15,21 +15,24 @@ metadata:
 
 ## 执行前依赖检查
 
-核心能力无外部依赖（XML→HTML 转换脚本、静态页面规则、画布图片生成规则均内置）。运行时可选协作：
+必需依赖（运行时部署，执行前检查齐备）：
 
-| 协作 skill | 级别 | 用途 |
-|------|------|------|
-| diagram-design | 可选 | 编辑级设计系统、39类视觉类型规则、Taste Gate 审查 |
+| 依赖 skill | 用途 |
+|------|------|
+| diagram-design | 编辑级设计系统、39类视觉类型规则、Taste Gate 审查 |
+| ui-ux-pro-max | XML→HTML 桥接稿的 UI 参考与非阻塞 UI 检查 |
 
 ```bash
-[ -d "$HOME/.agents/skills/diagram-design" ] && echo '[COLLAB] diagram-design available' || echo '[INFO] diagram-design not deployed, using internal design rules'
+for s in diagram-design ui-ux-pro-max; do
+  [ -d "$HOME/.agents/skills/$s" ] && echo "[OK] $s" || echo "[MISS] $s"
+done
 ```
 
-协作规则见 `references/diagram-design-collaboration.md`。缺失时不影响核心功能，使用内置设计系统。
+协作规则见 `references/diagram-design-collaboration.md`。缺失时如实告知用户依赖不全，不得静默降级。
 
 ## 概述
 
-本 Skill 是机器人/IoT 业务图表的统一绘制与页面化能力，由 draw.io XML 绘制规范、XML→HTML 桥接转换、领导汇报静态页面 HTML 三者融合而成：
+本 Skill 是机器人/IoT 业务图表的统一绘制与页面化能力，涵盖 draw.io XML 绘制规范、XML→HTML 桥接转换、领导汇报静态页面 HTML 三者：
 
 1. **统一的机器人视觉语言** — 标准机器人图标、状态配色、语义样式（draw.io 路径权威）
 2. **39+ 图表类型** — 流程图家族、分层架构、时序、状态机、ER/数据库、UML、网络拓扑、时间线、Agent/记忆架构、数据流、决策分析图等

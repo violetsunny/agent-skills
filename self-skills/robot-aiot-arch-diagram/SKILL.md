@@ -1,7 +1,7 @@
 ---
 name: robot-aiot-arch-diagram
-description: 架构图/技术可视化绘制能力。三条输出路径：diagram-design 编辑级设计系统（直绘 SVG/HTML，汇报级展示）、fireworks-tech-graph 工程制图管线（几何校验+构图契约）、archify 内置渲染（主题切换+导出）。覆盖流程图、分层架构、时序、状态机、ER、UML 类/用例、网络拓扑、时间线、Agent/记忆架构等 39+ 图表类型；内置 12 套 SVG 风格皮肤与品牌 token 定制、PNG/GIF 导出与 drawio/Mermaid 导入重绘。非 PPT 场景专用。
-version: 2.0.0
+description: 架构图/技术可视化绘制能力。两条输出路径：直绘 SVG/HTML（主路径，diagram-design 编辑级设计系统 + fireworks-tech-graph 工程制图管线，几何校验+构图契约，汇报级展示）、archify 运行时渲染（主题切换+导出）。覆盖流程图、分层架构、时序、状态机、ER、UML 类/用例、网络拓扑、时间线、Agent/记忆架构等 39+ 图表类型；内置 12 套 SVG 风格皮肤与品牌 token 定制、PNG/GIF 导出与 drawio/Mermaid 导入重绘。非 PPT 场景专用。
+version: 2.1.0
 author: kangll13
 license: MIT
 metadata:
@@ -14,38 +14,38 @@ metadata:
 
 ## 执行前依赖检查
 
-核心能力无外部依赖（archify 渲染引擎、AI 图像生成规则均内置）。运行时可选协作：
+必需依赖（运行时部署，执行前检查齐备）：
 
-| 协作 skill | 级别 | 用途 |
-|------|------|------|
-| archify | 可选 | 路径 C 内置渲染（已内置引擎，外部实例提供主题扩展） |
-| diagram-design | 可选 | 编辑级设计系统、39类视觉类型规则、Taste Gate 审查 |
-| ui-ux-pro-max | 可选 | 图表配色/布局的设计美学建议与页面审查 |
+| 依赖 skill | 用途 |
+|------|------|
+| archify | 路径 C 渲染引擎（`~/.agents/skills/archify`，本 SKILL 不内嵌引擎副本） |
+| diagram-design | 编辑级设计系统、39类视觉类型规则、Taste Gate 审查 |
+| ui-ux-pro-max | 图表配色/布局的设计美学建议与页面审查 |
 
 ```bash
 for s in archify diagram-design ui-ux-pro-max; do
-  [ -d "$HOME/.agents/skills/$s" ] && echo "[COLLAB] $s available" || echo "[INFO] $s not deployed, using internal rules"
+  [ -d "$HOME/.agents/skills/$s" ] && echo "[OK] $s" || echo "[MISS] $s"
 done
 ```
 
-缺失时不影响核心功能，使用内置设计系统和 archify 引擎。
+任一缺失时如实告知用户依赖不全，不得静默降级或假装可用。
 
 ## 概述
 
-本 Skill 从 robot-aiot-draw-flowchart 拆分而来，专注非 PPT 场景的技术图表绘制。承载原 draw-flowchart 的路径 B（直绘 SVG/HTML）和路径 C（archify 内置渲染）全部能力，不包含路径 A（draw.io XML）。
+本 Skill 专注非 PPT 场景的技术图表绘制，提供两条输出路径：直绘 SVG/HTML（B，主路径）与 archify 运行时渲染（C）；需要可编辑 draw.io XML 时使用 robot-aiot-draw-flowchart。
 
 核心能力：
 
 1. **diagram-design 编辑级设计系统** — 39 类视觉类型、通用质量硬规则、形状词汇、Z-order 画家模型
 2. **fireworks-tech-graph 工程制图管线** — 构图契约、几何校验、复杂度预算、视觉复查门、PNG/GIF 导出
-3. **archify 内置渲染** — 主题切换、内置导出菜单、Mermaid 方言映射
+3. **archify 运行时渲染** — 主题切换、产物导出菜单、Mermaid 方言映射
 4. **导入重绘** — 已有 `.drawio` / Mermaid 源可提取结构后按本 SKILL 规范重绘
 
 路径解析约定：下文 `SKILL_ROOT` 指本 SKILL.md 所在目录（运行时为 `~/.agents/skills/robot-aiot-arch-diagram`）。脚本一律用绝对路径调用，不假设当前工作目录。
 
 ## 输出路径选型
 
-| 维度 | B. 直绘 SVG/HTML（主路径） | C. archify 内置渲染 |
+| 维度 | B. 直绘 SVG/HTML（主路径） | C. archify 运行时渲染 |
 | --- | --- | --- |
 | 产物 | 自包含 SVG / HTML + PNG/GIF | 自包含 HTML（内联 SVG） |
 | 适用 | 汇报展示、README、精确几何控制、动图 | 暗/亮主题切换、内置导出菜单 |
@@ -217,9 +217,9 @@ done
 
 **错误恢复协议**：第一次错误定位根因针对性修复；第二次换方法（Python list → 分块生成）；第三次停止并报告用户，不无限重试。
 
-### 路径 C：archify 内置渲染
+### 路径 C：archify 运行时渲染
 
-archify 渲染引擎内置于 `$SKILL_ROOT/archify/`（零运行时依赖，node ≥ 18），入口 `$ARCHIFY` = `$SKILL_ROOT/archify/bin/archify.mjs`。选型、类型路由、6 步创作流程（schema→候选→validate showcase→deliver→visual-check）、Mermaid 方言映射、主题兼容硬约束见 `references/archify-integration.md`。
+archify 渲染引擎由运行时部署的 archify skill 提供（node ≥ 18），入口 `$ARCHIFY` = `$HOME/.agents/skills/archify/bin/archify.mjs`，本 SKILL 不内嵌引擎副本。选型、类型路由、6 步创作流程（schema→候选→validate showcase→deliver→visual-check）、Mermaid 方言映射、主题兼容硬约束见 `references/archify-integration.md`。
 
 ## 导入与重绘
 
@@ -237,7 +237,7 @@ archify 渲染引擎内置于 `$SKILL_ROOT/archify/`（零运行时依赖，node
 - **SVG/PNG 从 HTML 导出**：`references/export.md`（只导出 `<svg>` 本体，丢编辑壳；导出必须用户明确要求）
 - **GIF**：`scripts/motion.py`（经 `fireworks.py animate`），契约见 `references/motion-effects.md`
 - **离线交互 HTML**：`python3 $SKILL_ROOT/scripts/export-interactive-html.py` / `scripts/interactive_html.py`
-- 路径 C 用 archify 内置导出菜单
+- 路径 C 用 archify 产物的导出菜单
 
 ## 何时读取引用文档
 
@@ -270,9 +270,9 @@ archify 渲染引擎内置于 `$SKILL_ROOT/archify/`（零运行时依赖，node
 ### 路径 C（archify）
 19. 需要 archify 选型/类型路由/创作流程时，读 `references/archify-integration.md`
 
-### 外部协作
-20. 需要编辑级设计系统/Taste Gate 审查时，加载 `diagram-design`
-21. 需要图表配色/布局设计美学建议时，加载 `ui-ux-pro-max`
+### 必需依赖使用
+20. 编辑级设计系统/Taste Gate 审查加载 `diagram-design`
+21. 图表配色/布局设计美学建议加载 `ui-ux-pro-max`
 
 ## 规则优先级
 

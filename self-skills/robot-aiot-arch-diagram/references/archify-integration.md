@@ -1,26 +1,14 @@
-# Archify 内置渲染器（路径 C）
+# Archify 运行时渲染器（路径 C）
 
-archify 渲染引擎已**内置**于本 SKILL 的 `archify/` 子目录（零运行时依赖，仅需 node ≥ 18），不再依赖外部 SKILL。
+archify 渲染引擎由**运行时部署**的 archify skill 提供（`~/.agents/skills/archify`，仅需 node ≥ 18），本 SKILL 不内嵌引擎副本。
 
-约定：`$SKILL_ROOT` = 本 SKILL 目录；`$ARCHIFY` = `$SKILL_ROOT/archify/bin/archify.mjs`。
+约定：`$SKILL_ROOT` = 本 SKILL 目录；`$ARCHIFY_ROOT` = `$HOME/.agents/skills/archify`；`$ARCHIFY` = `$ARCHIFY_ROOT/bin/archify.mjs`。
 
 ## 输出路径选型指南
 
-本 SKILL 有三条输出路径：draw.io XML（A）、直绘 SVG/HTML（B，见 SKILL.md「生成工作流 · 路径 B」）、archify 内置渲染（C）。下表为 A 与 C 的对比：
+本 SKILL 有两条输出路径：直绘 SVG/HTML（B，主路径，见 SKILL.md「生成工作流 · 路径 B」）、archify 运行时渲染（C）；需要可编辑 draw.io XML 时使用 robot-aiot-draw-flowchart（本 SKILL 不含路径 A）。B/C 对比表与决策规则以 SKILL.md「输出路径选型」为唯一权威，此处不复述。
 
-| 维度 | draw.io XML（主路径） | archify HTML/SVG（高保真路径） |
-| --- | --- | --- |
-| 产物 | .drawio / .xml 可编辑文件 | 自包含 HTML（内联 SVG） |
-| 适用 | 需要二次编辑、进入 PPT 工作流（使用 robot-aiot-draw-flowchart）、团队协作修改 | 汇报展示、README 嵌入、需要主题切换或高分辨率导出 |
-| 主题 | 无 | 暗/亮主题切换（localStorage + prefers-color-scheme） |
-| 导出 | 依赖 draw.io | 内置菜单：PNG 剪贴板、PNG/JPEG/WebP（最高 4x）、双主题 SVG |
-| 校验 | `generation-workflow.md` 交付前自审 | archify fail-fast 校验（重叠/标签碰撞/越界） |
-
-**决策规则：**
-1. 用户要求可编辑或进 PPT 工作流 → draw.io XML（A）
-2. 用户要求汇报展示/README/精确几何/PNG/GIF/风格皮肤 → 直绘 SVG/HTML（B，见 SKILL.md）
-3. 用户要求暗/亮主题切换、高分辨率导出，或已在使用 archify JSON → archify 内置渲染（C）
-4. 未明确时默认 draw.io XML（主路径）
+archify 产物为自包含 HTML（内联 SVG），带暗/亮主题切换（localStorage + prefers-color-scheme）与导出菜单（PNG 剪贴板、PNG/JPEG/WebP 最高 4x、双主题 SVG），交付前必须通过 archify fail-fast 校验（重叠/标签碰撞/越界）。
 
 ## 图表类型 → archify 类型路由
 
@@ -35,7 +23,7 @@ archify 渲染引擎已**内置**于本 SKILL 的 `archify/` 子目录（零运�
 ## 快速创作流程（6 步）
 
 1. **定类型**：按上表路由；不确定时 `node $ARCHIFY guide <场景> --lang zh`。
-2. **读契约**：读 `archify/schemas/<type>.schema.json` + `archify/schemas/common.schema.json` + 至少一个 `archify/examples/*.<type>.json`。
+2. **读契约**：读 `$ARCHIFY_ROOT/schemas/<type>.schema.json` + `$ARCHIFY_ROOT/schemas/common.schema.json` + 至少一个 `$ARCHIFY_ROOT/examples/*.<type>.json`。
 3. **写候选**：产出 `<name>.<type>.json`。主节点 ≤ 12；`quality_profile: "showcase"`；布局遵循布局预算与叙事原则；语言与用户一致；品牌图标显式声明（`node $ARCHIFY brands <关键词>` 查询）。
 4. **校验**：每次编辑后必跑 `node $ARCHIFY validate <type> <候选.json> --quality showcase --json`。showcase 档 = 9 项产物检查，必须 0 errors 0 warnings；失败按输出的 Suggested fix 修正 JSON 重跑，**不得手改渲染器或生成的 HTML**。
 5. **交付**：`node $ARCHIFY deliver <type> <候选.json> <输出.html> --json`（冻结 spec 快照、原子写入、输出 SHA-256 回执）。非零退出不得声称成功。
@@ -70,7 +58,7 @@ archify 渲染引擎已**内置**于本 SKILL 的 `archify/` 子目录（零运�
 ## 环境自检与降级
 
 - 自检：`node $ARCHIFY doctor`；示例一览：`node $ARCHIFY examples`；本地演示：`node $ARCHIFY demo <目录>`
-- node 不可用或 doctor 失败时：降级为 draw.io XML 主路径（A）或直绘（B），并如实告知用户降级原因
+- node 不可用或 doctor 失败时：降级为直绘 SVG/HTML（B），并如实告知用户降级原因；需要可编辑 XML 时指引使用 robot-aiot-draw-flowchart
 
 ## 如实交付报告
 

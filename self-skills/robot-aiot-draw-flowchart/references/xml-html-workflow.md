@@ -34,7 +34,7 @@ python3 scripts/xml_to_html.py doc-ppt/<图表名>.xml -o doc-ppt/<图表名>.ht
 
 ### 步骤 0：加载 UI 参考
 
-可选加载 `ui-ux-pro-max`，结合本 SKILL 内置的轻量 MD3 规范化规则做非阻塞 UI 检查。
+加载 `ui-ux-pro-max`（必需依赖，运行时部署），结合本 SKILL 内置的轻量 MD3 规范化规则做非阻塞 UI 检查。
 
 重点检查：
 

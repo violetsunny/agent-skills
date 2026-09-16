@@ -8,7 +8,7 @@
 2. 识别关键节点、连接关系和角色边界
 3. 判断是否需要机器人状态图标
 4. 分层架构图额外确认层级数量、每层名称和核心组件
-5. 决定输出路径：draw.io XML 主路径（A）、直绘 SVG/HTML 路径（B）或 archify HTML/SVG 路径（C），决策规则见 SKILL.md「输出路径选型」
+5. 决定输出路径：draw.io XML 主路径（A）或直绘 SVG/HTML 路径（B）
 
 ### 步骤 2：加载资源
 
@@ -16,9 +16,8 @@
 2. `references/color-schemes.md`
 3. `references/flowchart-patterns.md`
 4. `references/layered-architecture.md`（分层架构图时）
-5. `references/archify-integration.md`（选定 archify 路径 C 时）
-6. `references/style-consistency.md`
-7. 直绘 SVG/HTML 路径 B：对应 `type-*.md` + `style-N-*.md` + `composition-quality-contract.md` + `svg-layout-best-practices.md`（见 SKILL.md「生成工作流 · 路径 B」）
+5. `references/style-consistency.md`
+6. 直绘 SVG/HTML 路径 B：对应 `type-*.md` + `style-N-*.md` + `composition-quality-contract.md` + `svg-layout-best-practices.md`（见 SKILL.md「生成工作流 · 路径 B」）
 
 ### 步骤 3：生成 XML 结构
 
@@ -45,10 +44,6 @@
 被 `robot-aiot-leadership-ppt-workflow` 调用时：
 
 1. 只返回本地 `doc-ppt/*.xml` 文件路径
-
-选定 archify 路径时：
-
-1. 直接交付自包含 `.html`
 
 ## 布局叙事四原则
 
@@ -90,10 +85,3 @@
 3. 跨层连接线使用目标层主题色
 4. 数据支撑区卡片数值突出
 5. 图例覆盖所有层类型
-
-archify 路径额外检查：
-
-1. 模式映射正确
-2. SVG 无硬编码 fill/stroke 十六进制
-3. `.toolbar`、`<script>`、`:root`、`[data-theme]` 未被破坏
-4. 通过 `node bin/archify.mjs validate` 或 `check`
