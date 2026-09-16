@@ -2,9 +2,13 @@ from __future__ import annotations
 
 import json
 import math
+import os
 import random
 import time
 from datetime import datetime, timezone
+
+# akshare 内部用 tqdm 输出进度条到 stderr，调用方 2>&1 合并时会污染 CLI JSON 输出。
+os.environ.setdefault("TQDM_DISABLE", "1")
 
 import requests
 
