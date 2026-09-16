@@ -3542,6 +3542,17 @@ def build_svg_with_report(
     # are allocated separately so normalization collisions (for example
     # ``a b`` vs ``a-b`` or multiple CJK-only IDs) cannot create duplicate IDs.
     used_dom_ids = set(_RESERVED_DOM_IDS)
+    a11y_slug = safe_identifier(
+        source_data.get("slug") or source_data.get("title") or "diagram", "diagram"
+    )
+    a11y_title_id = f"{a11y_slug}-title"
+    a11y_desc_id = f"{a11y_slug}-desc"
+    a11y_title_text = str(source_data.get("title", "")).strip() or "Diagram"
+    a11y_desc_text = (
+        str(source_data.get("desc") or source_data.get("subtitle") or "").strip()
+        or a11y_title_text
+    )
+    used_dom_ids.update({a11y_title_id, a11y_desc_id})
     for index, container in enumerate(containers):
         raw_id = str(container.get("id") or f"container-{index:03d}")
         container["_dom_id"] = allocate_dom_identifier(
@@ -3654,8 +3665,13 @@ def build_svg_with_report(
         f'data-min-node-gap="{contract_data["min_node_gap"]}" '
         f'data-min-container-gutter="{contract_data["min_container_gutter"]}" '
         f'data-min-label-clearance="{contract_data["min_label_clearance"]}" '
-        f'data-min-segment-length="{contract_data["min_segment_length"]}">'
+        f'data-min-segment-length="{contract_data["min_segment_length"]}" '
+        f'role="img" aria-labelledby="{a11y_title_id} {a11y_desc_id}">'
     ]
+    lines.append(
+        f'  <title id="{a11y_title_id}">{normalize_text(a11y_title_text)}</title>'
+    )
+    lines.append(f'  <desc id="{a11y_desc_id}">{normalize_text(a11y_desc_text)}</desc>')
     lines.append(defs)
     lines.append(canvas)
     if window_controls:

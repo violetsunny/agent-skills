@@ -138,6 +138,7 @@ Available arrow override fields (in recommended order of use):
 | `routing_padding` | number (default: 24) | *(Advanced)* Adjust obstacle clearance for this arrow |
 | `port_clearance` | number | *(Advanced)* Adjust first-segment offset from node edge |
 | `label_style` | `"badge"` / `"offset"` | Choose `"offset"` when badge backgrounds create visual clutter; keep `"badge"` (default) for legacy/high-contrast labels |
+| `stroke_width` | number (default: style `arrow_width`, e.g. 2.4) | Line thickness; arrowhead markers scale with stroke (`markerUnits="strokeWidth"`), so head width ≈ 10 × stroke_width. Set 1.6–1.8 on arrows when heads look chunky |
 
 For JSON/template rendering, the default remains `"badge"` for backward compatibility. Set `"label_style": "offset"` on individual arrows for offset-first labels without background rects.
 
@@ -154,6 +155,21 @@ Example — spacing two overlapping arrows into separate corridors:
 { "source": "nodeA", "target": "nodeB", "corridor_y": [280] }
 { "source": "nodeC", "target": "nodeD", "corridor_y": [320] }
 ```
+
+Example — shrinking chunky heads and rerouting a long cross-layer control arrow along the outer margin:
+
+```json
+{ "source": "d1", "target": "g1", "flow": "data", "stroke_width": 1.8 }
+{ "source": "a3", "target": "g1", "flow": "control", "label": "控制",
+  "source_port": "right", "target_port": "right",
+  "route_points": [[915, 160], [915, 425]], "stroke_width": 1.8 }
+```
+
+Arrow-refinement rules:
+
+- Never let two arrows share one node's port region (e.g. both at top-center); give one a different edge via `source_port` / `target_port`.
+- For long cross-layer arrows, hug the outer margin: same-side ports (right→right or left→left) plus `route_points` in a lane between the container edge and the canvas edge (e.g. x=915 on a 960-wide canvas) yields a clean C-shape instead of a diagonal cut across node columns.
+- `route_points` legs must stay orthogonal to the declared ports and must not cross node rects, else generation raises a route error — move the lane rather than forcing the path.
 
 ## SVG Generation & Error Prevention
 
