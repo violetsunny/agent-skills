@@ -3,7 +3,7 @@ name: robot-aiot-web-presentation-workflow
 version: 2.0.0
 description: >
   交互式Web演示页面制作工作流。根据知识文档生成分页汇报母稿，按需制作架构图/流程图，
-  逐页生成交互HTML（可翻页、带动画、数据动效，纯原生零依赖双击即用）。
+  逐页交互HTML（可翻页、带动画、数据动效，纯原生零依赖双击即用）委派 robot-aiot-interactive-html-author 编写。
   当用户要求"做交互演示""生成Web演示""做动态汇报""可翻页演示""带动画的汇报""Web版汇报"时触发。
   也适用于用户描述了需要将技术项目数据转化为可交互浏览器演示的场景。
 ---
@@ -14,8 +14,11 @@ description: >
 **让受众在浏览器中获得沉浸式体验** — 每页有业务价值结论 + 数据支撑 + 交互动效，
 不讲代码实现，双击即可运行。
 
-本技能覆盖从原始知识文档到最终交互 HTML 的全链路，涉及一个外部技能调用：
-- **robot-aiot-arch-diagram** — 生成架构图/流程图（SVG/HTML 格式）
+本技能覆盖从原始知识文档到最终交互 HTML 的全链路编排，涉及两个外部技能调用：
+- **robot-aiot-arch-diagram** — 生成架构图/流程图（SVG/HTML 格式）（Phase 3）
+- **robot-aiot-interactive-html-author** — 逐页交互动画特效 HTML 编写与单文件合并（Phase 4）
+
+本技能本身只负责编排与补充：阶段切换、母稿分页、图表调度、跨阶段一致性、验收与交付。
 
 与 `robot-aiot-leadership-ppt-workflow` 的关键区别：
 - 产出是单个可运行 HTML 文件，不是 PPTX
@@ -36,16 +39,16 @@ Sub agent 原则：
 
 ```bash
 [ -d "$HOME/.agents/skills/robot-aiot-arch-diagram" ] || printf '[DEP-MISSING] robot-aiot-arch-diagram\n'
+[ -d "$HOME/.agents/skills/robot-aiot-interactive-html-author" ] || printf '[DEP-MISSING] robot-aiot-interactive-html-author\n'
 ```
 
 | 依赖 skill | 级别 | 用途 |
 |------|------|------|
 | robot-aiot-arch-diagram | 必需 | Phase 3 绘制架构图/流程图（SVG/HTML） |
-| ui-ux-pro-max | 可选 | 设计系统建议与页面审查能力（内化规则优先） |
+| robot-aiot-interactive-html-author | 必需 | Phase 4 逐页交互动画特效 HTML 编写与单文件合并 |
 
 - 必需 skill 存在 → 略过，进入主流程
 - 必需 skill 缺失 → **暂停执行**，提示用户手动安装（本技能不私自安装）
-- 可选 skill 缺失 → 使用内化设计规则，不影响核心功能
 
 ## 输入
 
@@ -76,7 +79,7 @@ doc-web/
 Phase 1: 内容分析     → 读取知识文档，明确汇报对象和要求
 Phase 2: 母稿分页     → 按内容结构分页，每页定义四要素和图表需求
 Phase 3: 图表生成     → 调用 robot-aiot-arch-diagram 生成 SVG/HTML 图表
-Phase 4: 交互HTML    → 基于母稿和图表，逐页生成交互HTML，合并为单文件
+Phase 4: 交互HTML    → 委派 robot-aiot-interactive-html-author 逐页编写并合并单文件
 ```
 
 每个阶段产出是下一阶段的输入，逐级收敛。
@@ -133,74 +136,36 @@ Phase 4: 交互HTML    → 基于母稿和图表，逐页生成交互HTML，合�
 
 ---
 
-## Phase 4: 逐页交互 HTML
+## Phase 4: 逐页交互 HTML（委派编写）
 
-详细规则见 `references/phase4-interactive-html.md`。
+编写能力委派给 `robot-aiot-interactive-html-author`：加载该 skill 并按其编写契约与审查流程执行；本阶段只提供输入与验收。
 
 入口约束：
-1. 基于母稿和图表 HTML 逐页生成
-2. 所有页面合并为单个 HTML 文件（多页幻灯片模式）
-3. 必须实现翻页系统（键盘+点击）、过渡动画、元素入场
-4. 数据密集页实现数字滚动、进度条填充等动效
-5. 纯原生 HTML/CSS/JS，零外部依赖，双击即可运行
-6. 尊重 `prefers-reduced-motion`，检测到时降级为即时切换
-7. 固定 `1920x1080` 画布
+1. 向编写 skill 传递页面四要素、图表 HTML 与主色基调
+2. 编写 skill 产出单文件多页 deck：`doc-web/<project>-presentation.html`
+3. 验收自检（编排侧抽查）：
+   - 翻页键位全可用、`prefers-reduced-motion` 降级即时切换
+   - 零外部请求、固定 1920x1080、单页 DOM ≤ 500
+   - 母稿四要素与图表数据语义无缺页、无篡改
 
-交互 HTML 规范要点（完整规则见 `references/interactive-mode-rules.md`）：
-- 翻页：←→/Space/PageUp/PageDown/Home/End/F/Esc
-- 过渡：View Transition API 优先，降级 CSS transition
-- 入场：按 `data-enter-order` 依次入场，总时长 ≤ 2s
-- 数据动效：数字滚动、进度条填充、图表逐步绘制
-- 交互图表：hover 高亮、tooltip、点击展开（仅当母稿提供明细数据）
-- 性能：单页 DOM ≤ 500，动画仅限 transform/opacity/filter
-
-产物：`doc-web/<project>-presentation.html`，单文件多页交互演示。
-
-阻塞条件：所有页面生成完毕且通过交付前审查才算完成。
+阻塞条件：所有页面生成完毕且通过编写 skill 的交付前审查才算完成。
 
 ---
 
 ## 设计标准
 
-设计规范已全部内化到本技能 `references/` 下：
-- `design-system-standards.md` — 语义 token、字级、圆角、层次体系
-- `premium-design-standards.md` — 反模板化、高级感、AI 痕迹清单
-- `premium-review-fix.md` — 交付前审查与修复流程
-- `anti-ai-slop-design.md` — 反 AI 模板感设计规则（两遍工作流、token 系统、signature 元素）
-- `self-contained-html.md` — 自包含 HTML 构建规则（零依赖、资源内联、性能约束）
-- `keyframe-animation.md` — 关键帧动画与动效接缝规则（Seam Gate、缓动选择、时长预算）
-- `content-imagery-and-infographic.md` — 内容AI图像生成与信息图（21种信息图布局、社交图片样式、AI图像生成集成）
-- `generative-art-and-canvas.md` — 生成艺术与数据可视化动效（p5.js/Canvas API、种子随机性、画布级图片）
-- `web-slide-strategies.md` — Web 演示布局策略与文案公式（25种布局、叙事策略、文案公式）
-
-运行时可选协作：
-
-| 协作 skill | 级别 | 用途 |
-|------|------|------|
-| ui-ux-pro-max | 可选 | 设计系统建议与页面审查能力 |
-
-```bash
-[ -d "$HOME/.agents/skills/ui-ux-pro-max" ] && echo '[COLLAB] ui-ux-pro-max available' || echo '[INFO] ui-ux-pro-max not deployed, using internal design rules'
-```
-
-设计标准以本技能内化规则为准，`ui-ux-pro-max` 提供补充建议。
+设计与编写标准已全部内化在 `robot-aiot-interactive-html-author` 的 `references/` 下，
+由编写 skill 在 Phase 4 执行；本技能不重复存放，仅按验收自检抽查。
 
 ---
 
-## 硬约束
+## 硬约束（交付契约）
 
-1. 不使用响应式断点、媒体查询或 `max-width` 页面思维
-2. 不直接复用应用型 dashboard 套壳覆盖图表真源
-3. 不在组件里散落硬编码颜色，优先引用根变量
-4. 正文默认不小于 `16px`，说明/标签默认不小于 `12px`
-5. 可选视觉增强不得改动已验证的布局坐标
-6. 不伪造精确数字；占位数据必须显式标注"示意"
-7. 不使用 AI 紫/霓虹渐变、纯黑硬阴影、纯黑大面积背景（品牌色本身为紫色时例外）
-8. 不出现编号眉标、装饰状态点、版本号页脚等 AI 痕迹
-9. 每页 HTML 必须完整可运行，禁止占位注释和"同上"省略
-10. 最终交付物为单个 HTML 文件，双击即可在浏览器完整运行
-11. 纯原生零依赖，禁止 CDN、npm 包、外部字体
-12. 尊重 `prefers-reduced-motion`，检测到时所有动画降级为即时切换
+1. 最终交付物为单个 HTML 文件，双击即可在浏览器完整运行，纯原生零依赖（禁 CDN/npm/外部字体）
+2. 固定 `1920x1080` 画布，不使用响应式断点
+3. 尊重 `prefers-reduced-motion`，检测到时降级为即时切换
+4. 不伪造精确数字；占位数据必须显式标注"示意"
+5. 编写期细则（token、字级、AI 痕迹、动画属性、DOM 预算等）以 `robot-aiot-interactive-html-author` 编写契约为准
 
 ## 何时读取引用文档
 
@@ -208,25 +173,10 @@ Phase 4: 交互HTML    → 基于母稿和图表，逐页生成交互HTML，合�
 1. 需要内容分析规则时，读 `references/phase1-content-analysis.md`
 2. 需要分页策略和母稿模板时，读 `references/phase2-pagination.md`
 3. 需要图表生成调用规则时，读 `references/phase3-chart-generation.md`
-4. 需要逐页交互 HTML 编写规则时，读 `references/phase4-interactive-html.md`
-5. 需要交互模式完整规则时，读 `references/interactive-mode-rules.md`
 
-### 设计标准
-6. 需要设计系统细则时，读 `references/design-system-standards.md`
-7. 需要高级感设计标准时，读 `references/premium-design-standards.md`
-8. 需要执行交付前审查或修复时，读 `references/premium-review-fix.md`
-9. 需要反 AI 模板感规则时，读 `references/anti-ai-slop-design.md`
-10. 需要自包含 HTML 构建规则时，读 `references/self-contained-html.md`
-
-### 视觉增强
-11. 需要关键帧动画与动效接缝规则时，读 `references/keyframe-animation.md`
-12. 需要内容AI图像生成与信息图规则时，读 `references/content-imagery-and-infographic.md`
-13. 需要生成艺术与数据可视化动效时，读 `references/generative-art-and-canvas.md`
-14. 需要 Web 演示布局策略与文案公式时，读 `references/web-slide-strategies.md`
-
-### 外部协作
-15. 需要运行时设计系统建议和页面审查能力时，加载 `ui-ux-pro-max`
-16. 需要绘制架构图/流程图时，加载 `robot-aiot-arch-diagram`
+### 外部委派
+4. 需要绘制架构图/流程图（Phase 3）时，加载 `robot-aiot-arch-diagram`
+5. 需要逐页交互动画特效 HTML 编写（Phase 4）时，加载 `robot-aiot-interactive-html-author`
 
 ## 交付口径
 
@@ -236,4 +186,4 @@ Phase 4: 交互HTML    → 基于母稿和图表，逐页生成交互HTML，合�
 2. 采用了哪套主色/语义 token 规则
 3. 页面总数和交互功能清单
 4. 是否存在仍需人工确认的布局或内容风险
-5. 高级感审查结论：阻塞项是否全部通过、`[UI-WARN]` 列表
+5. 高级感审查结论（汇总自 `robot-aiot-interactive-html-author` 审查）：阻塞项是否全部通过、`[UI-WARN]` 列表

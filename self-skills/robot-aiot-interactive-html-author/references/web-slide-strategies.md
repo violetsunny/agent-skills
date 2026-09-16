@@ -2,7 +2,7 @@
 
 ## 定位
 
-为交互式 Web 演示提供页面布局模式和文案组织框架，补充 `phase2-pagination.md` 的分页策略。
+为交互式 Web 演示提供页面布局模式和文案组织框架，补充 `robot-aiot-web-presentation-workflow` 的 `phase2-pagination.md` 分页策略。
 
 ## 25种布局模式
 
