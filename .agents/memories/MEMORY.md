@@ -3,3 +3,5 @@
 ## 工作方式反馈
 
 - 吸收外部 skill 能力时，必须把规则内化到自身 references/ 文件中，禁止在 SKILL.md 或 references 中保留外部 skill 名称作为条件判断、可选依赖或导航索引。能力融合=写进自己的规则，不是做引用入口。
+- SKILL.md 禁止写"从X拆分而来/融合而成"等历史来历，只描述当前能力与边界；用户认为来历叙述对独立部署的 SKILL 是废话。
+- archify/diagram-design/ui-ux-pro-max 是用户运行时必部署的必需 skill；自写 skill 依赖表须标必需并检查齐备，禁止写"可选/缺失时降级用内置"。
