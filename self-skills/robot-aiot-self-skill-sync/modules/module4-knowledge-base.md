@@ -24,7 +24,11 @@
 # 全量同步，不加 --delete，保留知识库中独有的 skill；排除自写 skill 和 _mideameta.json
 # -t 保留 mtime、-u 跳过知识库中更新的文件（文件新旧比对规则，见 shared.md）
 self_skills_dir="/Users/kangll13/aiot/java-code/self/gggggggood/agent-skills/self-skills"
-excludes=(--exclude '_mideameta.json')
+# 统一排除项（shared.md：同步 skill 目录必须排除版本控制/依赖/缓存/发布元数据）
+excludes=(--exclude '.git/' --exclude '.gitignore' --exclude '.gitmodules' \
+  --exclude '.DS_Store' --exclude '__pycache__/' --exclude '*.pyc' \
+  --exclude '.idea/' --exclude '.vscode/' --exclude 'node_modules/' \
+  --exclude '_mideameta.json')
 for d in "$self_skills_dir"/*/; do
   [ -d "$d" ] || continue
   excludes+=(--exclude "/$(basename "$d")")
@@ -49,12 +53,13 @@ rsync -rtu "${excludes[@]}" ~/.agents/skills/ /Users/kangll13/aiot/java-code/sel
 
 执行规则：
 
-- **排除 npx 管理型项目**：superpowers / matt-skills / ui-ux-pro-max-skill / claude-code-java / baoyu-skills / ppt-master / anthropics-skills / ECC / ponytail / archify / diagram-design / humanizer / humanizer-zh / andrej-karpathy-skills / vercel-skills 这 15 个项目的 skill 由模块 3.1 通过 `npx skills@latest update` 安装到 `~/.agents/skills/` 后，经步骤 4.1 全量 rsync 同步到知识库，4.1A 不再处理，避免其 git 源结构被误判。其中 humanizer / humanizer-zh 当前无 `self/skills/` 本地克隆，4.1A 天然扫不到；将来若补克隆，必须把对应目录名加入下方排除清单
+- **排除 npx 管理型项目**：superpowers / matt-skills / ui-ux-pro-max-skill / claude-code-java / baoyu-skills / ppt-master / anthropics-skills / ECC / ponytail / archify / diagram-design / humanizer / humanizer-zh / andrej-karpathy-skills / vercel-agent-skills 这 15 个项目的 skill 由模块 3.1 通过 `npx skills@latest update` 安装到 `~/.agents/skills/` 后，经步骤 4.1 全量 rsync 同步到知识库，4.1A 不再处理，避免其 git 源结构被误判。其中 humanizer / humanizer-zh 当前无 `self/skills/` 本地克隆，4.1A 天然扫不到；将来若补克隆，必须把对应目录名加入下方排除清单
 - **gstack 特例必须最先判断**：gstack 根目录同时存在 `SKILL.md`（路由入口）和 `.agents/skills/`（54 个实际子技能），必须走 `.agents/skills/` 分支逐个同步子技能，**禁止按单 skill 项目整目录同步**（会把 1G+ 的项目本体和 `node_modules/` 带入知识库）
 - 若 `self/skills/<project>/SKILL.md` 存在，则按单 skill 项目处理，同步到 `agent-skills/skills/<project>/`
 - 若 `self/skills/<project>/skills/` 存在，则遍历其下每个子目录，分别同步到 `agent-skills/skills/<skill_name>/`
 - 若 `self/skills/<project>/.claude/skills/` 存在，则遍历其下每个子目录，分别同步到 `agent-skills/skills/<skill_name>/`
 - 若 `self/skills/<project>/.agents/skills/` 存在（如 gstack），则遍历其下每个子目录，分别同步到 `agent-skills/skills/<skill_name>/`
+- **后三种多技能结构可在同一项目内并存**（OpenSpec = `skills/` + `.agents/skills/`，hyperframes = 三者并存），此时必须全部遍历同步，禁止命中一个结构后跳过其余结构；同一 `skill_name` 出现在多个结构时标记 `[DUPLICATE-SKILL]`，报告冲突路径清单并跳过，禁止自动挑选其一覆盖
 - 同步到当前项目时仍然**不加 `--delete`**，只覆盖已有文件与新增文件；统一使用 `rsync -rtu` 并在覆盖前执行 `modules/shared.md` 的“文件新旧比对规则”，目标端更新的文件标记 `[NEWER-TARGET]` 跳过
 - 同步 skill 根目录时，**必须排除** `.git/`、`.gitignore`、`.gitmodules`、`.DS_Store`、`__pycache__/`、`*.pyc`、`.idea/`、`.vscode/`、`node_modules/`、`_mideameta.json` 等与 skill 运行/文档无关的版本控制、依赖、发布元数据或本地缓存文件，不要把这些内容带入知识库
 - 只同步当前项目里已经存在或明确需要保留的 skill 目录；不要删除知识库中的额外 skill
@@ -96,6 +101,13 @@ find "$project" \
 4.1A 默认结构分支示意：
 
 ```bash
+kb_skills="/Users/kangll13/aiot/java-code/self/gggggggood/agent-skills/skills"
+# 统一排除项（shared.md：同步 skill 目录必须排除版本控制/依赖/缓存/发布元数据）
+sync_excludes=(--exclude '.git/' --exclude '.gitignore' --exclude '.gitmodules' \
+  --exclude '.DS_Store' --exclude '__pycache__/' --exclude '*.pyc' \
+  --exclude '.idea/' --exclude '.vscode/' --exclude 'node_modules/' \
+  --exclude '_mideameta.json')
+
 for project in /Users/kangll13/aiot/java-code/self/skills/*; do
   [ -d "$project" ] || continue
   project_name=$(basename "$project")
@@ -110,43 +122,50 @@ for project in /Users/kangll13/aiot/java-code/self/skills/*; do
   if [ "$project_name" = "gstack" ] && [ -d "$project/.agents/skills" ]; then
     for skill_dir in "$project"/.agents/skills/*; do
       [ -d "$skill_dir" ] || continue
-      rsync -rtu --exclude '.git/' --exclude '.DS_Store' --exclude 'node_modules/' \
-        "$skill_dir/" "/Users/kangll13/aiot/java-code/self/gggggggood/agent-skills/skills/$(basename "$skill_dir")/"
+      rsync -rtu "${sync_excludes[@]}" "$skill_dir/" "$kb_skills/$(basename "$skill_dir")/"
     done
     continue
   fi
 
+  # 单 skill 项目：根 SKILL.md 即技能本体，整目录同步；
+  # 其下 skills/ 的嵌套同名副本（如 fireworks-tech-graph）不再单独展开，避免 [DUPLICATE-SKILL]
   if [ -f "$project/SKILL.md" ]; then
-    rsync -rtu --exclude '.git/' --exclude '.DS_Store' --exclude 'node_modules/' \
-      "$project/" "/Users/kangll13/aiot/java-code/self/gggggggood/agent-skills/skills/$project_name/"
+    rsync -rtu "${sync_excludes[@]}" "$project/" "$kb_skills/$project_name/"
     continue
   fi
 
-  if [ -d "$project/skills" ]; then
-    for skill_dir in "$project"/skills/*; do
-      [ -d "$skill_dir" ] || continue
-      rsync -rtu "$skill_dir/" "/Users/kangll13/aiot/java-code/self/gggggggood/agent-skills/skills/$(basename "$skill_dir")/"
+  # 多技能结构：skills/、.claude/skills/、.agents/skills/ 可以并存
+  # （OpenSpec = skills/ + .agents/skills，hyperframes = 三者并存），
+  # 必须逐一检查并全部同步，禁止命中一个结构后跳过其余结构
+  candidates=$(
+    for struct in skills .claude/skills .agents/skills; do
+      [ -d "$project/$struct" ] || continue
+      for skill_dir in "$project/$struct"/*; do
+        [ -d "$skill_dir" ] || continue
+        printf '%s|%s\n' "$struct" "$(basename "$skill_dir")"
+      done
     done
-    continue
-  fi
+  )
+  [ -n "$candidates" ] || continue
 
-  # 第三种结构：项目内 .claude/skills/
-  if [ -d "$project/.claude/skills" ]; then
-    for skill_dir in "$project"/.claude/skills/*; do
-      [ -d "$skill_dir" ] || continue
-      rsync -rtu "$skill_dir/" "/Users/kangll13/aiot/java-code/self/gggggggood/agent-skills/skills/$(basename "$skill_dir")/"
-    done
-    continue
-  fi
-
-  # 第四种结构：项目内 .agents/skills/（如 gstack）
-  if [ -d "$project/.agents/skills" ]; then
-    for skill_dir in "$project"/.agents/skills/*; do
-      [ -d "$skill_dir" ] || continue
-      rsync -rtu "$skill_dir/" "/Users/kangll13/aiot/java-code/self/gggggggood/agent-skills/skills/$(basename "$skill_dir")/"
-    done
-    continue
-  fi
+  # 同名冲突：同一项目内多个 SKILL.md 映射到同一 skill_name → [DUPLICATE-SKILL]，
+  # 报告冲突路径清单并跳过，禁止自动挑选其一覆盖；唯一时才同步
+  handled=" "
+  while IFS= read -r line; do
+    name=${line#*|}
+    case "$handled" in *" $name "*) continue ;; esac
+    handled="$handled$name "
+    hits=$(printf '%s\n' "$candidates" | awk -F'|' -v n="$name" '$2==n' | wc -l | tr -d ' ')
+    if [ "$hits" -gt 1 ]; then
+      echo "[DUPLICATE-SKILL] $project_name/$name 映射到 $hits 个 SKILL.md，跳过同步:"
+      printf '%s\n' "$candidates" | awk -F'|' -v n="$name" -v p="$project" '$2==n{print "  - " p "/" $1 "/" n "/SKILL.md"}'
+      continue
+    fi
+    struct=${line%%|*}
+    rsync -rtu "${sync_excludes[@]}" "$project/$struct/$name/" "$kb_skills/$name/"
+  done <<EOF
+$candidates
+EOF
 done
 ```
 

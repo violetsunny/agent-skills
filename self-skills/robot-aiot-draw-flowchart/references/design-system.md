@@ -1,6 +1,6 @@
 # Design System（diagram-design 核心规范承载）
 
-本文件是融合自 diagram-design 的设计系统权威细节，承载 SVG/HTML 直绘路径（路径 B）的哲学、反模式、视觉 token、SVG 基元、布局预算与交付门禁。`references/` 中出现的 `design-system.md §N` 引用指向本文件对应章节。图表类型选择表在 SKILL.md「图表类型选择」，语义模式见 `semantic-patterns.md`。
+本文件是设计系统权威细节（编辑级规则与运行时依赖 diagram-design 协作，见 SKILL.md），承载 SVG/HTML 直绘路径（路径 B）的哲学、反模式、视觉 token、SVG 基元、布局预算与交付门禁。`references/` 中出现的 `design-system.md §N` 引用指向本文件对应章节。图表类型选择表在 SKILL.md「图表类型选择」，语义模式见 `semantic-patterns.md`。
 
 ---
 

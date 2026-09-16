@@ -1,6 +1,6 @@
 ---
 name: robot-aiot-leadership-ppt-workflow
-version: 3.0.0
+version: 3.1.0
 description: >
   将项目数据和技术分析转化为结构化的领导汇报PPT，覆盖全链路五阶段工作流：
   数据池建立 → 技术明细版+领导汇报版文档分层 → 调用 robot-aiot-draw-flowchart 生成分层架构图/流程图XML并完成XML→HTML桥接与静态页面HTML化 → 调用 ppt-master 依据每页HTML样式生成最终PPTX文件。
@@ -133,6 +133,7 @@ Phase 5: PPT生成     → 调用 ppt-master，读取逐页 HTML/MD 生成最终
 3. 没有图表 HTML，不得进入 Phase 4
 4. 首页架构图确定全局主色基调，后续页面保持配色统一但允许版式多样
 5. 允许在 Phase 3.5 和 Phase 4 做轻量 Material 3 规范化，但只能整理 token、字体层级、间距和容器语义，不能改图表结构和数据语义
+6. 数据统计图表（饼图/箱线图/热力图/网络拓扑等）与 Mermaid 源导入重绘（含 pie/mindmap/timeline 等扩展类型）按 `robot-aiot-draw-flowchart` 的数据图表与导入规则路由；需要可编辑 `.excalidraw` 三件套产物时走其导出规则
 
 ---
 

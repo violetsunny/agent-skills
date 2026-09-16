@@ -1,4 +1,4 @@
-# PPT AI图像生成与封面设计（内化自 baoyu-image-gen + banner-design）
+# PPT AI图像生成与封面设计
 
 ## 定位
 

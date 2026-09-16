@@ -1,4 +1,4 @@
-# 自包含 HTML 构建规则（内化自 web-artifacts-builder，适配纯原生）
+# 自包含 HTML 构建规则（纯原生）
 
 ## 定位
 

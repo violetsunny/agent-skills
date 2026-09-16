@@ -557,3 +557,113 @@ chmod 000 "$src/proj/sub"
 rsync -rtu "$src/proj/" "$target/proj/"; echo "rc=$?"   # rc=23
 chmod 755 "$src/proj/sub"   # restore before rm -rf, or cleanup fails
 ```
+
+## Pitfall 13: continue-chained dispatch branches silently drop multi-structure items
+
+### Symptom
+
+A structure-dispatch loop (`if branch1; then ...; continue; fi; if branch2; ...`) processes only the first matching branch. Items that match multiple branches lose the content unique to later branches. No error, no report — the loop moves on.
+
+### Root cause
+
+`continue` makes branches mutually exclusive. The code assumes one item matches at most one branch, but real directories can carry several structures at once (e.g. a project with both `skills/` and `.agents/skills/`).
+
+### Reproduction
+
+```bash
+# Sandbox: project "dual" has skills/a AND .agents/skills/b (real case: OpenSpec)
+mkdir -p dual/skills/a dual/.agents/skills/b
+echo A > dual/skills/a/SKILL.md; echo B > dual/.agents/skills/b/SKILL.md
+
+# Exclusive code (buggy):
+if [ -d dual/skills ]; then
+  for d in dual/skills/*; do rsync -rtu "$d/" "kb/$(basename "$d")/"; done
+  continue   # ← .agents/skills/b never reached
+fi
+if [ -d dual/.agents/skills ]; then ... fi
+
+ls kb/   # a only — b silently dropped
+```
+
+### Impact
+
+Confirmed on real data: OpenSpec's `.agents/skills/` holds 4 skills (draft-openspec-docs, release-openspec, verify-openspec-docs, write-openspec-docs) absent from both runtime and knowledge base — the `skills/` branch always won and `continue`d. hyperframes carries three structures (`skills/` + `.claude/skills/` + `.agents/skills/`); its 6 `.claude`/`.agents` skills were stale in the knowledge base for the same reason.
+
+### Fix
+
+Make non-exclusive structures additive: collect candidates from all structures, then dispatch. Same-name collisions across structures must be flagged (`[DUPLICATE-SKILL]`) with all conflicting paths listed, and skipped — never auto-pick one:
+
+```bash
+candidates=$(
+  for struct in skills .claude/skills .agents/skills; do
+    [ -d "$project/$struct" ] || continue
+    for skill_dir in "$project/$struct"/*; do
+      [ -d "$skill_dir" ] || continue
+      printf '%s|%s\n' "$struct" "$(basename "$skill_dir")"
+    done
+  done
+)
+# two-pass: count hits per name (awk exact match, no regex pitfalls);
+# hits>1 → report [DUPLICATE-SKILL] + skip; hits==1 → rsync
+```
+
+Keep `continue` only where exclusivity is intentional (e.g. root `SKILL.md` = single-skill project whose nested `skills/` is a same-name duplicate copy).
+
+### Review method
+
+Enumerate actual structure combinations before judging the loop:
+
+```bash
+for p in "$base"/*/; do
+  s=""; [ -f "$p/SKILL.md" ] && s="${s}ROOT "
+  [ -d "$p/skills" ] && s="${s}skills/ "
+  [ -d "$p/.claude/skills" ] && s="${s}.claude/ "
+  [ -d "$p/.agents/skills" ] && s="${s}.agents/"
+  [ -n "$s" ] && echo "$(basename "$p"): $s"
+done
+# Every multi-tag line is a candidate for silent drop — trace which branch wins.
+```
+
+## Pitfall 14: Prose list diverges from code list; exclusion rule applied to only some calls
+
+### Symptom
+
+Documentation prose names an item differently from the code block that implements the list (`vercel-skills` in prose vs `vercel-agent-skills` in `case`), or prose states a mandatory exclusion set while some rsync calls in the same document carry only part of it — or none.
+
+### Root cause
+
+Prose and code are edited at different times. Only one side gets updated, and reviewers read them separately. Neither side is checked against the filesystem.
+
+### Reproduction
+
+```bash
+# Prose says the exclude list contains "vercel-skills"; code says "vercel-agent-skills".
+# Filesystem decides who is right:
+ls /path/to/self/skills/ | grep -i vercel
+# vercel-agent-skills   ← code correct, prose wrong
+
+# Exclusion audit: prose mandates 10 excludes (.git/ .gitignore .gitmodules
+# .DS_Store __pycache__/ *.pyc .idea/ .vscode/ node_modules/ _mideameta.json).
+# Count what each rsync call actually carries:
+grep -n 'rsync' "$FILE" | while IFS= read -r l; do echo "$l"; done
+# branch A: 3 excludes; branch B/C/D: 0 excludes  ← rule violated in 4 of 5 calls
+```
+
+### Impact
+
+Junk (`__pycache__/`, `.gitignore`, `.idea/`) flows into the knowledge base through the under-excluded calls; a future clone named per the prose spelling would bypass the code's exclude list entirely.
+
+### Fix
+
+1. Verify every name in prose lists AND code lists against `ls` of the real directory.
+2. Define the exclusion set once as an array and reference it from every call:
+
+```bash
+sync_excludes=(--exclude '.git/' --exclude '.gitignore' --exclude '.gitmodules' \
+  --exclude '.DS_Store' --exclude '__pycache__/' --exclude '*.pyc' \
+  --exclude '.idea/' --exclude '.vscode/' --exclude 'node_modules/' \
+  --exclude '_mideameta.json')
+rsync -rtu "${sync_excludes[@]}" "$src/" "$dst/"
+```
+
+3. Prove exclusions work per branch with a sandbox that plants one junk file of each excluded type in every structure variant.

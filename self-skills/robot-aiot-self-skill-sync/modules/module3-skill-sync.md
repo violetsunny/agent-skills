@@ -32,7 +32,7 @@ OpenSpec 在 `~/.claude/skills/` 下生成的完整 skills 集合只走模块 2 
 | humanizer              | `blader/humanizer` | `npx skills@latest add blader/humanizer` |
 | humanizer-zh           | `op7418/Humanizer-zh` | `npx skills@latest add op7418/Humanizer-zh` |
 | **andrej-karpathy-skills** | `forrestchang/andrej-karpathy-skills` | `npx skills@latest add forrestchang/andrej-karpathy-skills` |
-| vercel-skills          | `vercel-labs/agent-skills` | `npx skills@latest add vercel-labs/agent-skills` |
+| vercel-agent-skills    | `vercel-labs/agent-skills` | `npx skills@latest add vercel-labs/agent-skills` |
 
 ### 更新流程
 
@@ -121,7 +121,7 @@ env -u XDG_STATE_HOME npx skills@latest add vercel-labs/agent-skills -y -g
 | andrej-karpathy-skills | `self/skills/andrej-karpathy-skills/` | `skills/`（单 skill：karpathy-guidelines；克隆 remote 为 `multica-ai/andrej-karpathy-skills`，与 lock 源 `forrestchang/...` 不一致，疑上游更名/迁移） |
 | humanizer | （无本地克隆） | —（兜底按规则 5 标 `[NPX-FALLBACK-MISS]`） |
 | humanizer-zh | （无本地克隆） | —（兜底按规则 5 标 `[NPX-FALLBACK-MISS]`） |
-| vercel-skills | `self/skills/vercel-agent-skills/` | `skills/`（直接子目录即为 skill 名） |
+| vercel-agent-skills | `self/skills/vercel-agent-skills/` | `skills/`（直接子目录即为 skill 名） |
 
 **兜底规则**（交集口径，自包含）：
 

@@ -1,4 +1,4 @@
-# 关键帧动画与动效接缝规则（内化自 hyperframes + motion-doctrine）
+# 关键帧动画与动效接缝规则
 
 ## 定位
 

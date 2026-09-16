@@ -105,3 +105,7 @@ letter-spacing: 0.02em for labels
   <!-- nodes, edges, legend -->
 </svg>
 ```
+
+## See Also
+
+[dark-svg-techniques.md](dark-svg-techniques.md) for dark-canvas techniques this skin does not cover: background grid, semi-transparent fill + opaque mask double-rect, z-order, contrast hard floors, the dark semantic rgba palette, per-type dark recipes (architecture / flowchart / sequence / mind map / structural), and the standalone `.svg` output spec.

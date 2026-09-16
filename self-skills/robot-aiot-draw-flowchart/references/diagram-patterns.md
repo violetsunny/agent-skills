@@ -1,6 +1,6 @@
 # Diagram Patterns（UML 覆盖与高频架构模式）
 
-融合自 fireworks-tech-graph 的模式速查：UML 14 图型映射 + 常见系统架构模式骨架。用于快速起稿；具体布局语法仍以对应 type reference 为准。
+模式速查：UML 14 图型映射 + 常见系统架构模式骨架。用于快速起稿；具体布局语法仍以对应 type reference 为准。
 
 ## UML Coverage Map
 

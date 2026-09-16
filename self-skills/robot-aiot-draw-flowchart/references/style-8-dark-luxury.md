@@ -183,3 +183,5 @@ Optional: subtle ambient radial glow around the central cluster
 
 **When to choose Style 8**: architecture/pipeline docs where you want editorial gravitas —
 README hero images, conference slides, knowledge-base diagrams, premium product docs.
+
+**See also**: [dark-svg-techniques.md](dark-svg-techniques.md) for dark-canvas techniques that apply across dark styles — background grid, semi-transparent fill + opaque mask double-rect, z-order, contrast hard floors, and per-type dark recipes.

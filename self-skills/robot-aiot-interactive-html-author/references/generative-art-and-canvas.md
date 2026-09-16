@@ -1,4 +1,4 @@
-# 生成艺术与数据可视化动效（内化自 algorithmic-art + canvas-design）
+# 生成艺术与数据可视化动效
 
 ## 定位
 

@@ -118,6 +118,9 @@ For each bash code block:
 - [ ] Exit code checked before reporting success (`rc≠0` → `[FAIL]` with output)
 - [ ] Parallelism capped at 4 for `xargs -P`
 - [ ] Success判断 based on output content, not exit code
+- [ ] `continue`-chained dispatch branches tested against real multi-match items (mutual exclusivity silently drops content)
+- [ ] Prose name lists match code blocks, and both match actual filesystem names
+- [ ] Prose-stated exclusion rules applied to **every** rsync/copy call, not just some branches
 
 ## Key Rules
 
@@ -138,6 +141,10 @@ For each bash code block:
 8. **Silent skips must be surfaced.** `rsync -u` produces no output for skipped files. Detect them with a two-pass dry run (`-rtn -i` minus `-rtun -i`, without `--ignore-times`) and report the count.
 
 9. **Verify maxdepth empirically.** Don't assume depth — count at increasing depths until stable.
+
+10. **`continue`-chained branches are mutually exclusive — verify multi-match items.** An item matching several `if ... continue` branches only gets the first branch's handling; content unique to later branches is silently dropped. Enumerate real-world structure combinations and check what each branch actually reaches.
+
+11. **Prose and code must agree with the filesystem.** A name list in prose can diverge from the same list in code (`vercel-skills` vs `vercel-agent-skills`), and a prose exclusion rule can be applied to only some rsync calls. Diff prose lists against code lists, and verify both against `ls`; check every rsync/copy call carries the full stated exclusion set.
 
 ## Pitfalls Reference
 

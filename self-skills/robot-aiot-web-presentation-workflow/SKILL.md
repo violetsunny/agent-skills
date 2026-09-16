@@ -1,6 +1,6 @@
 ---
 name: robot-aiot-web-presentation-workflow
-version: 2.0.0
+version: 2.2.0
 description: >
   交互式Web演示页面制作工作流。根据知识文档生成分页汇报母稿，按需制作架构图/流程图，
   逐页交互HTML（可翻页、带动画、数据动效，纯原生零依赖双击即用）委派 robot-aiot-interactive-html-author 编写。
@@ -60,15 +60,26 @@ Markdown 知识文档，至少包含：
 
 ## 输出目录约定
 
-所有输出产物统一放在当前运行项目的 `doc-web/` 目录下。
+默认放在当前运行项目的 `doc-web/` 目录下；**用户可指定其他输出目录**（如项目已有演示资产目录），指定后所有产物路径随之替换，Phase 1 必须确认并记录。
 
 ```
 doc-web/
-├── assets/                     — 品牌静态资源（Logo 等）
+├── assets/                     — 品牌静态资源（Logo、素材截图等）
 │   └── midea-logo.png          — 美的品牌 Logo
-├── <chart-name>.html           — 图表 HTML（Phase 3，robot-aiot-arch-diagram 产出）
+├── <chart-name>.svg            — 图表 SVG（Phase 3，供 Phase 4 内嵌）
+├── <chart-name>.html           — 图表 HTML（Phase 3，可独立预览）
 ├── <project>_演示母稿.md        — 母稿（Phase 2）
-└── <project>-presentation.html — 最终交互演示文件（Phase 4，单文件多页）
+└── <project>-presentation.html — 最终交互演示文件（Phase 4，单文件多页，默认形态）
+```
+
+多页形态（用户指定时，覆盖单文件 deck 的文件形态）：
+
+```
+doc-web/
+├── INDEX.html                  — 总纲页，承载全场导航
+└── pages/
+    ├── p01-<slug>.html         — 每页独立 HTML，带"上一页/下一页"跳转控件
+    └── ...                     — 末页可返回 INDEX
 ```
 
 ---
@@ -79,7 +90,7 @@ doc-web/
 Phase 1: 内容分析     → 读取知识文档，明确汇报对象和要求
 Phase 2: 母稿分页     → 按内容结构分页，每页定义四要素和图表需求
 Phase 3: 图表生成     → 调用 robot-aiot-arch-diagram 生成 SVG/HTML 图表
-Phase 4: 交互HTML    → 委派 robot-aiot-interactive-html-author 逐页编写并合并单文件
+Phase 4: 交互HTML    → 委派 robot-aiot-interactive-html-author 逐页编写，合并单文件（默认）/ 产出 INDEX+pages（多页形态）
 ```
 
 每个阶段产出是下一阶段的输入，逐级收敛。
@@ -97,8 +108,10 @@ Phase 4: 交互HTML    → 委派 robot-aiot-interactive-html-author 逐页编�
 2. 明确汇报对象（领导/技术团队/客户）和场景（内部汇报/外部展示/培训）
 3. 识别核心结论和数据支撑点
 4. 标记需要图表辅助说明的内容
+5. 与用户确认结构形态：单文件 deck（默认）/ 多页形态（INDEX 总纲 + 每页上一页下一页导航）；确认输出目录与页面规模
+6. 盘点输出目录既有资产：素材截图、品牌 Logo、既有页面配色 token、旧图表/旧页面（旧产物默认只作内容参考，不直接复用；与新结构冲突时请用户确认归档或覆盖）
 
-产物：内容分析报告，包含汇报定位、核心信息清单、图表需求列表。
+产物：内容分析报告，包含汇报定位（含结构形态）、核心信息清单、图表需求列表、素材图清单。
 
 阻塞条件：内容分析未完成不得进入 Phase 2。
 
@@ -111,10 +124,12 @@ Phase 4: 交互HTML    → 委派 robot-aiot-interactive-html-author 逐页编�
 入口约束：
 1. 基于 Phase 1 分析报告进行分页
 2. 每页必须定义四要素：标题、结论、上屏内容、话术
-3. 每页标记是否需要图表及图表类型（架构图/流程图/数据图/无）
-4. 页面总数控制在 5-15 页，超出需拆分或合并
+3. 每页标记是否需要图表及图表类型（架构图/流程图/数据图/拓扑图/映射图/泳道图/循环图/生命周期图/脑图/分流汇聚图/对比图/层级图/时序图/无 等，开放枚举），并标注配套素材图（图表与素材图并举）
+4. 页面总数默认 5-15 页；用户明确要求扩充时可突破上限，须做节奏校验并在母稿记录扩充理由
+5. 上屏内容必须从源文档持续提炼填满（概念与示例成对出现），不得只写标题级骨架
+6. 章节/阶段之间的过渡论证独立成页（为什么从上一章进入下一章），主体章节页数占比与其分量匹配
 
-产物：`doc-web/<project>_演示母稿.md`，结构化分页文档。
+产物：`doc-web/<project>_演示母稿.md`，结构化分页文档（含图表需求总表与素材图映射表）。
 
 阻塞条件：母稿未完成不得进入 Phase 3。
 
@@ -127,10 +142,13 @@ Phase 4: 交互HTML    → 委派 robot-aiot-interactive-html-author 逐页编�
 入口约束：
 1. 仅生成母稿中标记需要图表的页面
 2. 调用 `robot-aiot-arch-diagram` 生成 SVG/HTML 格式图表
-3. 首页架构图确定全局主色基调，后续页面保持配色统一
-4. 图表产出直接为 HTML，无需 XML→HTML 桥接
+3. **默认全部新绘，不复用历史图表产物**（其他工作流目录的旧图表仅作内容参考）；确需复用必须用户明确同意
+4. 首页架构图确定全局主色基调，后续页面保持配色统一；输出目录已有既有页面/品牌色时，直接沿用其配色 token 锁定主色，无需等首页产出
+5. 图表产出直接为 HTML，无需 XML→HTML 桥接
+6. 数据统计图表（饼图/箱线图/热力图/网络拓扑等）按 `robot-aiot-arch-diagram` 的数据图表规则路由；页面需要嵌入 Mermaid/PlantUML 源码图时，Phase 4 由 `robot-aiot-interactive-html-author` 构建期渲染嵌入
+7. 图表数量多（>6 张）时：先锁定全局风格 token（皮肤/主色/箭头语义/viewBox/网格/数据标注纪律），再分批派发并行 sub agent 生成，避免风格漂移
 
-产物：`doc-web/<chart-name>.html`，每个图表一个文件。
+产物：`doc-web/<chart-name>.svg`（供 Phase 4 内嵌）+ `doc-web/<chart-name>.html`（独立预览），每个图表两个文件。
 
 阻塞条件：母稿中需要的图表未全部生成不得进入 Phase 4。
 
@@ -141,10 +159,10 @@ Phase 4: 交互HTML    → 委派 robot-aiot-interactive-html-author 逐页编�
 编写能力委派给 `robot-aiot-interactive-html-author`：加载该 skill 并按其编写契约与审查流程执行；本阶段只提供输入与验收。
 
 入口约束：
-1. 向编写 skill 传递页面四要素、图表 HTML 与主色基调
-2. 编写 skill 产出单文件多页 deck：`doc-web/<project>-presentation.html`
+1. 向编写 skill 传递页面四要素、图表 SVG/HTML、素材图映射与主色基调
+2. 默认形态：编写 skill 产出单文件多页 deck `doc-web/<project>-presentation.html`；多页形态（Phase 1 确认）：产出 `INDEX.html` 总纲 + `pages/` 逐页 HTML，每页必须有"上一页/下一页"跳转控件，末页可返回 INDEX
 3. 验收自检（编排侧抽查）：
-   - 翻页键位全可用、`prefers-reduced-motion` 降级即时切换
+   - 翻页键位全可用（多页形态为导航链接全可用）、`prefers-reduced-motion` 降级即时切换
    - 零外部请求、固定 1920x1080、单页 DOM ≤ 500
    - 母稿四要素与图表数据语义无缺页、无篡改
 
@@ -161,7 +179,7 @@ Phase 4: 交互HTML    → 委派 robot-aiot-interactive-html-author 逐页编�
 
 ## 硬约束（交付契约）
 
-1. 最终交付物为单个 HTML 文件，双击即可在浏览器完整运行，纯原生零依赖（禁 CDN/npm/外部字体）
+1. 默认交付物为单个 HTML 文件，双击即可在浏览器完整运行，纯原生零依赖（禁 CDN/npm/外部字体）；用户指定多页形态时，"单文件"被覆盖为 INDEX + pages/ 多文件，其余约束（零依赖、双击即用）不变
 2. 固定 `1920x1080` 画布，不使用响应式断点
 3. 尊重 `prefers-reduced-motion`，检测到时降级为即时切换
 4. 不伪造精确数字；占位数据必须显式标注"示意"
@@ -182,7 +200,7 @@ Phase 4: 交互HTML    → 委派 robot-aiot-interactive-html-author 逐页编�
 
 输出给用户时，优先报告：
 
-1. 生成了哪些文件（母稿、图表、最终演示 HTML）
+1. 生成了哪些文件（母稿、图表、最终演示 HTML；多页形态时报告 INDEX.html + pages/ 页面清单）
 2. 采用了哪套主色/语义 token 规则
 3. 页面总数和交互功能清单
 4. 是否存在仍需人工确认的布局或内容风险

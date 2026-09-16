@@ -35,8 +35,8 @@ Install Puppeteer outside the user's project and run the bundled converter:
 
 ```bash
 SKILL_ROOT="${CLAUDE_SKILL_DIR:-/absolute/path/from-codex-skill-metadata}"
-npm install --prefix /tmp/fireworks-tech-graph-puppeteer puppeteer
-NODE_PATH=/tmp/fireworks-tech-graph-puppeteer/node_modules node "$SKILL_ROOT/scripts/svg2png.js" ./output
+npm install --prefix /tmp/svg2png-puppeteer puppeteer
+NODE_PATH=/tmp/svg2png-puppeteer/node_modules node "$SKILL_ROOT/scripts/svg2png.js" ./output
 ```
 
 ## Known Limits

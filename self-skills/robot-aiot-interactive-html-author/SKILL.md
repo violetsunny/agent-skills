@@ -1,10 +1,11 @@
 ---
 name: robot-aiot-interactive-html-author
-version: 1.0.0
+version: 1.1.0
 description: >
   交互式动画特效 HTML 编写能力。纯原生零依赖产出浏览器可直接运行的交互页面/多页 deck：
   翻页系统（键盘+点击+View Transition）、元素入场（data-enter-order）、数据动效（数字滚动/
   进度条填充/图表逐步绘制）、交互图表（hover/tooltip/展开）、关键帧动画与动效接缝、
+  Mermaid/PlantUML 图表构建期渲染嵌入（headless Chrome→PNG/SVG，失败降级不静默丢图）、
   自包含单文件构建、高级感设计与交付前审查。
   当用户要求"写交互动画页""给 HTML 加翻页/动画/动效""交互图表动效""单文件交互演示页"，
   或 robot-aiot-web-presentation-workflow 委派 Phase 4 编写时触发。
@@ -22,7 +23,7 @@ description: >
 ## 输入
 
 1. 页面内容：四要素（标题、结论、上屏内容、话术）或母稿片段
-2. 图表 HTML/SVG（可选，由 robot-aiot-arch-diagram 产出；内联其 SVG，不改节点坐标与数据语义）
+2. 图表 HTML/SVG（可选，由 robot-aiot-arch-diagram 产出；内联其 SVG，不改节点坐标与数据语义）；Mermaid/PlantUML 源码输入时按 `references/diagram-embed-rendering.md` 构建期渲染为 PNG/SVG 后嵌入
 3. 主色基调（可选；缺省时按 `references/design-system-standards.md` 派生）
 
 ## 输出
@@ -72,6 +73,7 @@ description: >
 9. 内容 AI 图像生成与信息图（21 种信息图布局、社交图片样式）：`references/content-imagery-and-infographic.md`
 10. 生成艺术与数据可视化动效（p5.js/Canvas API、种子随机性）：`references/generative-art-and-canvas.md`
 11. Web 演示布局策略与文案公式（25 种布局、叙事策略）：`references/web-slide-strategies.md`
+12. Mermaid/PlantUML 图表构建期渲染嵌入（headless Chrome 流程、嵌入策略、失败降级）：`references/diagram-embed-rendering.md`
 
 运行时可选协作：
 

@@ -1,4 +1,4 @@
-# 内容AI图像生成与信息图（内化自 baoyu-article-illustrator + baoyu-infographic + baoyu-xhs-images）
+# 内容AI图像生成与信息图
 
 ## 定位
 

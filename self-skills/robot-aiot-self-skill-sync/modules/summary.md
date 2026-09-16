@@ -79,7 +79,7 @@
 | humanizer | `[NPX-AUTO]` / `[NPX-FALLBACK]` / `[NPX-FALLBACK-MISS]` / `[NPX-FAILED]` |
 | humanizer-zh | `[NPX-AUTO]` / `[NPX-FALLBACK]` / `[NPX-FALLBACK-MISS]` / `[NPX-FAILED]` |
 | andrej-karpathy-skills | `[NPX-AUTO]` / `[NPX-FALLBACK]` / `[NPX-FALLBACK-MISS]` / `[NPX-FAILED]` |
-| vercel-skills | `[NPX-AUTO]` / `[NPX-FALLBACK]` / `[NPX-FALLBACK-MISS]` / `[NPX-FAILED]` |
+| vercel-agent-skills | `[NPX-AUTO]` / `[NPX-FALLBACK]` / `[NPX-FALLBACK-MISS]` / `[NPX-FAILED]` |
 
 更新成功标记 `[NPX-AUTO]` 并报告更新的 skill 数量；失败的 skill 走 rsync 兜底，兜底成功标记 `[NPX-FALLBACK]`，无本地克隆标记 `[NPX-FALLBACK-MISS]`（提示用户手动 clone），兜底也失败标记 `[NPX-FAILED]`。这些项目不参与常规 rsync 同步/新增统计。
 

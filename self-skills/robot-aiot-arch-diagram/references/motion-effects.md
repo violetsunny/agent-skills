@@ -300,8 +300,8 @@ SVG-to-GIF export needs Node.js 18+, FFmpeg/FFprobe, Chrome/Chromium, and either
 ```bash
 brew install ffmpeg
 for SKILL_ROOT in \
-  "$HOME/.agents/skills/fireworks-tech-graph" \
-  "$HOME/.claude/skills/fireworks-tech-graph"
+  "$HOME/.agents/skills/robot-aiot-arch-diagram" \
+  "$HOME/.agents/skills/robot-aiot-draw-flowchart"
 do
   [ -d "$SKILL_ROOT" ] || continue
   npm install --prefix "$SKILL_ROOT" --ignore-scripts --no-save --package-lock=false puppeteer-core@25.3.0
@@ -320,7 +320,7 @@ isolated CI runners.
 
 ## Quality contract
 
-- Require a fireworks-tech-graph SVG with `viewBox`, valid semantic metadata, and
+- Require a source SVG with `viewBox`, valid semantic metadata, and
   explicit motion role, stage, and order on every reviewed edge.
 - Sanitize SVG and block scripts, event handlers, external references, active CSS,
   and browser network requests.
