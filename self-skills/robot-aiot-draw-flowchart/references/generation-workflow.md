@@ -38,12 +38,12 @@
 
 独立使用时：
 
-1. 写入 `doc-ppt/*.xml`
+1. 写入 `doc-ppt/flow/*.xml`
 2. 返回本地文件路径和重命名方式（`.xml` → `.drawio`）
 
 被 `robot-aiot-leadership-ppt-workflow` 调用时：
 
-1. 只返回本地 `doc-ppt/*.xml` 文件路径
+1. 只返回本地 `doc-ppt/flow/*.xml` 文件路径
 
 ## 布局叙事四原则
 

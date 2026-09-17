@@ -307,6 +307,8 @@ Quick check: if a coordinate ends in 1, 2, 3, 5, 6, 7, 9 — fix it.
 
 If you exceed, split into two diagrams (overview + detail).
 
+分层架构图例外：层容器内的能力卡不计入通用节点预算（节点总数不受 ≤9 限制）；箭头预算同样豁免——按连通分量分组计预算，每个独立连通分量（如一个独立垂直栈/烟囱，各含自身层间箭头）内箭头仍受 ≤12 约束，多个互不相连的分量的箭头总数不受单图 12 条上限判定。
+
 ### Page layout
 
 1. **Header** — eyebrow (Geist Mono), title (Instrument Serif), optional subtitle (Geist muted).

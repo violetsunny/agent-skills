@@ -23,6 +23,7 @@ SHAPE_MAP = {
     "ellipse": "border-radius: 50%;",
     "rhombus": "transform: rotate(45deg);",
     "cylinder": "border-radius: 50% / 10%;",
+    "cylinder3": "border-radius: 50% / 10%;",
     "hexagon": "clip-path: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%);",
     "triangle": "clip-path: polygon(50% 0%, 0% 100%, 100% 100%);",
 }
@@ -178,6 +179,19 @@ def map_style_to_css(
             except ValueError:
                 warn(f"Invalid float for {coord_key}={style_dict[coord_key]}, skipped")
 
+    # 安全忽略键：draw.io 模板强制或常见、但对 CSS 渲染无语义影响的键。
+    # html=1 富文本语义已由 Vertex.to_html 原样渲染实现；whiteSpace=wrap 是 HTML div 默认行为；
+    # arcSize 是 rounded 圆角的百分比微调（rounded 已映射固定圆角）；spacing* 是内边距微调。
+    # 这些键不 WARN、不计入 unmapped 报告，避免每次转换产生必然噪音。
+    safe_ignore_keys = {
+        "html",
+        "whiteSpace",
+        "arcSize",
+        "spacingLeft",
+        "spacingRight",
+        "spacingTop",
+        "spacingBottom",
+    }
     # warn on unmapped attributes
     mapped_keys = {
         "shape",
@@ -203,6 +217,8 @@ def map_style_to_css(
         *SHAPE_MAP.keys(),
     }
     for k, v in style_dict.items():
+        if k in safe_ignore_keys:
+            continue
         if k not in mapped_keys:
             warn(f"Unmapped style attribute: {k}={v}, skipped")
             unmapped_list.append(f"{k}={v}")
@@ -300,9 +316,10 @@ class Vertex:
         self.abs_y = y
 
     def to_html(self) -> str:
-        # draw.io html=1 语义：value 本身是 HTML（<b>/<br>/<font> 等），须原样渲染；
-        # 仅转义引号（与历史输出一致）。整体 escape 会把标签变成明文，破坏展示。
-        text = self.value.replace('"', "&quot;") if self.value else ""
+        # draw.io html=1 语义：value 本身是 HTML（<b>/<br>/<font> 等），须完全原样渲染。
+        # 禁止任何转义：整体 escape 会把标签变明文；仅转义引号也会破坏内联样式
+        # （style=&quot;…&quot; 被浏览器解码为带引号的属性值，CSS 解析失效）。
+        text = self.value if self.value else ""
         # 内容包一层块级 div：flex 容器会把 <b>/<font> 等内联子元素提升为并排 flex item
         # 且忽略 <br>，破坏富文本行结构；单块级子项可保留正常块级排版。
         inner = f'<div style="width:100%;">{text}</div>' if text else ""
@@ -698,7 +715,7 @@ def verify_fidelity(
     for vid, vtx in vertices.items():
         if not vtx.value:
             continue
-        expected_text = vtx.value.replace('"', "&quot;")
+        expected_text = vtx.value
         if expected_text not in html_content:
             text_missing.append(f"  vertex {vid}: expected '{vtx.value}'")
     if text_missing:

@@ -86,6 +86,8 @@ A self-contained palette for the terminal-window primitive (see [primitive-termi
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500;600&family=Noto+Sans+KR:wght@400;500;600&family=Noto+Serif+KR:wght@400&display=swap" rel="stylesheet">
 ```
 
+**场景裁决**：`assets/` 模板默认零外链、内置系统字体栈。上方 link 仅联网发布场景手动加入；零外部请求交付物（离线演示、robot-aiot 工作流产物）禁止外链，SVG 内品牌字体名自动回退系统字体。裁决细则见 [design-system.md §5](design-system.md)。
+
 ### Korean labels
 
 Geist and Instrument Serif carry no Hangul. A Korean `<text>` element extends its own family — never swap the skin:
@@ -94,7 +96,7 @@ Geist and Instrument Serif carry no Hangul. A Korean `<text>` element extends it
 <text font-family="'Geist', 'Noto Sans KR', 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif">결제 서비스</text>
 ```
 
-Both Noto faces ship in the font link above, so the web font resolves before any locally installed one and the same file renders identically on macOS, Windows, and a reviewer's browser. The local families follow it for offline viewing. Page titles need the serif equivalent — `'Instrument Serif', 'Noto Serif KR', serif` — or a mixed Latin/Korean title resolves Hangul through the platform's generic serif and the two halves disagree. Google's `css2` endpoint slices Korean by unicode-range, so a diagram with a handful of Korean labels downloads only the slices it touches. The four templates carry both faces because a new diagram may contain Hangul; the shipped Latin-only examples keep the shorter link, since a file with no Hangul has nothing to resolve.
+Both Noto faces ship in the font link above, so in online-publishing scenarios the web font resolves before any locally installed one and the same file renders identically on macOS, Windows, and a reviewer's browser. The local families follow it for offline viewing. Page titles need the serif equivalent — `'Instrument Serif', 'Noto Serif KR', serif` — or a mixed Latin/Korean title resolves Hangul through the platform's generic serif and the two halves disagree. Google's `css2` endpoint slices Korean by unicode-range, so a diagram with a handful of Korean labels downloads only the slices it touches. Templates ship zero-external (system stack); when adding the link manually for an online diagram that may contain Hangul, carry both Noto faces — a Latin-only diagram may keep the shorter link, since a file with no Hangul has nothing to resolve. In zero-external deliverables, Hangul resolves through platform local fonts (`'Apple SD Gothic Neo'`/`'Malgun Gothic'` in the family list cover macOS/Windows).
 
 **Width budget.** Measure per character, not per script: **every Unicode wide or full-width character costs 1em, every other character costs its face's Latin advance** (0.60em sans, 0.62em mono), and nonspacing/enclosing marks cost nothing. Sum over the string and multiply by the font size for the text width, then add padding and round the box up to the next multiple of 4. `verify-treemap.py` enforces exactly this text width for treemap cell labels; the padding and rounding are authoring convention, and no other type carries an automatic check, so on those the budget is yours to hold.
 

@@ -44,3 +44,7 @@ target/
 ### Python cache
 **/__pycache__/
 *.pyc
+
+# module5 mtime snapshot cache (local only)
+.docs/.skills-overview-mtimes.json
+docs/.skills-overview-mtimes.json

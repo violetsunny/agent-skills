@@ -50,7 +50,7 @@ description: >
 
 ## 硬约束（编写契约）
 
-1. 不使用响应式断点、媒体查询或 `max-width` 页面思维；固定 `1920x1080` 画布
+1. 不使用响应式断点、媒体查询或 `max-width` 页面思维；固定 `1920x1080` 设计画布，画布外必须包 scale-to-fit 视口自适应壳（等比缩放居中，任意窗口尺寸下无滚动条完整可见），实现见 `references/interactive-html-authoring.md`
 2. 不直接复用应用型 dashboard 套壳覆盖图表真源
 3. 不在组件里散落硬编码颜色，优先引用根变量
 4. 正文默认不小于 `16px`，说明/标签默认不小于 `12px`
@@ -64,12 +64,13 @@ description: >
 12. 尊重 `prefers-reduced-motion`，检测到时所有动画降级为即时切换
 13. 话术与一切演讲者专用文字只进 `display:none` 的 `.notes` 容器，禁止出现在页面可见区域
 14. 持续动效画布与扩展特效目录（27 种 CSS 入场动画 + 20 种 canvas FX）仅在用户明确要求时启用，按 `references/animation-fx-catalog.md` 路由选型；FX 必须随页启停（见 `references/generative-art-and-canvas.md` 生命周期契约）
+15. 素材图（截图/照片佐证）上屏：原图高清落盘（禁止降分辨率/降质，压的是格位占位空间不是图片）、固定格位网格平铺（区内无滚动条、不拉伸变形、`object-fit` 归一）、点击放大 lightbox（纯原生零依赖，Esc/遮罩关闭，放大图 `contain` 不超视口、用原图），规则见 `references/interactive-html-authoring.md` 素材图节
 
 ## 编写流程
 
 1. 核对输入：四要素/图表/主色是否齐备，缺失先问清再动手
 2. 建 token 体系与画布骨架（`:root` 语义 token，安全边距 32-48px）
-3. 逐页编写：结构 → `.notes` 话术容器（有演讲场景时）→ `data-enter-order` 入场 → 数据动效 → 交互图表（仅当有明细数据）
+3. 逐页编写：结构 → `.notes` 话术容器（有演讲场景时）→ 素材图网格+lightbox（有素材图映射时）→ `data-enter-order` 入场 → 数据动效 → 交互图表（仅当有明细数据）
 4. 多页时合并单文件：CSS 并入 `<style>`、JS 并入 `<script>`、图表 SVG 内联，接翻页系统与演讲者模式/总览/深链（上层 workflow 明确要求 INDEX + pages/ 多文件形态时除外）
 5. 按 `references/premium-review-fix.md` 逐项审查（含交互版专属审查项），阻塞项修复后交付
 
@@ -80,7 +81,9 @@ description: >
 - 含话术输入时：S 键演讲者窗口可弹出，四卡（当前页/下一页/话术/计时器）可用，双窗口翻页同步；N 键抽屉、O 键总览可用
 - `prefers-reduced-motion` 降级为即时切换、数字直显终值、入场跳过、背景特效关闭
 - 动画属性仅限 transform/opacity/filter；数字滚动/图表动画仅触发一次；非活跃页面无残留定时器与 rAF
+- scale-to-fit 壳生效：任意窗口尺寸画布等比缩放居中、无滚动条；含素材图时网格无滚动、lightbox 可开可关（Esc/遮罩）
 - 单页 DOM ≤ 500；最终文件零外部请求
+- 多页形态豁免：S 演讲者窗、O 总览网格、`#/N` 深链、Home/End 键、触摸滑动为单文件 deck 专属能力；`INDEX.html` + `pages/` 多页形态不适用上述各项，不判 FAIL（多页形态翻页以 INDEX 与页间真实链接为准）
 
 ## 何时读取引用文档
 

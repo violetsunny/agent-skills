@@ -8,11 +8,37 @@
 2. 不使用响应式布局、媒体查询、`max-width` 或 `width: 100%` 页面思维
 3. 每个 HTML 文件只表达一页幻灯片
 4. 画布容器使用 `position: relative; overflow: hidden`
+5. **scale-to-fit 视口自适应壳（强制）**：画布外必须包一层缩放壳，浏览器任意窗口尺寸下画布等比缩放居中、完整可见、无滚动条。设计画布尺寸不变（仍是 1920x1080 绝对定位坐标系），缩放只发生在壳层；1920x1080 视口时 scale=1，headless 截图/下游转 PPT 消费不受影响
 
 ```html
-<div class="canvas" style="position:relative;width:1920px;height:1080px;overflow:hidden;">
-  <!-- 页面内容全部放在固定画布内 -->
+<div class="fit-viewport"><!-- scale-to-fit 壳 -->
+  <div class="canvas" style="position:relative;width:1920px;height:1080px;overflow:hidden;">
+    <!-- 页面内容全部放在固定画布内 -->
+  </div>
 </div>
+<script>
+(function () {
+  var canvas = document.querySelector('.canvas');
+  function fit() {
+    var s = Math.min(window.innerWidth / 1920, window.innerHeight / 1080);
+    canvas.style.transform = 'scale(' + s + ')';
+  }
+  window.addEventListener('resize', fit);
+  fit();
+})();
+</script>
+```
+
+```css
+html, body { height: 100%; overflow: hidden; }
+.fit-viewport {
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-color);
+}
+.canvas { transform-origin: center center; flex-shrink: 0; }
 ```
 
 ## 2. 字体与 token
@@ -161,15 +187,23 @@ font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
       --radius-full: 9999px;
       --shadow-soft: 0 6px 24px rgba(18, 52, 86, 0.08);
     }
+    html, body { height: 100%; overflow: hidden; }
     body {
       background: var(--bg-color);
       font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
+    }
+    .fit-viewport {
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
     .canvas {
       position: relative;
       width: 1920px;
       height: 1080px;
-      margin: var(--space-md) auto;
+      flex-shrink: 0;
+      transform-origin: center center;
       background: var(--surface-color);
       overflow: hidden;
       box-shadow: var(--shadow-soft);
@@ -178,6 +212,7 @@ font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
   </style>
 </head>
 <body>
+  <div class="fit-viewport">
   <div class="canvas">
     <!-- 标题区 -->
     <!-- 结论区 -->
@@ -186,6 +221,18 @@ font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
     <!-- 品牌区 -->
     <div class="notes"><!-- 本页汇报话术，仅供演讲者，永不上屏 --></div>
   </div>
+  </div>
+  <script>
+  (function () {
+    var canvas = document.querySelector('.canvas');
+    function fit() {
+      var s = Math.min(window.innerWidth / 1920, window.innerHeight / 1080);
+      canvas.style.transform = 'scale(' + s + ')';
+    }
+    window.addEventListener('resize', fit);
+    fit();
+  })();
+  </script>
 </body>
 </html>
 ```

@@ -105,7 +105,7 @@ Type-specific anti-patterns live in each type reference.
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500;600&family=Noto+Sans+KR:wght@400;500;600&family=Noto+Serif+KR:wght@400&display=swap" rel="stylesheet">
 ```
 
-**Zero-external-request deliverables** (chart wrapper HTML, offline presentation pages, or any caller declaring zero external requests) must drop this link and use a system font stack instead; remove it from the template copy as well. The `self_check.py` Google Fonts allowlist applies only to single-file HTML where network access is permitted.
+**模板默认零外链**：`assets/` 下全部模板已内置系统字体栈、不含任何外链。上方 link 仅在**联网发布场景**（在线文章、允许网络访问的单文件 HTML）且需要品牌 webfont 时手动加入；`self_check.py` 的 Google Fonts allowlist 只约束这类场景（有外链时仅接受 `fonts.googleapis.com/css2`）。**零外部请求交付物**（图表包装 HTML、离线演示页、robot-aiot 工作流产物、任何调用方声明零外链）禁止加入该 link，一律系统字体栈；SVG 内 `font-family` 写品牌字体名时无外链会自动回退系统字体，可接受。
 
 ---
 
@@ -416,9 +416,9 @@ Every diagram ships in three variants (see `assets/`):
 
 | Variant | File pattern | When to use |
 |---|---|---|
-| **Minimal light** (default) | `assets/template.html` | Screenshot-ready. Diagram + title. Warm paper. |
-| **Minimal dark** | `assets/template-dark.html` | Dark mode sites, slides, high-contrast posts. |
-| **Full editorial** | `assets/template-full.html` | Long-form posts where the diagram is the hero. |
+| **Minimal light** (default) | `assets/template.html` | Screenshot-ready. Diagram only — title lives inside the SVG (`<title>`/图内文字), no HTML-layer h1. Warm paper, system font stack, zero external requests. |
+| **Minimal dark** | `assets/template-dark.html` | Dark mode sites, slides, high-contrast posts. Same title-single-source and zero-external rules. |
+| **Full editorial** | `assets/template-full.html` | Long-form posts where the diagram is the hero. Page-level header (eyebrow/h1/subtitle) is part of this variant's design — the SVG carries no visible title text, so no double title. |
 
 **Sketchy variant** (optional, applied to any of the above) — see [primitive-sketchy.md](primitive-sketchy.md). SVG turbulence filter wobbles strokes for a hand-drawn feel. Good for essays, not for technical docs.
 
@@ -430,6 +430,6 @@ Every diagram ships in three variants (see `assets/`):
 
 1. Copy the variant closest to what you want (`assets/template.html` for minimal, `assets/template-full.html` for cards, `assets/template-motion.html` only when motion is requested).
 2. If behavior is load-bearing, choose a semantic pattern; then load the matching type reference.
-3. Replace the eyebrow, h1, and SVG body. Replace `[diagram-slug]` with the file slug and fill `<title>` / `<desc>`.
+3. Replace the SVG body (minimal variants have no HTML-layer header; `template-full`/`template-motion`/`template-terminal` carry a page header — replace its eyebrow/h1/subtitle there). Replace `[diagram-slug]` with the file slug and fill `<title>` / `<desc>`.
 4. If motion is requested, load `animation.md`; otherwise keep mode `none` and no script.
 5. Run the §9 taste gate.

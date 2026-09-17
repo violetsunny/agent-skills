@@ -121,7 +121,7 @@ shape=spiral;fillColor=none;strokeColor=#FF6B35;strokeWidth=2;
 
 ## Arrow Colors by Purpose
 
-> **统一样式规范：** 所有箭头 strokeWidth=3。虚线（dashed）仅用于反馈回路和循环回退，演进/推进/错误路径一律实线。
+> **统一样式规范：** 所有箭头 strokeWidth=3。虚线（dashed）仅用于反馈回路、循环回退，以及"隔离/断联/边界切断"类目（链路断开、组件下线、网络/信任边界切断）；演进/推进/错误路径一律实线。
 
 | Purpose | Color | Stroke Width | Style |
 | --- | --- | --- | --- |
@@ -184,9 +184,11 @@ rounded=1;fillColor=#E8F4FD;strokeColor=#0078D4;strokeWidth=2;dashed=1;arcSize=8
 4. **Text contrast** — Always ensure text is readable against background (use dark text on light backgrounds)
 5. **Border consistency** — Main elements use 2px borders, details use 1px, layer containers use 3px
 6. **Shadow usage** — Apply shadows only to key visual elements (robot bodies, core ellipses); regular nodes use shadow=0
-7. **Dashed for feedback only** — Use dashed lines exclusively for feedback loops and loop-back arrows; error paths and progression arrows are solid
+7. **Dashed for feedback only** — Use dashed lines exclusively for feedback loops and loop-back arrows; error paths and progression arrows are solid。虚线还可用于"隔离/断联/边界切断"类目（链路断开、组件下线、边界切断）；除此之外一律实线
 8. **Palette-only colors** — Only use colors defined in this file. Do NOT introduce off-palette colors (e.g., `#FFF3E0`/`#FF9800` are forbidden; use `#FFF8E1`/`#FFA000` for warning yellow instead)
 9. **Blue layer background** — Layer/zone backgrounds use `#E8F4FD`; `#E3F2FD` is reserved for status card backgrounds only
+10. **中性工具色豁免** — `#CCCCCC` 一类中性工具色仅限非数据元素（分隔线、占位边框、禁用态、中性汇总容器边框），是色板规则的明确豁免，不与"数据系列禁灰"冲突；数据系列/状态语义仍禁止用灰色表达
+11. **箭头颜色双源裁决** — 同一箭头同时命中本表通用语义色（Main flow/Success/Error 等）与图表类型/层级配色规则（如分层图跨层箭头用目标层主题色）时，图表类型/层级规则优先
 
 ## PPT 场景配色对齐声明
 

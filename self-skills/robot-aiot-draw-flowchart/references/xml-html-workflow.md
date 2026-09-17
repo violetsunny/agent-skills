@@ -22,7 +22,7 @@
 脚本调用示例：
 
 ```bash
-python3 scripts/xml_to_html.py doc-ppt/<图表名>.xml -o doc-ppt/<图表名>.html
+python3 scripts/xml_to_html.py doc-ppt/flow/<图表名>.xml -o doc-ppt/flow/<图表名>.html
 ```
 
 选择原则：
@@ -107,7 +107,7 @@ python3 scripts/xml_to_html.py doc-ppt/<图表名>.xml -o doc-ppt/<图表名>.ht
 推荐交付说明：
 
 ```markdown
-- 图表真源：doc-ppt/<name>.xml
-- 图表 HTML：doc-ppt/<name>.html
+- 图表真源：doc-ppt/flow/<name>.xml
+- 图表 HTML：doc-ppt/flow/<name>.html
 - 状态：HTML 已完成，可进入 PPT 页面编排
 ```

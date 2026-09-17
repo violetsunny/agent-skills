@@ -27,10 +27,10 @@
 
 ### 产物
 
-输出到 `doc-ppt/`：
+输出到 `doc-ppt/flow/`（图表类产物统一落 `flow/` 子目录）：
 
 ```markdown
-- 图表真源：`doc-ppt/<图表文件名>.xml`
+- 图表真源：`doc-ppt/flow/<图表文件名>.xml`
 - 图表状态：Phase 3 已完成，待进入 Phase 3.5 转换
 ```
 
@@ -52,6 +52,8 @@
 ### 产物
 
 ```markdown
-- 图表真源：`doc-ppt/<图表文件名>.xml`
-- 图表 HTML：`doc-ppt/<图表文件名>.html`
+- 图表真源：`doc-ppt/flow/<图表文件名>.xml`
+- 图表 HTML：`doc-ppt/flow/<图表文件名>.html`
 ```
+
+页面 HTML 落 `doc-ppt/pages/`，页面引用图表用 `../flow/<图表文件名>.html` 相对路径。

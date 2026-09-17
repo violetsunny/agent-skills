@@ -23,9 +23,9 @@
 
 ## 输出
 
-每个图表生成两个文件：
-- `doc-web/<chart-name>.svg` — 供 Phase 4 页面内嵌
-- `doc-web/<chart-name>.html` — 自包含 HTML 内联 SVG，可独立预览
+每个图表生成两个文件，图表类产物统一落输出目录的 `flow/` 子目录：
+- `doc-web/flow/<chart-name>.svg` — 供 Phase 4 页面内嵌
+- `doc-web/flow/<chart-name>.html` — 自包含 HTML 内联 SVG，可独立预览
 
 要求：
 1. 直接输出 SVG/HTML，不经过 XML 中间格式

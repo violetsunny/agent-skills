@@ -140,7 +140,7 @@ If the target aspect ratio doesn't match the `viewBox` aspect ratio, say so and 
 - **Source is `assets/index.html`** (the gallery, multiple SVGs in one file): refuse the export and ask the user which specific diagram file they meant. Don't guess.
 - **No `<svg>` block found**: the source isn't a diagram file. Tell the user; don't write anything.
 - **Surrounding HTML matters to the user**: they want cards/header in the image. Tell them this skill exports diagrams only, and recommend a browser-based full-page screenshot (or a separate PDF print).
-- **Source is missing fonts at runtime**: Playwright will substitute, the screenshot will look off. Check that the source HTML has the `<link href="...fonts.googleapis.com...">` tag in `<head>`. If absent, the file isn't from a current template — fix the source rather than working around it in export.
+- **Source is missing fonts at runtime**: Playwright will substitute, the screenshot will look off. First determine the scenario: zero-external deliverables (offline presentation, robot-aiot workflow output) intentionally carry no `<link href="...fonts.googleapis.com...">` and render with the system stack — substitution is expected, not an error. Only for online-publishing diagrams that need brand webfonts, check the `<head>` for the link; if absent, the file predates the current font-stack convention — fix the source rather than working around it in export.
 
 ## What this command never does
 

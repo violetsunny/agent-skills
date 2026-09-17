@@ -56,10 +56,11 @@ done
 
 ```
 doc-ppt/
-├── assets/                     — 品牌静态资源（Logo 等）
+├── assets/                     — 品牌静态资源（Logo、素材图压缩副本等）
 │   └── midea-logo.png          — 美的品牌 Logo（从 skill assets/ 复制）
-├── <chart-name>.xml            — 图表 XML（Phase 3，robot-aiot-draw-flowchart 产出）
-├── <chart-name>.html           — 图表 HTML（Phase 3.5，robot-aiot-draw-flowchart XML→HTML 桥接产出）
+├── flow/                       — 图表类产物统一目录
+│   ├── <chart-name>.xml        — 图表 XML（Phase 3，robot-aiot-draw-flowchart 产出）
+│   └── <chart-name>.html       — 图表 HTML（Phase 3.5，robot-aiot-draw-flowchart XML→HTML 桥接产出）
 ├── <project>_PPT母稿.md        — 母稿（Phase 4）
 ├── pages/                      — 逐页 HTML（Phase 4）
 │   ├── 01-cover.html
@@ -163,11 +164,12 @@ Phase 4 的逐页 HTML 编写能力已内化到 `robot-aiot-draw-flowchart` 的�
 ### 阻塞性要求
 
 1. 逐页 HTML 生成必须调用 `robot-aiot-draw-flowchart` 的静态页面 HTML 能力
-2. **仅使用静态版**：禁止生成交互版（翻页/动画/特效），ppt-master 只消费静态 HTML
+2. **仅使用静态版**：禁止生成交互版（翻页/动画/特效），ppt-master 只消费静态 HTML；scale-to-fit 视口自适应壳不属于交互版特性，必须保留（1920x1080 视口下 scale=1，不影响 ppt-master 消费）
 3. 每页必须满足"标题 / 结论 / 上屏内容 / 话术"四要素；话术写入页面 `display:none` 的 `.notes` 容器，出现在可见区域按阻塞项处理
-4. 每页对应一个独立 HTML 文件，且图表优先引用 Phase 3.5 输出的图表 HTML
-5. `robot-aiot-draw-flowchart` 的布局审查清单 10 项全部通过，才允许进入 Phase 5
-6. 页面允许做轻量语义化规范化，但不得破坏首页图表确立的主色语义与图表 HTML 的冻结约束
+4. 每页对应一个独立 HTML 文件，且图表优先引用 Phase 3.5 输出的图表 HTML（`flow/` 目录）
+5. 母稿含素材图映射的页面必须把素材图以原图高清落盘、网格平铺上屏（只压格位占位空间不压图片分辨率，区内无滚动条、不拉伸变形），素材图规则由 `robot-aiot-draw-flowchart` 的 `references/slide-image-framing.md` 承载；母稿未指定但资源目录存在可用素材时，Phase 4 开始前盘点并向用户确认选配，不得静默忽略
+6. `robot-aiot-draw-flowchart` 的布局审查清单 10 项全部通过，才允许进入 Phase 5
+7. 页面允许做轻量语义化规范化，但不得破坏首页图表确立的主色语义与图表 HTML 的冻结约束
 
 ---
 
@@ -175,11 +177,13 @@ Phase 4 的逐页 HTML 编写能力已内化到 `robot-aiot-draw-flowchart` 的�
 
 移交前校验、输入清单和交付后三层验证见 `references/phase5-ppt-delivery.md`。
 
-主文件保留三条原则：
+主文件保留五条硬约束：
 
 1. `ppt-master` 的直接视觉输入是逐页 HTML，XML 只负责图表真源追溯，MD 负责语义来源
 2. 风格一致性指配色体系统一，不等于所有页面复用同一种版式
 3. 若采用轻量语义化规范化，必须贯穿图表 HTML 与页面 HTML，而不是只在某几页单独套新风格
+4. **PPTX 必须可编辑**：文字=原生文本框、图形=原生形状；PICTURE 仅限素材照片与 flow 图表渲染图；禁止整页光栅贴图（任何超尺寸整页 PICTURE 判交付失败）；交付前必须用 python-pptx 递归展开做形状构成验证，细则见 `references/phase5-ppt-delivery.md`
+5. **过程产物目录**：PPT 生成的一切工作区/脚本/中间产物放本次交付目录下 `projects/`，禁止写入 `~/.agents/projects` 等全局目录
 
 ---
 

@@ -55,6 +55,22 @@
 2. 内容区四周留 `32-48px` 安全边距
 3. 使用绝对定位或 CSS Grid/Flexbox 布局
 4. 元素不重叠、不溢出
+5. 画布外必须包一层 scale-to-fit 视口自适应壳：浏览器任意窗口尺寸下画布等比缩放居中、无滚动条完整可见；`1920x1080` 视口时 scale=1，headless 截图与下游消费不受影响
+
+标准实现（本文件结构中 `.canvas` 即 `.deck` 容器）：
+
+```html
+<div class="fit-viewport"><div class="canvas">…</div></div>
+<script>
+(function(){var c=document.querySelector('.canvas');function fit(){var s=Math.min(innerWidth/1920,innerHeight/1080);c.style.transform='scale('+s+')';}addEventListener('resize',fit);fit();})();
+</script>
+```
+
+```css
+html,body{height:100%;overflow:hidden}
+.fit-viewport{height:100vh;display:flex;align-items:center;justify-content:center}
+.canvas{transform-origin:center center;flex-shrink:0}
+```
 
 ## 翻页实现
 
@@ -166,6 +182,42 @@ SVG 路径用 `stroke-dasharray` + `stroke-dashoffset`；柱状图从底部生�
 
 优先内联 Phase 3 生成的图表 HTML 中的 SVG 内容，或通过 iframe/object 引用。
 不修改图表节点坐标、结构关系和数据语义。
+
+## 素材图网格与 lightbox
+
+素材图（截图/照片佐证）规则：
+
+1. 原图高清落盘：素材图按原始分辨率复制进产物 `assets/`，禁止降分辨率/降质（`sips -Z` 缩边、thumbs 平铺小图均禁止）；清晰度靠格位尺寸控制——压的是占位空间，不是图片
+2. 固定格位网格平铺：grid 定列数、格位同宽同高、容器 `overflow:hidden`、区内任何情况无滚动条
+3. `object-fit` 归一为 `contain` 或 `cover`，不拉伸变形
+4. 每图一行 caption；单页 ≤4 张
+5. 多页形态素材图用相对路径引用，不 base64 内联；单文件 deck 形态才内联，且需控制总体积
+
+交互页面另加 lightbox 点击放大：纯原生零依赖，点击缩略图弹出全屏遮罩层显示放大图，Esc 键或点击遮罩关闭，打开时 body 锁定滚动。
+
+参考实现：
+
+```html
+<div class="lightbox" id="lightbox"><img alt=""></div>
+```
+
+```css
+.lightbox{position:fixed;inset:0;background:rgba(0,0,0,.85);display:none;align-items:center;justify-content:center;z-index:999}
+.lightbox.open{display:flex}
+.lightbox img{max-width:92vw;max-height:92vh;object-fit:contain}
+```
+
+```js
+(function(){
+  var lb=document.getElementById('lightbox'),big=lb.querySelector('img');
+  document.querySelectorAll('.img-grid img').forEach(function(t){
+    t.addEventListener('click',function(){big.src=t.src;lb.classList.add('open');document.body.style.overflow='hidden';});
+  });
+  function close(){lb.classList.remove('open');document.body.style.overflow='';}
+  lb.addEventListener('click',close);
+  addEventListener('keydown',function(e){if(e.key==='Escape')close();});
+})();
+```
 
 ## prefers-reduced-motion
 

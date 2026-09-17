@@ -143,7 +143,7 @@ font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
 1. 读取母稿与页面类型
 2. 先加载 `ui-ux-pro-max`，拿到页面级设计系统建议与反模式提醒
 3. 再选布局骨架，按本文件内化规则补 token 变量
-4. 再放标题、结论、图表、数据卡、说明、页脚
+4. 再放标题、结论、图表、数据卡、说明、页脚；图表类产物（XML/SVG/图表 HTML）位于输出目录 `flow/` 子目录，页面 HTML 落 `pages/`，页面引用图表用 `../flow/<图表名>.html` 相对路径
 5. 最后补轻量视觉增强
 6. 生成后按模板清单逐项审查，并用 `ui-ux-pro-max` 做一次页面质量复核
 
@@ -152,6 +152,24 @@ font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
 1. 基础层：画布、尺寸、绝对定位、间距、对齐
 2. 语义层：颜色变量、字级变量、容器角色
 3. 增强层：渐变、阴影、圆角胶囊、强调描边
+
+基础层画布壳约束：
+
+1. `1920x1080` 设计画布外必须包一层 scale-to-fit 视口自适应壳：浏览器任意窗口尺寸下画布等比缩放居中、无滚动条完整可见；`1920x1080` 视口时 scale=1，headless 截图与下游消费不受影响
+2. 标准实现：
+
+```html
+<div class="fit-viewport"><div class="canvas">…</div></div>
+<script>
+(function(){var c=document.querySelector('.canvas');function fit(){var s=Math.min(innerWidth/1920,innerHeight/1080);c.style.transform='scale('+s+')';}addEventListener('resize',fit);fit();})();
+</script>
+```
+
+```css
+html,body{height:100%;overflow:hidden}
+.fit-viewport{height:100vh;display:flex;align-items:center;justify-content:center}
+.canvas{transform-origin:center center}
+```
 
 增强层约束：
 

@@ -64,10 +64,11 @@ Markdown 知识文档，至少包含：
 
 ```
 doc-web/
-├── assets/                     — 品牌静态资源（Logo、素材截图等）
+├── assets/                     — 品牌静态资源（Logo、素材图压缩副本等）
 │   └── midea-logo.png          — 美的品牌 Logo
-├── <chart-name>.svg            — 图表 SVG（Phase 3，供 Phase 4 内嵌）
-├── <chart-name>.html           — 图表 HTML（Phase 3，可独立预览）
+├── flow/                       — 图表类产物统一目录
+│   ├── <chart-name>.svg        — 图表 SVG（Phase 3，供 Phase 4 内嵌）
+│   └── <chart-name>.html       — 图表 HTML（Phase 3，可独立预览）
 ├── <project>_演示母稿.md        — 母稿（Phase 2）
 └── <project>-presentation.html — 最终交互演示文件（Phase 4，单文件多页，默认形态）
 ```
@@ -148,7 +149,7 @@ Phase 4: 交互HTML    → 委派 robot-aiot-interactive-html-author 逐页编�
 6. 数据统计图表（饼图/箱线图/热力图/网络拓扑等）按 `robot-aiot-arch-diagram` 的数据图表规则路由；页面需要嵌入 Mermaid/PlantUML 源码图时，Phase 4 由 `robot-aiot-interactive-html-author` 构建期渲染嵌入
 7. 图表数量多（>6 张）时：先锁定全局风格 token（皮肤/主色/箭头语义/viewBox/网格/数据标注纪律），再分批派发并行 sub agent 生成，避免风格漂移
 
-产物：`doc-web/<chart-name>.svg`（供 Phase 4 内嵌）+ `doc-web/<chart-name>.html`（独立预览），每个图表两个文件。
+产物：`doc-web/flow/<chart-name>.svg`（供 Phase 4 内嵌）+ `doc-web/flow/<chart-name>.html`（独立预览），每个图表两个文件；图表类产物一律落 `flow/` 子目录，不与母稿、页面混放。
 
 阻塞条件：母稿中需要的图表未全部生成不得进入 Phase 4。
 
@@ -163,8 +164,9 @@ Phase 4: 交互HTML    → 委派 robot-aiot-interactive-html-author 逐页编�
 2. 默认形态：编写 skill 产出单文件多页 deck `doc-web/<project>-presentation.html`；多页形态（Phase 1 确认）：产出 `INDEX.html` 总纲 + `pages/` 逐页 HTML，每页必须有"上一页/下一页"跳转控件，末页可返回 INDEX
 3. 验收自检（编排侧抽查）：
    - 翻页键位全可用（多页形态为导航链接全可用）、`prefers-reduced-motion` 降级即时切换
-   - 零外部请求、固定 1920x1080、单页 DOM ≤ 500
+   - 零外部请求、1920x1080 设计画布 + scale-to-fit 视口自适应（任意窗口无滚动条完整可见）、单页 DOM ≤ 500
    - 母稿四要素与图表数据语义无缺页、无篡改
+   - 母稿素材图映射表中该页有素材时必须已上屏（压缩缩略图 + 网格平铺无滚动 + 点击放大 lightbox）
 
 阻塞条件：所有页面生成完毕且通过编写 skill 的交付前审查才算完成。
 
@@ -180,7 +182,7 @@ Phase 4: 交互HTML    → 委派 robot-aiot-interactive-html-author 逐页编�
 ## 硬约束（交付契约）
 
 1. 默认交付物为单个 HTML 文件，双击即可在浏览器完整运行，纯原生零依赖（禁 CDN/npm/外部字体）；用户指定多页形态时，"单文件"被覆盖为 INDEX + pages/ 多文件，其余约束（零依赖、双击即用）不变
-2. 固定 `1920x1080` 画布，不使用响应式断点
+2. 固定 `1920x1080` 设计画布，不使用响应式断点；画布外包 scale-to-fit 视口自适应壳（等比缩放居中，任意窗口尺寸无滚动条完整可见）
 3. 尊重 `prefers-reduced-motion`，检测到时降级为即时切换
 4. 不伪造精确数字；占位数据必须显式标注"示意"
 5. 编写期细则（token、字级、AI 痕迹、动画属性、DOM 预算等）以 `robot-aiot-interactive-html-author` 编写契约为准

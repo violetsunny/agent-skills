@@ -150,6 +150,7 @@ done
 - 提示词指纹：`C4评审画布`→9；`多区域云部署`→10；`事件地铁图`→11；`可靠性脉冲/黄金指标`→12；仅在领域证据匹配时自动选用，否则用 1–7
 - 品牌定制：语义角色 token（paper/ink/muted/accent/link）定义在 `references/style-guide.md`；首次在新项目画图前按其默认值检查，未定制则询问用户是否从网站/本地设计系统/手工 token 定制，流程见 `references/onboarding.md`，多客户档案见 `references/profiles.md`
 - 机器人/IoT 场景优先把 `color-schemes.md` 的主题色注入为品牌 token，保持跨路径视觉一致
+- **分组容器视觉语言（强制）**：图表存在 ≥2 个逻辑分组且每组含 ≥2 个条目时（分层架构/阶段演进/泳道/对比/映射等），必须按 `references/grouped-container-style.md` 执行"容器-卡片-标签"三级纵深、色族身份、3/2/1 边框层级与药丸/图例/汇总区组件规则；风格皮肤只改色值基准，不改层级结构纪律
 
 ## 通用质量硬规则
 

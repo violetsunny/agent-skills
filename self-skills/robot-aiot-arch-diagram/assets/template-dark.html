@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Diagram</title>
-  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500;600&family=Noto+Sans+KR:wght@400;500;600&family=Noto+Serif+KR:wght@400&display=swap" rel="stylesheet">
+  <!-- 零外部请求硬约束：禁止引入 Google Fonts 等任何外链资源，一律使用系统字体栈。 -->
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
@@ -12,9 +12,9 @@
       --color-ink:     #f5f5f5;   /* warm off-white */
       --color-muted:   #bfc0c0;
       --color-accent:  #f08a59;
-      --font-sans:     'Geist', system-ui, sans-serif;
-      --font-serif:    'Instrument Serif', 'Noto Serif KR', serif;
-      --font-mono:     'Geist Mono', ui-monospace, monospace;
+      --font-sans:     system-ui, -apple-system, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+      --font-serif:    Georgia, 'Songti SC', 'SimSun', serif;
+      --font-mono:     ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
     }
 
     body {
@@ -30,33 +30,13 @@
 
     .frame { max-width: 1200px; width: 100%; }
 
-    .eyebrow {
-      font-family: var(--font-mono);
-      font-size: 0.66rem;
-      font-weight: 500;
-      letter-spacing: 0.18em;
-      text-transform: uppercase;
-      color: var(--color-muted);
-      margin-bottom: 0.5rem;
-    }
-
-    h1 {
-      font-family: var(--font-serif);
-      font-size: clamp(1.5rem, 2.4vw + 0.75rem, 2rem);
-      font-weight: 400;
-      letter-spacing: -0.02em;
-      line-height: 1.15;
-      color: var(--color-ink);
-      margin-bottom: 1.5rem;
-    }
-
     svg { width: 100%; min-width: 900px; display: block; }
   </style>
 </head>
 <body>
   <div class="frame">
-    <p class="eyebrow">[Type]</p>
-    <h1>[Diagram title]</h1>
+    <!-- 标题单写原则：图表标题只进 SVG 内部的 <title>/<desc> 与图内文字，
+         禁止在 HTML 层再写可见 h1/eyebrow，避免双标题。 -->
 
     <!-- Replace [diagram-slug] with a unique slug for this diagram before export. -->
     <svg viewBox="0 0 1000 600" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="[diagram-slug]-title [diagram-slug]-desc">

@@ -101,6 +101,19 @@ draw.io 的 `shape=` 属性决定节点的基本渲染形态：
 
 此规则确保脚本对未知的 draw.io 属性具有前向兼容性。
 
+### 安全忽略键（不 WARN、不计入 unmapped 报告）
+
+以下键是 draw.io 模板强制写入或高频出现、但对 CSS 渲染无语义影响的键，脚本内置 `safe_ignore_keys` 集合静默跳过：
+
+| 键 | 忽略理由 |
+|---|---|
+| `html`（=1） | 富文本语义已由节点 value 原样渲染实现，无需 CSS 映射 |
+| `whiteSpace`（=wrap） | HTML div 默认自动换行，与 draw.io 语义一致 |
+| `arcSize` | `rounded` 圆角的百分比微调；`rounded=1` 已映射固定圆角，微调量视觉不可辨 |
+| `spacingLeft/Right/Top/Bottom` | 内边距微调；HTML 节点已有统一 padding 处理 |
+
+新增安全忽略键的判据：该键在 draw.io 中的视觉效果与 HTML/CSS 默认行为一致，或差异小于视觉可辨阈值。有语义影响的键（如 `direction`、`flipH`）禁止加入。
+
 ---
 
 ## UI 规范补充说明
