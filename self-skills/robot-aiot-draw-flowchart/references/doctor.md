@@ -1,10 +1,10 @@
 # Environment doctor
 
-Load this file when the user asks to run diagnostics, health checks, or first-run troubleshooting, or when they invoke `/diagram-design:doctor` or `/doctor`.
+Load this file when the user asks to run diagnostics, a health check, or an environment doctor for this skill, or asks for first-run troubleshooting (e.g. "跑一下环境诊断", "check why PNG export fails", "run the doctor").
 
-The goal is a one-shot report that checks local readiness for Diagram Design import/export and command routing, without mutating user files or installing dependencies.
+The goal is a one-shot report that checks local readiness for this skill's import/export and command routing, without mutating user files or installing dependencies.
 
-Resolve the Diagram Design installation from this loaded reference, not from the
+Resolve the skill installation from this loaded reference, not from the
 user's current working directory. A normal project directory is the expected
 place to invoke the doctor and must not be treated as a repository-path error.
 
@@ -30,7 +30,12 @@ If no flags are provided, run in standard mode.
 Run all checks in this order and report each as `pass`, `warn`, or `fail`.
 
 1. Python runtime
-- Resolve `python3` first, then `python`.
+- Resolve `python3` first, then `python`. A name that is on PATH but cannot report
+  its own version does not win the resolution: fall through to the next candidate.
+  (Windows ships a `python3` App Execution Alias that is a Microsoft Store stub, not
+  an interpreter, and it sits on PATH ahead of a python.org install.) A name that
+  cannot be launched at all counts as the same kind of dud, and is reported as a
+  failed check rather than ending the run.
 - Require version >= 3.10.
 - `fail` if no Python interpreter is found.
 - `fail` if version is below 3.10.
@@ -115,5 +120,5 @@ Doctor summary: WARN (6 pass, 2 warn, 0 fail)
 
 Next actions
 - Install PNG export dependencies: pip install playwright && playwright install chromium
-- Re-run: /diagram-design:doctor --strict
+- Re-run the environment doctor with `--strict` (warnings treated as failures)
 ```

@@ -31,7 +31,7 @@
 | 弹性 | spring-like | `cubic-bezier(0.34, 1.56, 0.64, 1)` |
 | 数据变化 | linear | `linear` |
 
-## Motion Doctrine 规则
+## 动效分层与时长预算
 
 ### 动效分层
 

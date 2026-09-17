@@ -59,7 +59,7 @@
 
 ## Skill 同步汇总
 
-### (1) npx 管理型项目（15 个）
+### (1) npx 管理型项目（16 个）
 
 通过 `env -u XDG_STATE_HOME npx skills@latest update -y -g` 统一更新，安装到 `~/.agents/skills/`；更新失败的 skill 按 `self/skills/` 本地克隆走 rsync 兜底（见模块 3.1）。
 
@@ -80,6 +80,7 @@
 | humanizer-zh | `[NPX-AUTO]` / `[NPX-FALLBACK]` / `[NPX-FALLBACK-MISS]` / `[NPX-FAILED]` |
 | andrej-karpathy-skills | `[NPX-AUTO]` / `[NPX-FALLBACK]` / `[NPX-FALLBACK-MISS]` / `[NPX-FAILED]` |
 | vercel-agent-skills | `[NPX-AUTO]` / `[NPX-FALLBACK]` / `[NPX-FALLBACK-MISS]` / `[NPX-FAILED]` |
+| i-have-adhd | `[NPX-AUTO]` / `[NPX-FALLBACK]` / `[NPX-FALLBACK-MISS]` / `[NPX-FAILED]` |
 
 更新成功标记 `[NPX-AUTO]` 并报告更新的 skill 数量；失败的 skill 走 rsync 兜底，兜底成功标记 `[NPX-FALLBACK]`，无本地克隆标记 `[NPX-FALLBACK-MISS]`（提示用户手动 clone），兜底也失败标记 `[NPX-FAILED]`。这些项目不参与常规 rsync 同步/新增统计。
 
@@ -88,7 +89,7 @@
 | 字段 | 说明 |
 |------|------|
 | `[NPX-LOCK-MISS]` | 输出出现 `No global skills tracked in lock file.`，说明 lock 路径被 `XDG_STATE_HOME` 劫持、命令 exit 0 静默空跑；**不得计入成功**，须补 `env -u XDG_STATE_HOME` 重跑 |
-| lock 中各 source 的 skill 数 | 用于核对 15 个项目是否都真的被 npx 跟踪；某 source 为 0 说明未注册，需跑初始化 `add` |
+| lock 中各 source 的 skill 数 | 用于核对 16 个项目是否都真的被 npx 跟踪；某 source 为 0 说明未注册，需跑初始化 `add` |
 
 ### (2) rsync 管理型项目（0 个 — 类别已取消）
 
@@ -114,7 +115,7 @@
 
 ### (4) 自写命令双向同步（模块 3.4）
 
-`agent-skills/commands/` 下自写命令（当前 `dev-commit.md`、`dev-paradigm.md`、`opsx-apply.md`、`opsx-propose.md`）↔ `~/.agents/commands/` 按文件级比对结果双向定向（两步均 `rsync -rtu`，不加 `--delete`；固定「先回写、后部署」；OpenSpec 生成的 `opsx/` 子目录归模块 2 管理不在此列，根目录扁平 `opsx-apply.md` / `opsx-propose.md` 是自写命令不得混淆）。命令级只更新不新增。
+`agent-skills/commands/` 下自写命令（当前 `adhd.md`、`dev-commit.md`、`dev-paradigm.md`、`opsx-apply.md`、`opsx-propose.md`）↔ `~/.agents/commands/` 按文件级比对结果双向定向（两步均 `rsync -rtu`，不加 `--delete`；固定「先回写、后部署」；OpenSpec 生成的 `opsx/` 子目录归模块 2 管理不在此列，根目录扁平 `opsx-apply.md` / `opsx-propose.md` 是自写命令不得混淆）。命令级只更新不新增。
 
 | 字段 | 说明 |
 |------|------|

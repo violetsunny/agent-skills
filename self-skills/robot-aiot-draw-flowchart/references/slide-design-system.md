@@ -13,13 +13,18 @@
 | 语义角色 | 本技能变量 | 用途 |
 |---|---|---|
 | `primary` | `--primary-color` | 最高强调：结构线、重点数字、标题强调 |
-| `on-primary` | 主色上的文字 | 主色填充块上的文字/图标，必须与主色成对 |
+| `on-primary` | `--on-primary-color` | 主色填充块上的文字/图标，必须与主色成对 |
 | `secondary` | `--secondary-color` | 次级强调 |
+| `on-secondary` | `--on-secondary-color` | 次级强调色填充上的文字 |
 | `tertiary` | `--tertiary-color` | 补充分类色 |
+| `success` / `warning` / `danger` | `--success-color` 等 | 状态色填充 |
+| `on-success` / `on-warning` / `on-danger` | `--on-success-color` 等 | 状态色填充上的文字 |
+| `bg` | `--bg-color` | 画布外页面底色（body 背景），与 surface 分层 |
 | `surface` | `--surface-color` | 页面默认背景 |
 | `surface-container` | `--surface-muted` 及扩展档 | 容器背景（见 §2 层次） |
 | `on-surface` | `--text-primary` | 任何 surface 上的主文本 |
 | `on-surface-variant` | `--text-secondary` | 低强调文本（说明、注释、来源） |
+| `on-surface-dim` | `--text-tertiary` | 最低档文本（页码、来源行、辅助注记） |
 | `outline` | `--outline-color` | 重要边界（输入框、关键卡片描边） |
 | `outline-variant` | 更浅一档分隔色 | 纯装饰分隔线 |
 
@@ -28,6 +33,8 @@
 1. 音调配对锁定：只把成对角色组合使用（`primary`+`on-primary`、`surface-container`+`on-surface`），禁止任意交叉，否则对比度失控
 2. 分隔线用 `outline-variant` 一档，不用 `outline`；`outline` 只给"重要边界"
 3. 低强调文本（脚注、来源、说明）统一走 `on-surface-variant`，不与正文抢权重
+4. **`on-*` ink 实测选定**：每个强调色/状态色的配对 ink 只有两个候选——白（`#FFFFFF` 一档）或近黑（`--text-primary` 一档）——按对该填充色实测 WCAG AA（≥ 4.5:1）选定，选定后写入 token，禁止在组件里硬编码 `#fff` / `#000`
+5. 反例警示：近黑文字压在近黑强调色上实测对比度可低至 1.01:1，肉眼扫版式时几乎察觉不到（布局看起来正常），文字实际不可读；强调色越深越饱和，越必须实测而不是凭感觉
 
 ### 2. 用色调表面表达层次，不用阴影堆层次
 
@@ -35,7 +42,7 @@
 
 1. 容器层级用 5 档 surface 明度表达：`lowest → low → default → high → highest`
 2. 抬升一级的做法：把当前 surface 向 `primary` 色调偏移约 5%-11%（浅底加深一档、深底提亮一档），而不是加阴影
-3. 阴影只在背景杂乱、需要额外隔离时才用，且必须带背景色调（见 `premium-design-standards.md` 色彩纪律）
+3. 阴影只在背景杂乱、需要额外隔离时才用，且必须带背景色调（见 `slide-premium-design.md` 色彩纪律）
 4. 嵌套卡片每深一层，surface 升一档；同一页 surface 档位数不超过 3 档，避免层次噪音
 
 ### 3. 字级体系（1920x1080 具体值）
@@ -77,7 +84,7 @@
 
 **清晰**
 1. 每个元素都有明确作用，删掉任何一个会损失信息
-2. 领导 30 秒内能读出核心结论，无需解释
+2. 目标受众 30 秒内能读出核心结论，无需解释（受众由用户指定，默认领导层）
 3. 视觉层级一眼可辨：标题 > 结论 > 主数字 > 图表 > 说明
 
 **尊重内容**
@@ -101,7 +108,7 @@
 
 1. 主文本用 `--text-primary`（全强度）
 2. 次要文本用 `--text-secondary`（约 60% 强度）
-3. 辅助/来源信息再降一档（约 30-40% 强度）
+3. 辅助/来源信息用 `--text-tertiary`（约 30-40% 强度）
 4. 同一页文本明度档位不超过 3 档
 5. 用字重（400/500/600/700）配合层级，不只靠字号放大
 
@@ -122,6 +129,7 @@
 2. 大字（≥ 24px 或加粗 ≥ 19px）≥ 3:1
 3. 关键数字、结论与背景对比要足够，不靠颜色单独传达
 4. 浅色底不用过浅灰字，深色底不用过暗字
+5. 强调色/状态色填充上的文字一律用配对 `on-*` ink token，且该 ink 按 §1 配对规则第 4 条实测选定
 
 ### 10. 默认实底，毛玻璃需显式请求
 
@@ -132,5 +140,5 @@
 ## 与高级感标准的关系
 
 - 本文件管"设计系统的角色与层级"（token、字级、圆角、层次）
-- `premium-design-standards.md` 管"反模板化与高级感"（设计解读、一致性锁定、AI 痕迹）
+- `slide-premium-design.md` 管"反模板化与高级感"（设计解读、一致性锁定、AI 痕迹）
 - 二者冲突时：图表真源约束 > 本文件 token 规则 > 高级感风格偏好

@@ -36,10 +36,9 @@ prompt 文件保存后优先 batch 而非 subagent；每图最多 3 次重试。
 
 CLI > EXTEND.md > env > built-in default
 
-### 脚本入口
+### 调用方式
 
-- 单图：`{baseDir}/scripts/main.ts`
-- Batch：`{baseDir}/scripts/build-batch.ts`
+本 SKILL 不内置生图脚本：按上述 Provider 优先级与 Model 解析规则现场编写调用代码（HTTP/SDK）；Batch 模式先落 prompt 文件再批量调用。
 
 ## 与程序化导出的区别
 
@@ -58,7 +57,7 @@ CLI > EXTEND.md > env > built-in default
 2. **降级为程序化渲染** — 使用本 SKILL 已有的 SVG/PNG 导出管线（`generate-diagram.sh` / `png-export.md`）替代
 3. **降级为 CSS 视觉构建** — 用 CSS 渐变、几何图形、排版组合构建封面/配图，不依赖外部服务
 4. **提示用户** — 输出 `[NO-AI-IMAGE] 未检测到图像生成 API Key，已降级为程序化渲染/CSS 视觉构建`
-5. **不尝试调用脚本** — `{baseDir}/scripts/main.ts` 等脚本在无 Key 时不可用，跳过而非报错
+5. **不尝试调用生图接口** — 无 Key 时任何 Provider 都不可用，跳过而非报错
 
 检测方式：检查环境变量中是否存在以下任一 Key：`GEMINI_API_KEY`、`OPENAI_API_KEY`、`AZURE_OPENAI_API_KEY`、`DASHSCOPE_API_KEY`、`MINIMAX_API_KEY`、`REPLICATE_API_TOKEN`。全部缺失即触发降级。
 

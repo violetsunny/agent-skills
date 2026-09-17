@@ -14,7 +14,7 @@ are deliberately specialized rather than universal skins.
 | 11 Event Transit | Topics, ordered processors, consumer groups, junctions, DLQ/state | Thin metro rails, numbered stations, fixed arrowheads, role-specific terminals | `event metro map`, `事件地铁图`, `Kafka 拓扑图` | Generic flow style when stream evidence is absent | Cloud nesting, C4 cards, SRE dashboards |
 | 12 Ops Pulse | Fixed window, four golden signals, statuses, one critical path and trace | Live stamp, status rails, metric windows, numbered hops, trace ruler | `reliability pulse`, `事故排查视图`, `黄金信号追踪图` | Generic architecture when measured evidence is absent | Deployment ownership, event rail metaphor, C4 review marks |
 
-All four official fixtures use the `showcase` composition contract: at least
+Styles 9–12 follow the `showcase` composition contract: at least
 40px node spacing, 20px container gutter, zero bridge crossings, at most two
 bends per edge, and no semantic edge duplicated for visual effects.
 

@@ -4,7 +4,7 @@
 
 模块 3 分为三类同步方式：
 
-- **npx 管理型**（15 个项目）：通过 `npx skills@latest update` 统一更新，安装到 `~/.agents/skills/`；更新失败的 skill 走 rsync 兜底
+- **npx 管理型**（16 个项目）：通过 `npx skills@latest update` 统一更新，安装到 `~/.agents/skills/`；更新失败的 skill 走 rsync 兜底
 - **自写 skill 同步**（模块 3.3）：`agent-skills/self-skills/` ↔ `~/.agents/skills/`，按文件级比对结果决定方向，排在外部同步之后
 - **自写命令同步**（模块 3.4）：`agent-skills/commands/` ↔ `~/.agents/commands/`，方向判定同 3.3，排在 3.3 之后
 
@@ -12,9 +12,9 @@
 
 OpenSpec 在 `~/.claude/skills/` 下生成的完整 skills 集合只走模块 2 的专门同步流程。外部同步（npx / rsync 兜底）遇到与 `self-skills/` 同名的 skill 一律跳过，自写 skill 的真源规则见 `modules/shared.md`。
 
-## 3.1 npx 管理型项目（15 个）
+## 3.1 npx 管理型项目（16 个）
 
-以下 15 个项目通过 `npx skills@latest` 安装和更新，**不走常规 rsync 同步**（仅更新失败时走本节末尾的 rsync 兜底）。npx 安装更可靠，能正确处理 skill 依赖和元数据，大幅减少同步错误的可能性。
+以下 16 个项目通过 `npx skills@latest` 安装和更新，**不走常规 rsync 同步**（仅更新失败时走本节末尾的 rsync 兜底）。npx 安装更可靠，能正确处理 skill 依赖和元数据，大幅减少同步错误的可能性。
 
 | 项目                     | GitHub 仓库 | 初始化安装命令 |
 |------------------------|-----------|--------------|
@@ -33,6 +33,7 @@ OpenSpec 在 `~/.claude/skills/` 下生成的完整 skills 集合只走模块 2 
 | humanizer-zh           | `op7418/Humanizer-zh` | `npx skills@latest add op7418/Humanizer-zh` |
 | **andrej-karpathy-skills** | `forrestchang/andrej-karpathy-skills` | `npx skills@latest add forrestchang/andrej-karpathy-skills` |
 | vercel-agent-skills    | `vercel-labs/agent-skills` | `npx skills@latest add vercel-labs/agent-skills` |
+| **i-have-adhd**        | `ayghri/i-have-adhd` | `npx skills@latest add ayghri/i-have-adhd` |
 
 ### 更新流程
 
@@ -95,6 +96,7 @@ env -u XDG_STATE_HOME npx skills@latest add blader/humanizer -y -g
 env -u XDG_STATE_HOME npx skills@latest add op7418/Humanizer-zh -y -g
 env -u XDG_STATE_HOME npx skills@latest add forrestchang/andrej-karpathy-skills -y -g
 env -u XDG_STATE_HOME npx skills@latest add vercel-labs/agent-skills -y -g
+env -u XDG_STATE_HOME npx skills@latest add ayghri/i-have-adhd -y -g
 ```
 
 ### npx 更新失败时的 rsync 兜底（回退）
@@ -122,6 +124,7 @@ env -u XDG_STATE_HOME npx skills@latest add vercel-labs/agent-skills -y -g
 | humanizer | （无本地克隆） | —（兜底按规则 5 标 `[NPX-FALLBACK-MISS]`） |
 | humanizer-zh | （无本地克隆） | —（兜底按规则 5 标 `[NPX-FALLBACK-MISS]`） |
 | vercel-agent-skills | `self/skills/vercel-agent-skills/` | `skills/`（直接子目录即为 skill 名） |
+| i-have-adhd | `self/skills/i-have-adhd/` | `skills/`（单 skill：i-have-adhd） |
 
 **兜底规则**（交集口径，自包含）：
 
@@ -143,11 +146,11 @@ env -u XDG_STATE_HOME npx skills@latest add vercel-labs/agent-skills -y -g
   超时**不中断后续 3.3 / 3.4 的同步**
 - 安装/更新成功标记 `[NPX-AUTO]` 并报告更新的 skill 数量；失败的 skill 先走上述 rsync 兜底，兜底成功标记 `[NPX-FALLBACK]`，兜底不可用或失败标记 `[NPX-FAILED]` / `[NPX-FALLBACK-MISS]`；lock 读不到标记 `[NPX-LOCK-MISS]`，不计入成功
 - 这些项目的 skill 最终在 `~/.agents/skills/` 中，模块 4.1 全量 rsync 会同步到知识库
-- **模块 4.1A 排除全部 15 个 npx 管理型项目**（见模块 4 文档），避免其 `self/skills/` 下的 git 源结构被误判
+- **模块 4.1A 排除全部 16 个 npx 管理型项目**（见模块 4 文档），避免其 `self/skills/` 下的 git 源结构被误判
 
 ### Sub Agent 建议
 
-1. 用 fresh sub agent 预先枚举 15 个 npx 管理型项目，并核对 `~/.agents/.skill-lock.json` 中各 source 的 skill 数，生成执行清单
+1. 用 fresh sub agent 预先枚举 16 个 npx 管理型项目，并核对 `~/.agents/.skill-lock.json` 中各 source 的 skill 数，生成执行清单
 2. 若上一轮出现 `✗ Failed to update`，由 sub agent 对失败清单做兜底交集草稿：哪些 skill 运行时已存在可兜底、哪些会被拒绝新增、哪些无本地克隆
 3. 主线程执行 `env -u XDG_STATE_HOME npx skills@latest update -y -g` 和兜底时的实际 `rsync -rtu`
 4. 成功/失败计数、拒绝新增数量和项目级状态由主线程统一汇总
@@ -274,7 +277,7 @@ done
 
 **规则**：
 
-- 同步范围为**自写命令**（当前：`dev-commit.md`、`dev-paradigm.md`、`opsx-apply.md`、`opsx-propose.md`）；OpenSpec 生成的 `opsx/` **子目录**命令集由模块 2 的 `.claude -> .agents` 迁移管理，不在本步骤范围。**注意区分**：根目录扁平的 `opsx-apply.md` / `opsx-propose.md` 是用户自写命令（归本步骤），`opsx/` 子目录才是 OpenSpec 生成物（归模块 2），二者不得混淆。新增自写命令需人工把文件名加入本清单
+- 同步范围为**自写命令**（当前：`adhd.md`、`dev-commit.md`、`dev-paradigm.md`、`opsx-apply.md`、`opsx-propose.md`）；OpenSpec 生成的 `opsx/` **子目录**命令集由模块 2 的 `.claude -> .agents` 迁移管理，不在本步骤范围。**注意区分**：根目录扁平的 `opsx-apply.md` / `opsx-propose.md` 是用户自写命令（归本步骤），`opsx/` 子目录才是 OpenSpec 生成物（归模块 2），二者不得混淆。新增自写命令需人工把文件名加入本清单
 - **文件级方向由比对决定**（口径同 3.3，见 `modules/shared.md`）：
 
   | 比对结果 | 方向 | 标记 |
@@ -293,7 +296,7 @@ done
 commands_dir="/Users/kangll13/aiot/java-code/self/gggggggood/agent-skills/commands"
 rt_cmds="$HOME/.agents/commands"
 
-for cmd in dev-commit.md dev-paradigm.md opsx-apply.md opsx-propose.md; do
+for cmd in adhd.md dev-commit.md dev-paradigm.md opsx-apply.md opsx-propose.md; do
   s="$commands_dir/$cmd"; t="$rt_cmds/$cmd"
   [ -f "$s" ] || { printf '[COMMAND-MISSING-SRC] %s（仓库中不存在）\n' "$cmd"; continue; }
 

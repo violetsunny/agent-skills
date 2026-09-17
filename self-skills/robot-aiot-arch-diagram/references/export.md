@@ -6,15 +6,12 @@ Convert a generated diagram HTML file into a portable `.svg` and/or `.png` next 
 
 Load this file when:
 
-- The user invokes `/diagram-design:export-diagram <html-file>` (the plugin's slash command — defined in `commands/export-diagram.md` at the repo root).
-- The user asks in natural language to export, save, rasterize, convert, or download a diagram in `.svg` or `.png` form. Typical phrasings:
+- The user asks in natural language to export, save, rasterize, convert, or download a diagram in `.svg` or `.png` form, naming the source HTML file. Typical phrasings:
   - "export this as PNG"
   - "save as SVG"
   - "give me a PNG of that diagram"
   - "rasterize it"
   - "convert to png and svg"
-
-The slash command is a thin wrapper that delegates here — both paths run the same procedure below.
 
 ## Scope
 
@@ -38,9 +35,26 @@ If the user explicitly asks for "a screenshot of the whole page including the ca
        <style>@import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&amp;family=Geist:wght@400;500;600&amp;family=Geist+Mono:wght@400;500;600&amp;display=swap');</style>
      </defs>
      ```
-     If the SVG already contains a `<defs>` block, **merge** the `<style>` into it (don't add a second `<defs>`).
-4. Prepend `<?xml version="1.0" encoding="UTF-8"?>\n` so the file is well-formed XML.
-5. Write to `<basename>.svg` next to the source (e.g. `example-architecture.html` → `example-architecture.svg`). Honour an explicit output path if the user provides one.
+      If the SVG already contains a `<defs>` block, **merge** the `<style>` into it (don't add a second `<defs>`).
+      CJK labels never extend the `@import` with extra web-font families — a Korean, Simplified, or Traditional Chinese `<text>` element carries its own `font-family` stack that resolves through locally installed faces (Korean: `'Geist', 'Noto Sans KR', 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif`; Traditional: `'Geist', 'Noto Sans TC', 'PingFang TC', 'Microsoft JhengHei', sans-serif`; mixed Latin/Han titles: `'Instrument Serif', 'Noto Serif TC', serif`). Full stacks and metrics in [`style-guide.md`](style-guide.md).
+4. Normalize colors for strict SVG 1.1 consumers. This design system's tokens are authored as `rgba(...)` (see `style-guide.md`) and render correctly wherever colors are read as CSS — browsers, Figma, Illustrator. PowerPoint's SVG importer does not: it treats `rgba(...)` and `transparent` as unrecognized and paints them **opaque black**, turning a barely-there tint into a solid block that swallows the label inside it. The transform is lossless (every replacement renders identically to the original in a browser), so apply it to the SVG string extracted in step 2, before writing the file:
+
+   ```python
+   import re
+
+   svg = re.sub(
+       r'(fill|stroke)="rgba\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d*\.?\d+)\s*\)"',
+       lambda m: '{0}="#{1:02x}{2:02x}{3:02x}" {0}-opacity="{4}"'.format(
+           m.group(1), int(m.group(2)), int(m.group(3)), int(m.group(4)), m.group(5)
+       ),
+       svg,
+   )
+   svg = re.sub(r'(fill|stroke)="transparent"', r'\1="none"', svg)
+   ```
+
+   The `\s*` around each channel tolerates a spaced `rgba(45, 49, 66, 0.03)` as well as the compact `rgba(45,49,66,0.03)` the templates normally use; `\d*\.?\d+` accepts an alpha value with or without a leading zero (both `0.03` and `.03` appear in shipped tokens). Matching is scoped to the `fill="..."` / `stroke="..."` presentation attribute, not the bare `rgba(` string, so nothing else is touched — the shipped templates and examples only ever express color through these two attributes on SVG elements, never a `style="..."` attribute or a `<style>` block. (A brand's onboarded palette in `style-guide.md` could in principle add a third notation such as `hsl()`; none exists in any shipped token today, so this pass doesn't handle it — extend the regex if one is ever introduced.)
+5. Prepend `<?xml version="1.0" encoding="UTF-8"?>\n` so the file is well-formed XML.
+6. Write to `<basename>.svg` next to the source (e.g. `example-architecture.html` → `example-architecture.svg`). Honour an explicit output path if the user provides one.
 
 ### Caveat to surface to the user
 

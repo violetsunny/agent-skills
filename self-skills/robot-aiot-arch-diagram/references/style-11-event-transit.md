@@ -73,8 +73,3 @@ real `dlq` node. Multiple rail departures are only valid from a `junction`.
 Do not nest Region/VPC deployment boundaries, label cards as C4 containers, or
 attach golden-signal dashboards to every station. A request/response flow with
 no topic, consumer-group, or stream evidence should use a generic flow style.
-
-## Fixture
-
-`fixtures/event-transit-style11.json` shows a checkout event line with schema
-validation, fraud enrichment, a declared junction, DLQ, and materialized state.

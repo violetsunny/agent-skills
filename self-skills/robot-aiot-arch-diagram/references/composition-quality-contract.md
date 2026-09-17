@@ -84,9 +84,8 @@ python3 scripts/validate_svg.py diagram.svg --check composition
 `scripts/validate-svg.sh` runs both automatically. A successful render without
 these gates is still a draft.
 
-Dense legacy diagrams live under `fixtures/stress/`. They preserve routing
-pressure cases and are not visual quality references. The public 12-style
-showcase keeps a distinct engineering scene for every style. The internal
-`fixtures/quality-baseline/` set applies one shared Agent Runtime Architecture
-topology to all 11 generator-backed styles; Style 8 remains the static,
-AI-authored exception.
+Dense legacy stress diagrams preserve routing pressure cases and are not
+visual quality references. The 12-style showcase keeps a distinct engineering
+scene for every style; the quality baseline applies one shared Agent Runtime
+Architecture topology to all 11 generator-backed styles, with Style 8 as the
+static, AI-authored exception.

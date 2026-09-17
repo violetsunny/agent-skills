@@ -82,8 +82,3 @@ Never jitter:
 Do not add Region/VPC ownership bands, event-metro stations, or golden-signal
 metric chips. If those facts dominate the request, route to Style 10, 11, or
 12 instead of turning the C4 review into a mixed abstraction canvas.
-
-## Fixture
-
-`fixtures/c4-review-canvas-style9.json` demonstrates a checkout container
-review with a deterministic seed and a 100-point showcase composition score.

@@ -42,5 +42,5 @@ NODE_PATH=/tmp/svg2png-puppeteer/node_modules node "$SKILL_ROOT/scripts/svg2png.
 ## Known Limits
 
 - `rsvg-convert` can omit complex CSS, filters, and `<foreignObject>` content.
-- CairoSVG can miss CJK or emoji glyphs when the selected system font lacks them.
+- CairoSVG can miss CJK or emoji glyphs when the selected system font lacks them. On macOS, fontconfig frequently fails to resolve system CJK family names (e.g. `fc-match "PingFang SC"` falls back to Verdana), and symbol glyphs such as `≈ × → ① …` render as tofu boxes in SVG text; restrict SVG text to the safe set `—— 、，。（）【】：+ / · “”` plus plain CJK/Latin/digits (HTML page text is unaffected — browsers fall back per glyph). Switch to the Puppeteer renderer when those symbols must appear.
 - Use Puppeteer when browser rendering is required; its viewport path preserves the SVG dimensions more reliably than a raw Chrome `--window-size` screenshot.

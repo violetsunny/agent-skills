@@ -19,10 +19,10 @@
 - 发现已修改的跟踪文件、合并冲突、rebase/merge 状态、远端分支冲突或其他异常时，只读取并报告仓库路径、状态和简要原因，然后跳过该仓库。**注意：仅有未跟踪文件（.DS_Store 等）的仓库不触发此规则，可安全执行 `git pull --ff-only`。**
 - 对保护目录中的干净仓库，只允许执行非破坏性的远端检查和普通 `git pull --ff-only`；拉取失败或无法快进时直接提示并跳过。
 - 技能同步涉及保护目录中的源文件时，同样禁止使用会删除或覆盖用户文件的操作；发现源或目标存在差异、异常或冲突时直接提示并跳过同步。
-- **例外**：模块 3.5（同步到 `free-stock-line-skills/`）和模块 4（同步到 `agent-skills/` / `.claude/skills/` 备份）属于用户明确要求的受控同步场景，可在对应模块写明的目标路径内执行 `rsync -rtu` 这类**不带 `--delete` 的非删除式覆盖同步**；但仍禁止删除、强制 git 操作、自动冲突处理，以及超出模块定义目标范围的覆盖。
+- **例外**：模块 1 步骤 1.6（强制清除 `agent-skills/skills/` 下残留的 `.git` / `.github` 目录，仅限这两个目录名，skill 内容文件仍不删）、模块 3.5（同步到 `free-stock-line-skills/`）和模块 4（同步到 `agent-skills/` / `.claude/skills/` 备份）属于用户明确要求的受控同步场景，可在对应模块写明的目标路径内执行 `rsync -rtu` 这类**不带 `--delete` 的非删除式覆盖同步**；但仍禁止删除、强制 git 操作、自动冲突处理，以及超出模块定义目标范围的覆盖。
 - 任何不确定是否会修改、删除或覆盖保护目录内容的命令都不得执行，先提示用户确认。
 
-保护规则优先级高于本技能其他章节；但模块 3.5 与模块 4 中写明的“用户显式授权的非删除式同步例外”除外。结果汇总必须单独列出保护目录中跳过的仓库及原因，不得报告为成功。
+保护规则优先级高于本技能其他章节；但模块 1 步骤 1.6、模块 3.5 与模块 4 中写明的“用户显式授权例外”除外。结果汇总必须单独列出保护目录中跳过的仓库及原因，不得报告为成功。
 
 ---
 
@@ -122,12 +122,12 @@ rsync -rtu <排除项，含 _mideameta.json> "$src/" "$dst/"   # 标 [SELF-DEPLO
 - 模块 1 的 dirty 分类：只有未跟踪文件（`git status --porcelain` 输出除 `??` 外无其他条目）的仓库可安全执行 `git pull --ff-only`，不跳过
 - 分批执行，每批不超过 15 个项目，每批超时 **180s**
 - 扫描深度为 **3 层**（`self/` 下第一层子目录，再往下两层）
-- Skill 同步（模块 3）外部 skill 只有一类：**npx 管理型 15 个**（superpowers / matt-skills / ui-ux-pro-max-skill / claude-code-java / baoyu-skills / ppt-master / anthropics-skills / ECC / ponytail / archify / diagram-design / humanizer / humanizer-zh / andrej-karpathy-skills / vercel-agent-skills）通过 `env -u XDG_STATE_HOME npx skills@latest update -y -g` 统一更新（在用户主目录执行，`-y` 跳过确认，`-g` 全局安装并 Copy to all agents）；更新失败的 skill 按 `self/skills/` 本地克隆走 **rsync 兜底**（见模块 3.1，`rsync -rtu` 不加 `--delete`，交集 + 新旧比对，无本地克隆标 `[NPX-FALLBACK-MISS]` 不自动 clone）。原「rsync 管理型」类别已取消（anthropics-skills 并入 npx，source `anthropics/skills`）；模块 3.5 和模块 4 同步到 `free-stock-line-skills/` 和 `agent-skills/skills/` 时同样使用 `rsync -rtu`（**不加 `--delete`**），保留用户自定义文件
+- Skill 同步（模块 3）外部 skill 只有一类：**npx 管理型 16 个**（superpowers / matt-skills / ui-ux-pro-max-skill / claude-code-java / baoyu-skills / ppt-master / anthropics-skills / ECC / ponytail / archify / diagram-design / humanizer / humanizer-zh / andrej-karpathy-skills / vercel-agent-skills / i-have-adhd）通过 `env -u XDG_STATE_HOME npx skills@latest update -y -g` 统一更新（在用户主目录执行，`-y` 跳过确认，`-g` 全局安装并 Copy to all agents）；更新失败的 skill 按 `self/skills/` 本地克隆走 **rsync 兜底**（见模块 3.1，`rsync -rtu` 不加 `--delete`，交集 + 新旧比对，无本地克隆标 `[NPX-FALLBACK-MISS]` 不自动 clone）。原「rsync 管理型」类别已取消（anthropics-skills 并入 npx，source `anthropics/skills`）；模块 3.5 和模块 4 同步到 `free-stock-line-skills/` 和 `agent-skills/skills/` 时同样使用 `rsync -rtu`（**不加 `--delete`**），保留用户自定义文件
 - **`npx skills` 调用必须加 `env -u XDG_STATE_HOME`**：CLI 的 lock 路径为 `XDG_STATE_HOME` 已设置时取 `$XDG_STATE_HOME/skills/.skill-lock.json`、否则取 `~/.agents/.skill-lock.json`（真实 lock 在后者）。部分 Agent 运行环境会注入 `XDG_STATE_HOME`，漏加则输出 `No global skills tracked in lock file.` 并 **exit 0 静默空跑**，一个 skill 都不更新——标 `[NPX-LOCK-MISS]`，**不得报告为成功**。3.1 真正成功的标志是输出含 `Checking skills from source:` 并以 `✓ All global skills are up to date` 或 `✓ Updated <skill>` 结尾（详见模块 3.1“环境变量陷阱”）
 - **`timeout` 在 macOS 默认不存在**（无 coreutils 时 `command not found: timeout`）：按 `timeout` → `gtimeout` → 空 的顺序降级探测，探测不到时由调用方控制超时；**不得因 `command not found: timeout` 判定模块失败**
 - **所有文件级同步必须先执行“文件新旧比对规则”**：内容不同且目标端更新的文件，模块 2 / 3.1 rsync 兜底 / 3.5 / 4.x 标记 `[NEWER-TARGET]` 跳过并报告，严禁旧文件覆盖新文件；**模块 3.3 / 3.4 例外——方向反转，把运行时回写真源**（`[SELF-PULLBACK]` / `[COMMAND-PULLBACK]`，逐文件列入汇总供审查）；确需旧覆盖新必须写明原因由用户手动执行
 - 模块 3.3 负责自写 skill 同步：`agent-skills/self-skills/<name>/` ↔ `~/.agents/skills/<name>/`，**按文件级比对结果决定方向**（真源新→部署 `[SELF-DEPLOY]`；运行时新→回写真源 `[SELF-PULLBACK]`；仅运行时存在→回写 `[SELF-PULLBACK-NEW]`），双向均用 `rsync -rtu` 不加 `--delete`，排在外部同步之后执行（同名时自写版本为最终权威）；**skill 级只更新不新增：运行时没有的自写 skill 绝不私自新增**（`[SELF-DEPLOY-SKIP]`，人工手动加入）；`_mideameta.json` 永远运行时权威，不比对不部署不回写；自写 skill 名单以 `self-skills/` 下的实际子目录为准，不写死清单
-- 模块 3.4 负责自写命令同步：`agent-skills/commands/<name>.md` ↔ `~/.agents/commands/<name>.md`，方向判定同 3.3（真源新→`[COMMAND-DEPLOY]`；运行时新→回写 `[COMMAND-PULLBACK]`），`rsync -rtu` 不加 `--delete`，排在 3.3 之后执行；范围为自写命令（当前 `dev-commit.md`、`dev-paradigm.md`、`opsx-apply.md`、`opsx-propose.md`），OpenSpec 生成的 `opsx/` 子目录命令集归模块 2 管理不在此列（根目录扁平 `opsx-apply.md` / `opsx-propose.md` 是自写命令，与 `opsx/` 子目录不得混淆）；skill 级同样**只更新不新增**（`[COMMAND-DEPLOY-SKIP]`）
+- 模块 3.4 负责自写命令同步：`agent-skills/commands/<name>.md` ↔ `~/.agents/commands/<name>.md`，方向判定同 3.3（真源新→`[COMMAND-DEPLOY]`；运行时新→回写 `[COMMAND-PULLBACK]`），`rsync -rtu` 不加 `--delete`，排在 3.3 之后执行；范围为自写命令（当前 `adhd.md`、`dev-commit.md`、`dev-paradigm.md`、`opsx-apply.md`、`opsx-propose.md`），OpenSpec 生成的 `opsx/` 子目录命令集归模块 2 管理不在此列（根目录扁平 `opsx-apply.md` / `opsx-propose.md` 是自写命令，与 `opsx/` 子目录不得混淆）；skill 级同样**只更新不新增**（`[COMMAND-DEPLOY-SKIP]`）
 - 模块 3.1 的 rsync 兜底**只单向、严禁回写外部项目克隆**：方向只有 `self/skills/<外部项目>/` → `~/.agents/skills/`，且只补位运行时已存在的 skill（不借兜底扩充运行时清单）。原因：克隆是上游镜像不是真源，回写会 dirty 已跟踪文件，模块 1 随即判 `[SKIP-DIRTY]` 永久跳过 `git pull --ff-only`，克隆静默冻结收不到上游更新。长期定制外部 skill 的正确做法是复制进 `self-skills/` 转为自写 skill
 - 模块 4 可使用“查找 `SKILL.md` 并倒推其父目录”为统一发现补充手段，但**不是默认逻辑**；仅允许在 `self/skills/<project>/` 项目目录内部查找，禁止回退到用户根目录 `~/.claude/skills/` / `~/.agents/skills/`
 - 模块 4 若发现同一项目内多个 `SKILL.md` 映射到同一个 `skill_name`，必须标记 `[DUPLICATE-SKILL]` 并跳过该 skill，禁止自动覆盖

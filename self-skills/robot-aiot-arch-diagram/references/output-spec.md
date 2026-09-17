@@ -22,7 +22,7 @@ Infer choices that are clear from the request (for example, "for my deck" implie
 | `png` | `.png` at `device_scale_factor` | pixels exactly as the browser renders them | vector editability |
 | `html+png` | both | — | — |
 
-Always generate the HTML first — `svg` and `png` are produced *from* it via [`export.md`](export.md). Never hand-author an SVG file directly; the HTML is the source of truth and the only artifact the taste gate (design-system.md §9) is written against.
+Always generate the HTML first — `svg` and `png` are produced *from* it via [`export.md`](export.md). Never hand-author an SVG file directly in a text editor: SKILL.md path B SVGs are emitted line-by-line by the generation script, and export-format SVG/PNG are produced from the HTML via export.md. The HTML wrapper is the source of truth and the only artifact the taste gate (design-system.md §9) is written against.
 
 Pick by destination:
 
@@ -143,9 +143,11 @@ Geist has no CJK coverage. When labels contain Japanese, Chinese, or Korean text
 ```svg
 <text font-family="'Geist', 'Hiragino Sans', 'Noto Sans JP', 'Yu Gothic', sans-serif">認証サービス</text>
 <text font-family="'Geist', 'Noto Sans KR', 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif">인증 서비스</text>
+<text font-family="'Geist', 'PingFang SC', 'Noto Sans SC', 'Microsoft YaHei', sans-serif">认证服务</text>
+<text font-family="'Geist', 'Noto Sans TC', 'PingFang TC', 'Microsoft JhengHei', sans-serif">認證服務</text>
 ```
 
-The Hiragino/Yu Gothic stack carries no Hangul glyphs, so Korean labels need the Korean stack — don't reuse the Japanese one. Noto Sans KR ships in the skin's font link, so it leads that stack and the local families follow it; the register, floor, and title rules Korean needs beyond the font live in [`style-guide.md`](style-guide.md#korean-labels). For mono sublabels use `'Geist Mono', 'Noto Sans Mono CJK JP', monospace` (Japanese) or `'Geist Mono', 'Noto Sans Mono CJK KR', monospace` (Korean). Budget **1em per full-width CJK glyph**, not a small percentage over the average Latin glyph; `verify-treemap.py` uses that conservative contract for Unicode wide/full-width characters and treats combining marks as non-advancing. Prefer 12px names over 8px sublabels for CJK, which goes muddy below 10px. Actual width still varies by fallback font, so run the relevant geometry verifier after translating labels.
+The Hiragino/Yu Gothic stack carries no Hangul glyphs, so Korean labels need the Korean stack — don't reuse the Japanese one. Noto Sans KR ships in the skin's font link, so it leads that stack and the local families follow it; the register, floor, and title rules Korean needs beyond the font live in [`style-guide.md`](style-guide.md#korean-labels). Japanese fonts also cover only a subset of the Chinese character set and render Simplified forms with Japanese glyph variants, so Chinese labels need a Chinese stack; Simplified and Traditional are separate stacks for the same reason. The Chinese stacks resolve through locally installed faces — no external web font is added for them; the register, floor, and title rules Traditional Chinese needs beyond the font live in [`style-guide.md`](style-guide.md#traditional-chinese-labels). For mono sublabels use `'Geist Mono', 'Noto Sans Mono CJK JP', monospace` (Japanese), `'Geist Mono', 'Noto Sans Mono CJK KR', monospace` (Korean), or `'Geist Mono', 'Noto Sans Mono CJK SC', monospace` / `'Geist Mono', 'Noto Sans Mono CJK TC', monospace` (Chinese). Budget **1em per full-width CJK glyph**, not a small percentage over the average Latin glyph; `verify-treemap.py` uses that conservative contract for Unicode wide/full-width characters and treats combining marks as non-advancing. Prefer 12px names over 8px sublabels for CJK; Hangul and Han go muddy below 12px, so treat 12px as the floor rather than 10px. Actual width still varies by fallback font, so run the relevant geometry verifier after translating labels.
 
 ---
 
@@ -179,4 +181,4 @@ Run alongside the design-system.md §9 taste gate.
 - [ ] CJK labels given a font fallback?
 - [ ] Fidelity ledger reported for anything cut?
 - [ ] Diagram `<svg>` has `role="img"`, resolving `aria-labelledby`, a non-empty first-child `<title>`, a non-empty `<desc>`, and per-diagram/variant prefixed IDs?
-- [ ] Requested non-HTML formats produced via [`export.md`](export.md), not hand-authored?
+- [ ] Requested non-HTML formats produced via [`export.md`](export.md) or the path B generation script, not hand-authored?

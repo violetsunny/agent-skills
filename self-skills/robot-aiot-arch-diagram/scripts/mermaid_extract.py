@@ -204,7 +204,7 @@ def clean_label(value: str) -> str:
     text = re.sub(r"\*\*(.*?)\*\*", r"\1", text)
     text = re.sub(r"__(.*?)__", r"\1", text)
     text = re.sub(r"(?<!\w)[*_](.*?)[*_](?!\w)", r"\1", text)
-    text = text.replace("\\\"", '"').replace("\\'", "'")
+    text = text.replace('\\"', '"').replace("\\'", "'")
     return "\n".join(part.strip() for part in text.splitlines()).strip()
 
 
@@ -215,9 +215,7 @@ def _read_bounded(path: Path) -> str:
     except OSError as error:
         _fail(f"{path}: {error}")
     if len(data) > MAX_SOURCE_BYTES:
-        _fail(
-            f"source exceeds the {MAX_SOURCE_BYTES // (1024 * 1024)} MiB limit"
-        )
+        _fail(f"source exceeds the {MAX_SOURCE_BYTES // (1024 * 1024)} MiB limit")
     try:
         return data.decode("utf-8")
     except UnicodeDecodeError:
@@ -325,9 +323,7 @@ def _kind_and_direction(
             return "erDiagram", "TD", position
         token = text.split(maxsplit=1)[0]
         if token.casefold() in UNSUPPORTED_KINDS:
-            _fail(
-                f"unsupported diagram kind: `{token}` (supported: {SUPPORTED_KINDS})"
-            )
+            _fail(f"unsupported diagram kind: `{token}` (supported: {SUPPORTED_KINDS})")
         _fail(f"not a Mermaid file at line {line_number}")
     _fail("not a Mermaid file")
 
@@ -421,8 +417,7 @@ def _logical_statements(
         if not _statement_complete(combined):
             continue
         logical.extend(
-            (start_line, statement)
-            for statement in _split_top_level(combined, ";")
+            (start_line, statement) for statement in _split_top_level(combined, ";")
         )
         pending = []
     if pending:
@@ -588,11 +583,13 @@ class _Operator:
 
 def _operator_style(token: str) -> tuple[str, str, bool, bool]:
     style = "dashed" if "." in token else "thick" if "=" in token else "solid"
-    arrowhead = "cross" if token.endswith("x") else "circle" if token.endswith("o") else "arrow"
+    arrowhead = (
+        "cross" if token.endswith("x") else "circle" if token.endswith("o") else "arrow"
+    )
     undirected = ">" not in token and not token.endswith(("x", "o"))
-    bidirectional = (
-        token.startswith("<") and token.endswith(">")
-    ) or (token.startswith(("x", "o")) and token.endswith(("x", "o")))
+    bidirectional = (token.startswith("<") and token.endswith(">")) or (
+        token.startswith(("x", "o")) and token.endswith(("x", "o"))
+    )
     return style, arrowhead, bidirectional, undirected
 
 
@@ -632,13 +629,17 @@ def _edge_operators(text: str) -> list[_Operator]:
                 operator_start += 1
                 opening = opening[1:]
         token = opening + match.group("closing")
-        label_group = "spaced" if match.group("spaced") is not None else "compact"
         style, arrowhead, bidirectional, undirected = _operator_style(token)
+        # Read the label from the whole span between the operators rather than
+        # from the matched group. The mask blanks quoted spans, so a quoted
+        # label — `A-- "text" -->B` — leaves the spaced group nothing but
+        # blanks to settle on, and slicing that group returns a stray quote
+        # instead of the text. `clean_label` strips the padding and quotes.
         operators.append(
             _Operator(
                 operator_start,
                 match.end(),
-                clean_label(text[match.start(label_group) : match.end(label_group)]),
+                clean_label(text[match.end("opening") : match.start("closing")]),
                 style,
                 arrowhead,
                 bidirectional,
@@ -921,14 +922,19 @@ def _parse_state(
             continue
         alias = re.match(r'^state\s+"(.*?)"\s+as\s+([\w.:-]+)$', text, re.I)
         if alias:
-            diagram.add_node(alias.group(2), clean_label(alias.group(1)), "state", parent)
+            diagram.add_node(
+                alias.group(2), clean_label(alias.group(1)), "state", parent
+            )
             continue
         stereotype = re.match(
             r"^state\s+([\w.:-]+)\s+<<(fork|join|choice)>>$", text, re.I
         )
         if stereotype:
             diagram.add_node(
-                stereotype.group(1), stereotype.group(1), stereotype.group(2).casefold(), parent
+                stereotype.group(1),
+                stereotype.group(1),
+                stereotype.group(2).casefold(),
+                parent,
             )
             continue
         if "-->" in text:
@@ -1084,11 +1090,20 @@ def analyze(diagram: Diagram) -> dict[str, Any]:
         )[:5]
         if node.in_degree + node.out_degree > 0
     ]
-    entry_points = [name(node) for node in leaves if node.out_degree and not node.in_degree]
-    terminals = [name(node) for node in leaves if node.in_degree and not node.out_degree]
-    orphans = [name(node) for node in leaves if not node.in_degree and not node.out_degree]
+    entry_points = [
+        name(node) for node in leaves if node.out_degree and not node.in_degree
+    ]
+    terminals = [
+        name(node) for node in leaves if node.in_degree and not node.out_degree
+    ]
+    orphans = [
+        name(node) for node in leaves if not node.in_degree and not node.out_degree
+    ]
     candidates = {
-        "flowchart": ["flowchart" if shapes.get("rhombus") else "architecture", "architecture"],
+        "flowchart": [
+            "flowchart" if shapes.get("rhombus") else "architecture",
+            "architecture",
+        ],
         "sequenceDiagram": ["sequence"],
         "stateDiagram-v2": ["state machine"],
         "erDiagram": ["ER / data model"],
@@ -1213,7 +1228,9 @@ def digest(
             for group in info["collapsible_groups"]:
                 output.append(
                     f"  - {_escape_markdown(group['label'])} — {group['children']} children: "
-                    + ", ".join(_escape_markdown(label) for label in group["child_labels"])
+                    + ", ".join(
+                        _escape_markdown(label) for label in group["child_labels"]
+                    )
                 )
 
         output.extend(

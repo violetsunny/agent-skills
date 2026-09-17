@@ -37,6 +37,12 @@ Phase 5 负责将母稿、图表 XML/HTML、逐页 HTML 一并移交给 `ppt-mas
 2. XML：图表真源
 3. HTML：直接视觉约束输入
 
+## 路由与确认门禁
+
+1. 路由按 ppt-master 的 `workflows/routing.md` 判定：本移交形态（MD 语义源 + HTML 视觉约束、无光栅页框、无既有 PPTX）落 Generate PPTX 普通 Default；仅当同时具备光栅页框清单与 Codex 时才走 image-to-pptx，勿误路由。
+2. ppt-master Stage-1/Stage-2 为 ⛔ 两阶段确认门禁：交互场景暂停等待用户显式确认；端到端授权执行场景按显式委托处理（agent 做决策、安装并派生 Stage 2，决策后出示一份完整摘要，不伪造 UI 回执）。
+3. 会话 token 预算不足以走完 Step 4-7 时，停在路由定义的 ✅ Checkpoint 干净断点，记录恢复指针（项目路径 + 下一步编号），不得半程产出残缺 PPTX。
+
 ## 交付后验证
 
 结构验证：

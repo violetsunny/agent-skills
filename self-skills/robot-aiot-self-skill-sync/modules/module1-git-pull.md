@@ -30,6 +30,14 @@ done
 
 `maxdepth 5` 覆盖最深嵌套路径 `self/gggggggood/agent-skills/skills/<repo>/.git`（5 层）。实测 maxdepth 3 漏扫 17 个仓库（14 个在 `free-stock-line-skills/` depth 4，3 个在 `agent-skills/skills/` depth 5），maxdepth 5 扫全 103 个，6 无新增。
 
+**排除 `agent-skills/skills/`（用户指定，不允许在此拉取同步）**：`gggggggood/agent-skills/skills/` 是外部 skill 的知识库副本，更新只走模块 3 npx / 模块 4 rsync，**禁止对该目录下任何仓库发起 `git pull`**。扫描结果先过滤再进入去重：
+
+```bash
+<扫描输出> | grep -v "/gggggggood/agent-skills/skills/"
+```
+
+过滤掉的仓库标记 `[SKIP-NOSYNC]`，单独计数，不计入网络/认证失败，并进入步骤 1.6 清理其残留 `.git` / `.github`。
+
 ### 步骤 1.2：去重
 
 按仓库路径去重，避免同一项目在不同层级被重复拉取。注意嵌套仓库（如 `gggggggood/free-stock-line-skills/claude-trading-skills`）是独立仓库，需单独计入。
@@ -178,6 +186,20 @@ find /Users/kangll13/aiot/java-code/self -maxdepth 7 -type f -name "tmp_pack_*" 
 cat /tmp/pull_pending.txt | xargs -P 4 -I{} /tmp/pull_one.sh {} 40 3
 ```
 
+### 步骤 1.6：agent-skills/skills/ 下 .git / .github 残留清理（用户指定，强制执行）
+
+`gggggggood/agent-skills/skills/` 不允许在该目录拉取同步（见步骤 1.1 排除规则），历史克隆遗留的 `.git`、`.github` 目录每轮拉取结束后强制清除：
+
+```bash
+find /Users/kangll13/aiot/java-code/self/gggggggood/agent-skills/skills -maxdepth 5 \
+  \( -name ".git" -o -name ".github" \) -type d 2>/dev/null
+```
+
+先确认清单全部落在该目录下，再逐个 `rm -rf` 删除，数量计入汇总（`[NOSYNC-CLEANED]`）。清理后复扫必须为 0，不为 0 如实报告（说明有残留或出现新克隆）。删除动作由主线程确认并执行，sub agent 只生成清单。
+
+- 这是用户明确要求的删除例外，不受模块 4「禁止删除 skill 目录或文件」约束——删除对象**仅限 `.git` / `.github` 目录**，skill 内容文件仍一律不删
+- 路径整体硬编码，不做模式拼接；手写路径前必须验证 `gggggggood` 为 7 个 g（`printf 'gggggggood' | tr -cd 'g' | wc -c` 输出 7），拼写错会删到别处
+
 ### 已知跳过清单（豁免项，不重试）
 
 以下仓库失败原因已知且无法在本机自动修复，分类阶段直接跳过：**不发起 pull、不重试、不计入网络/认证失败**，汇总中单独计数：
@@ -201,6 +223,8 @@ cat /tmp/pull_pending.txt | xargs -P 4 -I{} /tmp/pull_one.sh {} 40 3
 |---|---|---|
 | `[OK]` | 拉取成功（含 `Already up to date`） | 否 |
 | `[SKIP-DIRTY]` | 有已修改跟踪文件 | 是，需手动 commit/stash |
+| `[SKIP-NOSYNC]` | `agent-skills/skills/` 下的仓库，禁止在此拉取同步（用户指定） | 否（豁免，残留进步骤 1.6 清理） |
+| `[NOSYNC-CLEANED]` | `agent-skills/skills/` 下清除的 `.git` / `.github` 残留 | 否（用户指定删除例外） |
 | `[SKIP-INTRANET]` | 内网远端不可达 | 否（豁免） |
 | `[SKIP-GUI]` | GUI 客户端维护 | 否（豁免） |
 | `[AUTH-PRIVATE]` / `[AUTH]` | 私有仓库无凭据 | 是，需配置凭据 |
@@ -214,7 +238,7 @@ cat /tmp/pull_pending.txt | xargs -P 4 -I{} /tmp/pull_one.sh {} 40 3
 
 ### Sub Agent 建议
 
-1. 先用 fresh sub agent 扫描五层仓库并生成候选仓库清单
+1. 先用 fresh sub agent 扫描五层仓库并生成候选仓库清单（含 `agent-skills/skills/` 排除过滤与 `[SKIP-NOSYNC]` 标记）
 2. 再用 sub agent 做 `git status --porcelain` 分类草稿，区分干净 / `[SAFE-UNTRACKED]` / `[SKIP-DIRTY]` / `[EMPTY-REPO]`
 3. 主线程根据分类结果分批执行真实 `git pull --ff-only`
 4. 失败重试、保护目录跳过、tmp_pack 清理前置校验由主线程处理，sub agent 只负责识别和汇总，不负责执行 git 命令

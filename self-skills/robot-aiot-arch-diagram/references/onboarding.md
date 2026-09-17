@@ -45,7 +45,7 @@ Gate-only choices use the same finish:
 
 ### Invocation
 
-> *"Onboard diagram-design to my site — `https://example.com`"*
+> *"Onboard robot-aiot-arch-diagram to my site — `https://example.com`"*
 
 ---
 
@@ -120,7 +120,7 @@ Before writing, validate:
 
 - **AA contrast**: `ink` on `paper` ≥ 4.5:1. `muted` on `paper` ≥ 4.5:1 for body text.
 - **Accent is the most saturated color**: not muted-ish, not near-grey.
-- **paper ≠ pure white**: if the site uses `#ffffff`, fall back to `#fafaf7` to preserve Diagram Design's warm-neutral feel — or ask the user to confirm pure-white is intentional.
+- **paper ≠ pure white**: if the site uses `#ffffff`, fall back to `#fafaf7` to preserve the design system's warm-neutral feel — or ask the user to confirm pure-white is intentional.
 
 If any check fails, propose an adjusted value and explain why.
 
@@ -161,7 +161,7 @@ Write the new tokens to `style-guide.md`. Suggest running the `/regenerate-examp
 
 After onboarding, the user should:
 
-1. Open `assets/index.html` (gallery) and confirm the new palette feels coherent across all 39 types.
+1. Open the shipped examples under `$SKILL_ROOT/assets/` (`template.html`, `template-dark.html`, `template-full.html`, `icons.html`) and the sample diagrams in `$SKILL_ROOT/templates/*.svg`, and confirm the new palette feels coherent across them.
 2. If any type looks off, they usually need to tune `muted` (often too dark or too light against the new `paper`).
 
 ---
@@ -181,7 +181,7 @@ Extract tokens from an installed Agent Skill that carries its own design system 
 
 ### Invocation
 
-> *"Onboard diagram-design from my `acme-design` skill"*
+> *"Onboard robot-aiot-arch-diagram from my `acme-design` skill"*
 
 Or the gate offers this as option (b) and the user names the skill.
 
@@ -199,6 +199,36 @@ Use the installed-skill location exposed by the current agent when available. Ot
 
 1. `~/.claude/skills/<skill-name>/` (user install)
 2. `.claude/skills/<skill-name>/` (project install)
+
+**Kiro:**
+
+1. `.kiro/skills/<skill-name>/` (workspace install)
+2. `~/.kiro/skills/<skill-name>/` (global install)
+
+**OpenCode:**
+
+1. `.opencode/skills/<skill-name>/` (project install)
+2. `~/.config/opencode/skills/<skill-name>/` (global install)
+
+**Cursor:**
+
+1. `.cursor/skills/<skill-name>/` or `.agents/skills/<skill-name>/` (project install)
+2. `~/.cursor/skills/<skill-name>/` or `~/.agents/skills/<skill-name>/` (user install)
+
+**Cline (CLI or VS Code):**
+
+1. `.cline/skills/<skill-name>/` or `.agents/skills/<skill-name>/` (workspace install)
+2. `~/.cline/skills/<skill-name>/` or `~/.agents/skills/<skill-name>/` (user install)
+
+**Codex:**
+
+1. The skill root exposed by an active marketplace plugin
+2. `~/.agents/skills/<skill-name>/` (user install or editable-clone link)
+
+**GitHub Copilot:**
+
+1. `.github/skills/<skill-name>/`, `.agents/skills/<skill-name>/`, or `.claude/skills/<skill-name>/` (project install)
+2. `~/.copilot/skills/<skill-name>/`, `~/.agents/skills/<skill-name>/`, or `~/.claude/skills/<skill-name>/` (user install)
 
 **Factory Droid:**
 
@@ -260,7 +290,7 @@ Extract tokens from a local directory — a checked-out design system repo, a Fi
 
 ### Invocation
 
-> *"Onboard diagram-design from my design system at `~/projects/brand/design-tokens/`"*
+> *"Onboard robot-aiot-arch-diagram from my design system at `~/projects/brand/design-tokens/`"*
 
 Or the gate offers this as option (c) and the user provides the path.
 

@@ -2,7 +2,7 @@
 name: robot-aiot-draw-flowchart
 description: >
   机器人/IoT 业务图表绘制与页面化能力。draw.io XML 图表生成（可编辑主路径）+ XML→HTML 稳定桥接转换 + 领导汇报静态页面 HTML 生成。覆盖流程图、分层架构、时序、状态机、ER、UML 类/用例、网络拓扑、时间线、Agent/记忆架构等 39+ 图表类型；内置机器人视觉语言、配色与样式一致性体系、几何/构图校验、PNG/GIF 导出与 drawio/Mermaid 导入重绘；支持 Mermaid 源码写作（23 类图表语法）与 .excalidraw/SVG/PNG 三件套离线导出、数据统计图表（饼图/箱线图/热力图/网络拓扑等）绘制规则、深色主题直绘技法与出版级示意图迭代流程；XML→HTML 转换保留原始样式/布局/层级/配色；静态页面固定 1920x1080 画布，内化语义 token、高级感设计标准与交付审查流程。
-version: 5.1.0
+version: 5.3.1
 author: kangll13
 license: MIT
 metadata:
@@ -84,7 +84,7 @@ done
 
 ### 复杂度预算
 
-节点 ≤9、箭头 ≤12、强调元素 ≤2、泳道 ≤5、时序生命线 ≤5、ER 实体 ≤8、树/组织深度 ≤4、层 ≤6。超预算拆"总览+详情"。完整预算表见 `references/design-system.md` §7。
+节点 ≤9、箭头 ≤12、强调元素 ≤2、泳道 ≤5、时序生命线 ≤5、ER 实体 ≤8、树/组织深度 ≤4、层 ≤6。超预算拆"总览+详情"。完整预算表见 `references/design-system.md` §7。分层架构图模式例外：其约束为层 ≤6 与层内节点间距，节点总数不受 ≤9 限制（层容器内的能力卡不计入通用节点预算）。
 
 ## 生成工作流：draw.io XML
 
@@ -184,11 +184,12 @@ done
 
 ### 已知坑与防回退约定
 
-`scripts/xml_to_html.py` 历史上暴露过以下 3 个缺陷，任何修改或 review 本脚本时必须作为硬约束核对，防止回退：
+`scripts/xml_to_html.py` 历史上暴露过以下 4 个缺陷，任何修改或 review 本脚本时必须作为硬约束核对，防止回退：
 
 1. **折线拐点不得丢失**：带 waypoints 的边必须按拐点渲染为 `polyline`，不得退化成首尾相连的单条直线。
 2. **无锚点边必须裁剪到节点边界**：无 exit/entry 锚点时，起点/终点须沿目标方向裁剪到节点边界（`_clip_to_boundary`），与 draw.io 行为一致；禁止中心到中心直接连线，否则线段会穿越节点内部。
 3. **富文本必须原样渲染**：draw.io `html=1` 语义下，节点 value 本身即 HTML（`<b>`/`<br>`/`<font>` 等），必须原样渲染、仅转义引号；禁止整体 `escape()`，否则标签变明文、破坏展示。
+4. **富文本行结构不得被 flex 破坏**：`.vertex` 用 flex 做垂直居中时，`<b>`/`<font>` 等内联子元素会被提升为并排 flex item 且 `<br>` 被忽略，多行富文本塌成一行；节点内容必须包一层块级 div（`<div style="width:100%">`）保留块级排版。
 
 校验局限补充：保真校验是结构性校验（数量 + 字符串包含），**无法发现渲染语义漂移**（如富文本被整体转义时仍会报 PASS）。凡改动渲染逻辑，除跑保真报告外，必须 headless 截图或浏览器目检确认，不得仅凭报告 PASS 放行。
 
@@ -241,6 +242,7 @@ done
 2. 固定 `1920x1080` 画布，作为 PPT 单页真源
 3. 页面主题单一，30 秒内可读懂核心结论
 4. 图表优先引用既有图表 HTML，不重画事实表达
+5. 四要素中的话术写入画布内 `display:none` 的 `.notes` 容器随页交付，禁止以可见元素出现在页面上
 
 ### 执行流程
 
@@ -248,9 +250,9 @@ done
 
 动手前按 `references/slide-premium-design.md` 完成：
 
-1. 输出一行设计解读：页面类型、受众、视觉语气、风格基调
-2. 设定三档刻度：DESIGN_VARIANCE（4-5）、MOTION_INTENSITY（1，静态页）、VISUAL_DENSITY（4-6）
-3. 锁定风格基调：克制商务 / 深底科技 / 暖调编辑，三选一并保持整套汇报一致
+1. 输出一行设计解读：页面类型、受众、视觉语气、风格基调。受众由用户指定（领导层/技术同行/外部客户/大众），未指定默认领导层
+2. 设定三档刻度：DESIGN_VARIANCE（4-5）、MOTION_INTENSITY（1，静态页）、VISUAL_DENSITY（4-6），按受众微调（映射表见 `slide-premium-design.md` §2）
+3. 锁定风格基调：克制商务 / 深底科技 / 暖调编辑，按受众→基调映射三选一并保持整套汇报一致（映射表见 `slide-premium-design.md` §3）
 
 #### 2. 先定页面契约，再写样式
 
@@ -281,6 +283,7 @@ done
 2. 先确定结构区块，再补视觉增强
 3. 标题、结论、主数字和图表必须形成清晰扫描路径
 4. UI 壳层服务内容，不与内容争抢注意力
+5. 位图（截图/照片/配图）必须经 `.img-frame` 容器上屏，禁止裸 `<img>`；截图/图表 PNG/Logo 用 `contain` 不裁剪，规则见 `references/slide-image-framing.md`
 
 #### 5. 图表真源冻结与审查修复
 
@@ -367,6 +370,7 @@ done
 3. 需要高级感设计标准（设计解读、刻度、风格基调、排版/色彩/布局纪律、AI 痕迹清单）时，读 `references/slide-premium-design.md`
 4. 需要执行交付前审查或修复既有页面时，读 `references/slide-premium-review.md`
 5. 需要设计系统细则（色彩角色配对、tonal surface 层次、字级、同心圆角、对比度判据）时，读 `references/slide-design-system.md`
+6. 页面需要放位图（截图/照片/AI 配图/图表 PNG）时，读 `references/slide-image-framing.md`
 
 ### 交付口径
 

@@ -21,6 +21,6 @@
 - Inconsistent layer heights without reason.
 
 ## Examples
-- `assets/example-layers.html` — minimal light
-- `assets/example-layers-dark.html` — minimal dark
-- `assets/example-layers-full.html` — full editorial
+- minimal light
+- minimal dark
+- full editorial

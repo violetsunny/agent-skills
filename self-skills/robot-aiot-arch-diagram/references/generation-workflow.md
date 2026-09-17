@@ -8,7 +8,7 @@
 2. 识别关键节点、连接关系和角色边界
 3. 判断是否需要机器人状态图标
 4. 分层架构图额外确认层级数量、每层名称和核心组件
-5. 决定输出路径：draw.io XML 主路径（A）、直绘 SVG/HTML 路径（B）或 archify HTML/SVG 路径（C），决策规则见 SKILL.md「输出路径选型」
+5. 决定输出路径：直绘 SVG/HTML 主路径（B）或 archify HTML/SVG 路径（C），决策规则见 SKILL.md「输出路径选型」；本 skill 不含 draw.io XML 路径（硬约束 1）
 
 ### 步骤 2：加载资源
 
@@ -20,12 +20,11 @@
 6. `references/style-consistency.md`
 7. 直绘 SVG/HTML 路径 B：对应 `type-*.md` + `style-N-*.md` + `composition-quality-contract.md` + `svg-layout-best-practices.md`（见 SKILL.md「生成工作流 · 路径 B」）
 
-### 步骤 3：生成 XML 结构
+### 步骤 3：生成 SVG（路径 B 主路径）
 
-1. 创建 `mxfile`
-2. 添加 `diagram` 和 `mxGraphModel`
-3. 初始化 `root` 元素（`id=0` 和 `id=1`）
-4. 按所选图表类型生成节点、容器、箭头和图例
+1. Python list 逐行生成 `.svg`，viewBox、坐标与标注遵循 `svg-layout-best-practices.md` 与 SKILL.md「生成工作流 · 路径 B」
+2. 标注 `data-graph-role`/`data-node-id`/`data-edge-id`/`data-source`/`data-target`/`data-owner`，使 validate_svg.py 的几何与构图检查生效
+3. 生成同目录同名 `.html` 包装；零外部请求场景使用系统字体栈
 
 ### 步骤 4：添加图表元素
 
@@ -39,12 +38,12 @@
 
 独立使用时：
 
-1. 写入 `doc-ppt/*.xml`
-2. 返回本地文件路径和重命名方式（`.xml` → `.drawio`）
+1. 写入 `.svg` + `.html`（或调用方指定目录）
+2. 返回本地文件路径
 
-被 `robot-aiot-leadership-ppt-workflow` 调用时：
+被上层 workflow（如 `robot-aiot-leadership-ppt-workflow`、`robot-aiot-web-presentation-workflow`）调用时：
 
-1. 只返回本地 `doc-ppt/*.xml` 文件路径
+1. 按调用方契约返回本地 `.svg`/`.html` 文件路径
 
 选定 archify 路径时：
 
@@ -62,8 +61,8 @@
 1. 机器人样式统一：只从 `robot-icons.md` 复制，不手绘
 2. 配色选择：按状态选主题色，从 `color-schemes.md` 取值
 3. 图表类型选择：简单顺序选线性，有判断选分支，有重试选循环，多角色选泳道，架构展示选分层架构图
-4. 文件打开：将 `.xml` 重命名为 `.drawio` 后用 draw.io 打开
-5. 已生成图表修改：在 draw.io 中拖拽编辑，但仍需保持样式规范
+4. 文件打开：`.html` 双击浏览器打开；`.svg` 可导入 draw.io 重绘（见 `import-drawio.md`）
+5. 已生成图表修改：改生成脚本重跑，不在编辑器手改坐标
 
 ## 交付前自审
 
@@ -72,10 +71,10 @@
 1. 无元素重叠、标签碰撞、标签宽于节点
 2. 无越界元素，画布留白至少 20px
 3. 图例位于所有容器之外且在其下方
-4. XML 结构完整，所有 id 唯一且引用正确
+4. SVG 通过 `scripts/validate-svg.sh` 与 `self_check.py`，所有 id 唯一且引用正确
 5. 已返回本地文件路径
 
-样式一致性必检：
+样式一致性必检（路径 B 按 `style-consistency.md` 的属性映射执行，如 fontSize→font-size）：
 
 1. 普通节点 `fontSize=12`、`strokeWidth=2`、`arcSize=15`、`shadow=0`、`fillColor=#FFFFFF`
 2. 分层容器 `strokeWidth=3`，层标签 `fontSize=16`

@@ -9,7 +9,7 @@
 2. 双击 HTML 文件即可在浏览器完整运行
 3. 固定 `1920x1080` 画布不变
 4. 所有动画使用 CSS `@keyframes` + `transition` + 原生 View Transition API；JS 仅负责状态切换和事件绑定
-5. 禁止 `setInterval` 持续动画和无限 `requestAnimationFrame` 循环；`requestAnimationFrame` 仅允许用于有明确终止条件的有限动画（如数字滚动到目标值后停止）
+5. 禁止 `setInterval` 持续动画和无限 `requestAnimationFrame` 循环；`requestAnimationFrame` 仅允许用于有明确终止条件的有限动画（如数字滚动到目标值后停止）。唯一豁免：`animation-fx-catalog.md` 的 canvas FX 循环型特效，必须遵守 `generative-art-and-canvas.md` 生命周期契约（随页启停、离页即销毁）
 6. 尊重 `prefers-reduced-motion`：检测到减少动画偏好时，所有过渡降级为即时切换
 
 ## 翻页系统
@@ -22,8 +22,19 @@
 | `←` / `PageUp` | 上一页 |
 | `Home` | 首页 |
 | `End` | 末页 |
-| `Esc` | 退出全屏（如处于全屏模式） |
+| `Esc` | 退出全屏 / 关闭总览与抽屉 |
 | `F` | 切换全屏 |
+| `S` | 打开演讲者窗口（机制见 `presenter-mode.md`） |
+| `N` | 当前页话术抽屉 |
+| `O` | 总览网格 |
+| `T` | 主题审阅循环（仅评审期，声明了 `data-themes` 时生效） |
+
+### 触摸与深链
+
+1. 触摸设备左右滑动翻页（水平位移 ≥ 50px 且大于垂直位移），与点击热区互斥
+2. 触控目标（翻页热区、按钮、进度条点击区）≥ 44×44px（触摸精度下限）
+3. 翻页同步 `#/N` 深链（`history.replaceState`），加载时解析 hash 直达对应页
+4. 实现细则见 `presenter-mode.md` §5-§6
 
 ### 点击控制
 
@@ -38,13 +49,18 @@
 
 ```html
 <div class="deck">
-  <section class="slide active" data-index="0">...</section>
-  <section class="slide" data-index="1">...</section>
+  <section class="slide active" data-index="0" data-title="页面标题">
+    <!-- 可见内容 -->
+    <div class="notes"><!-- 本页话术，display:none，仅供演讲者 --></div>
+  </section>
+  <section class="slide" data-index="1" data-title="页面标题">...</section>
 </div>
 ```
 
 - 当前页 `.active` 可见，其余 `visibility: hidden; position: absolute`
 - 不使用 `display: none`（会导致 View Transition 无法捕获旧帧）
+- `data-title` 供总览网格与深链展示使用
+- 每页话术写入 `.notes` 容器（`display: none`），演讲者专用文字禁止出现在可见区域；承载与显示机制见 `presenter-mode.md` §2
 
 ## 页面过渡动画
 
@@ -190,6 +206,10 @@ function animateNumber(el, target, duration = 1200) {
 2. 高频闪烁、脉冲
 3. 大面积颜色快速变化
 4. 3D 透视旋转
+
+### 扩展特效路由
+
+用户明确要求动画特效（"炫酷""动效""粒子""发布会风格"等）时，从 `animation-fx-catalog.md` 的 27 种 CSS 入场动画与 20 种 canvas FX 中路由选型，遵守其预算硬限与例外条款；未明确要求时只用本文件的克制入场表，不主动加特效。
 
 ## 字体效果
 

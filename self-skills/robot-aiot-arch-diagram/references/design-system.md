@@ -1,6 +1,6 @@
-# Design System（diagram-design 核心规范承载）
+# Design System（编辑级设计系统核心规范）
 
-本文件是设计系统权威细节（编辑级规则与运行时依赖 diagram-design 协作，见 SKILL.md），承载 SVG/HTML 直绘路径（路径 B）的哲学、反模式、视觉 token、SVG 基元、布局预算与交付门禁。`references/` 中出现的 `design-system.md §N` 引用指向本文件对应章节。图表类型选择表在 SKILL.md「图表类型选择」，语义模式见 `semantic-patterns.md`。
+本文件是编辑级设计系统规则的唯一权威承载；运行时依赖见 SKILL.md「执行前依赖检查」。本文件承载 SVG/HTML 直绘路径（路径 B）的哲学、反模式、视觉 token、SVG 基元、布局预算与交付门禁。`references/` 中出现的 `design-system.md §N` 引用指向本文件对应章节。图表类型选择表在 SKILL.md「图表类型选择」，语义模式见 `semantic-patterns.md`。
 
 ---
 
@@ -105,6 +105,8 @@ Type-specific anti-patterns live in each type reference.
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500;600&family=Noto+Sans+KR:wght@400;500;600&family=Noto+Serif+KR:wght@400&display=swap" rel="stylesheet">
 ```
 
+**Zero-external-request deliverables** (chart wrapper HTML, offline presentation pages, or any caller declaring zero external requests) must drop this link and use a system font stack instead; remove it from the template copy as well. The `self_check.py` Google Fonts allowlist applies only to single-file HTML where network access is permitted.
+
 ---
 
 ## §6 Core SVG Primitives
@@ -186,7 +188,7 @@ These six rules are **non-negotiable**. Run the pre-output checklist (§9) to ve
 
    When in doubt, reroute. The exception exists for the narrow case where rerouting is geometrically impossible, not as a shortcut to avoid layout work.
 
-6. **A label mask must not overlap a node drawn after it.** Rule 2 keeps the label off its own connector; this one keeps it off the boxes. Because nodes are painted after labels, a mask that lands partly inside a node is covered by the node fill and the text renders as a fragment sitting on the node border. Place the label on a segment of the connector that runs through open canvas — for a connector leaving a node's right edge, that means clearing the node's `x + width` before the mask starts. A mask fully *inside* a node is a badge chip and is fine; a mask overlapping a zone container is fine too, since zones are painted first. From a repository checkout, verify with `python3 <repo-root>/scripts/verify-geometry.py <file>`.
+6. **A label mask must not overlap a node drawn after it.** Rule 2 keeps the label off its own connector; this one keeps it off the boxes. Because nodes are painted after labels, a mask that lands partly inside a node is covered by the node fill and the text renders as a fragment sitting on the node border. Place the label on a segment of the connector that runs through open canvas — for a connector leaving a node's right edge, that means clearing the node's `x + width` before the mask starts. A mask fully *inside* a node is a badge chip and is fine; a mask overlapping a zone container is fine too, since zones are painted first. Verify with `python3 scripts/validate_svg.py <file>` (geometry checks: collisions, bounds, edge routing).
 
 ### Node box — full pattern
 
@@ -288,6 +290,7 @@ Quick check: if a coordinate ends in 1, 2, 3, 5, 6, 7, 9 — fix it.
 | Max polar series | 1 |
 | Max focal polar categories | 1 |
 | Max bars (bar chart) | 8 |
+| Max bars (waterfall) | 8 incl. totals, 1 subtotal |
 | Max cells (treemap) | 8 |
 | Max series (line chart) | 5 |
 | Max tasks (Gantt) | 12 |
@@ -379,14 +382,14 @@ Run before producing any diagram.
 - [ ] **No two connectors overlap, share a stroke path, or run on top of each other? Crossings use the bridge/hop primitive?**
 - [ ] **When several connectors enter or exit the same edge of a box, each has its own attach point (≥12px apart)? No connector hides another?**
 - [ ] **No connector passes behind a non-endpoint box, except the unavoidable-intervening-box case (§6 rule 5) — and in that case, the stroke is dashed and the label sits at the visible end?**
-- [ ] **No label mask overlaps a node drawn after it? (Node fill would clip the text — §6 rule 6. From a repository checkout, run `python3 <repo-root>/scripts/verify-geometry.py <file>`.)**
+- [ ] **No label mask overlaps a node drawn after it? (Node fill would clip the text — §6 rule 6. Run `python3 scripts/validate_svg.py <file>`.)**
 - [ ] Every arrow label has an opaque `fill="#f5f5f5"` rect behind it?
 - [ ] Legend is a horizontal bottom strip, not floating?
 - [ ] No vertical `writing-mode` text?
 - [ ] `viewBox` expanded for the legend strip (~60px)?
 - [ ] Every font size, coord, width, height, gap divisible by 4?
 - [ ] From the installed skill directory, did `python3 scripts/self_check.py <file>` pass? (Accessible-SVG contract, single-file safety, motion basics; ships with the skill.)
-- [ ] If animated, does the complete static/no-JS frame work, does reduced motion hide/disable playback, and is the controller copied verbatim from `assets/template-motion.html`? From a repository checkout, also run `python3 <repo-root>/scripts/verify-motion.py path/to/generated.html` plus the skin linter; from an installed skill, manually check print and static-query states on top of the self-check.
+- [ ] If animated, does the complete static/no-JS frame work, does reduced motion hide/disable playback, and is the controller copied verbatim from `assets/template-motion.html`? Run `python3 scripts/self_check.py path/to/generated.html`, and manually check print and static-query states on top of it.
 
 **Typography:**
 
@@ -396,6 +399,14 @@ Run before producing any diagram.
 - [ ] Page title in Instrument Serif?
 - [ ] Annotation callouts (if any) in *italic* Instrument Serif? (see [primitive-annotation.md](primitive-annotation.md))
 - [ ] No JetBrains Mono anywhere?
+
+### Accessible SVG contract
+
+The Technical checklist above verifies the mechanics; these editorial rules are what the mechanics serve:
+
+- `<title>` is the short name of the subject — roughly the page `<h1>`, and about 60 characters or fewer.
+- `<desc>` is one sentence stating what the diagram shows in terms a reader needs without the image. Describe the content, not the geometry: “Org chart showing a command center routing work to specialist agents and escalation owners,” not “A box at the top with five boxes below it.” A shape-by-shape narration is worse than no useful description.
+- Decorative-only SVG, such as the specimen glyphs in `assets/icons.html`, carries `aria-hidden="true"` instead of `<title>` / `<desc>`.
 
 ---
 

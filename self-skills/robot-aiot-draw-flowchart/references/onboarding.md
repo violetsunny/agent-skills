@@ -120,7 +120,7 @@ Before writing, validate:
 
 - **AA contrast**: `ink` on `paper` ≥ 4.5:1. `muted` on `paper` ≥ 4.5:1 for body text.
 - **Accent is the most saturated color**: not muted-ish, not near-grey.
-- **paper ≠ pure white**: if the site uses `#ffffff`, fall back to `#fafaf7` to preserve Diagram Design's warm-neutral feel — or ask the user to confirm pure-white is intentional.
+- **paper ≠ pure white**: if the site uses `#ffffff`, fall back to `#fafaf7` to preserve the design system's warm-neutral feel — or ask the user to confirm pure-white is intentional.
 
 If any check fails, propose an adjusted value and explain why.
 

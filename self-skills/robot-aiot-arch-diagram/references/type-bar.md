@@ -101,6 +101,6 @@ Two of these rules live in a formula rather than a drawing, so they are executab
 
 ## Examples
 
-- `assets/example-bar.html` — minimal light
-- `assets/example-bar-dark.html` — minimal dark
-- `assets/example-bar-full.html` — full editorial
+- minimal light
+- minimal dark
+- full editorial

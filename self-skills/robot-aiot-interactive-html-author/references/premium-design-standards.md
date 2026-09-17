@@ -29,7 +29,7 @@
 | 刻度 | 默认值 | 说明 |
 |---|---|---|
 | DESIGN_VARIANCE | 4-5 | 1=完全对称，10=艺术化混乱。汇报页保持克制，允许不对称分区，禁止炫技 |
-| MOTION_INTENSITY | 1 | 幻灯片为静态单页，不做滚动动画、入场动画、循环动效 |
+| MOTION_INTENSITY | 1 | 幻灯片为静态单页，不做滚动动画、循环动效；入场动画按 `interactive-mode-rules.md` 的 `data-enter-order` 执行（交互版必做，纯静态版不做） |
 | VISUAL_DENSITY | 4-6 | 封面/结论页取低值（留白多），数据看板页取高值 |
 
 规则：

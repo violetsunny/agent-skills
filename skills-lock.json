@@ -1,0 +1,11 @@
+{
+  "version": 1,
+  "skills": {
+    "i-have-adhd": {
+      "source": "SKILL_CS30SK20260722000006993752",
+      "sourceType": "midea",
+      "versionNo": "CS31KC20260722000002541916",
+      "computedHash": "aa48370d8b9517470ff0f53c239984e2d9bfe56d00373d1e63098d4a8988357c"
+    }
+  }
+}

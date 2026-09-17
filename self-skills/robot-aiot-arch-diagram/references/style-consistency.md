@@ -1,6 +1,6 @@
 # 统一样式规范
 
-本文件是 draw.io XML 输出的唯一样式权威。`references/` 中的示例若与这里冲突，以本文件为准。
+本文件是图表输出的唯一样式权威。draw.io XML 路径已移除（SKILL.md 硬约束 1）；路径 B 直绘 SVG 时按属性映射执行：`fontSize`→`font-size`、`strokeWidth`→`stroke-width`、`arcSize`→`rx`、`fillColor`→`fill`、`shadow=0`→不加滤镜。`references/` 中的示例若与这里冲突，以本文件为准。
 
 ## 节点样式标准
 

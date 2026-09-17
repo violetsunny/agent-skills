@@ -1,6 +1,7 @@
 # Flowchart Patterns Reference
 
 > **⚠️ 样式规范优先声明：** 本文件中的 XML 示例可能展示旧版样式值（如 arcSize=20、shadow=1、strokeWidth=2 等）。绘制时请以 `style-consistency.md`（统一样式规范）为唯一权威标准。当示例与本规范冲突时，以规范为准。
+> XML 块仅为布局逻辑的历史示意：本 skill 输出路径为路径 B 直绘 SVG（SKILL.md 硬约束 1），绘制时按路径 B 流程把同一布局结构渲染为 SVG。
 
 ## 1. 线性流程图 (Linear Flow)
 

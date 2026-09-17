@@ -82,8 +82,3 @@ Never invent a vendor service logo. Unknown `icon_id` values fail validation.
 Do not use C4 abstraction labels, transit-map station numbering, or live SRE
 metric cards. When deployment evidence is absent, fall back to a generic Style
 1–7 architecture view instead of inventing cloud ownership.
-
-## Fixture
-
-`fixtures/cloud-fabric-style10.json` demonstrates active-active checkout
-deployment with two regions, explicit VPC ownership, and neutral glyphs.

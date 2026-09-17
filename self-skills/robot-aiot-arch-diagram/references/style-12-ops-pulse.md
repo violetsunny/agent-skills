@@ -69,8 +69,3 @@ trace waterfall has exactly one root when spans are present.
 Do not turn the service band into a Region/VPC deployment map, an event-metro
 rail, or a C4 responsibility review. If the prompt lacks measured signals,
 status, time window, and trace evidence, use a generic architecture style.
-
-## Fixture
-
-`fixtures/ops-pulse-style12.json` demonstrates a degraded checkout path with
-four service cards, an OTel collector, and a correlated four-span trace.

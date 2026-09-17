@@ -268,7 +268,7 @@ reset. Live rails never exceed their source stroke width or their scene ceiling.
 
 Styles 8, 11, and 12 use `(data-motion-role, data-motion-stage,
 data-motion-order)` because repeated roles must stay independently addressable.
-Styles 10–12 add only explicit motion metadata to their source fixtures; stripping
+Styles 10–12 add only explicit motion metadata to their static source diagrams; stripping
 `data-motion-role`, `data-motion-stage`, and `data-motion-order` reproduces the
 pre-animation static SVG geometry exactly.
 

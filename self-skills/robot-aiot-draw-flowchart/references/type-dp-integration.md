@@ -402,9 +402,9 @@ When this gets unwieldy:
 
 ## 12. Examples
 
-- `assets/example-dp-integration.html` — minimal light (1 footer = AD). Gallery default.
-- `assets/example-dp-integration-dark.html` — same, dark skin.
-- `assets/example-dp-integration-full.html` — same, editorial-card frame.
-- `assets/example-dp-integration-extended.html` — exercises §4 color override + multi-footer: AD in rust-red, Observability (Prometheus/Grafana/Loki) in slate-blue. Canvas height grown to fit 2 footer rows.
-- `assets/example-dp-integration-extended-dark.html` — extended pattern, dark skin.
-- `assets/example-dp-integration-extended-full.html` — extended pattern, editorial-card frame.
+- minimal light (1 footer = AD). Gallery default.
+- same, dark skin.
+- same, editorial-card frame.
+- exercises §4 color override + multi-footer: AD in rust-red, Observability (Prometheus/Grafana/Loki) in slate-blue. Canvas height grown to fit 2 footer rows.
+- extended pattern, dark skin.
+- extended pattern, editorial-card frame.

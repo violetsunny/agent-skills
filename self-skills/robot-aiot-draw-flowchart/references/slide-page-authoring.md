@@ -27,6 +27,12 @@
 - <解释业务意义、风险、动作>
 ```
 
+话术承载规则：
+
+1. 话术只写给演讲者，解释变化、归因和动作，不复述屏幕上已有的文字
+2. 交付的页面 HTML 中，话术写入画布内 `<div class="notes">`（`display:none`），随页面一起交付，结构见 `slide-page-template.md` 第 8 节
+3. 演讲者专用文字（提示语、口播稿、"这一页讲……"类描述）一律进 `.notes`，禁止以任何可见元素出现在页面上
+
 ## 内容规则
 
 1. 数据先行，话术负责解释变化、归因和动作
@@ -50,17 +56,20 @@
 页面推荐至少定义：
 
 1. `--primary-color`：核心主色，默认服从首页架构图主色
-2. `--secondary-color`：次级强调色
-3. `--tertiary-color`：补充分类色
-4. `--surface-color` / `--surface-muted`：容器背景
-5. `--outline-color`：边界和分割
-6. `--text-primary` / `--text-secondary`：正文与辅助文本
+2. `--on-primary-color`：主色填充上的文字色，按 WCAG AA 对主色实测选白或近黑；其余强调色/状态色同理配对 `--on-*-color`
+3. `--secondary-color`：次级强调色
+4. `--tertiary-color`：补充分类色
+5. `--bg-color`：画布外 body 底色，与 surface 分层
+6. `--surface-color` / `--surface-muted`：容器背景
+7. `--outline-color`：边界和分割
+8. `--text-primary` / `--text-secondary` / `--text-tertiary`：正文、辅助文本与最低档注记文本
 
 规则：
 
 1. 主色负责最重要的结构线、重点数字、标题强调
-2. 容器层次优先通过 surface 明暗差表达，不靠重阴影堆层次
-3. 状态色只在确有含义时使用，不把红绿橙滥用成装饰色
+2. 强调色/状态色填充上的文字只用配对 `--on-*-color`，禁止硬编码 `#fff` / `#000`
+3. 容器层次优先通过 surface 明暗差表达，不靠重阴影堆层次
+4. 状态色只在确有含义时使用，不把红绿橙滥用成装饰色
 
 ### 3. 字级体系
 

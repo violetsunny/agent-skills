@@ -28,16 +28,23 @@ font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
 ```css
 :root {
   --primary-color: #0078D4;
+  --on-primary-color: #FFFFFF;
   --secondary-color: #4F6BED;
+  --on-secondary-color: #FFFFFF;
   --tertiary-color: #00A389;
+  --bg-color: #EEF2F7;
   --surface-color: #FFFFFF;
   --surface-muted: #F5F7FB;
   --outline-color: #D7DFEA;
   --text-primary: #16324F;
   --text-secondary: #5B6B7F;
+  --text-tertiary: #8A99AC;
   --success-color: #1F9D55;
+  --on-success-color: #FFFFFF;
   --warning-color: #D98324;
+  --on-warning-color: #FFFFFF;
   --danger-color: #C93C37;
+  --on-danger-color: #FFFFFF;
   --space-sm: 8px;
   --space-md: 16px;
   --space-lg: 24px;
@@ -57,10 +64,12 @@ font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
 1. 首页架构图主色优先覆盖 `--primary-color`
 2. 页面中优先引用变量，不散落硬编码颜色和值
 3. 表现层需要新颜色时，先判断是否能映射到现有语义角色
+4. `on-*` ink 值按 `slide-design-system.md` §1 配对规则实测选定（白或近黑，对该填充色 ≥ 4.5:1），换强调色时必须复核配对 ink
+5. `--bg-color` 是画布外 body 底色，与画布 `--surface-color` 分层，禁止在 body 上硬编码 hex
 
 ## 3. 页面类型
 
-常用 8 类页面：
+常用 12 类页面：
 
 1. 封面页：核心结论、项目定位、能力卡、右上角 Logo
 2. 架构图页：分层结构、连接关系、少量数字锚点
@@ -69,7 +78,11 @@ font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
 5. 漏斗策略页：层级递进、方向箭头、底部总结
 6. 治理闭环页：左右分栏，左数右流程
 7. 案例对比页：左右对照、中心对比点、总结区
-8. 尾页：核心结论收束、联系信息、底部居中 Logo
+8. 时间线页：水平/垂直里程碑节点 + 关键事件 + 当前进度锚点；节点多或需精确排期时改引甘特图真源 iframe
+9. 数据表格页：表格为唯一主体，表头用 surface 分层，数字列 `tabular-nums` 右对齐，行高均匀，超过 8 行拆页或摘要化
+10. 观点引用页：大字观点/客户原话 + 来源行（`--text-tertiary`），大留白，仅封面级单一结论使用
+11. 路线图页：NOW / NEXT / LATER 分栏卡片，每栏 ≤ 4 条；精确到周的排期不手绘，引甘特图真源 iframe
+12. 尾页：核心结论收束、联系信息、底部居中 Logo
 
 ## 4. 常用区块
 
@@ -128,13 +141,16 @@ font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
     * { margin: 0; padding: 0; box-sizing: border-box; }
     :root {
       --primary-color: #0078D4;
+      --on-primary-color: #FFFFFF;
       --secondary-color: #4F6BED;
       --tertiary-color: #00A389;
+      --bg-color: #EEF2F7;
       --surface-color: #FFFFFF;
       --surface-muted: #F5F7FB;
       --outline-color: #D7DFEA;
       --text-primary: #16324F;
       --text-secondary: #5B6B7F;
+      --text-tertiary: #8A99AC;
       --space-sm: 8px;
       --space-md: 16px;
       --space-lg: 24px;
@@ -146,7 +162,7 @@ font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
       --shadow-soft: 0 6px 24px rgba(18, 52, 86, 0.08);
     }
     body {
-      background: #EEF2F7;
+      background: var(--bg-color);
       font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
     }
     .canvas {
@@ -158,6 +174,7 @@ font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
       overflow: hidden;
       box-shadow: var(--shadow-soft);
     }
+    .notes { display: none; }
   </style>
 </head>
 <body>
@@ -167,6 +184,7 @@ font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
     <!-- 主内容区 -->
     <!-- 说明区 -->
     <!-- 品牌区 -->
+    <div class="notes"><!-- 本页汇报话术，仅供演讲者，永不上屏 --></div>
   </div>
 </body>
 </html>
@@ -185,13 +203,16 @@ font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
     * { margin: 0; padding: 0; box-sizing: border-box; }
     :root {
       --primary-color: #0078D4;
+      --on-primary-color: #FFFFFF;
       --secondary-color: #4F6BED;
       --tertiary-color: #00A389;
+      --bg-color: #EEF2F7;
       --surface-color: #FFFFFF;
       --surface-muted: #F5F7FB;
       --outline-color: #D7DFEA;
       --text-primary: #16324F;
       --text-secondary: #5B6B7F;
+      --text-tertiary: #8A99AC;
       --space-sm: 8px;
       --space-md: 16px;
       --space-lg: 24px;
@@ -205,10 +226,11 @@ font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
       --transition-easing: cubic-bezier(0.4, 0, 0.2, 1);
     }
     body {
-      background: #EEF2F7;
+      background: var(--bg-color);
       font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
       overflow: hidden;
     }
+    .notes { display: none; }
     .deck {
       position: relative;
       width: 1920px;
@@ -284,9 +306,11 @@ font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
   <div class="deck">
     <section class="slide active" data-index="0">
       <!-- 第一页内容，元素加 data-enter-order="1/2/3..." -->
+      <div class="notes"><!-- 本页话术 --></div>
     </section>
     <section class="slide" data-index="1">
       <!-- 第二页内容 -->
+      <div class="notes"><!-- 本页话术 --></div>
     </section>
   </div>
   <div class="nav-progress"></div>
@@ -374,3 +398,24 @@ font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
 </body>
 </html>
 ```
+
+## 8. 话术 notes 容器
+
+每页四要素中的"汇报话术"必须随 HTML 一起交付，承载体是画布内的 `.notes` 容器：
+
+```html
+<div class="notes">
+  <p>话术段落，核心关键词可加 <strong>强调</strong>。</p>
+</div>
+```
+
+规则：
+
+1. `.notes { display: none; }`，任何情况下不得改为可见，也不得用可见元素复述话术
+2. 话术只写给演讲者：解释含义、风险、动作，不复述屏幕上已有的文字
+3. 演讲者专用文字（"这一页讲……"、提示语、口播稿）一律进 `.notes`，出现在可见区域即违反页面契约
+4. `display:none` 无渲染成本，静态版与交互版通用；下游 PPTX 转换时该容器可作为演讲者备注来源
+
+## 9. 图片上屏
+
+位图（截图/照片/AI 配图/图表 PNG）必须经 `.img-frame` 容器上屏，禁止裸 `<img>`；contain/cover 选型、图片版式与 scrim 边界见 `slide-image-framing.md`。图表 HTML 真源仍走第 6 节 iframe 约束，不适用本节。

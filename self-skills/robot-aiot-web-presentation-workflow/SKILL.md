@@ -1,6 +1,6 @@
 ---
 name: robot-aiot-web-presentation-workflow
-version: 2.2.0
+version: 2.2.1
 description: >
   交互式Web演示页面制作工作流。根据知识文档生成分页汇报母稿，按需制作架构图/流程图，
   逐页交互HTML（可翻页、带动画、数据动效，纯原生零依赖双击即用）委派 robot-aiot-interactive-html-author 编写。
@@ -14,7 +14,7 @@ description: >
 **让受众在浏览器中获得沉浸式体验** — 每页有业务价值结论 + 数据支撑 + 交互动效，
 不讲代码实现，双击即可运行。
 
-本技能覆盖从原始知识文档到最终交互 HTML 的全链路编排，涉及两个外部技能调用：
+本技能覆盖从原始知识文档到最终交互 HTML 的全链路编排，涉及两个兄弟技能调用：
 - **robot-aiot-arch-diagram** — 生成架构图/流程图（SVG/HTML 格式）（Phase 3）
 - **robot-aiot-interactive-html-author** — 逐页交互动画特效 HTML 编写与单文件合并（Phase 4）
 

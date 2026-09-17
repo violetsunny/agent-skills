@@ -54,13 +54,19 @@ def map_style_to_css(
     edge_info = {}
     unmapped_list = []
 
-    # shape
+    # shape（兼容 shape= 属性与 draw.io 裸关键字写法，如 "ellipse;whiteSpace=wrap;..."）
     if "shape" in style_dict:
         shape = style_dict["shape"]
         if shape in SHAPE_MAP:
             css_parts.append(SHAPE_MAP[shape])
-    elif style_dict.get("rounded") == "1":
-        css_parts.append("border-radius: 8px;")
+    else:
+        for _kw, _css in SHAPE_MAP.items():
+            if style_dict.get(_kw) == "1":
+                shape = _kw
+                css_parts.append(_css)
+                break
+        if shape is None and style_dict.get("rounded") == "1":
+            css_parts.append("border-radius: 8px;")
 
     # fillColor
     fill = style_dict.get("fillColor")
@@ -193,6 +199,8 @@ def map_style_to_css(
         "exitY",
         "entryX",
         "entryY",
+        "labelBackgroundColor",
+        *SHAPE_MAP.keys(),
     }
     for k, v in style_dict.items():
         if k not in mapped_keys:
@@ -295,11 +303,14 @@ class Vertex:
         # draw.io html=1 语义：value 本身是 HTML（<b>/<br>/<font> 等），须原样渲染；
         # 仅转义引号（与历史输出一致）。整体 escape 会把标签变成明文，破坏展示。
         text = self.value.replace('"', "&quot;") if self.value else ""
+        # 内容包一层块级 div：flex 容器会把 <b>/<font> 等内联子元素提升为并排 flex item
+        # 且忽略 <br>，破坏富文本行结构；单块级子项可保留正常块级排版。
+        inner = f'<div style="width:100%;">{text}</div>' if text else ""
         return (
             f'    <div class="vertex" id="v-{self.cell_id}" '
             f'style="position:absolute; left:{_fmt(self.abs_x)}px; top:{_fmt(self.abs_y)}px; '
             f'width:{_fmt(self.w)}px; height:{_fmt(self.h)}px; {self.style_css}">'
-            f"{text}</div>\n"
+            f"{inner}</div>\n"
         )
 
 

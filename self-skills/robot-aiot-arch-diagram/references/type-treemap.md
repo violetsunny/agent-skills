@@ -61,6 +61,6 @@ Watch the smallest cell hardest: it is the one that grid snapping and gutters di
 
 ## Examples
 
-- `assets/example-treemap.html` — minimal light
-- `assets/example-treemap-dark.html` — minimal dark
-- `assets/example-treemap-full.html` — full editorial
+- minimal light
+- minimal dark
+- full editorial

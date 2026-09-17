@@ -7,6 +7,7 @@
 - **Start**: filled ink dot (`r=6`). **End**: ringed dot (outer `r=8` outline, inner filled `r=5`).
 - Transitions: curved arrows labeled in Geist Mono as `event [guard] / action` (omit sections you don't need).
 - Self-loops curve above the state.
+- Composite states: double-border rounded rectangle (outer border = composite boundary, substates nested inside).
 - Orient along the dominant flow direction (left→right or top→down); rearrange before crossing transitions.
 - Coral on the state the reader should notice — typically the error state, or "happy completion".
 
@@ -16,6 +17,6 @@
 - Unlabeled transitions (the whole point is *what triggers this*).
 
 ## Examples
-- `assets/example-state.html` — minimal light
-- `assets/example-state-dark.html` — minimal dark
-- `assets/example-state-full.html` — full editorial
+- minimal light
+- minimal dark
+- full editorial

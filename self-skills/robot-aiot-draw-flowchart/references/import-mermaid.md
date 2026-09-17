@@ -6,7 +6,7 @@ Turn Mermaid source into an editorial-quality diagram at the format, size, and d
 
 ## Trigger
 
-Load this file for `.mmd`, `.mermaid`, or Markdown containing fenced `mermaid` blocks when the user asks to convert, redraw, simplify, or present the diagram, or uses `/diagram-design:import-mermaid`.
+Load this file for `.mmd`, `.mermaid`, or Markdown containing fenced `mermaid` blocks when the user asks to convert, redraw, simplify, or present the diagram.
 
 ---
 
@@ -107,7 +107,7 @@ Kinds with no editorial analogue stay rejected — report the supported-kinds me
 
 ## Worked example
 
-[`assets/example-import-mermaid.html`](../assets/example-import-mermaid.html) redraws `scripts/fixtures/sample-flowchart.mmd` at `format=html`, `size=doc-inline`, `detail=balanced`, `audience=mixed`.
+This worked example redraws a sample flowchart Mermaid source (two subgraphs, dual entry points, one decision node) at `format=html`, `size=doc-inline`, `detail=balanced`, `audience=mixed`.
 
 | Source | Output | Reason |
 |---|---|---|

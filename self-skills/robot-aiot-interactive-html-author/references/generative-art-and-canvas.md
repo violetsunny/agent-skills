@@ -63,6 +63,17 @@ noiseSeed(seed);
 | 品牌色 token | 色彩映射 |
 | 无障碍契约 | 交互方式 |
 
+## 动效画布生命周期契约
+
+用户明确要求持续动效（粒子背景、力导向图、数据流等）时，画布必须接入 deck 生命周期，不允许"加载即跑、永不停止"：
+
+1. **随页启停**：监听页面激活/离开（翻页事件或 IntersectionObserver），进入页面才启动 rAF 循环，离开立即 `cancelAnimationFrame` 并释放引用；这是"禁止无限 rAF"约束的唯一豁免形态——循环仅在活跃页运行
+2. **尺寸自适应**：容器尺寸变化用 `ResizeObserver` 重设画布宽高，并按 `devicePixelRatio` 缩放（`canvas.width = rect.width * dpr` + `ctx.scale(dpr, dpr)`），避免高分屏模糊
+3. **配色读 token**：粒子/连线/文字颜色从 `getComputedStyle` 读取 `--primary-color`、`--secondary-color` 等语义 token，不硬编码色值；主题审阅（T 键）切换时同步换色
+4. **容器显式尺寸**：画布容器必须有明确宽高，canvas 填充 100%；禁止靠内容撑开
+5. **一页一效**：单页最多一个持续动效画布；与入场动画、数据动效同页时，持续动效透明度退后作背景层
+6. **清理可验证**：交付自检时翻离页面后用 Performance 面板确认 rAF 已停止、无残留定时器
+
 ## 约束
 
 1. 生成艺术是增强手段，不是目的——内容理解优先

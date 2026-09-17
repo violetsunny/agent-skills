@@ -1,6 +1,6 @@
 # Client profiles
 
-Named profiles let one Diagram Design install serve several clients without repeatedly editing the installed `style-guide.md`. A profile is a complete style guide stored outside the install, so managed plugin updates cannot erase it.
+Named profiles let one install serve several clients without repeatedly editing the installed `style-guide.md`. A profile is a complete style guide stored outside the install, so managed plugin updates cannot erase it.
 
 This file is the source of truth for profile resolution and for the `save`, `load`/`switch`, `list`, `show`, `update`, `reset`, and `delete` verbs.
 

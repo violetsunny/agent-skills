@@ -1,9 +1,9 @@
 ---
 name: robot-aiot-leadership-ppt-workflow
-version: 3.1.0
+version: 3.3.0
 description: >
   将项目数据和技术分析转化为结构化的领导汇报PPT，覆盖全链路五阶段工作流：
-  数据池建立 → 技术明细版+领导汇报版文档分层 → 调用 robot-aiot-draw-flowchart 生成分层架构图/流程图XML并完成XML→HTML桥接与静态页面HTML化 → 调用 ppt-master 依据每页HTML样式生成最终PPTX文件。
+  数据池建立 → 技术明细版+目标受众汇报版文档分层（受众由用户指定，默认领导层） → 调用 robot-aiot-draw-flowchart 生成分层架构图/流程图XML并完成XML→HTML桥接与静态页面HTML化 → 调用 ppt-master 依据每页HTML样式生成最终PPTX文件。
   当用户要求"写领导汇报PPT"、"出PPT母稿"、"做汇报材料"、"汇报方案"、"写PPT"、
   "领导汇报"、"生成汇报PPT"时触发。也适用于用户描述了需要将技术项目数据
   转化为管理层可读的汇报格式的场景。
@@ -85,7 +85,7 @@ doc-ppt/
 
 ```
 Phase 1: 方案基础     → 提取真实指标，建立统一数据池（单一数据源）
-Phase 2: 受众分层     → 技术明细版MD + 领导汇报版MD（同一数据，不同表达）
+Phase 2: 受众分层     → 技术明细版MD + 目标受众汇报版MD（受众由用户指定，默认领导层；同一数据，不同表达）
 Phase 3: 图表生成     → 调用 robot-aiot-draw-flowchart 生成分层架构图/流程图 XML
 Phase 3.5: 桥接转换  → 调用 robot-aiot-draw-flowchart 的 XML→HTML 桥接能力，将 XML 稳定转 HTML 并保留原样式
 Phase 4: PPT母稿     → 调用 robot-aiot-draw-flowchart 的静态页面 HTML 能力，按页结构化：标题→结论→数据→话术，并将每页落成 HTML 页面样式
@@ -110,15 +110,16 @@ Phase 5: PPT生成     → 调用 ppt-master，读取逐页 HTML/MD 生成最终
 
 ---
 
-## Phase 2: 受众分层 — 技术明细版 + 领导汇报版
+## Phase 2: 受众分层 — 技术明细版 + 目标受众汇报版
 
-文档结构、术语映射模板和业务化翻译规则见 `references/phase2-audience-layering.md`。
+文档结构、受众→表达策略映射、术语映射模板和业务化翻译规则见 `references/phase2-audience-layering.md`。
 
 入口约束：
 
-1. 先写技术明细版，再提炼领导汇报版
-2. 两份文档共用同一数据池
-3. 领导汇报版不得直接暴露表名、类名、API 路径或无解释缩写
+1. 先确认目标受众（用户指定：领导层/技术同行/外部客户/大众；未指定默认领导层），受众决定表达策略与 Phase 4 风格基调
+2. 先写技术明细版，再按受众表达策略提炼汇报版
+3. 两份文档共用同一数据池
+4. 面向领导层/外部客户/大众时，汇报版不得直接暴露表名、类名、API 路径或无解释缩写（技术同行受众豁免）
 
 ---
 
@@ -145,9 +146,10 @@ Phase 4 的逐页 HTML 编写能力已内化到 `robot-aiot-draw-flowchart` 的�
 
 布局模式选择、Deck叙事策略、文案公式详见 `references/slide-layout-strategies.md`：
 
-1. 按页面类型选择 25 种布局模式中最匹配的一种
-2. 按汇报场景选择 15 种 Deck 策略确定叙事弧线
-3. 用 25 个文案公式框架组织每页文案（PAS/AIDA/FAB/3W 等）
+1. 按页面类型选择 17 种布局模式中最匹配的一种，相邻两页不得使用相同布局
+2. 按汇报场景选择 11 种 Deck 策略确定叙事弧线；演讲时长按页数换算（30 分钟 = 8-12 页）
+3. 用 8 个文案公式框架组织每页文案（PAS/AIDA/FAB/3W 等）
+4. 每页话术按逐字稿三铁律写作：提示信号（关键词加粗）、150-300 字/页、口语化；话术只进母稿话术栏与页面 `.notes` 容器，不得上屏
 
 ### 配图与封面图
 
@@ -162,7 +164,7 @@ Phase 4 的逐页 HTML 编写能力已内化到 `robot-aiot-draw-flowchart` 的�
 
 1. 逐页 HTML 生成必须调用 `robot-aiot-draw-flowchart` 的静态页面 HTML 能力
 2. **仅使用静态版**：禁止生成交互版（翻页/动画/特效），ppt-master 只消费静态 HTML
-3. 每页必须满足"标题 / 结论 / 上屏内容 / 话术"四要素
+3. 每页必须满足"标题 / 结论 / 上屏内容 / 话术"四要素；话术写入页面 `display:none` 的 `.notes` 容器，出现在可见区域按阻塞项处理
 4. 每页对应一个独立 HTML 文件，且图表优先引用 Phase 3.5 输出的图表 HTML
 5. `robot-aiot-draw-flowchart` 的布局审查清单 10 项全部通过，才允许进入 Phase 5
 6. 页面允许做轻量语义化规范化，但不得破坏首页图表确立的主色语义与图表 HTML 的冻结约束

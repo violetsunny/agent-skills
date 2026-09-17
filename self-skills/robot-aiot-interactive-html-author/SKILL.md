@@ -1,13 +1,17 @@
 ---
 name: robot-aiot-interactive-html-author
-version: 1.1.0
+version: 1.3.1
 description: >
   交互式动画特效 HTML 编写能力。纯原生零依赖产出浏览器可直接运行的交互页面/多页 deck：
-  翻页系统（键盘+点击+View Transition）、元素入场（data-enter-order）、数据动效（数字滚动/
-  进度条填充/图表逐步绘制）、交互图表（hover/tooltip/展开）、关键帧动画与动效接缝、
+  翻页系统（键盘+点击+触摸滑动+View Transition+#/N 深链）、演讲者模式（S 键弹窗：
+  当前页/下一页像素级预览+话术提词+计时器，双窗口同步）、总览网格（O 键）、话术抽屉（N 键）、
+  元素入场（data-enter-order）、数据动效（数字滚动/进度条填充/图表逐步绘制）、
+  交互图表（hover/tooltip/展开）、关键帧动画与动效接缝、动效画布生命周期管理、
+  扩展动画特效目录（27 种 CSS 入场动画 + 20 种 canvas FX，仅用户明确要求时路由启用）、
   Mermaid/PlantUML 图表构建期渲染嵌入（headless Chrome→PNG/SVG，失败降级不静默丢图）、
   自包含单文件构建、高级感设计与交付前审查。
-  当用户要求"写交互动画页""给 HTML 加翻页/动画/动效""交互图表动效""单文件交互演示页"，
+  当用户要求"写交互动画页""给 HTML 加翻页/动画/动效""交互图表动效""单文件交互演示页"
+  "演讲者模式/提词器/双屏演示"，
   或 robot-aiot-web-presentation-workflow 委派 Phase 4 编写时触发。
 ---
 
@@ -19,6 +23,20 @@ description: >
 不负责：知识文档分析、分页母稿、图表调度与阶段编排 —— 这些属于
 `robot-aiot-web-presentation-workflow` 的职责；被委派时只接收其给出的页面四要素、
 图表 HTML 与主色基调。
+
+## 执行前依赖检查
+
+必需依赖（运行时部署，执行前检查齐备）：
+
+| 依赖 skill | 用途 |
+|------|------|
+| ui-ux-pro-max | 设计数据资产检索（search.py 查询风格/调色板库；字体库受硬约束 11 限制仅用系统字体栈） |
+
+```bash
+[ -d "$HOME/.agents/skills/ui-ux-pro-max" ] && echo "[OK] ui-ux-pro-max" || echo "[MISS] ui-ux-pro-max"
+```
+
+缺失时如实告知用户依赖不全，不得静默降级或假装可用。设计规则权威在本技能 `references/`；检索结果仅为数据建议，不得覆盖内化规则。
 
 ## 输入
 
@@ -41,23 +59,27 @@ description: >
 7. 不使用 AI 紫/霓虹渐变、纯黑硬阴影、纯黑大面积背景（品牌色本身为紫色时例外）
 8. 不出现编号眉标、装饰状态点、版本号页脚等 AI 痕迹
 9. 每页 HTML 必须完整可运行，禁止占位注释和"同上"省略
-10. 最终交付物为单个 HTML 文件，双击即可在浏览器完整运行
+10. 最终交付物为自包含 HTML、双击即可完整运行：单页形态为单个文件；上层 workflow 要求多页形态时交付 `INDEX.html` + `pages/` 目录，每页独立自包含且导航链接真实存在
 11. 纯原生零依赖，禁止 CDN、npm 包、外部字体
 12. 尊重 `prefers-reduced-motion`，检测到时所有动画降级为即时切换
+13. 话术与一切演讲者专用文字只进 `display:none` 的 `.notes` 容器，禁止出现在页面可见区域
+14. 持续动效画布与扩展特效目录（27 种 CSS 入场动画 + 20 种 canvas FX）仅在用户明确要求时启用，按 `references/animation-fx-catalog.md` 路由选型；FX 必须随页启停（见 `references/generative-art-and-canvas.md` 生命周期契约）
 
 ## 编写流程
 
 1. 核对输入：四要素/图表/主色是否齐备，缺失先问清再动手
 2. 建 token 体系与画布骨架（`:root` 语义 token，安全边距 32-48px）
-3. 逐页编写：结构 → `data-enter-order` 入场 → 数据动效 → 交互图表（仅当有明细数据）
-4. 多页时合并单文件：CSS 并入 `<style>`、JS 并入 `<script>`、图表 SVG 内联，接翻页系统
+3. 逐页编写：结构 → `.notes` 话术容器（有演讲场景时）→ `data-enter-order` 入场 → 数据动效 → 交互图表（仅当有明细数据）
+4. 多页时合并单文件：CSS 并入 `<style>`、JS 并入 `<script>`、图表 SVG 内联，接翻页系统与演讲者模式/总览/深链（上层 workflow 明确要求 INDEX + pages/ 多文件形态时除外）
 5. 按 `references/premium-review-fix.md` 逐项审查（含交互版专属审查项），阻塞项修复后交付
 
 ## 验收自检
 
 - 键盘翻页全键位可用（←→/Space/PageUp/PageDown/Home/End/F/Esc）；点击热区不遮挡可交互内容
+- 触摸滑动翻页可用且与点击热区不双触发；`#/N` 深链加载直达对应页
+- 含话术输入时：S 键演讲者窗口可弹出，四卡（当前页/下一页/话术/计时器）可用，双窗口翻页同步；N 键抽屉、O 键总览可用
 - `prefers-reduced-motion` 降级为即时切换、数字直显终值、入场跳过、背景特效关闭
-- 动画属性仅限 transform/opacity/filter；数字滚动/图表动画仅触发一次；非活跃页面无残留定时器
+- 动画属性仅限 transform/opacity/filter；数字滚动/图表动画仅触发一次；非活跃页面无残留定时器与 rAF
 - 单页 DOM ≤ 500；最终文件零外部请求
 
 ## 何时读取引用文档
@@ -74,11 +96,5 @@ description: >
 10. 生成艺术与数据可视化动效（p5.js/Canvas API、种子随机性）：`references/generative-art-and-canvas.md`
 11. Web 演示布局策略与文案公式（25 种布局、叙事策略）：`references/web-slide-strategies.md`
 12. Mermaid/PlantUML 图表构建期渲染嵌入（headless Chrome 流程、嵌入策略、失败降级）：`references/diagram-embed-rendering.md`
-
-运行时可选协作：
-
-| 协作 skill | 级别 | 用途 |
-|------|------|------|
-| ui-ux-pro-max | 可选 | 设计系统建议与页面审查补充（内化规则优先） |
-
-设计标准以本技能内化规则为准，`ui-ux-pro-max` 仅提供补充建议。
+13. 演讲者模式（S 键弹窗/磁吸卡片/双窗口同步）、话术 .notes 承载、总览网格、深链、触摸翻页、主题审阅：`references/presenter-mode.md`
+14. 用户明确要求动画特效时的扩展目录与路由（27 CSS 入场 + 20 canvas FX、预算硬限、clip-path 例外条款）：`references/animation-fx-catalog.md`

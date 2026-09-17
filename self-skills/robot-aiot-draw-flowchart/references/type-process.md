@@ -487,9 +487,9 @@ Everything else — viewBox sizing, chip positions, legend layout, dark-mode tok
 
 ## 13. Examples
 
-- `assets/example-process.html` — minimal light (quarterly survey: 11 steps, 6 divisions, data-type chips). Gallery default.
-- `assets/example-process-dark.html` — same, dark skin.
-- `assets/example-process-full.html` — same, editorial-card frame.
-- `assets/example-process-extended.html` — exercises §4 color override: Build app in slate-blue (data quality), Train enumerators in rust-red (governance), Publish results in olive-green (data products). Focal accent on Pilot test step + node unchanged.
-- `assets/example-process-extended-dark.html` — extended pattern, dark skin.
-- `assets/example-process-extended-full.html` — extended pattern, editorial-card frame.
+- minimal light (quarterly survey: 11 steps, 6 divisions, data-type chips). Gallery default.
+- same, dark skin.
+- same, editorial-card frame.
+- exercises §4 color override: Build app in slate-blue (data quality), Train enumerators in rust-red (governance), Publish results in olive-green (data products). Focal accent on Pilot test step + node unchanged.
+- extended pattern, dark skin.
+- extended pattern, editorial-card frame.
