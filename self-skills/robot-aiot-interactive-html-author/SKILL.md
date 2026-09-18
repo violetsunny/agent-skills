@@ -1,6 +1,6 @@
 ---
 name: robot-aiot-interactive-html-author
-version: 1.6.0
+version: 1.7.0
 description: >
   交互式动画特效 HTML 编写能力。纯原生零依赖产出浏览器可直接运行的交互页面/多页 deck：
   翻页系统（键盘+点击+触摸滑动+View Transition+#/N/M 深链）、演讲者模式（S 键弹窗：
@@ -8,14 +8,17 @@ description: >
   总览网格（O 键）、话术抽屉（N 键）、页内分步揭示（fragment）、分支序列与内容热点、
   元素入场（data-enter-order）、数据动效（数字滚动/进度条填充/图表逐步绘制）、
   交互图表（hover/tooltip/展开）、关键帧动画与动效接缝、相机飞行过渡、
+  页面级运镜与分镜规划（运镜预算制/对数时长/相机层/能量骨架/分镜卡）、
+  UI 演示与画廊展示编排（八式帧级参数/画廊墙 render(t)/?seek ?autoplay）、
+  多版本并行设计与选优（三方向硬门/6 视角 5 维评审/4 Pass 收敛/调参面板）、
   动效画布生命周期管理、41 套视觉风格预设（mood 路由+五维旋钮+72 组配色）、
-  登记版式系统（瑞士风 S01-S22 × 杂志风 M01-M10 版式锁定+deck 排版阶梯）、
+  登记版式系统（瑞士风 S01-S22 × 杂志风 M01-M10 版式锁定+deck 排版阶梯+中文排印细则）、
   扩展动画特效目录（49 种 CSS 入场动画 + 21 种 canvas FX，仅用户明确要求时路由启用）、
   Mermaid/PlantUML 图表构建期渲染嵌入（headless Chrome→PNG/SVG，失败降级不静默丢图）、
   自包含单文件构建、高级感设计与交付前审查。
   当用户要求"写交互动画页""给 HTML 加翻页/动画/动效""交互图表动效""单文件交互演示页"
   "演讲者模式/提词器/双屏演示""分步揭示/分支导航/内容热点""风格预设/deck 换肤"
-  "瑞士风/杂志风 deck/登记版式"，
+  "瑞士风/杂志风 deck/登记版式""多版本对比/方向选优""运镜/分镜/镜头语言""UI 演示编排"，
   或 robot-aiot-web-presentation-workflow 委派 Phase 4 编写时触发。
 ---
 
@@ -109,4 +112,7 @@ description: >
 14. 用户明确要求动画特效时的扩展目录与路由（49 CSS 入场 + 21 canvas FX + 5 页面级编排 recipe、预算硬限、clip-path 例外条款）：`references/animation-fx-catalog.md`
 15. 视觉风格预设（41 套设计系统预设、mood 路由表、先预览再定稿选型流程、五维旋钮、72 组配色库）：`references/visual-style-presets.md`
 16. 登记版式系统（瑞士风 S01-S22 × 杂志风 M01-M10 版式锁定、结构骨架 px 锚定、选择索引、内容-数据类型匹配、禁止清单）：`references/swiss-layout-system.md`
-17. 演示 deck 排版阶梯（字号双约束与画布推荐值、字重阶梯、中文大标题分档、最小字号三层下限）：`references/typography.md`
+17. 演示 deck 排版阶梯（字号双约束与画布推荐值、字重阶梯、中文大标题分档、最小字号三层下限、中文排印细则与字体配对）：`references/typography.md`
+18. 多版本并行设计与选优（三方向硬门、7 Phase 工作流、6 视角 5 维评审、选择无效铁律、4 Pass 收敛、调参面板）：`references/multi-version-selection.md`
+19. 页面级运镜与分镜规划（运镜预算制、动机表、对数时长公式、相机层结构、镜间三分律、能量骨架、分镜卡、thumbnail pass）：`references/camera-storyboard.md`
+20. UI 演示与画廊展示编排（演示即叙事公理、八式帧级参数、画廊墙 render(t)、Gallery Ripple、Dashboard Overlay、?seek/?autoplay/?speed、iframe 三坑）：`references/ui-demo-choreography.md`

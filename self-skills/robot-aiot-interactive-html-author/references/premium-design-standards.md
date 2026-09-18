@@ -73,7 +73,7 @@
 9. 暗底排版补偿：深底上正文降一档字重（500→400 或 400→350）、行高加 `0.05-0.1`、展示大字加 `0.01em` 字距；浅字深底视觉膨胀，不补偿会显臃肿
 10. 字重对比拉层级：同页允许 300 细体正文与 900 特重展示体的大跨度对比；字重差 ≥300 即算一级层级，与字号梯度等效
 11. OpenType 数据特性：数字列 `font-variant-numeric: tabular-nums`；分数用 `diagonal-fractions`；小型大写字母标签用 `all-small-caps`；数据/代码区关连字 `font-variant-ligatures: none`，防 `fi`/`!=` 连写误读
-12. 西文展示字体禁用清单（19 个 AI 生成界面默认脸）：Inter、Roboto、Open Sans、Noto Sans、Arimo、Lato、Source Sans、PT Sans、Nunito、Poppins、Outfit、Sora、Playfair Display、Cormorant Garamond、Bodoni Moda、EB Garamond、Cinzel、Prata、Syne。用它们等于没选字体；需要西文展示体时选清单外且有性格的（如 Geist、DIN、Barlow，须随稿捆绑或确认渲染环境可用）
+12. 西文展示字体禁用清单（17 个 AI 生成界面默认脸）：Inter、Roboto、Open Sans、Noto Sans、Arimo、Lato、Source Sans、PT Sans、Nunito、Poppins、Outfit、Sora、Playfair Display、Bodoni Moda、Cinzel、Prata、Syne。用它们等于没选字体；需要西文展示体时选清单外且有性格的（如 Geist、DIN、Barlow，须随稿捆绑或确认渲染环境可用）
 13. 字体配对规则：禁止双 sans（两个无衬线族配对无张力）；display 与 body 跨类配对（serif 展示 + sans 正文，或特重 sans 展示 + serif 正文）；每个场景只允许一个表现型字体；配对必须说得出一条张力理由（年代反差 / 软硬反差 / 宽度反差），说不出就退回单字族加减字重
 
 ## 5. 色彩纪律
