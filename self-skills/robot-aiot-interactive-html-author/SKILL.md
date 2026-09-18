@@ -105,4 +105,4 @@ description: >
 12. Mermaid/PlantUML 图表构建期渲染嵌入（headless Chrome 流程、嵌入策略、失败降级）：`references/diagram-embed-rendering.md`
 13. 演讲者模式（S 键弹窗/磁吸卡片/双窗口同步）、话术 .notes 承载、总览网格、深链、触摸翻页、主题审阅：`references/presenter-mode.md`
 14. 用户明确要求动画特效时的扩展目录与路由（49 CSS 入场 + 21 canvas FX、预算硬限、clip-path 例外条款）：`references/animation-fx-catalog.md`
-15. 视觉风格预设（13 套设计系统预设、mood 路由表、五维旋钮、72 组配色库）：`references/visual-style-presets.md`
+15. 视觉风格预设（35 套设计系统预设、mood 路由表、先预览再定稿选型流程、五维旋钮、72 组配色库）：`references/visual-style-presets.md`

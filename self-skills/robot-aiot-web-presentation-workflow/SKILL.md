@@ -1,6 +1,6 @@
 ---
 name: robot-aiot-web-presentation-workflow
-version: 2.2.1
+version: 2.3.0
 description: >
   交互式Web演示页面制作工作流。根据知识文档生成分页汇报母稿，按需制作架构图/流程图，
   逐页交互HTML（可翻页、带动画、数据动效，纯原生零依赖双击即用）委派 robot-aiot-interactive-html-author 编写。
@@ -167,6 +167,7 @@ Phase 4: 交互HTML    → 委派 robot-aiot-interactive-html-author 逐页编�
    - 零外部请求、1920x1080 设计画布 + scale-to-fit 视口自适应（任意窗口无滚动条完整可见）、单页 DOM ≤ 500
    - 母稿四要素与图表数据语义无缺页、无篡改
    - 母稿素材图映射表中该页有素材时必须已上屏（压缩缩略图 + 网格平铺无滚动 + 点击放大 lightbox）
+   - 用户无风格偏好时：三标题页预览已出并经用户定稿，全套锁定无混用
 
 阻塞条件：所有页面生成完毕且通过编写 skill 的交付前审查才算完成。
 
@@ -176,6 +177,8 @@ Phase 4: 交互HTML    → 委派 robot-aiot-interactive-html-author 逐页编�
 
 设计与编写标准已全部内化在 `robot-aiot-interactive-html-author` 的 `references/` 下，
 由编写 skill 在 Phase 4 执行；本技能不重复存放，仅按验收自检抽查。
+
+视觉风格选型走编写 skill 预设库的 mood 路由表与"先预览再定稿"流程：Phase 1 的汇报对象与场景作选型输入；用户无风格偏好时由编写 skill 出 3 个真实标题页供用户预览定稿后全套锁定。
 
 ---
 

@@ -106,15 +106,31 @@ function goTo(index) {
 
 不支持时降级为 class 切换 + CSS transition。
 
+翻页落定后（View Transition 完成回调或降级 transition 结束）派发 `slidechange` 事件：
+
+```js
+document.dispatchEvent(new CustomEvent('slidechange', {
+  detail: { index: current, reason } // reason: 'key' | 'click' | 'hash' | 'auto'
+}));
+```
+
+页内 ambient 动画、数字滚动、自动推进定时器一律订阅该事件启停——这是"非活跃页面无残留定时器"的落地机制；禁止定时器自行轮询可见性。
+
 ### 键盘绑定
 
 ```js
 document.addEventListener('keydown', (e) => {
+  if (e.target.closest('input,textarea,select,[contenteditable]')) {
+    if (e.key === 'Escape') e.target.blur();
+    return; // 输入态除 Escape 外不触发翻页
+  }
+  if (/^[1-9]$/.test(e.key)) { goTo(Math.min(+e.key - 1, totalSlides - 1)); return; }
   switch (e.key) {
     case 'ArrowRight': case ' ': case 'PageDown': next(); break;
     case 'ArrowLeft': case 'PageUp': prev(); break;
     case 'Home': goTo(0); break;
     case 'End': goTo(totalSlides - 1); break;
+    case 'r': case 'R': goTo(0); break; // 重置回首页
     case 'f': case 'F': toggleFullscreen(); break;
     case 'Escape': exitFullscreen(); break;
   }
@@ -125,6 +141,7 @@ document.addEventListener('keydown', (e) => {
 
 右半区点击下一页，左半区点击上一页，底部进度条可跳转。
 点击热区不遮挡可交互内容。
+触屏改三分区：左右 1/3 翻页、中间 1/3 死区（持握防误触）；鼠标保持左右半区。
 
 ## 入场动画
 
@@ -303,11 +320,37 @@ deck 需要常驻公司/产品 logo 时，声明一次、全 deck 生效，不�
 - 数字滚动/图表动画仅触发一次
 - 非活跃页面无残留定时器
 - 单页 DOM ≤ 500
+- 数字键 1-9 直跳、R 重置、输入态守卫（input/textarea/contenteditable 内不翻页）全部可用
+- `@media print` 一页一张按序展开、缩放壳已禁用、入场动画元素强制可见
 
 ## 合并为单文件
 
 所有页面的 CSS 合并到 `<style>`，JS 合并到 `<script>`，图表 SVG 内联。
 最终文件双击即可在浏览器完整运行，无任何外部请求。
+
+## 打印与导出
+
+deck 需支持打印 / 导出 PDF（发给听众做资料）：
+
+```css
+@media print {
+  .canvas { transform: none !important; } /* scale-to-fit 缩放禁用 */
+  .nav-ui, .progress-bar { display: none !important; }
+  .slide {
+    position: relative !important;
+    display: block !important;
+    opacity: 1 !important;
+    width: 1920px; height: 1080px;
+    page-break-after: always;
+    break-after: page;
+  }
+  .slide .enter { opacity: 1 !important; transform: none !important; } /* 入场动画元素强制可见 */
+}
+@page { size: 1920px 1080px; margin: 0; } /* 竖版 deck 同步改 810×1080 */
+```
+
+- 打印态全部 slide 按序展开、一页一张；控件与进度条隐藏
+- 截图 / 导出工具用 `?noscale` URL 参数跳过 scale-to-fit 壳，按设计画布原始尺寸渲染（fit 脚本检测该参数即不施加 transform）
 
 ## headless 验证方法论
 
