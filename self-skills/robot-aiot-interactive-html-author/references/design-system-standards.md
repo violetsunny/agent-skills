@@ -28,6 +28,7 @@
 1. 音调配对锁定：只把成对角色组合使用（`primary`+`on-primary`、`surface-container`+`on-surface`），禁止任意交叉，否则对比度失控
 2. 分隔线用 `outline-variant` 一档，不用 `outline`；`outline` 只给"重要边界"
 3. 低强调文本（脚注、来源、说明）统一走 `on-surface-variant`，不与正文抢权重
+4. `on-primary` 禁止硬编码 `#fff` / `#000` 顶替：主色明度跨度大（近白到近黑），没有任何单一字面量在所有主色上可读——实测近黑主色配深色文字对比度仅 1.01:1，完全不可见而版式乍看无异常。每套预设的 `on-primary` 取白 / 近黑中按 WCAG 相对亮度公式（实算法见 `premium-review-fix.md` 对比度实测法）与其主色实算 ≥ 4.5:1 的那个
 
 ### 2. 用色调表面表达层次，不用阴影堆层次
 

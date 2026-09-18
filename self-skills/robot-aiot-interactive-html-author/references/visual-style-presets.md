@@ -23,6 +23,8 @@ deck 换肤素材库。每套预设 = 一组语义 token 覆盖集，直接覆�
 
 > 每套格式：look（一句话视觉）/ pick-when（一句话适用）/ 核心 token（覆盖变量 hex）/ 字体·形状 / 签名动效（entry·exit·ambient 缓动 + 时长）/ 页型配方要点（cover·stat-grid·quote·timeline·closing 各 1 行特有做法）。
 
+> 预设未显式给出 `on-primary` 时按 `design-system-standards.md` §1 配对规则推导：取白 / 近黑中与 `--primary-color` 按 WCAG 公式实算 ≥ 4.5:1 的那个；主色填充块上的文字一律用推导结果，不硬编码 `#fff`/`#000`。
+
 ### 2.1 biennale-yellow
 
 - **look**: 文学编辑目录风——暖羊皮纸底、单一深靛蓝墨、太阳黄作径向晕染 / 色板 / 瓷砖底印，严格矩形 0 圆角，1px 发丝线作唯一边框，无阴影。

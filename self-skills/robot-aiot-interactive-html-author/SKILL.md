@@ -1,6 +1,6 @@
 ---
 name: robot-aiot-interactive-html-author
-version: 1.4.1
+version: 1.5.0
 description: >
   交互式动画特效 HTML 编写能力。纯原生零依赖产出浏览器可直接运行的交互页面/多页 deck：
   翻页系统（键盘+点击+触摸滑动+View Transition+#/N/M 深链）、演讲者模式（S 键弹窗：

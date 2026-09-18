@@ -56,6 +56,7 @@
 3. 使用绝对定位或 CSS Grid/Flexbox 布局
 4. 元素不重叠、不溢出
 5. 画布外必须包一层 scale-to-fit 视口自适应壳：浏览器任意窗口尺寸下画布等比缩放居中、无滚动条完整可见；`1920x1080` 视口时 scale=1，headless 截图与下游消费不受影响
+6. 例外——竖版社交 deck 画布：小红书图文/社交轮播类交付形态可用竖版 3:4 画布，标准 `810x1080`（与 `content-imagery-and-infographic.md` 竖版画布规则对齐）；仅此形态豁免第 1 条的 `1920x1080`，本节其余条款照常适用，scale-to-fit 壳的缩放分母改为画布实际宽高（`Math.min(innerWidth/W,innerHeight/H)`）。用户未点名竖版 deck 时一律 `1920x1080`
 
 标准实现（本文件结构中 `.canvas` 即 `.deck` 容器）：
 
@@ -218,6 +219,32 @@ SVG 路径用 `stroke-dasharray` + `stroke-dashoffset`；柱状图从底部生�
   addEventListener('keydown',function(e){if(e.key==='Escape')close();});
 })();
 ```
+
+## 品牌 logo 声明
+
+deck 需要常驻公司/产品 logo 时，声明一次、全 deck 生效，不逐页手放：
+
+1. **常驻元素挂在 slide 同级**：logo 不属于任何 `.slide`，绝对定位在 `.canvas` 四角之一（内缩沿用画布安全边距 32-48px），跨页持续存在：
+
+```html
+<div class="canvas">
+  <img class="deck-logo" src="data:image/svg+xml;base64,…" alt="品牌名">
+  <section class="slide active">…</section>
+</div>
+```
+
+```css
+.deck-logo{position:absolute;right:40px;bottom:40px;height:44px;width:auto;opacity:.9;z-index:5;pointer-events:none}
+```
+
+2. **logo 源零外部请求**：内联 `<svg>` 优先，其次 base64 data URI；禁止 `<img src="logo.svg">` 外链文件（违反单文件自包含硬约束）
+3. **按页豁免走纯 CSS**：封面与自带品牌元素的全幅图页不显示 logo——页面加 `data-no-logo` 标记，用 `:has()` 豁免，无需 JS：
+
+```css
+.canvas:has(.slide.active[data-no-logo]) .deck-logo{opacity:0}
+```
+
+4. **不抢戏**：高度 40-48px、不透明度 ≤ 0.9、`pointer-events:none` 不挡翻页热区；不与页码/进度条及页内内容重叠，冲突时换角或对该页豁免；`alt` 写品牌名（装饰性内联 SVG 用 `aria-hidden="true"`）
 
 ## 共享背景层
 
