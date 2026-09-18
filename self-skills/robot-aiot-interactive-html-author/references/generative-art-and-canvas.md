@@ -121,6 +121,45 @@ function arcMotion(start, end, height, t) {
 5. **一页一效**：单页最多一个持续动效画布；与入场动画、数据动效同页时，持续动效透明度退后作背景层
 6. **清理可验证**：交付自检时翻离页面后用 Performance 面板确认 rAF 已停止、无残留定时器
 
+## ASCII 字符呼吸场
+
+封面/章节页的点阵质感背景：单色品牌底上，等宽字符网格随噪声场明暗涌动，形成"仪表板呼吸"质感。纯 canvas 2D + rAF 零依赖；生命周期遵循"动效画布生命周期契约"全部条款，本节只写 ASCII 特有差异。
+
+### 挂载与网格
+
+1. 容器第一个子元素插入 `<canvas class="ascii-bg" aria-hidden="true">`；CSS：`position:absolute; inset:0; width:100%; height:100%; mix-blend-mode:screen; opacity:.92`，容器内其余内容 `position:relative; z-index:1` 浮于其上
+2. 网格 CELL = 16px，字号 13px，字体读 `--mono` token（fallback monospace），字重 500，`ctx.textBaseline = 'top'`
+3. DPR 取 `Math.min(devicePixelRatio, 2)`，`ctx.setTransform(dpr,0,0,dpr,0,0)`；尺寸重建走生命周期契约的 ResizeObserver 条款，重建回调用 rAF 去抖（cancel 上一帧再排新帧）
+
+### 噪声场与字符密度映射
+
+四个 sin 项叠加取均值到 [-1,1]，时间因子 `t = 经过秒数 × 0.55`（慢是关键，快了显躁）：
+
+```javascript
+const n = (
+  Math.sin(col * 0.18 + t) +
+  Math.sin(row * 0.24 - t * 0.7) +
+  Math.sin((col + row) * 0.12 + t * 0.45) +
+  Math.sin(Math.hypot(col - cols * 0.5, row - rows * 0.5) * 0.16 - t * 0.55)
+) / 4;
+const v = (n + 1) / 2; // [0,1]
+```
+
+1. 字符色板由疏到密：`'   ...:::---+++***◦◦••▢▣'`（开头三个空格 = 纯留白档）
+2. `idx = Math.min(PALETTE.length - 1, Math.floor(v * PALETTE.length))`；命中空格字符的格子直接跳过，不进入 fillText
+3. `v < 0.22` 的格子整体不画——留白比例决定质感，画满即噪
+4. 透明度随场值线性爬升：`alpha = 0.08 + (v - 0.22) * 0.55`；深色品牌底用白色字符（screen 混合自然发亮），浅色底改主色字符（读 `--primary-color`）+ `mix-blend-mode:multiply`，不硬编码色值
+
+### 生命周期与降级
+
+1. 多个 ascii-bg 实例共用一个 rAF 循环，不各开各的；仅所在页激活时运行（随页启停条款）
+2. 页面隐藏暂停：`visibilitychange` 且 `document.hidden` → 停循环并 `clearRect` 清场；恢复可见时以 `performance.now()` 重置 t0 再启动，不累计旧时间
+3. 离屏降帧：同页多实例时，视口外实例每 4 帧才绘制一次（`(frame & 3) !== 0` 跳过）
+4. 低功耗模式切换（自定义事件广播）时 stop/start；stop 必须 clearRect，不留残影
+5. `prefers-reduced-motion`：不启动循环，只画 t=0 的静态单帧，或直接 `display:none` 保留纯色底——字符场不承载信息量，降级无损失
+6. 性能预算：1920×1080 / CELL 16 ≈ 120×68 ≈ 8200 格每帧，主开销在 fillText；帧率不足先把 CELL 放大到 20-24 降密度，不降帧率
+7. 预算归属：计入该页"一页一效"名额，并计入 animation-fx-catalog.md"持续型特效全套 ≤ 3 页"预算
+
 ## 约束
 
 1. 生成艺术是增强手段，不是目的——内容理解优先

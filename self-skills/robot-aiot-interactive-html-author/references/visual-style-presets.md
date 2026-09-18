@@ -40,8 +40,14 @@ deck 换肤素材库。每套预设 = 一组语义 token 覆盖集，直接覆�
 | 独立 · 暖调 · 顽皮 | playful | capsule |
 | 社群 · 餐饮 · 账本诚实 | long-table | editorial-forest |
 | 文学 · 柔和 · 杂志感 | soft-editorial | biennale-yellow |
+| 冷静 · 瓷白 · 学术期刊感 | porcelain-indigo | blue-professional |
+| 怀旧 · 牛皮纸 · 人文手账 | kraft-journal | long-table |
+| 瑞士 · 灰白底 · 皇家蓝单锚 | swiss-ultramarine | monochrome |
+| 瑞士 · 灰白底 · 柠檬黄活力 | swiss-lemon | neo-grid-bold |
+| 瑞士 · 灰白底 · 荧光绿未来 | swiss-lime | studio |
+| 瑞士 · 灰白底 · 安全橙工业警示 | swiss-safety | broadside |
 
-## 2. 三十五套设计系统预设
+## 2. 四十一套设计系统预设
 
 > 每套格式：look（一句话视觉）/ pick-when（一句话适用）/ 核心 token（覆盖变量 hex）/ 字体·形状 / 签名动效（entry·exit·ambient 缓动 + 时长）/ 页型配方要点（cover·stat-grid·quote·timeline·closing 各 1 行特有做法）。
 
@@ -537,6 +543,90 @@ deck 换肤素材库。每套预设 = 一组语义 token 覆盖集，直接覆�
   - timeline: CSS counter 编号列表 + 28px 青色短线阶段标。
   - closing: 单色场收底 + pin-note 注记重现 + 强调黄 `<em>` 收底词。
 
+### 2.36 porcelain-indigo
+
+- **look**: 冷瓷学术杂志风——瓷白冷底、深靛蓝单墨（墨即主题色），暗靛反转页（墨底瓷字）作节奏，1px 靛蓝发丝线分栏，serif 展示 + mono 栏目标签 chrome，零彩色零阴影零渐变。
+- **pick-when**: 冷静 / 理性 / 深度内容；想要学术期刊式克制与工程文化气质的科技研究、数据分享、技术发布产品。锁定 M 系登记版式（M01-M10），不与 S 系混用。
+- **核心 token**: `--surface-color:#F1F3F5` `--surface-muted:#E4E8EC` `--text-primary:#0A1F3D` `--text-secondary:#0A1F3D`（降 opacity 至 60%） `--primary-color:#0A1F3D`（双色单墨，墨即主色） `--secondary-color:#152A4A` `--tertiary-color:#E4E8EC` `--outline-color:#0A1F3D`（20% 软发丝）；on-primary `#F1F3F5`（墨底瓷字，显式）。
+- **字体·形状**: 展示体 `"Songti SC","SimSun",Georgia,serif`（400-600，紧行高）/ 正文 `"PingFang SC","Microsoft YaHei",system-ui,sans-serif`（400）/ 数据与栏目标签 `ui-monospace,"SF Mono",Consolas,monospace`（uppercase，0.1-0.16em）；圆角 0px；密度中低（两段式页标题-内容间距 65-86px）；阴影无渐变无（深度 = 墨/纸反转页 + 发丝线）。
+- **签名动效**: entry `cubic-bezier(0.19,1,0.22,1)` 0.4s / exit `cubic-bezier(0.755,0.05,0.855,0.06)` 0.6s / ambient 无。
+- **页型配方要点**:
+  - cover: M01 开场封面——深靛 hero-dark 底 + 瓷白 serif 巨字（192px 档）+ mono kicker（场合·主讲人），页眉不写页码。
+  - stat-grid: M03 数据大字报——瓷白底 3×2 六格统计卡，数字深靛，卡间 1px 靛蓝发丝线，数字过长用 K/M 简写。
+  - quote: M08 大引用页——dark 优先（靛底瓷字），serif 金句 111px 档逐句揭示 + 出处 lead 65% 透明度。
+  - timeline: M06 两列流水线——mono 靛蓝步骤编号 + fragment 分步点亮；旧/新范式对照改 M09（左列 55% 透明度弱化）。
+  - closing: M07 悬念问题页——靛蓝 hero-dark + 巨字三行断在语义处；多幕 deck 用 M02 幕封收束（hero dark/light 交替呼吸）。
+
+### 2.37 kraft-journal
+
+- **look**: 牛皮纸手账人文杂志风——深牛皮底、深棕单墨、暖米 tint 区块作层次，棕墨发丝规线分栏，serif 引文 + sans 正文，零阴影零渐变，全库最暖的纸面色位。
+- **pick-when**: 怀旧 / 人文 / 老笔记本；想要牛皮信封式温度与年代感的书评、文学历史、手作品牌、生活方式产品。锁定 M 系登记版式（M01-M10），不与 S 系混用。
+- **核心 token**: `--surface-color:#EEDFC7` `--surface-muted:#E0D0B6` `--text-primary:#2A1E13` `--text-secondary:#2A1E13`（60%） `--primary-color:#2A1E13`（双色单墨，墨即主色） `--secondary-color:#3A2A1D` `--tertiary-color:#E0D0B6` `--outline-color:#2A1E13`（25% 软发丝）；on-primary `#EEDFC7`（棕底牛皮字，显式）。
+- **字体·形状**: 展示体 `"Songti SC","SimSun",Georgia,serif`（400-700）/ 引文面同栈斜体（CJK 无斜体→字重 / 颜色替代）/ 正文 `"PingFang SC","Microsoft YaHei",system-ui,sans-serif`（400）/ 数据 `ui-monospace,"SF Mono",Consolas,monospace`；圆角 0px；密度中；阴影无渐变无（深度 = 牛皮双档色块 + 棕墨发丝线）。
+- **签名动效**: entry `cubic-bezier(0.445,0.05,0.55,0.95)` 1.0s / exit `cubic-bezier(0.55,0.085,0.68,0.53)` 1.5s / ambient 无。
+- **页型配方要点**:
+  - cover: M01 开场封面——牛皮底 + 深棕 serif 巨字 + mono meta 行（作者·身份），卷次文案强化年代语义（如"Vol.03 · 秋"式）。
+  - stat-grid: M03 数据大字报——六格卡牛皮双档（#EEDFC7/#E0D0B6）交替，数字深棕 serif 大字。
+  - quote: M08 大引用页——深棕 hero-dark 反转（棕底牛皮字）+ 斜体引文 + meta 出处行。
+  - timeline: M06 两列流水线——mono 棕编号步骤行 + 发丝分隔线分步点亮；多案例图片实证改 M05（281px 固定高网格）。
+  - closing: M07 悬念问题页——牛皮底巨字居中三行 + 棕短线收底；或 M02 幕封式收束。
+
+### 2.38 swiss-ultramarine
+
+- **look**: 瑞士国际主义皇家蓝锚点——高级灰白底（非纯白）+ 统一三档灰阶，深皇家蓝单一高饱和 accent，16 列网格 + 1px 发丝线，巨字 200 超轻 / 重点数字 300 / 小标 600，直角纯色不透明，零渐变零阴影零圆角。
+- **pick-when**: 冷静 / 理性 / 学术感；想要单锚点色瑞士克制的商业发布、科技产品、设计领域分享。锁定 S 系登记版式（S01-S22）；高密度黄块填满改 neo-grid-bold，全墨零彩色改 monochrome。
+- **核心 token**: `--surface-color:#FAFAF8` `--surface-muted:#F0F0EE`（灰底卡） `--text-primary:#0A0A0A` `--text-secondary:#737373` `--primary-color:#002FA7`（皇家蓝唯一 accent） `--secondary-color:#0A0A0A`（ink 反转块） `--tertiary-color:#D4D4D2` `--outline-color:#D4D4D2`（1px 发丝）；on-primary `#FFFFFF`（显式）。
+- **字体·形状**: 展示体 `"PingFang SC","Microsoft YaHei",system-ui,sans-serif`（200 巨字，拉丁字距 −0.04em 行高 0.9-0.94；中文巨标题字距归零行高 1.15-1.25）/ 正文同栈（300）/ 小标同栈（600）/ 数据 `ui-monospace,"SF Mono",Consolas,monospace`（`font-feature-settings:"tnum"`）；圆角 0px 全元素；密度中（16 列网格 gap 16px）；阴影无渐变无（accent 不加阴影 / 圆角 / 透明度）。
+- **签名动效**: entry expressive `cubic-bezier(0,0,0.3,1)` 0.4-0.7s（每页一个语义化 recipe 与图形耦合：数字 scale 弹入 / bar scaleY 拉起 / 圆环 stroke-dashoffset 描线）/ exit productive `cubic-bezier(0.2,0,0.38,0.9)` 0.24s / ambient 无。
+- **页型配方要点**:
+  - cover: S01 目录封面——皇家蓝 accent 满屏 + 三行 cover-row（mono 编号 + 巨字 205px/200）；调性不合时改左 ink 右纸白对开变体。
+  - stat-grid: S06 KPI 塔（bar 高度数据驱动、皇家蓝 bar）/ 4-6 行账单改 S20 / 规格 benchmark 改 S21。
+  - quote: S03 分屏陈述（左半皇家蓝反白巨字 / 右半灰底解释栏）/ 中段宣言改 S12 ink 通栏。
+  - timeline: S11 横向（8×8 直角方块节点，无数据）/ 带数据演化改 S02 / 闭环改 S14。
+  - closing: S10 分屏收束——左半皇家蓝满屏巨字宣言 + 右半纸白 3 条 takeaway，第 3 条穿蓝完成缝合。蓝色只做 KPI 数字与单焦点卡，满屏蓝即掉档；黑底页上蓝色反白同样克制。
+
+### 2.39 swiss-lemon
+
+- **look**: 瑞士风柠檬黄锚点——高级灰白底 + 统一三档灰阶，金柠檬黄单一高饱和 accent，块戳 / 下划线 / 单字符高亮为主要武器，16 列网格 + 1px 发丝线，直角纯色不透明，零渐变零阴影。
+- **pick-when**: 年轻 / 活力 / 消费零售；想要鲜亮图形能量的运动、消费品、活力主题发布。锁定 S 系登记版式；高密度黄块填满的新粗野改 neo-grid-bold（金柠檬 vs 酸霓虹，色相与系统均不同）。
+- **核心 token**: `--surface-color:#FAFAF8` `--surface-muted:#F0F0EE` `--text-primary:#0A0A0A` `--text-secondary:#737373` `--primary-color:#FFD500`（金柠檬黄唯一 accent） `--secondary-color:#0A0A0A`（ink 反转块） `--tertiary-color:#D4D4D2` `--outline-color:#D4D4D2`（1px 发丝）；on-primary `#0A0A0A`（浅色 accent——黄块上墨字，禁白字，显式）。
+- **字体·形状**: 展示体 `"PingFang SC","Microsoft YaHei",system-ui,sans-serif`（200 巨字，拉丁字距 −0.04em 行高 0.9-0.94；中文巨标题字距归零行高 1.15-1.25）/ 正文同栈（300）/ 小标同栈（600）/ 数据 `ui-monospace,"SF Mono",Consolas,monospace`（`font-feature-settings:"tnum"`）；圆角 0px 全元素；密度中（16 列网格 gap 16px）；阴影无渐变无。
+- **签名动效**: entry expressive `cubic-bezier(0,0,0.3,1)` 0.4-0.7s（每页一个语义化 recipe：数字 scale 弹入 / 节点序列点亮）/ exit productive `cubic-bezier(0.2,0,0.38,0.9)` 0.24s / ambient 无。
+- **页型配方要点**:
+  - cover: S01 目录封面——纸白底三行 cover-row + 柠檬黄块戳 accent；或黄满屏变体（黄底墨字）。
+  - stat-grid: S15 矩阵 + 巨数（12 格灰底卡填满、强调项单独一张柠檬黄 accent 卡，单焦点法则）/ 6 项快讯改 S16 微卡。
+  - quote: S09 点阵陈述——巨字三行宣言 + 柠檬黄单字符高亮（mark 式黄块），点阵 mask 从左推到右。
+  - timeline: S11 横向——8×8 柠檬黄方块节点左→右依次点亮（220ms/节点）。
+  - closing: S10 分屏收束——左半柠檬黄满屏 + 墨黑巨字宣言（黄底墨字），右半纸白 takeaway 第 3 条穿黄。
+
+### 2.40 swiss-lime
+
+- **look**: 瑞士风荧光柠檬绿锚点——高级灰白底 + 统一三档灰阶，荧光黄绿单一 accent，屏幕显色自带发光感，16 列网格 + 1px 发丝线，直角纯色不透明，零渐变零阴影。
+- **pick-when**: 生态 / 未来 / 新兴；想要当代感的可持续、健康、Z 世代品牌、AI 创业项目。锁定 S 系登记版式；深底酸黄二元反转改 studio（本套是浅底单锚点，结构不同）。
+- **核心 token**: `--surface-color:#FAFAF8` `--surface-muted:#F0F0EE` `--text-primary:#0A0A0A` `--text-secondary:#737373` `--primary-color:#C5E803`（荧光柠檬绿唯一 accent） `--secondary-color:#0A0A0A`（ink 反转块） `--tertiary-color:#D4D4D2` `--outline-color:#D4D4D2`（1px 发丝）；on-primary `#0A0A0A`（浅色 accent——绿块上墨字，禁白字，显式）。
+- **字体·形状**: 展示体 `"PingFang SC","Microsoft YaHei",system-ui,sans-serif`（200 巨字，拉丁字距 −0.04em 行高 0.9-0.94；中文巨标题字距归零行高 1.15-1.25）/ 正文同栈（300）/ 小标同栈（600）/ 数据 `ui-monospace,"SF Mono",Consolas,monospace`（`font-feature-settings:"tnum"`）；圆角 0px 全元素；密度中（16 列网格 gap 16px）；阴影无渐变无。
+- **签名动效**: entry expressive `cubic-bezier(0,0,0.3,1)` 0.4-0.7s（圆环 stroke-dashoffset 描线 / 节点序列点亮）/ exit productive `cubic-bezier(0.2,0,0.38,0.9)` 0.24s / ambient 无。
+- **页型配方要点**:
+  - cover: S01 目录封面——灰白底 + 荧光绿 mono 编号列 + 巨字 205px/200；或左 ink 右纸白对开变体（ink 块上一条绿线）。
+  - stat-grid: S06 KPI 塔（荧光绿 bar，高度数据驱动，最小 65px 最大 389px）/ 层级架构与生态地图改 S17 同心圆（引线绿色、标签 HTML）。
+  - quote: S03 分屏陈述——左半 ink 底反白巨字 + 荧光绿强调词，右半灰底解释栏错峰升入。
+  - timeline: S14 闭环流程——同心圆环荧光绿 stroke-dashoffset 描线 + 灰底直角节点序列点亮。
+  - closing: S10 分屏收束——左半荧光绿满屏 + 墨黑巨字（绿底墨字），右半 takeaway 第 3 条穿绿。
+
+### 2.41 swiss-safety
+
+- **look**: 瑞士风安全橙锚点——高级灰白底 + 统一三档灰阶，安全橙单一 accent 承担工业紧迫感与视觉锚点感，只做局部高亮不做满屏，16 列网格 + 1px 发丝线，直角纯色，零渐变零阴影。
+- **pick-when**: 工业 / 警示 / 转折点；想要锚点级紧迫感的制造业、汽车、施工安全、"警告 / 决策"主题内容。锁定 S 系登记版式；墨黑/火橙双色调抗议海报改 broadside（本套是灰白底单锚点，结构不同）。
+- **核心 token**: `--surface-color:#FAFAF8` `--surface-muted:#F0F0EE` `--text-primary:#0A0A0A` `--text-secondary:#737373` `--primary-color:#FF6B35`（安全橙唯一 accent） `--secondary-color:#0A0A0A`（ink 反转块） `--tertiary-color:#D4D4D2` `--outline-color:#D4D4D2`（1px 发丝）；on-primary `#FFFFFF`（橙为中明度 accent——橙底白字必须 ≥600 字重才达对比度，显式）。
+- **字体·形状**: 展示体 `"PingFang SC","Microsoft YaHei",system-ui,sans-serif`（200 巨字，拉丁字距 −0.04em 行高 0.9-0.94；中文巨标题字距归零行高 1.15-1.25）/ 正文同栈（300）/ 小标同栈（600）/ 数据 `ui-monospace,"SF Mono",Consolas,monospace`（`font-feature-settings:"tnum"`）；圆角 0px 全元素；密度中（16 列网格 gap 16px）；阴影无渐变无。
+- **签名动效**: entry expressive `cubic-bezier(0,0,0.3,1)` 0.4-0.7s（条宽 0→目标 / 中线 scaleY 先拉开）/ exit productive `cubic-bezier(0.2,0,0.38,0.9)` 0.24s / ambient 无。
+- **页型配方要点**:
+  - cover: S01 目录封面——左 ink 右纸白对开变体（ink 块上一条橙规线），橙不满屏。
+  - stat-grid: S07 横向条形（1px 橙条 0→目标宽 + 末端数字 count-up，必须真实数据）/ 4-6 行账单改 S20（巨数橙）。
+  - quote: S12 宣言 + ink 通栏——上半橙短线 + 大字 4 行宣言，下半 ink 通栏 scaleX 铺开 + 反白短句。
+  - timeline: S08 双轨对照——中线 1px 纵线 scaleY 0→1 先拉开，旧/新两列镜像入场，新列橙强调。
+  - closing: S10 分屏收束——经典 ink 双半屏变体（左 ink 巨字 / 右纸白 takeaway），第 3 条橙收口。
+
 ## 3. 主题五维旋钮
 
 预设锁定后，用五维旋钮微调，不另选预设：
@@ -553,7 +643,7 @@ deck 换肤素材库。每套预设 = 一组语义 token 覆盖集，直接覆�
 
 **用户无风格偏好时——先预览再定稿**：不默默选，走五步：
 
-1. **三阶收敛读文件**：先只读 §1 路由表按情绪 / 受众圈出 3-5 套 → 再只读候选条目的 look / pick-when → 仅对进入预览的一套读条目全文；不通读三十五套。
+1. **三阶收敛读文件**：先只读 §1 路由表按情绪 / 受众圈出 3-5 套 → 再只读候选条目的 look / pick-when → 仅对进入预览的一套读条目全文；不通读四十一套。
 2. **出 3 个真实标题页**：1 个安全款（最贴受众的一套）+ ≥1 个 bold 款（高张力套）+ 1 个 wildcard 款（跨情绪套），用 deck 真实标题与真实数据，合并为单文件双击可翻页浏览。
 3. **预览真实性铁律**：预览页只出现将真实上屏的内容，禁止内部工作流词汇（预设名、token 名、旋钮档位）上屏。
 4. **定稿后全套锁定**：用户选定一套即锁定，后续微调只走 §3 五维旋钮；禁止中途换预设或混用两套元素。

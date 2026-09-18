@@ -162,6 +162,124 @@
 2. **sweep_static 静默扫查**：入场全部播完后（翻页后约 2-3s）检查整页是否完全静止。除刻意决策（高密度数据页、quote 页允许全静）外，保留一个低幅度活元素（ambient 呼吸 / 慢速 glow / 微幅 canvas）；全静且非刻意 = 记 `[UI-WARN]`
 3. **对比度实测法**：对比度不目测，按 WCAG 相对亮度公式实算——sRGB 通道先 gamma 校正（`c <= 0.03928 ? c/12.92 : ((c+0.055)/1.055)^2.4`），亮度 `L = 0.2126R + 0.7152G + 0.0722B`，对比度 `= (L1 + 0.05) / (L2 + 0.05)`；渐变底/图片底上的小字取背景最暗点计算
 
+## 登记版式专属校验（S/M 系 deck）
+
+仅当交付物为登记版式 deck（每页 `<section>` 带 `data-layout="Sxx|Mxx"`，登记定义见 `swiss-layout-system.md`）时执行；其余单文件汇报页跳过本节。本节静态扫描四项全部计入阻塞项，任一不过则不交付。
+
+### 静态扫描（机器可查项，先于目测全部跑完）
+
+#### 1. data-layout 登记校验
+
+- 每页 `<section>` 必须带 `data-layout`，值必须在 S01-S22 / M01-M10 登记范围内；未登记编号（S23、M11、自造名）= 阻塞
+- 同一 deck S 系与 M 系不混用：下面两条计数同时 >0 即违规
+- `<section>` 出现次数与 `data-layout` 出现次数必须相等，差值即漏登记页
+
+```bash
+grep -o 'data-layout="[^"]*"' index.html | sort | uniq -c   # 逐个值对照登记范围
+grep -o '<section' index.html | wc -l                       # 应与下行相等
+grep -o 'data-layout=' index.html | wc -l
+grep -c 'data-layout="S' index.html                         # S/M 混用检查
+grep -c 'data-layout="M' index.html
+```
+
+#### 2. 大标题居中拦截
+
+登记版式禁则：顶部大标题禁止 `text-align:center`。例外仅限 S03/S09/S10（S 系陈述/分屏版式）与 M01/M02/M07/M08（M 系 hero 页）。
+
+```bash
+grep -nE 'text-align: ?center' index.html
+```
+
+命中行逐个确认所在页的 data-layout：非例外版式且命中元素是页级大标题（h1/h2 或标题字号档元素）= 阻塞，改为左对齐贴左上内容轴。卡片内部小元素居中、时间线 label 的 `translateX(-50%)` 居中不属于本项。
+
+#### 3. SVG 可见文字拦截
+
+SVG 只画几何线条/圆/路径/箭头，不写可见文字；所有文字标签用 HTML 放网格、卡片或 caption 里。
+
+```bash
+grep -n '<text' index.html
+```
+
+`<svg>` 内命中即阻塞：删除 `<text>`，标签改 HTML 元素按网格落位；引线保留在 SVG 里，标签文字一律 HTML。
+
+#### 4. nav-safe 底部安全区校验
+
+分页圆点 bottom 22px，登记版式统一预留底部 86px 安全区（规则见 `web-slide-strategies.md` nav-safe 节，此处只做机器查与实测，不重述）。
+
+```bash
+grep -nE 'align-items:end|align-self:end|margin-top:auto|bottom: ?0' index.html
+```
+
+命中处逐个确认：元素最低边缘距画布底 ≥86px，或所在版式已内置安全区。caption、脚注、时间线下 label、KPI 小字是最高发侵入点；手写贴底命中的页面必须再走下节实测拿 navSafeIntrusionPx 定论。
+
+### 后验测量（先量再修，不目测猜）
+
+溢出、底部空白、标题间距、安全区侵入一律实测，目测只做最终风格确认。入场动画稳定后（翻页约 2-3s）再量，不把动画中间态当溢出。
+
+**方法一：headless Chrome 逐页截图**
+
+```bash
+"/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" \
+  --headless --disable-gpu --window-size=1920,1080 \
+  --virtual-time-budget=6000 \
+  --screenshot=page-03.png "file://$PWD/index.html#/3"
+```
+
+多页 deck 按 `#/N` 深链逐页截图；Linux 环境用 `google-chrome --headless=new` 或 `chromium` 等价命令。截图逐页看：溢出、贴住、安全区侵入。
+
+**方法二：getBoundingClientRect 四值实测**（比截图精确，控制台执行）
+
+```js
+document.querySelectorAll('section[data-layout]').forEach(sec => {
+  const sr = sec.getBoundingClientRect();
+  const k = sr.height / 1080;  // scale-to-fit 缩放系数，把实测值折回 1920x1080 画布 px
+  let overflow = 0, maxBottom = 0;
+  sec.querySelectorAll('*').forEach(el => {
+    const r = el.getBoundingClientRect();
+    if (!r.width && !r.height) return;
+    overflow = Math.max(overflow, r.bottom - sr.bottom, r.right - sr.right);
+    maxBottom = Math.max(maxBottom, r.bottom);
+  });
+  const title = sec.querySelector('h1,h2');
+  const next = title && title.nextElementSibling;
+  console.log(sec.dataset.layout, JSON.stringify({
+    overflowPx: Math.round(overflow / k),                                   // >0 = 溢出
+    bottomWhitespacePx: Math.round((sr.bottom - maxBottom) / k),            // 防"超出修成巨空"
+    titleGapPx: next ? Math.round((next.getBoundingClientRect().top - title.getBoundingClientRect().bottom) / k) : null,
+    navSafeIntrusionPx: Math.round(Math.max(0, maxBottom - (sr.bottom - 86 * k)) / k)  // >0 = 侵入安全区
+  }));
+});
+```
+
+隐藏页（display:none）rect 全 0，测量无效：逐页翻到当前页再量（控制台先执行 `location.hash = '#/3'`），或在 devtools 里临时移除非活跃页隐藏后整批量。
+
+**修完反查**：修溢出后 bottomWhitespacePx 变大 = 修过头，恢复部分间距或放大最后一块再量；每轮只做一个档位的调整，改完重跑测量，不连改两轮再验。
+
+### overflow 修正阶梯（按实测 overflowPx 分级处置）
+
+| 实测溢出 | 处置 | 禁止动作 |
+|---|---|---|
+| 1-40px | 只微调：上移内容组，或收紧一处 gap/padding | 删内容 |
+| 40-90px | 局部压缩 gap/padding，或降低一个模块高度，优先保内容 | 删内容、缩字号 |
+| 90-160px | 轻微压标题档位或压缩一段正文，再考虑拆页 | 直接换版式 |
+| 160px+ | 才允许：换更高容量登记版式、合并模块、删内容、拆页 | — |
+
+- 禁止靠降低字号解决拥挤；字号下限按 `typography.md` 第四节（18/16/14px）守住
+- 拆页/换版式必须回 `swiss-layout-system.md` 的 P0 匹配表重选登记版式，不临时发明未登记结构
+
+### title gap 校验
+
+- 两段式页面（顶部标题 + 下部长正文/引用/图表）：titleGapPx 实测 65-86px
+- 章节级标题-卡片间距 ≥97px（S15/S16 矩阵与微卡页）
+- titleGapPx <54px = 标题与正文贴住，阻塞
+- titleGapPx >160px 且非刻意留白记 `[UI-WARN]`：多为修溢出的副产品，按修完反查处理
+
+### 与现有流程的衔接
+
+1. 本节静态扫描四项与 overflowPx >0、navSafeIntrusionPx >0、titleGapPx <54px 阈值全部计入"交付前预检清单 · 阻塞项"；阻塞项中"内容不溢出，元素不重叠"以本节实测值判定，不以目测判定
+2. 未过项走第三步修复顺序处理；换版式骨架级修复仍遵守修复红线第 6 条——不改页面契约（标题/结论/上屏内容/话术）
+3. 审查报告逐页附 overflowPx / bottomWhitespacePx / titleGapPx / navSafeIntrusionPx 四值；无测量记录的页面不算通过审查
+
 ## 审查报告格式
 
 ```text
@@ -173,5 +291,6 @@
   图表真源: 未触碰 / 需转 bridge 审查（说明原因）
   Web 可访问性: 通过 / 有问题（列出）
   交互版审查: 不适用 / 通过 / 有问题（列出）
+  登记版式校验: 不适用 / 通过 / 有问题（列出 overflowPx / titleGapPx / navSafe 实测值）
   结论: 可交付 / 需返工
 ```

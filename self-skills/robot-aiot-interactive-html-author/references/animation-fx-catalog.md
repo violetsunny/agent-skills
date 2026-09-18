@@ -48,6 +48,36 @@
 | sine-inout | (0.37, 0, 0.63, 1) | 环境循环 |
 | smooth-inout | (0.65, 0, 0.35, 1) | 移位对称 |
 
+## 1c. 页面级入场编排 recipe（5 种）
+
+单个效果（§2）是叶子级动作，recipe 是页面级编排：页面激活时把一组 data-anim 元素按语义顺序播完。挂载属性分工：`<section>` 用 `data-animate="<recipe>"` 选编排；元素用裸 `data-anim`（无值）加入编排，或取角色值 `left / right / divider / line / step`。§2 的效果名值（如 `data-anim="fade-up"`）与 recipe 角色值互斥——页面带 data-animate 时整页按 recipe 时序播，不再单独播单效果名。一个 recipe 计入 §1.3"单页 CSS 入场 ≤ 2 种"预算时算 1 种。
+
+| recipe | 触发 | 行为与帧级参数 |
+|---|---|---|
+| `cascade`（默认） | 不加 data-animate | 全部 data-anim：opacity 0→1 + translateY 16→0px，0.75s，delay = 0.15s + i×0.1s，quart-out |
+| `hero` | data-animate="hero"（封面/章节大页） | y 14→0px，0.9s，delay = 0.2s + i×0.16s，quart-out——比 cascade 慢，仪式感 |
+| `quote` | data-animate="quote" | 非 line 元素先出（y 8→0px，0.6s，stagger 0.12s、start 0.2s）；`data-anim="line"` 行 opacity 0.35→1 + y 10→0px，0.8s，行间 stagger 0.55s、start 0.5s，逐句揭示 |
+| `directional` | data-animate="directional" | 其余元素先出（stagger 0.1s、start 0.15s）→ 左列 x -24→0px，0.8s，delay 0.35s → 分割线 opacity 0→0.25，0.5s，delay 0.9s → 右列 x 24→0px，0.8s，delay 1.0s |
+| `pipeline` | data-animate="pipeline" | 进页全部 step 置 opacity 0.15；每次前进键点亮一个 step（opacity 0.15→1 + y 8→0px，0.5s），step 间箭头 opacity 0.15→0.7，0.3s，delay 0.15s；全部点亮后才放行翻页 |
+
+库 API → 原生换算（全部 WAAPI/rAF/CSS，零依赖）：
+
+| 库 API 形态 | 原生等价物 |
+|---|---|
+| `animate(el, {opacity:[0,1], y:[12,0]}, {duration:.6, easing:[.22,1,.36,1]})` | `el.animate([{opacity:0, transform:'translateY(12px)'}, {opacity:1, transform:'translateY(0)'}], {duration:600, easing:'cubic-bezier(.22,1,.36,1)', fill:'both'})` |
+| `animate(list, …, {delay: stagger(step, {start})})` | `list.forEach((el,i) => el.animate(…, {delay: start + i*step, fill:'both'}))` |
+| `x / y / scale` 简写属性 | 拼进 transform 字符串（translateX / translateY / scale） |
+| easing 四元数组 `[x1,y1,x2,y2]` | `'cubic-bezier(x1,y1,x2,y2)'` 字符串 |
+| 滚动驱动入场 | IntersectionObserver 触发，或 CSS `animation-timeline: view()`；不支持时回退页面激活即播 |
+
+实现规则：
+
+1. 触发时机：页面转场中段（转场开始约 450ms 后）调用 playSlide(idx)，避免与转场本体打架；翻回页面先复位再重播
+2. pipeline 与导航耦合：前进事件（→ / 空格 / 滚轮下滑）先询问 pipeline 钩子是否还有未点亮 step，有则消费事件点亮，无则放行翻页
+3. 保底：编排脚本报错时把所有 data-anim 强制 `opacity:1; transform:none`——内容可读性优先于动效
+4. 低功耗 / reduced-motion：先 `document.getAnimations().forEach(a => a.cancel())` 再直接置可见态，不播任何入场
+5. data-anim 只挂叶子语义块（标题/lead/卡片/图/列），不挂 grid 容器、不挂每个 li；整页不想入场就整页不打标
+
 ## 2. CSS 与 DOM 动画目录（49 种）
 
 挂载方式：入场类元素加 `data-anim="<name>"`，与 `data-enter-order` 共用触发机制——页面激活时按 order 依次播放，翻回该页时重触发。交互类（§2c）由事件绑定触发，数据类（§2d）随页面激活触发一次。

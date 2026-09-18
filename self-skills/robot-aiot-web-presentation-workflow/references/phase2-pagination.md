@@ -127,3 +127,23 @@
 3. 页面总数超出默认上限且无用户明确扩充要求 → 重新合并或拆分
 4. 章节交界处缺过渡论证页 → 补页后再继续
 5. 上屏内容仅为标题级骨架、未从源文档提炼 → 加厚后再继续
+
+## 明暗主题节奏规划（母稿阶段先行）
+
+deck 将使用登记版式（S/M 系，见 `robot-aiot-interactive-html-author/references/swiss-layout-system.md`）时，主题节奏必须在母稿阶段规划完成，不留到写页时临场决定：
+
+1. 规划时机：分页决策流程第 5 步（节奏检查）完成后、第 6 步填写四要素模板前，先画 light/dark/hero 分布表；跳过规划直接写页 = 成品全是 light
+2. 母稿产物在"素材图映射表"之后新增主题节奏表：
+
+```markdown
+## 主题节奏表
+| 页 | 主题档 | 版式 | 备注 |
+|----|--------|------|------|
+| 1 | hero dark | 封面 | 开场 |
+| 2 | light | 数据大字报 | 数据抛出 |
+```
+
+3. 主题档四选一：light / dark / hero light / hero dark；hero 页放章节交界（封面、幕封、问题页、大引用），非 hero 页承载正文
+4. 母稿阶段自检（摘要）：禁止连续 3 页以上相同主题；8 页以上 deck 至少 1 个 hero dark + 1 个 hero light；每 3-4 页插 1 个 hero 页
+5. 完整节奏硬规则、逐版式主题默认值表、8 页节奏模板 → `robot-aiot-interactive-html-author/references/web-slide-strategies.md`"登记版式明暗主题节奏"节，本文件不重复；版式骨架与选择索引 → `swiss-layout-system.md`
+6. 阻塞条件补充：登记版式 deck 缺主题节奏表、或连续同主题超限 → 调整后再继续

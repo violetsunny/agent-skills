@@ -77,6 +77,82 @@
 3. 数据动效配合文案节奏，先出结论再展开细节
 4. 过渡动画服务于叙事连贯性，不是装饰
 
+## 登记版式明暗主题节奏
+
+适用：S/M 登记版式 deck（见 `swiss-layout-system.md`）；其余单文件 deck 可参照做节奏规划。M 系每页 `<section>` 必带主题四档之一：light / dark / hero light / hero dark；hero 页用于章节封面/开场/收束/转场，非 hero 页用于正文。S 系以纸白底为主，暗节奏由 ink 反转块与 accent 满屏页制造。
+
+节奏硬规则（生成后自检）：
+
+1. 禁止连续 3 页以上相同主题（包括 light 堆叠和 dark 堆叠）
+2. 8 页以上 deck 必须至少 1 个 hero dark + 1 个 hero light
+3. 禁止整个 deck 只有 light 正文页、没有任何 dark 正文页——平淡、没呼吸
+4. 推荐每 3-4 页插 1 个 hero 页（封面/幕封/问题页/大引用）；hero 与非 hero 约 2-3:1 交错，不连续超过 3 页非 hero、不连续超过 2 页 hero
+5. 先画节奏对齐表再动手写 slide；跳过规划直接粘骨架 = 全是 light
+
+版式主题默认值：
+
+| 版式 | 默认主题 | 原因 |
+|---|---|---|
+| M01 开场封面 | hero dark | 开场仪式感，暗底强冲击 |
+| M02 章节幕封 | hero dark 与 hero light 必须交替 | 呼吸节奏 |
+| M03 数据大字报 | light | 数字需纸白底；多幕连发可偶插 dark |
+| M04 左文右图 / M10 图文混排 | light / dark 交替 | 正文节奏主力 |
+| M05 图片网格 | light | 截图需亮底 |
+| M06 流水线 | light | 流程图需清晰 |
+| M07 问题页 | hero dark | 强视觉冲击 |
+| M08 大引用 | dark 优先，偶用 light | 金句仪式感靠暗底 |
+| M09 对比页 | light | 双列需清晰 |
+| S01 封面 / S10 收尾 | accent 满屏 / 左半 accent + 右半纸白 | 首尾色彩闭环 |
+| S 系正文 | 纸白底为主 | ink 块（S03/S12/S13）作页内暗节奏 |
+
+8 页节奏模板（可直接套用）：
+
+| 页 | 主题 | 版式 | 备注 |
+|---|---|---|---|
+| 1 | hero dark | 封面 | 开场 |
+| 2 | light | 大字报 | 数据抛出 |
+| 3 | dark | 左文右图 | 对比/故事 |
+| 4 | light | 流水线 | 流程 |
+| 5 | hero light | 章节幕封 | 呼吸 |
+| 6 | dark | 左文右图或大引用 | — |
+| 7 | hero dark | 问题页 | 悬念收束 |
+| 8 | light | 大引用/结尾 | 收尾 |
+
+## 登记版式封面与收底
+
+1. S 系默认色彩闭环：封面 S01 accent 满屏（可选 ASCII 字符呼吸场背景，实现与生命周期见 `generative-art-and-canvas.md`），收尾 S10 左半 accent + 右半纸白 takeaway——"开场全 accent ↔ 收尾半 accent"
+2. 收尾右侧第 3 条 takeaway 用 accent 强调，把 accent 色从左半穿到右半完成缝合
+3. 反白大标题 weight 200；强调字拉丁用 italic+300、中文降级字重/颜色——accent 压 accent 看不见（见 `typography.md` 第二节）
+4. 封面不再放大编号（页眉已有页码）；收尾每 deck 仅 1 页，不得出现在中间页
+5. 封面没用 accent 满屏时，收尾改用经典 ink 双半屏变体，保持首尾重量对称
+
+## chrome 与 kicker 分工
+
+1. 页眉 chrome 左上 = 栏目/导航元数据：稳定的"栏目名"或"章节分类"，跨多页可以相同（"Act II · Workflow" / "Data · Result"）
+2. 页眉 chrome 右上 = 页码 + 幕号，固定格式（"Act II · 15 / 25"）
+3. kicker = 本页独一份的引导句，是大标题的"小前缀"（像杂志大标题上方的一行话），每页都应不同、短句有戏剧性（"BUT" / "一个人，做了什么。"）
+4. chrome 与 kicker 禁止写同一句话或互相翻译——chrome 是栏目标签（稳定可复用），kicker 是本页钩子（每页独一份），互为补充；重复会一眼露出 AI 生成痕迹
+
+结构位置：kicker 必须在大标题上方（flex column 上下叠，gap 15px），禁止 grid 两列挤成左右（见 `swiss-layout-system.md` P0 结构对齐）。
+
+## 底部导航安全区（nav-safe）
+
+适用：登记版式 deck；其余含底部分页圆点的单文件 deck 同样适用。
+
+1. 分页圆点固定 bottom 22px，视觉占据约 1004px 之后区域；主内容、图片 caption、图表说明、timeline label 的最低处必须停在安全区上方
+2. 登记版式统一预留底部 86px 安全区；底对齐图片版式已内置安全区，不要再额外把图片或 caption 往页面底部推
+3. 手写 `align-items:end` / `margin-top:auto` / `position:absolute;bottom` 的页面必须目检：内容最低边缘与分页圆点之间 ≥32px 呼吸；横向时间线要同时检查上下 label 与安全区
+
+## 登记版式飞行前检查
+
+1. 版式先登记：每页写代码前列"页码 → data-layout → 为什么选它 → 图片槽位"，`data-layout` 必须是登记编号（S01-S22 / M01-M10）
+2. 主题节奏先行：先画 light/dark/hero 分布表（对照 8 页模板），再动手写 slide
+3. 字号下限对照：必读档 ≥40px（演讲型）、任何文字 18/16/14px 底限、中文大标题分档（见 `typography.md`）
+4. 结构对齐：水平 padding 不二次叠加（画布卡已带左右 96px，主体 `padding:0`）、kicker 在大标题上方、子块间距用 grid gap 不用 margin 堆
+5. 组件必选/可选边界：页眉与 kicker 在 head 区必选（正文卡片内可省 kicker）；大标题在章节/论点页必选，列表型小卡页可用较小标题但不能缺页级信息锚点；lead 可选——标题已解释清楚可省，但不用长段正文贴着标题；图片 caption 在 S15/S16 多图格必选、S22 可选；hairline 只用于建立层级不为装饰堆线；KPI 数字只在有真实数据时使用；脚注可选但必须避开 nav-safe
+
+生成后审查按 `premium-review-fix.md` 流程执行；登记版式额外视觉锚点：大标题保持轻字重、留白不填满到底、hairline 只在章节边界/证据墙/卡片层级处、timeline label 不碰安全区、每页不误用其他版式的组件（如无真实数值的概念列表套数据图表）。
+
 ## 教学/课程场景元素
 
 教学模块、在线课程、工作坊讲义启用；商务汇报不加，避免侧栏与自测抢内容权重：
