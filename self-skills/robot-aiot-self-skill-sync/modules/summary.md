@@ -2,23 +2,28 @@
 
 执行完毕后，分模块汇总：
 
-汇总建议：各模块原始扫描、分类、差异比对结果优先由 fresh sub agent 先整理为结构化草稿，再由主线程统一出最终汇总，避免模块 1-5 的状态口径互相污染。
+汇总建议：各模块标记均由 `scripts/` 下脚本输出（中间产物在 `/tmp/self-skill-sync/`），汇总直接取脚本输出整理，主线程统一出最终汇总；仅模块 2 的 openspec init/update 输出解读等非脚本化环节可由 fresh sub agent 整理草稿。
 
 全局规则：所有文件级同步（模块 2 覆盖、模块 3.1 兜底 / 3.3 / 3.4 / 3.5、模块 4 的 4.1 / 4.1A / 4.2 / 4.4）统一使用 `rsync -rtu` 并执行 `modules/shared.md` 的“文件新旧比对规则”。内容不同且目标端更新的文件：模块 2 / 3.1 兜底 / 3.5 / 4.x 标记 `[NEWER-TARGET]` 跳过并在对应模块汇总中计数；模块 3.3 / 3.4 则方向反转回写真源（`[SELF-PULLBACK]` / `[COMMAND-PULLBACK]`，逐文件列入汇总供审查）。确需旧覆盖新必须写明原因由用户手动执行。
 
 ## Git Pull 汇总
 
+> 直接取 `m1_git_pull.sh report` 输出；标记含义见 `module1-git-pull.md` 汇总口径表。
+
 | 状态 | 数量 |
 |------|------|
-| ✅ 成功（干净仓库） | N |
+| ✅ 成功（[OK]，区分实际更新 / Already up to date） | N |
 | ✅ 成功（[SAFE-UNTRACKED]，只有未跟踪文件） | N |
 | ⏭️ 跳过（[SKIP-DIRTY]，有已修改跟踪文件） | N |
+| ⏭️ 跳过（[SKIP-NOSYNC]，agent-skills/skills/ 禁拉） | N |
+| 🧹 清理（[NOSYNC-CLEANED] / [TMPPACK-CLEANED]） | N |
 | ⏭️ 跳过（[SKIP-INTRANET]，内网 gitlab 已知豁免） | N |
 | ⏭️ 跳过（[AUTH-PRIVATE]，GitHub 私有仓库已知豁免） | N |
 | ⏭️ 跳过（[SKIP-GUI]，GUI 客户端维护已知豁免） | N |
-| ❌ 网络失败 | N |
-| ❌ 认证失败 | N |
-| ⚠️ 保护跳过/异常 | N |
+| ❌ 网络失败（[NETWORK] / [TIMEOUT]，附断点续跑命令） | N |
+| ❌ 认证失败（[AUTH]，清单外） | N |
+| ⚠️ 需人工（[EMPTY-REPO] / [REPO-CORRUPT] / [PROTO] / [UNKNOWN] / [BEHIND]） | N |
+| ⚠️ 保护跳过/异常（[TMPPACK-PROTECTED] 等） | N |
 
 ## openspec update 汇总
 
@@ -167,3 +172,4 @@
 | 缺失 `name` 数量 | frontmatter 未提供 `name:`，需回退到目录名的 skill 数量 |
 | 缺失 `description` 数量 | frontmatter 未提供 `description:` 或为空的 skill 数量 |
 | 文档写入结果 | 成功 / 跳过 / 失败，以及失败原因 |
+| `[M5-STAT]` 统计行 | 直接引用 `m5_extract.sh` / `m5_render.sh` 输出：总数、各部分数、缓存命中、新翻译、超500字数、长度分布、快照已删条目 |

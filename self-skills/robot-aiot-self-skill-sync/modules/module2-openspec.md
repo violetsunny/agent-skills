@@ -1,185 +1,65 @@
 # 模块 2：切换完整 Profile 并更新 OpenSpec（使用用户终端环境）
 
 > 共享规则见 `modules/shared.md`
+> 可脚本化部分（6A 命令数校验、`.claude -> .agents` 迁移、迁移后校验）已内置于 `scripts/m2_migrate.sh`；profile 判断、`openspec init/update` 执行与输出解读、hooks 恢复是语言/决策工作，保留给主线程。
 
-> **XDG 环境陷阱**：workspace-cli 会注入 `XDG_CONFIG_HOME` / `XDG_DATA_HOME` 等变量，`openspec` 据此把配置解析到 `$XDG_CONFIG_HOME/openspec/config.json`（注入的 profile 可能与用户真实配置不同，如 core/6 workflows vs custom/12 workflows），而用户真实配置在 `~/.config/openspec/config.json`。在本 CLI 环境执行任何 `openspec` 命令必须加 `env -u XDG_CONFIG_HOME -u XDG_DATA_HOME -u XDG_STATE_HOME -u XDG_CACHE_HOME`，否则读错配置、生成错误的命令集合。执行前先用 `openspec config path` 确认指向 `~/.config/openspec/config.json`。
+> **XDG 环境陷阱**：workspace-cli 会注入 `XDG_CONFIG_HOME` / `XDG_DATA_HOME` 等变量，`openspec` 据此把配置解析到 `$XDG_CONFIG_HOME/openspec/config.json`（注入的 profile 可能与用户真实配置不同，如 core/6 workflows vs custom/12 workflows），而用户真实配置在 `~/.config/openspec/config.json`。在本 CLI 环境执行任何 `openspec` 命令必须加 `env -u XDG_CONFIG_HOME -u XDG_DATA_HOME -u XDG_STATE_HOME -u XDG_CACHE_HOME`（`m2_migrate.sh` 已内置），否则读错配置、生成错误的命令集合。执行前先用 `openspec config path` 确认指向 `~/.config/openspec/config.json`。
 
-OpenSpec 旧版本的 `openspec update` 只能更新已有工具文件，不能完成 CLI 本身升级。并且如果当前 profile 仍是基础/核心最小集合，即使执行了 init/update，生成出来的 commands / skills 也不会是用户要的"最全"集合。必须先确认并在需要时切换到更完整的 profile，再在用户自己的 macOS Terminal 中执行 `openspec init`、升级 CLI、运行 `openspec update`。**必须从用户主目录（`~`）执行 `openspec init` 和 `openspec update`，不得在项目目录或批处理子 shell 中代执行。** 唯一例外：步骤 6A 的 `openspec update --force` 命令数修复由 agent 自动执行（见下文「步骤 6A」），且必须带 `env -u XDG_*` 前缀（见本节顶部 XDG 环境陷阱规则）。
+**必须从用户主目录（`~`）执行 `openspec init` 和 `openspec update`，不得在项目目录或批处理子 shell 中代执行。** 唯一例外：步骤 6A 的 `openspec update --force` 由脚本自动执行。
 
-### "最全"的判定
+## 主线程操作步骤（1-7）
 
-本技能中"最全"的含义不是某个固定 profile 名称，也不是只看 `opsx` 是否存在，而是：**当前启用 profile 在 `~/.claude/commands/` 与 `~/.claude/skills/` 下实际生成的 commands / skills 集合，是否已经覆盖用户需要的完整内容**。判断时以运行后的实际目录内容为准，不写死文件名名单。
+1. 打开 macOS Terminal，确认 shell 初始化完成；`compinit` insecure files 提示与 OpenSpec 无关，按提示继续即可。
+2. 检查当前 profile 是否已是目标完整 profile；不足时在 `~` 下执行 `openspec config profile` 交互式选择。**"最全"的判定**不是固定名字，而是看该 profile 在 `~/.claude/commands/` 与 `~/.claude/skills/` 下实际生成的内容是否覆盖用户需要，以运行后实际目录内容为准，不写死文件名名单。
+3. 环境未初始化 / 刚切换 profile / update 提示需初始化时，在 `~` 下执行 `openspec init`。
+4. 升级 CLI 并确认版本：`npm install -g @fission-ai/openspec@latest` → `openspec --version`。仍是旧版本 → 停止并提示用户，不继续旧版更新。
+5. 在 `~` 下执行 `openspec update`。
+6. 按输出判定（解读表见下）。
+7. 运行 `m2_migrate.sh check-commands` → `migrate` → 立即通过 skill 工具运行 `opsx-workflow-hooks` 恢复 Hook A/B → `m2_migrate.sh verify`。
 
-### Sub Agent 建议
+## 步骤 6 输出解读表（主线程语言工作）
 
-1. 用 fresh sub agent 对 `openspec update` 输出做结构化归类：版本、profile、工具生成状态、删除项、leftover、commands skipped
-2. 用 sub agent 单独比对 `~/.claude/commands/`、`~/.agents/commands/`、`~/.claude/skills/`、`~/.agents/skills/` 的集合差异，生成迁移前后的校验草稿
-3. 主线程负责真正执行 `openspec config profile`、`openspec init`、`openspec update`、`.claude -> .agents` 迁移与 hook 恢复
-4. 任何 `--force`、覆盖迁移、leftover 提示是否继续，都只能由主线程决定
+| 输出特征 | 判定 |
+|---|---|
+| `Upgrading to the new OpenSpec` + `Updated: ... (vX.Y.Z)` | CLI 和工具升级成功 |
+| `All N tool(s) up to date (vX.Y.Z)` | 工具更新成功，但须结合 `openspec --version` 判断 CLI 是否升级 |
+| `Use --force to refresh files anyway.` | 提示信息非错误；仅明确要求刷新时用 `--force` |
+| `Detected new tool: Gemini CLI...` | 已有工具更新成功，需要时再 `openspec init` |
+| `No configured tools found...` | 再执行 `openspec init`；不能仅因存在旧 `openspec/AGENTS.md` 判失败 |
+| `custom profile is missing N core workflow(s)` | `openspec config profile core` 后重跑 update；不可用则交互式选择；汇总报告切换前后状态 |
+| `Left N files in .codex/ that differ...` | `[CODEX-LEFTOVER]` 提示用户比对后删除 `.codex/` 副本，**不自动删除** |
+| `Commands skipped for: codex (uses skills)` | 正常行为，汇总标 `SKIPPED (uses skills)`，不视为错误 |
+| `Removed: N command files (deselected workflows)` | 记录数量并提示用户因 workflow deselect 被删除 |
+| `Removed: N skill directories (deselected workflows)` | 同上 |
+| `Setup complete for <tool>` / `Updated <tool>` | 提取所有工具名与状态列入汇总 |
 
-**操作步骤**：
+`No user content to preserve` 可按提示清理；`differ from the copy in .agents` 不得覆盖用户自定义副本，提示人工比对。**`--force` 只允许用于步骤 6A 在用户主目录重新生成 OpenSpec 文件集合**，不得用于 `gggggggood/` 下用户代码。
 
-1. 打开 macOS Terminal，确认 shell 初始化完成；若出现 `compinit` insecure files 提示，按终端提示选择继续即可，该提示与 OpenSpec 无关。
-2. 先检查当前 OpenSpec profile 是否已经是目标完整 profile；如果当前 profile 只能生成基础 commands / skills，则先执行：
-
-```bash
-cd ~
-openspec config profile
-```
-
-在交互式列表中选择能生成更完整 commands / skills 集合的 profile。**"最全"的判定方式**不是固定名字，而是看该 profile 在 `~/.claude/commands/` 与 `~/.claude/skills/` 下实际生成的内容是否满足用户需要。
-
-3. 如当前环境尚未初始化 OpenSpec，或刚切换了 profile，或 `openspec update` 提示需要初始化 / 新增工具，再在用户主目录执行：
-
-```bash
-cd ~
-openspec init
-```
-
-4. 从用户主目录升级 CLI 并确认版本：
-
-```bash
-cd ~
-npm install -g @fission-ai/openspec@latest
-openspec --version
-```
-
-版本必须是当前 latest 版本；如果仍是旧版本，停止并提示用户，不要继续执行旧版更新。
-
-5. 执行升级式更新：
+## 脚本化步骤
 
 ```bash
-cd ~
-openspec update
+S=~/.agents/skills/robot-aiot-self-skill-sync/scripts/m2_migrate.sh
+
+$S check-commands      # 6A：workflow 数 vs opsx/*.md 数，不足自动 update --force 重生成
+$S migrate --dry-run   # 迁移预检：输出 [NEWER-TARGET] 清单供审查
+$S migrate             # 真实迁移（6A 通过后执行）
+# → 立即运行 opsx-workflow-hooks skill 恢复 propose.md/apply.md 的 Hook A/B
+$S verify              # 迁移后两侧一致性校验
 ```
 
-6. 根据输出判定结果：
-   - `Upgrading to the new OpenSpec` 且随后出现 `Updated: ... (vX.Y.Z)`：CLI 和工具升级成功。
-   - `All N tool(s) up to date (vX.Y.Z)`：工具更新成功，但不代表 CLI 已升级；必须结合 `openspec --version` 判断。
-   - `Use --force to refresh files anyway.`：提示信息，不是错误；只有明确要求刷新时才使用 `--force`。
-   - `Detected new tool: Gemini CLI. Run 'openspec init' to add it.`：已有工具更新成功，只是提示 Gemini CLI 尚未加入；需要时再执行 `openspec init`。
-   - `No configured tools found. Run "openspec init" to set up tools.`：当前用户环境没有 OpenSpec 工具配置，再执行 `openspec init`；不能仅因存在旧的 `openspec/AGENTS.md` 就判定更新失败。
-   - `custom profile is missing N core workflow(s): <workflow-name>`：更新成功但 profile 不完整；执行 `openspec config profile core` 切换到 core profile，然后重新执行 `openspec update` 确保所有 core workflows 的文件已生成。在汇总中报告 profile 切换前后状态。若 `openspec config profile core` 不可用，回退到 `openspec config profile` 交互式选择。
-   - `Left N files in .codex/ that differ from the copy in .agents/`：OpenSpec 检测到 `.codex/` 中有拋留文件。标记 `[CODEX-LEFTOVER]`，在汇总中提示用户：「检测到 .codex/ 中有 N 个文件与 .agents/ 不同，请比对后删除 .codex/ 副本」。**不自动删除 `.codex/` 中的文件。**
-   - `Commands skipped for: codex (uses skills)`：Codex 工具使用 skills 而非 commands，这是正常行为。在汇总中将 Codex 的 commands 状态标记为 `SKIPPED (uses skills)`，不视为错误。
-   - `Removed: N command files (deselected workflows)`：OpenSpec 主动删除了被 deselect 的 command 文件。在汇总中记录被删除的 command 文件数量，并提示用户这些文件因 workflow 被 deselect 而被删除。
-   - `Removed: N skill directories (deselected workflows)`：OpenSpec 主动删除了被 deselect 的 skill 目录。在汇总中记录被删除的 skill 目录数量，并提示用户这些目录因 workflow 被 deselect 而被删除。
-   - `Setup complete for <tool>` / `Updated <tool>`：从 init/update 输出中提取所有已配置工具名称及状态（成功/跳过/失败），在汇总中列出完整工具列表。
-7. 运行完成后，继续执行下文定义的 `.claude -> .agents` 迁移与 hook 恢复步骤，完成 OPSX 工作流初始化。
+### check-commands（步骤 6A）
+`openspec update` 在 custom profile 下可能误删已选定 workflow 的命令文件，必须在迁移前校验：脚本用 `openspec config list --json | jq '.workflows | length'` 取选定数（**不要用无参 `openspec config profile`——交互式 picker 在非 TTY 下挂起**），对比 `~/.claude/commands/opsx/*.md` 实际数；不足自动 `openspec update --force` 重生成并复查。输出 `[COMMAND-COUNT-OK]` 才放行迁移；`[COMMAND-FIX-FAILED]` → 停止迁移，提示用户检查 OpenSpec 版本或 profile。
 
-### 步骤 6A：命令数量校验与自动修复（`openspec update` 后、迁移前）
+### migrate
+迁移范围严格限定：commands 只限 `~/.claude/commands/opsx/` 子目录；skills 只限 OpenSpec 生成项（`openspec-*` 前缀 + `opsx-workflow-hooks`）。`~/.claude/` 下其他 commands/skills（npx 管理型、4.4 备份等）**严禁迁移或覆盖**——npx 归模块 3，自写归 3.3。
 
-> `openspec update` 在 custom profile 下可能误删已选定的 workflow 命令文件（输出 `Removed: N command files (deselected workflows)`），导致 `.claude/commands/opsx/` 实际命令数少于 profile 选定的 workflow 数。**必须在执行 `.claude -> .agents` 迁移之前自动校验，不通过时自动修复，不得让用户手动操作。**
+- `opsx/` 镜像用 `rsync -rtu --delete`：**`--delete` 仅限本子目录**（让集合精确跟随 profile），禁止对 `~/.agents/commands/` 根目录整体 `--delete`（自写命令归 3.4，绝不能被模块 2 删改）。被 `-u` 跳过的文件（如 `.agents` 侧因 append-only hook 而更新的 `propose.md`/`apply.md`）脚本输出 `[NEWER-TARGET]`，主线程提示用户，确需旧覆盖新须写明原因手动执行
+- skills：`.claude` 是权威源，差异直接受控覆盖（`[OVERWRITE]`）；两侧一致静默跳过属正常（`.agents` 可能被 openspec 经 codex 直写已是最新，不代表「skills 未更新」）；与 `self-skills/` 同名 → `[SELF-SKILL-SKIP]`（纵深防御：4.4 备份会把自写 skill 带进 `.claude`，不跳过则旧备份会回滚用户已更新的自写 skill）
+- 其他工具目录（`.codebuddy/`、`.cursor/`、`.gemini/`、`.github/`、`.lingma/`、`.trae/`）由 OpenSpec 直接管理，**不同步到 `.agents`**（各工具文件格式特有，混合同步会冲突），汇总仅记录生成状态
 
-**校验逻辑**：
+### verify
+校验 `opsx/` 两侧文件集合一致、自写命令未被动过、OpenSpec skills 两侧内容一致。`.agents/commands/opsx/` 的 `propose.md`/`apply.md` 仅允许比 `.claude` 侧多出 append-only 的 Hook A/B 尾部；hook 只能在 `.agents` 运行时副本末尾补回，不得修改 `.claude` 原命令正文。非 OpenSpec skills 不在校验范围，不视为异常。
 
-1. 用可脚本化命令提取当前选定的 workflow 数量：`openspec config list --json | jq '.workflows | length'`（当前为 `12`）。**不要用无参 `openspec config profile`——它是交互式 picker，在非 TTY 下会挂起且无 `N selected` 输出。**
-2. 统计 `~/.claude/commands/opsx/` 下 `.md` 文件数量。
-3. 如果实际命令数 < 选定 workflow 数 → 标记 `[COMMAND-COUNT-MISMATCH]`，**自动执行 `openspec update --force`** 重新生成完整命令集合，然后重新统计确认数量一致。
-4. 如果 `--force` 后仍不一致 → 停止迁移，标记 `[COMMAND-FIX-FAILED]`，在汇总中报告并提示用户检查 OpenSpec 版本或 profile 配置。
-5. 只有数量一致时才继续执行下一步的 `.claude -> .agents` 迁移。
+## 汇总口径
 
-```bash
-cd ~
-# 提取选定 workflow 数量
-selected_count=$(env -u XDG_CONFIG_HOME -u XDG_DATA_HOME -u XDG_STATE_HOME -u XDG_CACHE_HOME openspec config list --json | jq '.workflows | length')
-# 统计实际命令文件数
-actual_count=$(ls -1 ~/.claude/commands/opsx/*.md 2>/dev/null | wc -l | tr -d ' ')
-
-if [ "$actual_count" -lt "$selected_count" ]; then
-  printf '[COMMAND-COUNT-MISMATCH] 期望 %s 个命令，实际 %s 个，执行 openspec update --force\n' "$selected_count" "$actual_count"
-  env -u XDG_CONFIG_HOME -u XDG_DATA_HOME -u XDG_STATE_HOME -u XDG_CACHE_HOME openspec update --force
-  actual_count=$(ls -1 ~/.claude/commands/opsx/*.md 2>/dev/null | wc -l | tr -d ' ')
-fi
-
-if [ "$actual_count" -lt "$selected_count" ]; then
-  printf '[COMMAND-FIX-FAILED] --force 后仍只有 %s 个命令（期望 %s），停止迁移\n' "$actual_count" "$selected_count"
-  # 不执行迁移，在汇总中报告
-else
-  printf '[COMMAND-COUNT-OK] %s 个命令，与 profile 选定的 %s 个 workflow 一致\n' "$actual_count" "$selected_count"
-fi
-```
-
-OpenSpec 升级可能清理旧版命令文件，并将 OPSX 迁移到 Agent Skills。出现 `No user content to preserve` 时可按提示清理；出现 `differ from the copy in .agents` 时不得覆盖用户自定义副本，必须提示并人工比对。**`--force` 只允许用于步骤 6A 在用户主目录重新生成 OpenSpec 文件集合**，不得拿它覆盖 `/Users/kangll13/aiot/java-code/self/gggggggood/` 下用户代码或用户自行维护的文件。
-
-### 多工具目录生成状态（OpenSpec 直接生成，仅记录状态）
-
-> 本节只记录 OpenSpec 对各工具目录的直接生成状态；实际的 `.claude -> .agents` 迁移步骤见下一节。
-
-OpenSpec v1.12.0 为多个工具生成文件，包括但不限于：`.claude/`、`.agents/`、`.codebuddy/`、`.cursor/`、`.gemini/`、`.github/`、`.lingma/`、`.trae/`。`openspec init` / `openspec update` 的输出会列出所有已配置工具的 `Setup complete for <tool>` 或 `Updated <tool>` 状态。
-
-**关键规则**：
-- `.claude` 是 OpenSpec 更新后的权威源，模块 2 只从 `.claude` 同步到 `.agents`。
-- **`.agents` 直写**：`openspec update` 经 codex (uses skills) 会直接更新 `~/.agents/skills/openspec-*`，因此迁移前 `.agents` 侧可能已是最新。迁移循环只做校验与补差，两侧一致时静默跳过属正常，不代表「skills 未更新」。
-- 其他工具目录（`.codebuddy/`、`.cursor/`、`.gemini/`、`.github/`、`.lingma/`、`.trae/`）由 OpenSpec 直接管理，**不同步到 `.agents`**——这些目录中的文件格式是各工具特有的，混合同步会冲突。
-- 模块 2 在汇总中报告所有已配置工具的生成状态，但不自动操作其他工具目录。
-- **Codex 特殊行为**：Codex 工具使用 skills 而非 commands。`openspec init` / `openspec update` 输出 `Commands skipped for: codex (uses skills)` 是正常行为，不视为错误。Codex 的 commands 状态在汇总中标记为 `SKIPPED (uses skills)`。
-
-### OpenSpec commands / skills 补充与校验（`.claude -> .agents` 迁移步骤）
-
-> 本节是 OpenSpec 更新完成后的额外迁移步骤；与上一节的直接生成状态是两个独立动作，汇总时必须分开记录。
-
-OpenSpec 可能按 profile 生成不同数量的 commands / skills，且文件集合随 profile、版本和工具配置变化。**模块 2 的迁移范围严格限定**：commands 只限 `~/.claude/commands/opsx/` 子目录；skills 只限 OpenSpec 生成项（`openspec-*` 前缀 + `opsx-workflow-hooks`）。`~/.claude/` 下的其他 commands 与 skills（npx 管理型 skill、4.4 运行时备份等）不归模块 2 管，**严禁迁移或覆盖**——npx 管理型 skill 归模块 3，自写 skill 归模块 3.3。
-
-更新 OpenSpec 后，**必须先完成步骤 6A 的命令数量校验并通过后**，再按以下固定顺序执行迁移：
-
-这里的 `--delete` 仅用于**模块 2 的 `.claude -> .agents` 运行时镜像迁移**：目标是让 `.agents` 精确跟随当前 OpenSpec profile 的实际生成结果。它不适用于模块 3、模块 3.5、模块 4 或知识库同步；这些场景仍然遵循“不加 `--delete`、不删除用户自定义文件”的保护规则。
-
-```bash
-rsync -rtu --delete ~/.claude/commands/opsx/ ~/.agents/commands/opsx/
-```
-
-> **镜像范围仅限 OpenSpec 生成的 `opsx/` 命令集**，禁止对 `~/.agents/commands/` 根目录整体执行 `--delete`：`.agents/commands/` 下的自写命令（`dev-commit.md`、`dev-paradigm.md`、`opsx-apply.md`、`opsx-propose.md`，均归模块 3.4 管理）绝不能被模块 2 删除或修改。**注意区分**：根目录扁平的 `opsx-apply.md` / `opsx-propose.md` 是用户自写命令，`opsx/` 子目录才是 OpenSpec 生成的命令集，二者不是同一事物，不得混淆。
->
-> `-t` 保留 mtime、`-u` 防止旧文件覆盖新文件（见 `modules/shared.md` 的“文件新旧比对规则”）。`--delete` 仍负责让 `.agents/commands/opsx/` 的文件集合精确跟随当前 profile（集合级镜像不受 `-u` 影响）；被 `-u` 跳过的文件（如 `.agents` 侧因 append-only hook 而更新的 `propose.md` / `apply.md`）需在汇总中标记 `[NEWER-TARGET]` 并提示用户，确需旧覆盖新时写明原因手动执行。执行前按共享规则输出 `[NEWER-TARGET]` 清单。
-
-然后同步 `~/.claude/skills/` 下 OpenSpec 生成的 skills（`openspec-*` 前缀 + `opsx-workflow-hooks`）。`.claude` 是 OpenSpec 更新后的权威源，无论本地是否有差异，均直接覆盖。**严禁遍历整个 `~/.claude/skills/*`**——其他 skills 归模块 3（npx 管理型）/ 模块 3.3（自写）/ 模块 4.4（备份）管，模块 2 不得触碰。自写 skill 跳过守卫保留作纵深防御（模块 4.4 会把运行时的自写 skill 备份进 `~/.claude/skills/`，若不跳过，旧备份会在下一次迁移时把用户已更新的自写 skill 回滚）：
-
-```bash
-self_skills_dir="/Users/kangll13/aiot/java-code/self/gggggggood/agent-skills/self-skills"
-
-for skill_dir in ~/.claude/skills/openspec-* ~/.claude/skills/opsx-workflow-hooks; do
-  [ -d "$skill_dir" ] || continue
-  skill_name=$(basename "$skill_dir")
-
-  # 自写 skill 以 self-skills/ 为唯一真源，禁止被 .claude 副本覆盖
-  if [ -d "$self_skills_dir/$skill_name" ]; then
-    printf '[SELF-SKILL-SKIP] %s\n' "$skill_name"
-    continue
-  fi
-
-  target_dir="$HOME/.agents/skills/$skill_name"
-
-  if diff -rq "$skill_dir" "$target_dir" >/dev/null 2>&1; then
-    continue
-  fi
-
-  # 比对清单：内容不同且目标端更新的文件禁止自动覆盖，先报告
-  ( cd "$skill_dir" && find . -type f ! -name '.DS_Store' ) | while read -r f; do
-    t="$target_dir/$f"
-    [ -f "$t" ] || continue
-    cmp -s "$skill_dir/$f" "$t" && continue
-    [ "$t" -nt "$skill_dir/$f" ] && printf '[NEWER-TARGET] %s/%s\n' "$skill_name" "$f"
-  done
-
-  rsync -rtu --delete "$skill_dir/" "$target_dir/"
-  printf '[OVERWRITE] %s\n' "$skill_name"
-done
-```
-
-`.claude` 是权威源，OpenSpec 生成的 skills（`openspec-*`、`opsx-workflow-hooks`）遇到差异时直接用 `rsync -rtu --delete` 覆盖 `.agents` 副本，并在汇总中报告已覆盖的 skill 名称（`[OVERWRITE]`）；被跳过的自写 skill 以 `[SELF-SKILL-SKIP]` 单独计数。两者一致时静默跳过。再次强调：这是模块 2 对运行时副本的受控覆盖例外，仅限 OpenSpec 生成项，不得外推到 agent-skills、free-stock-line-skills、其他用户维护目录或任何非 OpenSpec skills，也不得覆盖自写 skill。
-
-**同步范围说明**：这里仅同步 OpenSpec 生成的 `opsx/` 命令子目录与 OpenSpec 生成的 skills（`openspec-*`、`opsx-workflow-hooks`）。模块 3 负责其他 skills 的最新性，模块 4.4 负责 `~/.claude/skills/` 的运行时备份；数据流单向，不反向同步 `.agents/skills/ -> .claude/skills/`。
-
-完成上述同步后，必须立即通过 skill 工具运行 `opsx-workflow-hooks` skill，恢复并校验 `propose.md` / `apply.md` 的 Hook A / Hook B。原因只有一个：`rsync -rtu --delete ~/.claude/commands/opsx/ ~/.agents/commands/opsx/` 会先覆盖 `.agents` 运行时副本；若不立刻补回 hook，下一次 `/opsx` 流程将失去自动回调。
-
-不要从旧的 `~/.agents/commands/` 或 `~/.agents/skills/` 反向覆盖新版 `.claude` 文件；完整 commands / skills 集合始终以 `~/.claude/commands/` 与 `~/.claude/skills/` 的实际目录内容为准。
-
-升级后必须检查以下两处目录：
-
-- OpenSpec 权威源 commands：`/Users/kangll13/.claude/commands/`
-- 运行时目标 commands：`/Users/kangll13/.agents/commands/`
-- OpenSpec 权威源 skills：`/Users/kangll13/.claude/skills/`
-- 运行时目标 skills：`/Users/kangll13/.agents/skills/`
-
-commands 校验应满足：`~/.claude/commands/opsx/` 与 `~/.agents/commands/opsx/` 包含相同的实际文件集合；`.agents/commands/` 下的自写命令（`dev-commit.md`、`dev-paradigm.md`、`opsx-apply.md`、`opsx-propose.md`，模块 3.4 管理）不视为异常且不得触碰。skills 校验应满足：`~/.claude/skills/` 下 OpenSpec 生成的 skills（`openspec-*`、`opsx-workflow-hooks`）都已同步到 `~/.agents/skills/` 且内容一致；`.agents/skills/` 与 `.claude/skills/` 中的其他非 OpenSpec skills 不在模块 2 校验范围，不视为异常。随后仅允许 `.agents/commands/opsx/` 中的 `propose.md` 和 `apply.md` 比 `.claude/commands/opsx/` 多出 append-only 的 Hook A / Hook B 尾部；如果新版 OpenSpec 源文件没有 hook，只能在 `.agents` 运行时副本末尾按 append-only 规则补回，不得修改 `.claude` 原命令正文，也不得改动 `/self/gggggggood/` 下用户维护的源文件。
+模块 2 汇总必须区分两类独立动作：(1) OpenSpec 对各工具目录的**直接生成状态**（成功/跳过/失败）；(2) `.claude -> .agents` 的**迁移结果**（同步的 commands/skills 数量、`[OVERWRITE]` / `[SELF-SKILL-SKIP]` / `[NEWER-TARGET]` 列表）。不得混为一条。数据流单向，不反向同步 `.agents -> .claude`；完整集合始终以 `~/.claude/` 实际目录内容为准。

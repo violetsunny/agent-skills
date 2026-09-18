@@ -67,31 +67,11 @@
 - 确需“旧覆盖新”（如刻意回退到某个版本）时，必须由用户**写明原因并手动执行**（如去掉 `-u` 的 `rsync -rt` 或 `cp`），本技能流程绝不自动执行；手动操作的原因与结果记入汇总
 - 例外：模块 1 的 `git pull` 走 git 自身合并机制，不适用本规则；模块 3.1 由 npx 官方机制管理更新，不走本规则的 rsync 比对（如需本地定制应转为自写 skill 放入 `self-skills/`）；但 npx 更新失败触发模块 3.1 的 rsync 兜底时，兜底同步必须按本规则执行比对
 
-同步前比对清单（每个同步对执行一次，由主线程负责）：
+同步前比对清单：**已内置于各脚本**——`scripts/config.sh` 的 `newer_target_scan()` 是统一实现（cmp + mtime 口径），m2/m3_fallback/m35/m4 在每次 rsync 前自动调用并输出 `[NEWER-TARGET]`；模块 3.3/3.4 的比对分类由 `m3_self_sync.sh --dry-run` / `m3_cmd_sync.sh --dry-run` 输出。主线程手写补充同步命令时仍须遵守本规则口径。
 
-```bash
-# 通用：仅报告“内容不同且目标更新”的项；这些文件禁止被源端覆盖
-( cd "$src" && find . -type f ! -name '.DS_Store' ) | while read -r f; do
-  s="$src/$f"; t="$dst/$f"
-  [ -f "$t" ] || continue          # 目标不存在：属新增，按各模块自身规则处理
-  cmp -s "$s" "$t" && continue     # 内容一致：无风险
-  [ "$t" -nt "$s" ] && printf '[NEWER-TARGET] %s\n' "$f"
-done
+模块 3.3 / 3.4 专用：扫出的「目标端更新」不是跳过项，而是**回写清单**。`m3_self_sync.sh` / `m3_cmd_sync.sh` 已内置固定顺序「先回写（运行时 → 真源，标 `[SELF-PULLBACK]`）、后部署（真源 → 运行时，标 `[SELF-DEPLOY]`）」，两步都 `rsync -rtu` 不加 `--delete`。
 
-# 然后用 -rtu 同步（各模块自身的排除项照常附加）：
-# rsync -rtu <各模块排除项> "$src/" "$dst/"
-```
-
-模块 3.3 / 3.4 专用：上一步扫出的 `[NEWER-TARGET]` 不是跳过项，而是**回写清单**。先回写（运行时 → 真源），再部署（真源 → 运行时），两步都用 `rsync -rtu` 不加 `--delete`：
-
-```bash
-# 回写方向：dst(运行时) -> src(真源)，仅运行时更新的文件会被 -u 放行
-rsync -rtu <排除项，含 _mideameta.json> "$dst/" "$src/"   # 标 [SELF-PULLBACK]
-# 部署方向：src(真源) -> dst(运行时)
-rsync -rtu <排除项，含 _mideameta.json> "$src/" "$dst/"   # 标 [SELF-DEPLOY]
-```
-
-> 比对范围与同步范围一致：被各模块排除项剔除的文件（如 `_mideameta.json`、`__pycache__/`、`.DS_Store`）不参与比对，不计入 `[NEWER-TARGET]`，也**不回写**。
+> 比对范围与同步范围一致：被各模块排除项剔除的文件（如 `_mideameta.json`、`__pycache__/`、`.DS_Store`）不参与比对，不计入 `[NEWER-TARGET]`，也**不回写**（排除项统一定义在 `scripts/config.sh` 的 `EXCLUDES` / `EXCL_RE`）。
 
 ---
 
@@ -142,15 +122,14 @@ rsync -rtu <排除项，含 _mideameta.json> "$src/" "$dst/"   # 标 [SELF-DEPLO
 
 ---
 
-## Sub Agent 控制面
+## Sub Agent 控制面（脚本化后的分工）
 
-1. sub agent 负责工作面：扫描仓库、分类 dirty 状态、枚举 skills、生成差异清单、识别重复/冲突、起草总览文档内容
-2. 主线程负责控制面：执行真正会改动系统状态的命令、处理保护目录例外、决定跳过/继续、写入最终汇总
-3. 只要涉及以下动作，必须回到主线程：
-   - `git pull`
-   - `openspec init/update/config profile`
-   - `env -u XDG_STATE_HOME npx skills@latest update`
-   - `rsync` / `cp`
-   - 修改 `docs/skills-overview.md`
-4. 保护目录内的异常、冲突和本地修改不得由 sub agent 自行处置；sub agent 只能识别并上报
-5. tiny 局部修正可不启用 sub agent，但跨模块状态梳理默认优先用 fresh sub agent
+1. **脚本负责确定性工作**：扫描、分类、比对、重试、校验、同步、统计全部由 `scripts/` 下脚本执行，输出统一标记；中间产物在 `/tmp/self-skill-sync/`
+2. **主线程负责控制面**：按模块文档顺序调脚本、解读标记、处理保护目录例外、决定跳过/继续/放行下一模块、核对 `--confirm` 类删除清单、写入最终汇总
+3. 以下动作只能通过调脚本或由主线程亲自执行，不得交 sub agent：
+   - `m1_git_pull.sh`（git pull / tmp_pack 清理 / .git 清理）
+   - `openspec init/update/config profile`（主线程在用户终端语义下执行）与 `m2_migrate.sh`
+   - `m3_npx_update.sh` / `m3_fallback.sh` / `m3_self_sync.sh` / `m3_cmd_sync.sh`
+   - `m35_stock_sync.sh` / `m4_kb_sync.sh` / `m5_render.sh`（写 `docs/skills-overview.md`）
+4. sub agent 只保留语言工作：模块 2 的 openspec 输出解读草稿、模块 5 的翻译压缩（读 `/tmp/zh/in_NN.json` 写 `out_NN.json`，不回传 JSON 正文）、跨模块状态梳理草稿
+5. 保护目录内的异常、冲突和本地修改不得由 sub agent 或脚本自动处置；只能识别并上报，由主线程提示用户
