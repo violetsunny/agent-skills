@@ -1,6 +1,6 @@
 ---
 name: robot-aiot-interactive-html-author
-version: 1.7.0
+version: 1.8.0
 description: >
   交互式动画特效 HTML 编写能力。纯原生零依赖产出浏览器可直接运行的交互页面/多页 deck：
   翻页系统（键盘+点击+触摸滑动+View Transition+#/N/M 深链）、演讲者模式（S 键弹窗：
@@ -11,14 +11,16 @@ description: >
   页面级运镜与分镜规划（运镜预算制/对数时长/相机层/能量骨架/分镜卡）、
   UI 演示与画廊展示编排（八式帧级参数/画廊墙 render(t)/?seek ?autoplay）、
   多版本并行设计与选优（三方向硬门/6 视角 5 维评审/4 Pass 收敛/调参面板）、
-  动效画布生命周期管理、41 套视觉风格预设（mood 路由+五维旋钮+72 组配色）、
+  动效画布生命周期管理、41 套视觉风格预设（mood 路由+五维旋钮+72 组配色+单一主色推导）、
   登记版式系统（瑞士风 S01-S22 × 杂志风 M01-M10 版式锁定+deck 排版阶梯+中文排印细则）、
   扩展动画特效目录（49 种 CSS 入场动画 + 21 种 canvas FX，仅用户明确要求时路由启用）、
   Mermaid/PlantUML 图表构建期渲染嵌入（headless Chrome→PNG/SVG，失败降级不静默丢图）、
-  自包含单文件构建、高级感设计与交付前审查。
+  自包含单文件/多页 INDEX 构建、衍生交付形态（文档 PDF A4/落地页 1440px）、
+  高级感设计（品味六维/视觉密度/3 米测试）与交付前审查（高级感评分/终局三问）。
   当用户要求"写交互动画页""给 HTML 加翻页/动画/动效""交互图表动效""单文件交互演示页"
   "演讲者模式/提词器/双屏演示""分步揭示/分支导航/内容热点""风格预设/deck 换肤"
-  "瑞士风/杂志风 deck/登记版式""多版本对比/方向选优""运镜/分镜/镜头语言""UI 演示编排"，
+  "瑞士风/杂志风 deck/登记版式""多版本对比/方向选优""运镜/分镜/镜头语言""UI 演示编排"
+  "品牌主色推导套色""落地页/文档 PDF 衍生形态"，
   或 robot-aiot-web-presentation-workflow 委派 Phase 4 编写时触发。
 ---
 
@@ -97,20 +99,20 @@ description: >
 ## 何时读取引用文档
 
 1. 翻页/过渡/入场/交互图表模式完整规则：`references/interactive-mode-rules.md`
-2. 逐页编写实现（结构/token/画布/翻页/入场/数据动效/合并）：`references/interactive-html-authoring.md`
-3. 关键帧动画与动效接缝（Seam Gate、缓动选择、时长预算）：`references/keyframe-animation.md`
+2. 逐页编写实现（结构/token/画布/翻页/入场/数据动效/合并、多页 INDEX+pages 形态、概览墙三硬约束、禁用 emoji→Unicode/内联 SVG）：`references/interactive-html-authoring.md`
+3. 关键帧动画与动效接缝（Seam Gate、缓动选择、时长预算、相机 rig 元素级接口、counter-transform、放大防糊栅格化）：`references/keyframe-animation.md`
 4. 自包含 HTML 构建（零依赖、资源内联、性能约束）：`references/self-contained-html.md`
 5. 语义 token、字级、圆角、层次体系：`references/design-system-standards.md`
-6. 反模板化、高级感、AI 痕迹清单：`references/premium-design-standards.md`
-7. 反 AI 模板感设计规则（两遍工作流、token 系统、signature 元素）：`references/anti-ai-slop-design.md`
-8. 交付前审查与修复流程：`references/premium-review-fix.md`
-9. 内容 AI 图像生成与信息图（21 种信息图布局、社交图片样式）：`references/content-imagery-and-infographic.md`
-10. 生成艺术与数据可视化动效（p5.js/Canvas API、种子随机性）：`references/generative-art-and-canvas.md`
-11. Web 演示布局策略与文案公式（25 种布局、叙事策略）：`references/web-slide-strategies.md`
+6. 反模板化、高级感、AI 痕迹清单、品味六维、视觉密度上下限、3 米测试、品位锚点：`references/premium-design-standards.md`
+7. 反 AI 模板感设计规则（两遍工作流、token 系统、signature 元素、data/quote slop、bento 用烂、CSS 神器过度清单）：`references/anti-ai-slop-design.md`
+8. 交付前审查与修复流程、高级感评分与终局三问：`references/premium-review-fix.md`
+9. 内容 AI 图像生成与信息图（21 种信息图布局、社交图片样式、真图诚实性测试、文档 PDF A4/落地页 1440px 衍生形态）：`references/content-imagery-and-infographic.md`
+10. 生成艺术与数据可视化动效（p5.js/Canvas API、种子随机性、render(t) canvas 纯函数契约、程序化纸纹 fractalNoise）：`references/generative-art-and-canvas.md`
+11. Web 演示布局策略与文案公式（25 种布局、叙事策略、hero 字号 180-240px、视觉主角轮换）：`references/web-slide-strategies.md`
 12. Mermaid/PlantUML 图表构建期渲染嵌入（headless Chrome 流程、嵌入策略、失败降级）：`references/diagram-embed-rendering.md`
-13. 演讲者模式（S 键弹窗/磁吸卡片/双窗口同步/激光笔圈选/自动翻页/演前检查）、话术 .notes 承载、总览网格、深链、触摸翻页、主题审阅：`references/presenter-mode.md`
-14. 用户明确要求动画特效时的扩展目录与路由（49 CSS 入场 + 21 canvas FX + 5 页面级编排 recipe、预算硬限、clip-path 例外条款）：`references/animation-fx-catalog.md`
-15. 视觉风格预设（41 套设计系统预设、mood 路由表、先预览再定稿选型流程、五维旋钮、72 组配色库）：`references/visual-style-presets.md`
+13. 演讲者模式（S 键弹窗/磁吸卡片/双窗口同步/激光笔圈选/自动翻页/演前检查）、话术 .notes 承载、总览网格、深链、触摸翻页、主题审阅、预览 iframe 三坑防护、?seek/?autoplay 联动、调参面板联动：`references/presenter-mode.md`
+14. 用户明确要求动画特效时的扩展目录与路由（49 CSS 入场 + 21 canvas FX + 5 页面级编排 recipe、打字机两场景、预算硬限、clip-path 例外条款）：`references/animation-fx-catalog.md`
+15. 视觉风格预设（41 套设计系统预设、mood 路由表、先预览再定稿选型流程、五维旋钮、72 组配色库、预设标注三字段、单一主色推导三步法）：`references/visual-style-presets.md`
 16. 登记版式系统（瑞士风 S01-S22 × 杂志风 M01-M10 版式锁定、结构骨架 px 锚定、选择索引、内容-数据类型匹配、禁止清单）：`references/swiss-layout-system.md`
 17. 演示 deck 排版阶梯（字号双约束与画布推荐值、字重阶梯、中文大标题分档、最小字号三层下限、中文排印细则与字体配对）：`references/typography.md`
 18. 多版本并行设计与选优（三方向硬门、7 Phase 工作流、6 视角 5 维评审、选择无效铁律、4 Pass 收敛、调参面板）：`references/multi-version-selection.md`

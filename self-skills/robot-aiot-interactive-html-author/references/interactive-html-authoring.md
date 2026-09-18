@@ -26,6 +26,14 @@
 </html>
 ```
 
+## 形态选择与批量节奏
+
+1. 默认形态为单文件（"合并为单文件"节）；仅上层 workflow 明确要求时才走 `INDEX.html` + `pages/` 多页形态（SKILL.md 硬约束 10），细则见"多页形态（INDEX + pages/）细则"节
+2. deck 页数较多且风格基调尚未经用户确认时，禁止从第 1 页直接写到最后一页：先做 2 页代表性 showcase（选视觉结构差异最大的两页，通常是封面 + 核心内容页）交用户确认，锁定视觉语法（版式/字体/色彩/间距/中英双语比例），再批量铺开其余页——方向性返工成本封顶在 2 页，不放大到全套 N 页
+3. 触发阈值、showcase 页选择标准、确认点与未过处置以下列两处真源为准，本文件不重述：
+   - PPT 汇报语境：`robot-aiot-leadership-ppt-workflow` 的 `phase4-page-authoring.md`"两页 showcase 门"
+   - Web 演示语境：`robot-aiot-web-presentation-workflow` 的 `phase2-pagination.md`"两页 showcase 确认门"
+
 ## Token 体系
 
 在 `<style>` 根级定义语义 token：
@@ -286,6 +294,52 @@ deck 需要常驻公司/产品 logo 时，声明一次、全 deck 生效，不�
 3. 氛围画布 FX 仍走 `generative-art-and-canvas.md` 启停契约；共享背景层只解决"跨页连续视觉状态"
 4. 页面容器自身不加 display/visibility 动画（与翻页机制的显隐逻辑竞争），要动就动页内子包装
 
+## 禁用 emoji：Unicode 文字符号与内联 SVG
+
+禁 emoji 的两条硬理由：
+
+1. **导出豆腐块**：headless Chromium 默认不带彩色 emoji 字体，`--screenshot` 与导出 PDF 时 emoji 渲染为空方框，且不报任何异常——与"静默布局坑"同类，自动化抓不到
+2. **色彩失控**：emoji 自带各平台彩色字形，不走 token 体系，与 deck 色彩纪律冲突；活泼气质与汇报场景不合
+
+替代物两级：
+
+1. **Unicode 文字符号**：属文本，继承 `currentColor` 与字号，色彩随 token 可控；只用下方对照表内、字体栈覆盖已确认的常见符号
+2. **内联 SVG 线性图标**：物件类图标一律用它，`stroke="currentColor"`、线宽 1.5-2px，与页面线宽语言对齐；零外部请求，内联或 base64（同"品牌 logo 声明"条 2）
+
+对照表（高频 emoji 码位 → 替代物）：
+
+| 禁用符号（码位） | 语义 | 替代 |
+|---|---|---|
+| U+2705 / U+2611 | 正确、完成 | ✓（U+2713），重要场景用加粗 ✓ |
+| U+274C / U+274E / U+1F6AB | 错误、禁止 | ✕（U+2715） |
+| U+2B50 / U+1F31F | 高亮、精选 | ★（U+2605）或 ✦（U+2726） |
+| U+27A1、U+25B6 带 U+FE0F | 方向、下一步 | →（U+2192）/ ▸（U+25B8） |
+| U+1F534、U+2022 带 U+FE0F | 列表圆点 | ·（U+00B7）/ ‣（U+2023） |
+| U+26A0 / U+2757 | 警告 | 内联 SVG 三角感叹号，或文案改"注意：" |
+| U+1F4E7 / U+1F4F1 / U+1F50D / U+1F4CA / U+23F1 | 物件图标（邮件/手机/搜索/图表/计时） | 内联 SVG 线性图标，或直接文字（"Email · 23"而非图标+数字） |
+| U+1F389 / U+1F525 / U+1F4A1 | 氛围符号（庆祝/火热/点子） | 直接删除；氛围由版式与色彩承担，不靠符号 |
+
+规则：
+
+1. deck 全部文案禁 emoji：上屏文字、`.notes` 话术、caption、`alt`、按钮文案都算
+2. 文字符号只取对照表白名单；生僻符号（✦ ✧ 等）交付前实测字体栈覆盖，任一平台缺字形即降级为内联 SVG
+3. 不用 icon font（SKILL.md 硬约束 11 禁外部字体）；不为图标引任何外部请求
+4. 交付前自检加"上屏零 emoji"断言（浏览器控制台或 headless 跑；禁段覆盖 emoji 主块与 emoji 变体选择符 U+FE0F，白名单文字符号 ✓ ✕ ★ ✦ → ▸ · ‣ 不在其中）：
+
+```js
+(function () {
+  var RE = /[\u{1F000}-\u{1FAFF}\u{FE0F}\u{203C}\u{2049}\u{231A}\u{231B}\u{23E9}-\u{23FA}\u{2611}\u{26A0}\u{2705}\u{274C}\u{274E}\u{27A1}\u{2B50}\u{2B55}]/u;
+  var walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+  var hits = [];
+  while (walker.nextNode()) {
+    var n = walker.currentNode;
+    var p = n.parentElement;
+    if (p && !p.closest('script,style') && RE.test(n.nodeValue)) hits.push(n.nodeValue.trim());
+  }
+  console.assert(hits.length === 0, '上屏 emoji 残留: ' + hits.join(' | '));
+})();
+```
+
 ## 静默布局坑
 
 以下错误不报异常、自动化检查抓不到，表现为"元素永远不出现"或"渲染里被裁掉"：
@@ -322,11 +376,67 @@ deck 需要常驻公司/产品 logo 时，声明一次、全 deck 生效，不�
 - 单页 DOM ≤ 500
 - 数字键 1-9 直跳、R 重置、输入态守卫（input/textarea/contenteditable 内不翻页）全部可用
 - `@media print` 一页一张按序展开、缩放壳已禁用、入场动画元素强制可见
+- 上屏零 emoji，图标走 Unicode 文字符号或内联 SVG（见"禁用 emoji"节自检断言）
 
 ## 合并为单文件
 
 所有页面的 CSS 合并到 `<style>`，JS 合并到 `<script>`，图表 SVG 内联。
 最终文件双击即可在浏览器完整运行，无任何外部请求。
+
+## 多页形态（INDEX + pages/）细则
+
+仅上层 workflow 明确要求多页形态时使用（SKILL.md 硬约束 10），默认仍为单文件。多页形态的价值：每页文件双击即可独立验证（"改一点验一点"成本接近零）、headless 截图直接访问单页文件不需 JS 跳页、多人/多子任务并行做不同页零冲突、一页样式错误不波及他页。
+
+### 文件结构
+
+```text
+交付根/
+├── INDEX.html            # 导航壳：MANIFEST + iframe 视口 + 上一页/下一页 + 概览入口
+├── assets/               # 素材图等共享资源（相对路径引用）
+└── pages/
+    ├── 01-cover.html     # 每页都是完整 1920×1080 自包含 HTML
+    ├── 02-agenda.html
+    └── 03-architecture.html
+```
+
+1. 每页文件独立自包含：自带 token、scale-to-fit 壳、`.notes` 话术容器，本文件全部规则照常适用；双击可单独打开，不依赖 INDEX 存在
+2. 素材图按"素材图网格与 lightbox"条 5：多页形态用相对路径引 `assets/`，不 base64 内联；除此之外每页零外部请求
+3. INDEX.html 用 MANIFEST 声明页序与标签，`slideId` 与各页 `data-slide-id` 对齐（`presenter-mode.md` §9）：
+
+```js
+window.DECK_MANIFEST = [
+  { file: 'pages/01-cover.html',        label: '封面',     slideId: 'cover' },
+  { file: 'pages/02-agenda.html',       label: '议程',     slideId: 'agenda' },
+  { file: 'pages/03-architecture.html', label: '系统架构', slideId: 'architecture' }
+];
+```
+
+### 上一页 / 下一页导航
+
+1. INDEX 单 iframe 视口，翻页 = 换 `src` 为目标页文件；底部提供"上一页 / 下一页"按钮与页码 `N / total`，键盘 ←/→/Space/PageUp/PageDown 绑同一动作
+2. 导航链接真实存在（SKILL.md 硬约束 10）：每页文件自带指向相邻页文件的真实 `<a href>` 上一页/下一页链接，作脱离 INDEX 时的兜底导航；首末页对应链接隐藏或禁用，不写死链
+3. iframe 焦点防护：iframe 加 `tabindex="-1"`；页文件内导航键转发给 INDEX 处理（转发实现见 `ui-demo-choreography.md` §10 坑三，不重述）；INDEX 监听 `blur` 兜底收回焦点
+4. 翻页状态写 `localStorage`（key 含 INDEX 文件名），刷新恢复当前页
+5. 概览入口（可选）：INDEX 以网格陈列全部页缩略单元、点击跳页，实现遵守下方"概览墙三条硬约束"
+
+### `#/N` 深链
+
+1. `#/N/M` 深链是单文件 deck 专属能力（SKILL.md 多页形态豁免条款：S 演讲者窗、O 总览网格、深链、Home/End、触摸滑动均不判验收）；多页形态翻页以 INDEX 与页间真实链接为准
+2. INDEX 可选实现 `INDEX.html#/N` 位置记忆：翻页时 `history.replaceState` 写 hash，加载时解析并直达第 N 页；页文件自身不做 `#/N`
+3. 多页形态下演讲者模式联动（预览 iframe 指向页文件带 `?preview=1`、BroadcastChannel 用 INDEX 文件名）见 `presenter-mode.md` §8.5，不重述
+
+### 多页形态打印与导出
+
+1. 每页文件自带 `@media print` 规则（同"打印与导出"节，一页一张），单页打开单页打印
+2. INDEX 不做聚合打印（跨 iframe 打印遍历不可靠）；用户要整套聚合 PDF 时说明取舍——回单文件形态导出，或逐页打印后合并，不静默丢页
+
+## 概览墙三条硬约束
+
+适用于 O 键总览网格（`presenter-mode.md` §4，交互契约以其为准）与 INDEX 概览页；画廊式陈列页（内容展示）走 `ui-demo-choreography.md` §6，本节只约束作导航与自检用的概览墙：
+
+1. **禁用 `transform-style: preserve-3d` 做卡片墙**：preserve-3d 的 3D 场景里，浏览器对向后倾斜卡片的命中测试不可靠——顶排点不到、中排时好时坏。正解：整墙作为单个被 3D 倾斜的平面（墙容器不开 preserve-3d），全部卡片共面，点击即普通 DOM 命中测试、天然可靠；hover 提升用 2D `scale`，不用 `translateZ`
+2. **任意页数自适应**：按页数 + 视口尺寸计算列数，行数增多则倾斜角变平，一屏放不下就纵向滚动；禁止两种懒做法——固定列数 + 写死强倾斜（页一多溢出塌角、透视失真），把几十页硬塞一屏缩成邮票（概览是看清页，不是看墙）
+3. **缩略图分辨率下限**：单文件 deck 的 O 键总览恒用真实 DOM `transform: scale()` 渲染（`presenter-mode.md` §4 条 1，所见即所得）；多页形态页数极多、确需 `<img>` 缩略单元做性能兜底时，源图宽 ≥1600px，<1000px 在 hover 放大后必然发虚
 
 ## 打印与导出
 
@@ -360,3 +470,4 @@ deck 需支持打印 / 导出 PDF（发给听众做资料）：
 2. **截图矩阵**：深链 `#/N/M` 加载即对应步的即时终态，适合逐 frag 截图；分支页无深链，用全局索引 `?preview=N` 截图；拍完逐张目检话术零泄漏、标签碰撞、划线飞出、裁切
 3. **注入断言用 rpartition**：场景脚本必须经 `src.rpartition('</body>')` 插入临时副本——deck 的演讲者窗 HTML 字符串内含 `</body>` 字面量，`replace('</body>')` 会命中它截断 deck 脚本，导致全部断言假失败；注入后用 `dispatchEvent(new KeyboardEvent(...))` 与 `el.click()` 驱动，结果写隐藏节点，`--dump-dom` 提取
 4. **命令模板**：`chrome --headless=new --disable-gpu --hide-scrollbars --window-size=1920,1080 --virtual-time-budget=6000 --screenshot=OUT "file://DECK#/N/M"`
+5. **捆绑 webfont 的产物**：截图/导出 PDF 前确保字体就绪或已超时锁定回系统栈——体积闸、子集化与 3500ms 超时锁定见 `typography.md` §5.7，此处不重述细节；命令模板的 `--virtual-time-budget=6000` 已覆盖该等待窗口，默认系统栈产物无此问题

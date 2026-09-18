@@ -79,6 +79,16 @@ function arcMotion(start, end, height, t) {
 2. 驱动器（rAF 或编排时间轴）只更新 st 的数值；render 函数把 st 应用到 DOM/canvas 后绘制
 3. 初始化末尾手动调一次 render() seed 第 0 帧；任意时刻跳转/回看 = 由时间反推 st 再 render 一次，天然可擦洗、帧帧确定
 
+#### render(t) canvas 2D 侧纯函数契约
+
+DOM/transform 侧的 render(t)（画廊墙）契约见 ui-demo-choreography.md §6；canvas 2D 侧遵循同一纯函数纪律——无副作用、单帧单画、时间归一——另有三条像素绘制特有的条款：
+
+1. **无副作用**：render(t) 只读 t 与预生成的确定性数据（种子随机序列按上方"确定性随机"在启动前一次生成完毕）；不读时钟、不抽 `Math.random()`、不读事件状态、不修改共享状态对象——状态由驱动器（rAF/调度器）写，render 只读（state-proxy 分工）
+2. **单帧单画**：一次 render(t) 调用完成一整帧——以 `clearRect`（或整幅重绘底色）开头、以该帧完整像素结尾，不跨帧累积、不把一帧内容拆到多次 rAF。常见"半透明矩形盖住上一帧"的拖尾画法依赖帧历史，不是纯函数——seek/回看/变速下拖尾全错；需要拖尾改用显式历史：粒子位置写成 t 的闭式函数，由 t 反推最近 N 个采样点、每帧整条重画（闭式轨迹见上方"粒子物理质感"arcMotion）
+3. **时间归一**：与 ui-demo-choreography.md §6 同约定——t ∈ [0,1] 为入场段，t > 1 继续线性推进、只驱动驻场漂移（粒子慢旋/呼吸/淡出长尾）；循环型特效用 t 取模或周期函数派生相位（`(t % period) / period`），不在 render 内维护帧计数器——取模仍是 t 的纯函数，seek 依旧精确复现
+
+配套两件事：初始化后手动 render(0) seed 首帧（state-proxy 条款 3）；暴露 seek 入口（停 rAF 循环 → render(t)）供调试与 headless 截图，与 ui-demo-choreography.md §6 的 `window.__seek` 同款。验收标准：连续调用 render(0.5) 一万次，像素级一致。
+
 #### 自包含要求
 
 - 零外部依赖，一切 inline
@@ -100,6 +110,70 @@ function arcMotion(start, end, height, t) {
 - 设计哲学驱动，不是随机拼贴
 - 边界约束：所有元素在画布内，有呼吸空间
 - 精炼优于添加：第二轮优化不增加图形
+
+## 程序化纸纹（fractalNoise）
+
+浅色底最怕"太平"：纯色封面、画廊页、卡片底叠一层极弱的分形噪声纸纹，"看上去没区别，去掉就知道有了"。纸纹是静态纹理不是动效：一次生成、平铺复用，不占"一页一效"名额，不触发持续重绘。
+
+两条原生实现路线（零依赖，选一条）：
+
+**路线一 · SVG 滤镜 data-URI（零 JS，CSS 背景平铺）**：
+
+```css
+.paper::before {
+  content: ''; position: absolute; inset: 0; pointer-events: none; z-index: 30;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.078  0 0 0 0 0.078  0 0 0 0 0.074  0 0 0 0.035 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+  opacity: 0.5;
+}
+```
+
+feColorMatrix 的三个通道常量即墨色（按主题文字色 token 换算成 0-1 小数替换，data-URI 内读不到 CSS 变量）；`stitchTiles='stitch'` 保证四方连续无缝；z-index 按宿主层级调整，原则是盖在内容之上且不拦截交互。
+
+**路线二 · canvas fBm 逐像素生成（可读色 token、可导出纹块）**：
+
+```javascript
+// 值噪声格点 + smoothstep 双线性插值，双 octave 叠加（fBm）：频率 ×2、振幅 ×0.5
+// 格点值由 hash2d 直接派生（见上方"确定性随机"），同 seed 恒同纹块；
+// 格点坐标对 period 取模回绕采样，保证四边无缝平铺
+function paperTexture({ size = 200, basePeriod = 170, seed = 42, ink = [20, 20, 19], alpha = 0.04 } = {}) {
+  const cv = document.createElement('canvas');
+  cv.width = cv.height = size;
+  const ctx = cv.getContext('2d');
+  const img = ctx.createImageData(size, size);
+  const lattice = (period, ix, iy) =>
+    hash2d((ix % period) * 331 + seed, (iy % period) * 337 + seed);
+  for (let y = 0; y < size; y++) {
+    for (let x = 0; x < size; x++) {
+      let v = 0, total = 0;
+      for (const [period, amp] of [[basePeriod, 0.5], [basePeriod * 2, 0.25]]) {
+        const fx = (x / size) * period, fy = (y / size) * period;
+        const x0 = Math.floor(fx), y0 = Math.floor(fy);
+        const tx = fx - x0, ty = fy - y0;
+        const sx = tx * tx * (3 - 2 * tx), sy = ty * ty * (3 - 2 * ty);
+        v += amp * ((lattice(period, x0, y0) * (1 - sx) + lattice(period, x0 + 1, y0) * sx) * (1 - sy) +
+                    (lattice(period, x0, y0 + 1) * (1 - sx) + lattice(period, x0 + 1, y0 + 1) * sx) * sy);
+        total += amp;
+      }
+      const i4 = (y * size + x) * 4;
+      img.data[i4] = ink[0]; img.data[i4 + 1] = ink[1]; img.data[i4 + 2] = ink[2];
+      img.data[i4 + 3] = Math.round((v / total) * alpha * 255);   // 噪声值调 alpha，墨色恒定
+    }
+  }
+  ctx.putImageData(img, 0, 0);
+  return cv;
+}
+// 用法：宿主背景 document.querySelector('.cover').style.backgroundImage = `url(${paperTexture().toDataURL()})`;
+// canvas 底纹：const pat = ctx.createPattern(paperTexture(), 'repeat'); ctx.fillStyle = pat; ctx.fillRect(0, 0, W, H);
+// 墨色读 token：getComputedStyle 取文字色 hex 后拆成 [r, g, b] 传 ink，不硬编码
+```
+
+强度与用法纪律：
+
+1. 强度在"几乎不可察"档：canvas 路线 alpha ≤0.04，SVG 路线 feColorMatrix alpha 0.035 量级 + 整体 opacity ≤0.5；能看出"噪点/屏幕脏"即过强，立刻减
+2. 颗粒频率取细（SVG 路线 baseFrequency 0.8-0.9；canvas 路线 basePeriod ≈ size × 0.85）：细颗粒读作"纸"，低频大颗粒读作"云/大理石"，频率错即材质错
+3. 只给浅色底：深色底靠渐变与光晕出层次，叠纸纹显脏
+4. 纸纹禁止叠在动画内容上：噪声层随元素运动会让每帧像素都不同，录屏/GIF 类逐帧压缩导出时体积与画质双爆；纸纹只放静态底层。需要动效导出的页面先评估，必要时以"底色 + 暖色阴影"替代纸纹（纸感保留大半）
+5. 纸纹计入静态装饰，不受"动效画布生命周期契约"约束（无 rAF、无循环）；但同页纹理层 ≤1，不与 ASCII 呼吸场等点阵质感背景叠加
 
 ## FIXED vs VARIABLE
 

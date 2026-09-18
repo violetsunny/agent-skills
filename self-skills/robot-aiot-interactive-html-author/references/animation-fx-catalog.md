@@ -156,6 +156,17 @@
 | `karaoke-highlight` | 逐词累积高亮 | 词点亮 0.06s 变强调色 + scale 1.1、回退 0.08s；组入场 scale 1.3→1、0.15s back-out；组出场 opacity 0 + scale 0.9、0.1s，且终点强制 `visibility:hidden` 收口防复活；粗描边 `-webkit-text-stroke` + `paint-order:stroke fill` | 逐词讲稿强调、歌词式叙述 |
 | `font-axis-morph` | 可变字体轴动画（字重/光学尺寸滑动） | `font-variation-settings` 经自定义属性 --wght/--opsz 动画，需 `@property` 注册（`syntax:"<number>"`）才可插值；0.45s cubic-out | 高级感标题、强调词变重 |
 
+### 打字机两场景（标题逐字 / 正文逐块）
+
+打字机不是一种效果而是两种场景，场景用错比参数不对更扎眼：流式输出做成匀速逐字读作"老电影字幕"，真人输入做成块状涌现读作"输入框自己在生成"。先定场景再取参数：
+
+| 场景 | 条目 | 何时用 | 参数范围 | 原生实现要点 |
+|---|---|---|---|---|
+| 标题逐字 | `typewriter` | 单行口号、金句、终端命令、章节标题——短文本（≤20 字）且"机械/精确"动词档是刻意风格选择 | 字速与真人输入档同源：汉字 100-150ms/字（观众逐字跟读的速度下限）、英文/数字 40-70ms/字符；匀速逐字、不加不规律抖动——抖动是流式输出的性格，标题档要的恰是机械感；光标打字常亮、打完转 steps(1) 闪烁（帧级参数表与光标状态机见 ui-demo-choreography.md §3 式⑦，不复制） | 按字符拆 `<span>`，逐字 opacity 0→1 用 steps(1) 离散切换（无缓动插值），字符间 delay = 字速 × 序号（WAAPI 逐字 `delay` 或 CSS `animation-delay: calc(var(--i) * 字速)`）；禁 width + steps(N) 裁剪方案——width 是布局属性，触犯 §1 冲突裁决的动画属性白名单 |
+| 正文逐块 | `typewriter-multi` | AI 流式输出、Agent 回复、多行日志生成——"模型在吐 token"；单行流式输出也走本档节奏 | 2-5 字符/块；中文按词 + 标点切块（不切词中间）；块间隔不规律 40-120ms；多行并发时行间起步错峰 100-150ms、强调色光标只跟最新一行——两个光标同时闪就是两个作者；文本过长先对时长预算：砍块数/砍行数，不加速 | 块间隔用种子随机（generative-art-and-canvas.md mulberry32）预生成累计时刻表，render(t) 纯函数按时间查表重建完整可见文本（与 ui-demo-choreography.md §3 式⑦ 的事件表回放同构）——双向 seek 安全、翻回页面重播帧帧一致；禁 setTimeout + Math.random 链 |
+
+真人在输入框/终端打字（带犹豫、退格修正、确认停顿）是 UI 演示层形态，事件表编译与回放实现见 ui-demo-choreography.md §3 式⑦，本目录不收；三种形态共用同一光标纪律：打字常亮、打完 steps(1) 闪烁。
+
 ### 标记强调（手绘感）
 
 | 名称 | 效果 | 关键参数 |
@@ -199,6 +210,7 @@
 - `path-draw`：单段 0.3-0.8s（>1s 拖沓）；多段 stagger = 下一段在前段 70-80% 处启动；末段时长 = 普通段 60-80%；cubic-out 或 linear（笔不弹，禁 back/elastic）；dasharray 用 `getTotalLength()` 实测，复杂路径可 ×1.05 高估（偏大仅起始不可见、偏小截尾）；连接线两端必须落在真实元素上
 - `shimmer-sweep`：光带位置用注册自定义属性 `@property --shimmer-pos`（`syntax:"<percentage>"`）-20%→120%、1.2s smooth-inout、多元素 stagger 0.15s；--shimmer-width 默认 20%、--shimmer-angle 默认 120deg
 - `counter-up`：计数+缩放复合变体见 `count-scale`
+- `typewriter` / `typewriter-multi`：两场景（标题逐字 / 正文逐块）选型与参数范围见上方"打字机两场景"小节
 
 ## 3. Canvas FX 目录（21 种）
 

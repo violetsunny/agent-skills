@@ -53,6 +53,12 @@ deck 换肤素材库。每套预设 = 一组语义 token 覆盖集，直接覆�
 
 > 预设未显式给出 `on-primary` 时按 `design-system-standards.md` §1 配对规则推导：取白 / 近黑中与 `--primary-color` 按 WCAG 公式实算 ≥ 4.5:1 的那个；主色填充块上的文字一律用推导结果，不硬编码 `#fff`/`#000`。
 
+> 预设标注三字段——选型与交付审查时对选定预设补齐以下三个判断（判断方法，不改写四十一套条目原文）：
+>
+> - **温度（暖/冷）**：把条目 `--primary-color` 与 `--surface-color` 的 hex 转 HSL 按色相判——H ∈ [345°, 90°]（红/品红/橙/黄）或底色偏奶油/牛皮/羊皮纸 = 暖；H ∈ [180°, 300°]（青/蓝/紫）或底色偏灰蓝/瓷白 = 冷；[90°, 180°]（黄绿/绿）与 [300°, 345°]（洋红/粉紫）为过渡扇区，按底色偏暖灰还是偏冷灰判。用途：§1 路由表锁定预设后做二次校验——受众情绪温度与预设温度冲突（如"人文·温暖"锁了冷瓷套）时回路由表重选，或向用户摆出冲突理由；禁止同页混用暖/冷两套预设元素。
+> - **还原度（屏幕↔打印差异）**：本库默认屏幕演示；用户要 PDF 导出/印刷时按三档标注预期差异并给降级方案——高：平面实底 + 发丝线 + 纯排版（monochrome、cartesian、porcelain-indigo、swiss 四套），屏幕 ≈ 打印，直接导；中：大面积高饱和 accent 或双色实底（emerald-editorial、bold-poster、peoples-platform），印刷整体压暗约一档，accent 先加深一档再导；低：暗底 + 霓虹/辉光/grain/扫描线（8-bit-orbit、pink-script、studio、retro-windows），印刷必失真——出降级版（底色改纸白、霓虹改同色相深墨、去辉光与扫描线），并在交付说明标注哪些页做了降级，不假装是原版。
+> - **字体平替（无网络字体时的系统栈回退）**：本库条目"字体·形状"行已是零外链系统栈，平替字段记录两件事——① 跨平台落点与再回退：展示 serif `"Songti SC"`(macOS) → `"SimSun"`(Windows) → Georgia → serif；正文 sans `"PingFang SC"`(macOS) → `"Microsoft YaHei"`(Windows) → system-ui → sans-serif；数据 mono `ui-monospace` → `"SF Mono"`(macOS) → Consolas(Windows) → monospace；手写面 `"Kaiti SC"`(macOS) → `"KaiTi"/"STKaiti"`(Windows) → cursive；Linux 无头导出环境统一再回退 `"Noto Serif CJK SC"` / `"Noto Sans CJK SC"` / `"DejaVu Sans Mono"`。② 签名特征降级：预设签名依赖字体特征而落点字体不具备时用 CSS 逼近——condensed 缺 `"Arial Narrow"` 用字距 −0.02em + 收窄容器宽模拟窄体感；200 超轻档缺失回退 300 并在交付说明标注；像素感不用普通字体硬凑，保留方块装饰与 `steps()` 阶梯动画的块状视觉语言。
+
 ### 2.1 biennale-yellow
 
 - **look**: 文学编辑目录风——暖羊皮纸底、单一深靛蓝墨、太阳黄作径向晕染 / 色板 / 瓷砖底印，严格矩形 0 圆角，1px 发丝线作唯一边框，无阴影。
@@ -654,6 +660,59 @@ deck 换肤素材库。每套预设 = 一组语义 token 覆盖集，直接覆�
 ## 4. 配色库（9 类 72 组）
 
 按类分组，每组一行：序号 + hex（多数 5 色，非 5 色组注明实际色数）。不编造 hex，全部来自源配色文件。
+
+### 单一主色推导三步法
+
+用户只给一个主色（品牌色 / logo 吸色）时，从主色推导整套 token，不直接套 72 组色板。OKLCH 空间的派生与 chroma 阶梯规则见 `anti-ai-slop-design.md` §OKLCH 单色相派色板，本节不重复；本节给 hex token 工作流的 HSL 可运行实现。
+
+1. **定基调**：主色转 HSL，记录 H（色相）与 S（饱和度）。按 H 扇区判暖/冷（判法见 §2 预设标注三字段·温度）；S 按用途封顶——大面积底色 S ≤ 12%、中性/文字层 S ≤ 30%、主色本身 S ≤ 72%（防屏幕荧光感）。主色 S/L 极端（近黑、近白、荧光）时先修正到可推导区间再走后续两步。
+2. **算明度阶梯**：固定 H，L 走 97% → 92% → 82% → 42% → 14% 五档生成 surface / surface-muted / outline / text-secondary / text-primary。同 H 保证整套色温天然一致；中性色不是纯灰，带主色 8-14% 饱和度。暗底预设把阶梯反转（surface 取 14% 档、text 取 92% 档），accent 取高 L 档。
+3. **配强调色**：secondary 取 (H+150)° % 360、tertiary 取 (H+210)° % 360 的分裂互补位，S 为主色的 0.6-0.8 倍，L 与主色同档或提亮一档；强调色只作小面积点睛。语义状态色（成功/警告/危险）用固定红黄绿，不从主色偏移推导——偏移位落不到正确语义色相上。
+
+可运行推导函数（零依赖，输入主色 hex，输出 token 对象；`on-primary` 不在推导内，仍按 §2 白/近黑实算规则配对）：
+
+```js
+function derivePalette(hex) {
+  const n = parseInt(hex.slice(1), 16);
+  const r = ((n >> 16) & 255) / 255;
+  const g = ((n >> 8) & 255) / 255;
+  const b = (n & 255) / 255;
+  const max = Math.max(r, g, b), min = Math.min(r, g, b), d = max - min;
+  let h = 0;
+  if (d !== 0) {
+    if (max === r) h = ((g - b) / d) % 6;
+    else if (max === g) h = (b - r) / d + 2;
+    else h = (r - g) / d + 4;
+    h = Math.round(h * 60);
+    if (h < 0) h += 360;
+  }
+  const l = (max + min) / 2;
+  const s = d === 0 ? 0 : d / (1 - Math.abs(2 * l - 1));
+  const toHex = (hh, ss, ll) => {
+    const a = ss * Math.min(ll, 1 - ll);
+    const f = (k) => {
+      const x = (k + hh / 30) % 12;
+      const v = ll - a * Math.max(-1, Math.min(x - 3, 9 - x, 1));
+      return Math.round(255 * v).toString(16).padStart(2, "0");
+    };
+    return "#" + f(0) + f(8) + f(4);
+  };
+  const sBase = Math.min(s, 0.72);
+  const sNeutral = Math.min(sBase, 0.14);
+  return {
+    "--primary-color": toHex(h, sBase, l),
+    "--surface-color": toHex(h, Math.min(sNeutral, 0.12), 0.97),
+    "--surface-muted": toHex(h, sNeutral, 0.92),
+    "--outline-color": toHex(h, sNeutral, 0.82),
+    "--text-secondary": toHex(h, Math.min(sBase, 0.20), 0.42),
+    "--text-primary": toHex(h, Math.min(sBase, 0.30), 0.14),
+    "--secondary-color": toHex((h + 150) % 360, sBase * 0.8, l),
+    "--tertiary-color": toHex((h + 210) % 360, sBase * 0.6, Math.min(l + 0.15, 0.85))
+  };
+}
+```
+
+推导后自检：① `--text-primary` 对 `--surface-color` 对比度实算 ≥ 4.5:1，不足把 text 的 L 压到 0.10 重算；② 交付说明写一句"为什么是这个色"（主色来源：品牌 logo / 内容真图 / 主题文化语境），写不出 = 在抽签，回 §1 路由表重选；③ 推导色板与下方 72 组是两条平行路径——有主色走推导，无主色从色板组选，同一 deck 不混用两条路径的产物。
 
 ### bold-energetic（8 组）
 
