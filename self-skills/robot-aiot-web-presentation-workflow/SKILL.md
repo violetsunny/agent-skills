@@ -1,10 +1,11 @@
 ---
 name: robot-aiot-web-presentation-workflow
-version: 2.4.0
+version: 2.5.0
 description: >
   交互式Web演示页面制作工作流。根据知识文档生成分页汇报母稿，按需制作架构图/流程图，
   逐页交互HTML（可翻页、带动画、数据动效，纯原生零依赖双击即用）委派 robot-aiot-interactive-html-author 编写。
-  当用户要求"做交互演示""生成Web演示""做动态汇报""可翻页演示""带动画的汇报""Web版汇报"时触发。
+  交付形态含单文件 deck（默认）、多页形态、竖版社交 deck、滚动叙事页。
+  当用户要求"做交互演示""生成Web演示""做动态汇报""可翻页演示""带动画的汇报""Web版汇报""竖版社交演示""滚动叙事页"时触发。
   也适用于用户描述了需要将技术项目数据转化为可交互浏览器演示的场景。
 ---
 
@@ -198,8 +199,8 @@ Phase 4: 交互HTML    → 委派 robot-aiot-interactive-html-author 逐页编�
 3. 需要图表生成调用规则时，读 `references/phase3-chart-generation.md`
 
 ### 外部委派
-4. 需要绘制架构图/流程图（Phase 3）时，加载 `robot-aiot-arch-diagram`
-5. 需要逐页交互动画特效 HTML 编写（Phase 4）时，加载 `robot-aiot-interactive-html-author`
+1. 需要绘制架构图/流程图（Phase 3）时，加载 `robot-aiot-arch-diagram`
+2. 需要逐页交互动画特效 HTML 编写（Phase 4）时，加载 `robot-aiot-interactive-html-author`
 
 ## 交付口径
 

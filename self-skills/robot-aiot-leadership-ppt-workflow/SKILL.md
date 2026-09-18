@@ -1,6 +1,6 @@
 ---
 name: robot-aiot-leadership-ppt-workflow
-version: 3.5.0
+version: 3.6.0
 description: >
   将项目数据和技术分析转化为结构化的领导汇报PPT，覆盖全链路五阶段工作流：
   数据池建立 → 技术明细版+目标受众汇报版文档分层（受众由用户指定，默认领导层） → 调用 robot-aiot-draw-flowchart 生成分层架构图/流程图XML并完成XML→HTML桥接与静态页面HTML化 → 调用 ppt-master 依据每页HTML样式生成最终PPTX文件。
