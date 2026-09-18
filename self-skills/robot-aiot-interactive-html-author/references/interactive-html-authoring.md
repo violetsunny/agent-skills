@@ -172,7 +172,7 @@ function animateNumber(el, target, duration = 1200) {
 
 ### 进度条填充
 
-使用 CSS `transition: width 800ms` 而非 JS 逐帧。
+填充层固定 `width:100%`，用 `transform: scaleX(0→PCT)` + `transform-origin:left`，transition 800ms cubic-out；不 transition width（触发 layout，违反性能红线）。
 
 ### 图表动画
 
@@ -218,6 +218,39 @@ SVG 路径用 `stroke-dasharray` + `stroke-dashoffset`；柱状图从底部生�
   addEventListener('keydown',function(e){if(e.key==='Escape')close();});
 })();
 ```
+
+## 共享背景层
+
+跨页持续的视觉状态（底色渐变、氛围画布、grain/暗角）用"共享背景层 + 透明内容层"，不要每页各带一份不透明背景：
+
+```html
+<div class="canvas">
+  <div id="bg" class="full-bleed"></div>    <!-- 常驻背景，不属于任何页 -->
+  <section class="slide active">…</section> <!-- 内容层背景透明 -->
+</div>
+```
+
+```css
+.full-bleed { position: absolute; inset: 0; }
+.slide { background: transparent; }
+```
+
+规则：
+
+1. 背景层不随翻页显隐，存在整个 deck 生命周期；全局色调偏移、暗角、grain 只在共享层驱动一次，不在每页重复实现
+2. 背景层必须 `position:absolute; inset:0` 自己撑满——它不参与翻页布局，塌成 0 高时上面画的任何东西都不可见（此模式最常见错误）
+3. 氛围画布 FX 仍走 `generative-art-and-canvas.md` 启停契约；共享背景层只解决"跨页连续视觉状态"
+4. 页面容器自身不加 display/visibility 动画（与翻页机制的显隐逻辑竞争），要动就动页内子包装
+
+## 静默布局坑
+
+以下错误不报异常、自动化检查抓不到，表现为"元素永远不出现"或"渲染里被裁掉"：
+
+1. **transform 对 inline 元素无效**：scaleX/translate 在 `display:inline` 的 span 上是 no-op；被动画元素必须 block/inline-block/flex-item 且有真实宽高——auto 宽 0px 元素做缩放等于永远不可见
+2. **峰值尺寸留净空**：脉冲/过冲装饰（yoyo scale、back-out 过冲）按最大帧定位而非静止帧，且不跨 `overflow:hidden` 边界，否则被裁或压住邻居
+3. **先建静态终态**：先用 HTML/CSS 搭出可见的静态终态，再往上加动画——终态本身错了，动画只会更晚暴露问题
+4. **离屏 canvas 测文本**：字号自适应宽度时用离屏 canvas `ctx.measureText` 测量后二分字号，不写进页面再读回（每次读回都触发 reflow）
+5. **正文不用 `<br>` 断行**：强制换行忽略实际渲染字宽，行已自然换行时多出一折造成重叠；用 max-width 控制自然换行。例外：短展示标题刻意每词一行
 
 ## prefers-reduced-motion
 

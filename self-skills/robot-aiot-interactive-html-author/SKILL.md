@@ -1,17 +1,19 @@
 ---
 name: robot-aiot-interactive-html-author
-version: 1.3.1
+version: 1.4.0
 description: >
   交互式动画特效 HTML 编写能力。纯原生零依赖产出浏览器可直接运行的交互页面/多页 deck：
-  翻页系统（键盘+点击+触摸滑动+View Transition+#/N 深链）、演讲者模式（S 键弹窗：
-  当前页/下一页像素级预览+话术提词+计时器，双窗口同步）、总览网格（O 键）、话术抽屉（N 键）、
+  翻页系统（键盘+点击+触摸滑动+View Transition+#/N/M 深链）、演讲者模式（S 键弹窗：
+  当前页/下一页像素级预览+话术提词+计时器，双窗口同步，可编辑备注 localStorage 持久化）、
+  总览网格（O 键）、话术抽屉（N 键）、页内分步揭示（fragment）、分支序列与内容热点、
   元素入场（data-enter-order）、数据动效（数字滚动/进度条填充/图表逐步绘制）、
-  交互图表（hover/tooltip/展开）、关键帧动画与动效接缝、动效画布生命周期管理、
-  扩展动画特效目录（27 种 CSS 入场动画 + 20 种 canvas FX，仅用户明确要求时路由启用）、
+  交互图表（hover/tooltip/展开）、关键帧动画与动效接缝、相机飞行过渡、
+  动效画布生命周期管理、13 套视觉风格预设（mood 路由+五维旋钮+72 组配色）、
+  扩展动画特效目录（49 种 CSS 入场动画 + 21 种 canvas FX，仅用户明确要求时路由启用）、
   Mermaid/PlantUML 图表构建期渲染嵌入（headless Chrome→PNG/SVG，失败降级不静默丢图）、
   自包含单文件构建、高级感设计与交付前审查。
   当用户要求"写交互动画页""给 HTML 加翻页/动画/动效""交互图表动效""单文件交互演示页"
-  "演讲者模式/提词器/双屏演示"，
+  "演讲者模式/提词器/双屏演示""分步揭示/分支导航/内容热点""风格预设/deck 换肤"，
   或 robot-aiot-web-presentation-workflow 委派 Phase 4 编写时触发。
 ---
 
@@ -63,7 +65,7 @@ description: >
 11. 纯原生零依赖，禁止 CDN、npm 包、外部字体
 12. 尊重 `prefers-reduced-motion`，检测到时所有动画降级为即时切换
 13. 话术与一切演讲者专用文字只进 `display:none` 的 `.notes` 容器，禁止出现在页面可见区域
-14. 持续动效画布与扩展特效目录（27 种 CSS 入场动画 + 20 种 canvas FX）仅在用户明确要求时启用，按 `references/animation-fx-catalog.md` 路由选型；FX 必须随页启停（见 `references/generative-art-and-canvas.md` 生命周期契约）
+14. 持续动效画布与扩展特效目录（49 种 CSS 入场动画 + 21 种 canvas FX）仅在用户明确要求时启用，按 `references/animation-fx-catalog.md` 路由选型；FX 必须随页启停（见 `references/generative-art-and-canvas.md` 生命周期契约）
 15. 素材图（截图/照片佐证）上屏：原图高清落盘（禁止降分辨率/降质，压的是格位占位空间不是图片）、固定格位网格平铺（区内无滚动条、不拉伸变形、`object-fit` 归一）、点击放大 lightbox（纯原生零依赖，Esc/遮罩关闭，放大图 `contain` 不超视口、用原图），规则见 `references/interactive-html-authoring.md` 素材图节
 
 ## 编写流程
@@ -76,14 +78,15 @@ description: >
 
 ## 验收自检
 
-- 键盘翻页全键位可用（←→/Space/PageUp/PageDown/Home/End/F/Esc）；点击热区不遮挡可交互内容
-- 触摸滑动翻页可用且与点击热区不双触发；`#/N` 深链加载直达对应页
-- 含话术输入时：S 键演讲者窗口可弹出，四卡（当前页/下一页/话术/计时器）可用，双窗口翻页同步；N 键抽屉、O 键总览可用
+- 键盘翻页全键位可用（←→/Space/PageUp/PageDown/Home/End/F/B/Esc）；点击热区不遮挡可交互内容
+- 触摸滑动翻页可用且与点击热区不双触发；`#/N/M` 深链加载直达对应页与步
+- 含话术输入时：S 键演讲者窗口可弹出，四卡（当前页/下一页/话术/计时器）可用，双窗口翻页同步；话术卡可编辑且刷新后保留；N 键抽屉、O 键总览可用
+- 含 fragment/分支/热点时：步序无跳号、热点 target 真实存在、分支可导航栈回退（审查细则见 `references/premium-review-fix.md` deck 结构 lint）
 - `prefers-reduced-motion` 降级为即时切换、数字直显终值、入场跳过、背景特效关闭
 - 动画属性仅限 transform/opacity/filter；数字滚动/图表动画仅触发一次；非活跃页面无残留定时器与 rAF
 - scale-to-fit 壳生效：任意窗口尺寸画布等比缩放居中、无滚动条；含素材图时网格无滚动、lightbox 可开可关（Esc/遮罩）
 - 单页 DOM ≤ 500；最终文件零外部请求
-- 多页形态豁免：S 演讲者窗、O 总览网格、`#/N` 深链、Home/End 键、触摸滑动为单文件 deck 专属能力；`INDEX.html` + `pages/` 多页形态不适用上述各项，不判 FAIL（多页形态翻页以 INDEX 与页间真实链接为准）
+- 多页形态豁免：S 演讲者窗、O 总览网格、`#/N/M` 深链、Home/End 键、触摸滑动为单文件 deck 专属能力；`INDEX.html` + `pages/` 多页形态不适用上述各项，不判 FAIL（多页形态翻页以 INDEX 与页间真实链接为准）
 
 ## 何时读取引用文档
 
@@ -100,4 +103,5 @@ description: >
 11. Web 演示布局策略与文案公式（25 种布局、叙事策略）：`references/web-slide-strategies.md`
 12. Mermaid/PlantUML 图表构建期渲染嵌入（headless Chrome 流程、嵌入策略、失败降级）：`references/diagram-embed-rendering.md`
 13. 演讲者模式（S 键弹窗/磁吸卡片/双窗口同步）、话术 .notes 承载、总览网格、深链、触摸翻页、主题审阅：`references/presenter-mode.md`
-14. 用户明确要求动画特效时的扩展目录与路由（27 CSS 入场 + 20 canvas FX、预算硬限、clip-path 例外条款）：`references/animation-fx-catalog.md`
+14. 用户明确要求动画特效时的扩展目录与路由（49 CSS 入场 + 21 canvas FX、预算硬限、clip-path 例外条款）：`references/animation-fx-catalog.md`
+15. 视觉风格预设（13 套设计系统预设、mood 路由表、五维旋钮、72 组配色库）：`references/visual-style-presets.md`
