@@ -251,6 +251,8 @@ SVG 路径用 `stroke-dasharray` + `stroke-dashoffset`；柱状图从底部生�
 3. **先建静态终态**：先用 HTML/CSS 搭出可见的静态终态，再往上加动画——终态本身错了，动画只会更晚暴露问题
 4. **离屏 canvas 测文本**：字号自适应宽度时用离屏 canvas `ctx.measureText` 测量后二分字号，不写进页面再读回（每次读回都触发 reflow）
 5. **正文不用 `<br>` 断行**：强制换行忽略实际渲染字宽，行已自然换行时多出一折造成重叠；用 max-width 控制自然换行。例外：短展示标题刻意每词一行
+6. **`.notes{display:none}` 漏写**：话术容器只在 HTML 挂了 class 而 CSS 规则漏写时，话术全文泄漏进观众视图且不报任何异常；CSS 规则必须显式落盘，验证时断言全量容器 `[...document.querySelectorAll('.notes')].every(n => getComputedStyle(n).display === 'none')`（每页一个容器，只查首个会漏检）
+7. **SVG 浮动标签与节点盒碰撞**：凭经验坐标放的 `<text>` 标签易压相邻节点盒或连线（实测中英混排标签 font 14 宽可达 80px+，纯 4 汉字仅 ≈56px，按字数估 gap 不可靠）；标签与任何盒边/连线净空 ≥8px，完成后逐页 headless 截图目检
 
 ## prefers-reduced-motion
 
@@ -279,3 +281,12 @@ SVG 路径用 `stroke-dasharray` + `stroke-dashoffset`；柱状图从底部生�
 
 所有页面的 CSS 合并到 `<style>`，JS 合并到 `<script>`，图表 SVG 内联。
 最终文件双击即可在浏览器完整运行，无任何外部请求。
+
+## headless 验证方法论
+
+交互机制的自动化验证用 headless Chrome，四条确定性规则：
+
+1. **交互断言加 reduced-motion**：`--virtual-time-budget` 下 View Transition 回调时序不确定（状态机正确但 DOM 落定延迟且不可复现）；翻页/frag/分支/回退等交互断言一律加 `--force-prefers-reduced-motion`，走 REDUCED 同步落 DOM 路径；VT 本体靠 `document.startViewTransition` 存在性检查 + CSS 中 `::view-transition` 规则文本存在性检查（grep 级），真实浏览器表现信任人工目检
+2. **截图矩阵**：深链 `#/N/M` 加载即对应步的即时终态，适合逐 frag 截图；分支页无深链，用全局索引 `?preview=N` 截图；拍完逐张目检话术零泄漏、标签碰撞、划线飞出、裁切
+3. **注入断言用 rpartition**：场景脚本必须经 `src.rpartition('</body>')` 插入临时副本——deck 的演讲者窗 HTML 字符串内含 `</body>` 字面量，`replace('</body>')` 会命中它截断 deck 脚本，导致全部断言假失败；注入后用 `dispatchEvent(new KeyboardEvent(...))` 与 `el.click()` 驱动，结果写隐藏节点，`--dump-dom` 提取
+4. **命令模板**：`chrome --headless=new --disable-gpu --hide-scrollbars --window-size=1920,1080 --virtual-time-budget=6000 --screenshot=OUT "file://DECK#/N/M"`

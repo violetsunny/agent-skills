@@ -1,6 +1,6 @@
 ---
 name: robot-aiot-interactive-html-author
-version: 1.4.0
+version: 1.4.1
 description: >
   交互式动画特效 HTML 编写能力。纯原生零依赖产出浏览器可直接运行的交互页面/多页 deck：
   翻页系统（键盘+点击+触摸滑动+View Transition+#/N/M 深链）、演讲者模式（S 键弹窗：
@@ -86,6 +86,7 @@ description: >
 - 动画属性仅限 transform/opacity/filter；数字滚动/图表动画仅触发一次；非活跃页面无残留定时器与 rAF
 - scale-to-fit 壳生效：任意窗口尺寸画布等比缩放居中、无滚动条；含素材图时网格无滚动、lightbox 可开可关（Esc/遮罩）
 - 单页 DOM ≤ 500；最终文件零外部请求
+- headless 自检按 `references/interactive-html-authoring.md` headless 验证方法论：reduced-motion 确定性交互断言、`#/N/M` 截图矩阵目检、rpartition 注入断言
 - 多页形态豁免：S 演讲者窗、O 总览网格、`#/N/M` 深链、Home/End 键、触摸滑动为单文件 deck 专属能力；`INDEX.html` + `pages/` 多页形态不适用上述各项，不判 FAIL（多页形态翻页以 INDEX 与页间真实链接为准）
 
 ## 何时读取引用文档

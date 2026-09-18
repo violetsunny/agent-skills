@@ -10,6 +10,7 @@
    - 单页 CSS 入场动画 ≤ 2 种（stagger 列表算 1 种）
    - 单页 canvas FX ≤ 1 个，且只放封面、尾页、重点强调页
    - 全套 deck 持续型特效（marquee/kenburns/FX）总计 ≤ 3 页
+   - 豁免：验证/测试产物（test-run 下的验证 deck）不受本节预算约束，用于逐效果验收；豁免必须在验证报告中显式声明，交付 deck 不适用
 4. **冲突裁决**：目录效果与既有硬约束冲突时，硬约束赢——动画属性仅限 transform/opacity/filter（clip-path 类效果见 §2 标注的例外条款）；FX 必须走 `generative-art-and-canvas.md` 生命周期契约（随页启停）；`prefers-reduced-motion` 一律降级
 5. **色彩纪律**：所有特效颜色读语义 token（--primary-color 等），不硬编码色值
 6. **情绪→动效路由**（用户给了情绪词但没点名效果时按表选）：
@@ -240,7 +241,7 @@ FX 附加规则：
 ## 4. 交付审查联动
 
 1. 选型声明与实际使用一致，无未声明效果
-2. 预算硬限逐项核对（单页 CSS ≤2、FX ≤1、持续型全套 ≤3 页）
+2. 预算硬限逐项核对（单页 CSS ≤2、FX ≤1、持续型全套 ≤3 页；交付 deck 适用，验证产物豁免见 §1 预算硬限豁免条款）
 3. clip-path 例外效果（glitch-in/spotlight/ripple-reveal）仅在用户点名风格时出现
 4. reduced-motion 下全部特效降级为即时显示；FX 画布不启动
 5. 翻离页面后 rAF 停止、无残留定时器（Performance 面板验证）
