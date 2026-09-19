@@ -147,6 +147,7 @@
 - [ ] hover/focus 状态样式可见且符合 token
 - [ ] 单页 DOM 节点数 ≤ 500
 - [ ] O 键总览、`#/N/M` 深链、触摸滑动翻页可用
+- [ ] 内联编辑模式（如内置）：E 键/热区可切换、编辑态 outline 可见、localStorage 自动存、Ctrl+S 导出（见 `interactive-mode-rules.md`「内联文本编辑模式」节）
 - [ ] 持续动效画布（如有）随页启停，翻离后 rAF 已停止
 
 ### deck 结构 lint（含 fragment / 分支 / 热点 / 多页 deck 时逐项过）

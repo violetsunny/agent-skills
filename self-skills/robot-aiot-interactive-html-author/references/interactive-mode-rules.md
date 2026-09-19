@@ -28,6 +28,7 @@
 | `N` | 当前页话术抽屉 |
 | `O` | 总览网格 |
 | `B` | 回主线（清空分支导航栈） |
+| `E` | 切换内联文本编辑模式（见「内联文本编辑模式」节；编辑态中不触发） |
 | `T` | 主题审阅循环（仅评审期，声明了 `data-themes` 时生效） |
 
 ### 触摸与深链
@@ -263,6 +264,48 @@ function animateNumber(el, target, duration = 1200) {
 - 左右箭头按钮：半透明，hover 时完全不透明
 - 进度指示器：底部居中，当前页高亮
 - 页码显示：`当前页 / 总页数`，右下角
+
+## 内联文本编辑模式
+
+草稿生成后默认内置的轻量微调能力：浏览器内直接点上屏文字修改，不回源码。生成前不问用户要不要——用户明确要锁定版/仅导出版时才省略。
+
+### 交互入口（三路并存）
+
+1. `E` 键切换；`contenteditable` 元素内不触发（与翻页输入态守卫同口径：input/textarea/contenteditable 内按键一律不响应全局快捷键）
+2. 左上角 80×80px 固定热区：hover 显现编辑按钮，点击热区直接切换
+3. 编辑按钮点击切换；激活态按钮常显（`.active`），退出后恢复 hover 显现
+
+### 热区 hover 链硬规则
+
+禁止用 CSS `~` 兄弟选择器做热区 hover 显隐：按钮 `pointer-events: none` 会断掉 hover 链——鼠标移向按钮即离开热区，按钮在可点击前消失。必须 JS 接管：
+
+```js
+let hideTimeout = null;
+const show = () => { clearTimeout(hideTimeout); toggle.classList.add('show'); };
+const scheduleHide = () => {
+  hideTimeout = setTimeout(() => {
+    if (!editor.isActive) toggle.classList.remove('show');
+  }, 400);   // 400ms 宽限：留出鼠标从热区移到按钮的时间
+};
+hotzone.addEventListener('mouseenter', show);
+hotzone.addEventListener('mouseleave', scheduleHide);
+toggle.addEventListener('mouseenter', show);
+toggle.addEventListener('mouseleave', scheduleHide);
+```
+
+按钮可见性只由 `.show`/`.active` class 控制（`opacity: 0; pointer-events: none` 为默认态）；编辑模式激活期间 mouseleave 不隐藏。
+
+### 编辑与持久化
+
+1. 激活时给上屏文字元素（标题/正文/卡片文案/caption）加 `contenteditable="true"` 并显示虚线 outline 提示可编辑；`.notes` 话术容器不进编辑范围（话术改动回源文件）
+2. 输入即自动存 localStorage，key 含 deck 文件名（与翻页状态 key 同约定）；读取走消毒纪律（`presenter-mode.md` §3.1：坏数据回退默认，不注入未校验内容）
+3. `Ctrl+S`/`Cmd+S` 导出改动后的完整 HTML：`preventDefault` 拦截浏览器默认保存，序列化当前 DOM（先移除编辑态 outline 与 `contenteditable` 属性）走 Blob 下载
+4. 刷新恢复：加载时若 localStorage 有编辑记录，按元素稳定选择器（`data-slide-id` + 页内序号）回填，不整页覆盖 DOM
+5. 交付说明写明用法：hover 左上角或按 E 进编辑、点文字改、Ctrl+S 导出
+
+### 验证
+
+编辑模式断言走 `scripts/headless_assert.py`：E 键切换后抽一个文字元素断言 `isContentEditable === true`、输入后 localStorage 有记录、`Ctrl+S` 触发的 Blob 下载在 headless 不可达（记入真浏览器抽查清单，与跨窗口同步同批）。
 
 ## 性能约束
 

@@ -1,11 +1,12 @@
 ---
 name: robot-aiot-interactive-html-author
-version: 1.9.0
+version: 1.10.0
 description: >
   交互式动画特效 HTML 编写能力。纯原生零依赖产出浏览器可直接运行的交互页面/多页 deck：
   翻页系统（键盘+点击+触摸滑动+View Transition+#/N/M 深链）、演讲者模式（S 键弹窗：
   当前页/下一页像素级预览+话术提词+计时器，双窗口同步，可编辑备注 localStorage 持久化）、
-  总览网格（O 键）、话术抽屉（N 键）、页内分步揭示（fragment）、分支序列与内容热点、
+  总览网格（O 键）、话术抽屉（N 键）、内联文本编辑（E 键切换+localStorage 持久化+Ctrl+S 导出）、
+  页内分步揭示（fragment）、分支序列与内容热点、
   元素入场（data-enter-order）、数据动效（数字滚动/进度条填充/图表逐步绘制）、
   交互图表（hover/tooltip/展开）、关键帧动画与动效接缝、相机飞行过渡、
   页面级运镜与分镜规划（运镜预算制/对数时长/相机层/能量骨架/分镜卡）、
@@ -20,7 +21,7 @@ description: >
   当用户要求"写交互动画页""给 HTML 加翻页/动画/动效""交互图表动效""单文件交互演示页"
   "演讲者模式/提词器/双屏演示""分步揭示/分支导航/内容热点""风格预设/deck 换肤"
   "瑞士风/杂志风 deck/登记版式""多版本对比/方向选优""运镜/分镜/镜头语言""UI 演示编排"
-  "品牌主色推导套色""落地页/文档 PDF 衍生形态"，
+  "品牌主色推导套色""落地页/文档 PDF 衍生形态""浏览器内直接改文字/内联编辑"，
   或 robot-aiot-web-presentation-workflow 委派 Phase 4 编写时触发。
 ---
 
@@ -86,6 +87,7 @@ description: >
 ## 验收自检
 
 - 键盘翻页全键位可用（←→/Space/PageUp/PageDown/Home/End/F/B/Esc）；点击热区不遮挡可交互内容
+- 内联编辑模式默认内置：E 键/左上角热区可切换、点上屏文字可改、localStorage 自动存、Ctrl+S 导出改动后 HTML（锁定版/仅导出版除外，规则见 `references/interactive-mode-rules.md`）
 - 触摸滑动翻页可用且与点击热区不双触发；`#/N/M` 深链加载直达对应页与步
 - 含话术输入时：S 键演讲者窗口可弹出，四卡（当前页/下一页/话术/计时器）可用，双窗口翻页同步；话术卡可编辑且刷新后保留；N 键抽屉、O 键总览可用
 - 含 fragment/分支/热点时：步序无跳号、热点 target 真实存在、分支可导航栈回退（审查细则见 `references/premium-review-fix.md` deck 结构 lint）

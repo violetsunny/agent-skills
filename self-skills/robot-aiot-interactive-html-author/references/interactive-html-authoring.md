@@ -390,7 +390,7 @@ headless 验证注意：无渲染帧环境（`--dump-dom`/`--screenshot`）下 .
 - 数字滚动/图表动画仅触发一次
 - 非活跃页面无残留定时器
 - 单页 DOM ≤ 500
-- 数字键 1-9 直跳、R 重置、输入态守卫（input/textarea/contenteditable 内不翻页）全部可用
+- 数字键 1-9 直跳、R 重置、E 内联编辑切换、输入态守卫（input/textarea/contenteditable 内不翻页）全部可用
 - `@media print` 一页一张按序展开、缩放壳已禁用、入场动画元素强制可见
 - 上屏零 emoji，图标走 Unicode 文字符号或内联 SVG（见"禁用 emoji"节自检断言）
 
