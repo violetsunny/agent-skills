@@ -583,7 +583,7 @@ deck 换肤素材库。每套预设 = 一组语义 token 覆盖集，直接覆�
 ### 2.38 swiss-ultramarine
 
 - **look**: 瑞士国际主义皇家蓝锚点——高级灰白底（非纯白）+ 统一三档灰阶，深皇家蓝单一高饱和 accent，16 列网格 + 1px 发丝线，巨字 200 超轻 / 重点数字 300 / 小标 600，直角纯色不透明，零渐变零阴影零圆角。
-- **pick-when**: 冷静 / 理性 / 学术感；想要单锚点色瑞士克制的商业发布、科技产品、设计领域分享。锁定 S 系登记版式（S01-S22）；高密度黄块填满改 neo-grid-bold，全墨零彩色改 monochrome。
+- **pick-when**: 冷静 / 理性 / 学术感；想要单锚点色瑞士克制的商业发布、科技产品、设计领域分享。锁定 S 系登记版式（S01-S25）；高密度黄块填满改 neo-grid-bold，全墨零彩色改 monochrome。
 - **核心 token**: `--surface-color:#FAFAF8` `--surface-muted:#F0F0EE`（灰底卡） `--text-primary:#0A0A0A` `--text-secondary:#737373` `--primary-color:#002FA7`（皇家蓝唯一 accent） `--secondary-color:#0A0A0A`（ink 反转块） `--tertiary-color:#D4D4D2` `--outline-color:#D4D4D2`（1px 发丝）；on-primary `#FFFFFF`（显式）。
 - **字体·形状**: 展示体 `"PingFang SC","Microsoft YaHei",system-ui,sans-serif`（200 巨字，拉丁字距 −0.04em 行高 0.9-0.94；中文巨标题字距归零行高 1.15-1.25）/ 正文同栈（300）/ 小标同栈（600）/ 数据 `ui-monospace,"SF Mono",Consolas,monospace`（`font-feature-settings:"tnum"`）；圆角 0px 全元素；密度中（16 列网格 gap 16px）；阴影无渐变无（accent 不加阴影 / 圆角 / 透明度）。
 - **签名动效**: entry expressive `cubic-bezier(0,0,0.3,1)` 0.4-0.7s（每页一个语义化 recipe 与图形耦合：数字 scale 弹入 / bar scaleY 拉起 / 圆环 stroke-dashoffset 描线）/ exit productive `cubic-bezier(0.2,0,0.38,0.9)` 0.24s / ambient 无。

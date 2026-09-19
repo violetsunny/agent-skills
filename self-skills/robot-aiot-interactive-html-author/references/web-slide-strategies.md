@@ -171,7 +171,7 @@
 
 ## 登记版式飞行前检查
 
-1. 版式先登记：每页写代码前列"页码 → data-layout → 为什么选它 → 图片槽位"，`data-layout` 必须是登记编号（S01-S22 / M01-M10）
+1. 版式先登记：每页写代码前列"页码 → data-layout → 为什么选它 → 图片槽位"，`data-layout` 必须是登记编号（S01-S25 / M01-M10）
 2. 主题节奏先行：先画 light/dark/hero 分布表（对照 8 页模板），再动手写 slide
 3. 字号下限对照：必读档 ≥40px（演讲型）、任何文字 18/16/14px 底限、中文大标题分档（见 `typography.md`）
 4. 结构对齐：水平 padding 不二次叠加（画布卡已带左右 96px，主体 `padding:0`）、kicker 在大标题上方、子块间距用 grid gap 不用 margin 堆

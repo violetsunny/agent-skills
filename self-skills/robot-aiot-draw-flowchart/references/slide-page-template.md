@@ -95,7 +95,7 @@ font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
 
 ## 3. 页面类型
 
-常用 12 类页面：
+常用 13 类页面：
 
 1. 封面页：核心结论、项目定位、能力卡、右上角 Logo
 2. 架构图页：分层结构、连接关系、少量数字锚点
@@ -108,7 +108,8 @@ font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
 9. 数据表格页：表格为唯一主体，表头用 surface 分层，数字列 `tabular-nums` 右对齐，行高均匀，超过 8 行拆页或摘要化
 10. 观点引用页：大字观点/客户原话 + 来源行（`--text-tertiary`），大留白，仅封面级单一结论使用
 11. 路线图页：NOW / NEXT / LATER 分栏卡片，每栏 ≤ 4 条；精确到周的排期不手绘，引甘特图真源 iframe
-12. 尾页：核心结论收束、联系信息、底部居中 Logo
+12. 检查清单页：单列列表（4-8 条，超出拆页），每行 = 22×22 方框 checkbox + 一行事项（`>= 18px`）+ 右侧 mono 小标签（`--text-tertiary`）；完成态 `--success-color` 填充 + 反白 ✓ + 文字删除线降为 `--text-tertiary`；行间 `--outline-color` 发丝分隔；完成/未完成两态必须同页可见区分
+13. 尾页：核心结论收束、联系信息、底部居中 Logo
 
 ## 4. 常用区块
 

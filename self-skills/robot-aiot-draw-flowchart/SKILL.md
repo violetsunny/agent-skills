@@ -2,7 +2,7 @@
 name: robot-aiot-draw-flowchart
 description: >
   机器人/IoT 业务图表绘制与页面化能力。draw.io XML 图表生成（可编辑主路径）+ XML→HTML 稳定桥接转换 + 领导汇报静态页面 HTML 生成。覆盖流程图、分层架构、时序、状态机、ER、UML 类/用例、网络拓扑、时间线、Agent/记忆架构等 39+ 图表类型；内置机器人视觉语言、配色与样式一致性体系、几何/构图校验、PNG/GIF 导出与 drawio/Mermaid 导入重绘；支持 Mermaid 源码写作（23 类图表语法）与 .excalidraw/SVG/PNG 三件套离线导出、数据统计图表（饼图/箱线图/热力图/网络拓扑等）绘制规则、深色主题直绘技法与出版级示意图迭代流程；XML→HTML 转换保留原始样式/布局/层级/配色；静态页面固定 1920x1080 画布，内化语义 token、高级感设计标准与交付审查流程。
-version: 5.3.2
+version: 5.4.0
 author: kangll13
 license: MIT
 metadata:
