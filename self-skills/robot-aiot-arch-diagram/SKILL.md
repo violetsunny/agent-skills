@@ -1,7 +1,7 @@
 ---
 name: robot-aiot-arch-diagram
 description: 架构图/技术可视化绘制能力。两条输出路径：直绘 SVG/HTML（主路径，编辑级设计系统 + 工程制图管线，几何校验+构图契约，汇报级展示）、archify 运行时渲染（主题切换+导出）。覆盖流程图、分层架构、时序、状态机、ER、UML 类/用例、网络拓扑、时间线、Agent/记忆架构等 40+ 图表类型；内置 12 套 SVG 风格皮肤与品牌 token 定制、PNG/GIF 导出与 drawio/Mermaid/Excalidraw 导入重绘；支持 Mermaid 源码写作（23 类图表语法）与 .excalidraw/SVG/PNG 三件套离线导出、数据统计图表（饼图/箱线图/热力图/网络拓扑等）绘制规则、深色主题直绘技法与出版级示意图迭代流程。非 PPT 场景专用。
-version: 2.3.0
+version: 2.4.0
 author: kangll13
 license: MIT
 metadata:
@@ -120,7 +120,7 @@ done
 | 记忆架构图 | 写路径与读路径分色；层级 Working→Short-term→Long-term→External；标注 `store()/retrieve()/forget()/consolidate()` |
 | 网络拓扑 | 设备象形（路由器/交换机/防火墙/LB/云）；实线=有线标带宽，虚线=无线/VPN；分区用虚线容器（DMZ/内网/外网）；自上而下分层 |
 | UML 用例 | 演员小人+系统边界虚线框+用例椭圆（动宾短语）；`<<include>>`/`<<extend>>` 虚线箭头 |
-| 对比/特性矩阵 | 行高 40px，列宽 ≥120px，表头 50px；支持格 `#dcfce7`+✓；最多 5 列，超出拆图 |
+| 对比/特性矩阵 | 行高 40px，列宽 ≥120px，表头 50px；支持格 `#dcfce7`+✓，不支持格中性浅灰 `#f9fafb` 填充（无符号）；数据行交替斑马纹 `#f9fafb`/`#ffffff`；最多 5 列，超出拆图 |
 | 思维导图 | 中心节点放射布局，一级分支 360/N 均布，二级偏 30-45°，分支用三次贝塞尔曲线 |
 
 ### 画前确认

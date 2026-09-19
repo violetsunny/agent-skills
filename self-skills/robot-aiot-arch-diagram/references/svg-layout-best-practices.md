@@ -47,6 +47,7 @@
   - Opacity: 0.9-0.95
 - **Safety distance**: 15px minimum from any component edge
 - **Multiple converging arrows**: stagger label positions vertically by 20px
+- **Length cap**: ≤3 words (CJK ≤6 chars); shorten to verb-object phrases, never full sentences
 
 ### 4. Component Overlap Detection
 Before finalizing SVG, check:

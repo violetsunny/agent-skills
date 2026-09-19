@@ -1,6 +1,6 @@
 ---
 name: robot-aiot-interactive-html-author
-version: 1.8.0
+version: 1.9.0
 description: >
   交互式动画特效 HTML 编写能力。纯原生零依赖产出浏览器可直接运行的交互页面/多页 deck：
   翻页系统（键盘+点击+触摸滑动+View Transition+#/N/M 深链）、演讲者模式（S 键弹窗：
@@ -112,7 +112,7 @@ description: >
 12. Mermaid/PlantUML 图表构建期渲染嵌入（headless Chrome 流程、嵌入策略、失败降级）：`references/diagram-embed-rendering.md`
 13. 演讲者模式（S 键弹窗/磁吸卡片/双窗口同步/激光笔圈选/自动翻页/演前检查）、话术 .notes 承载、总览网格、深链、触摸翻页、主题审阅、预览 iframe 三坑防护、?seek/?autoplay 联动、调参面板联动：`references/presenter-mode.md`
 14. 用户明确要求动画特效时的扩展目录与路由（49 CSS 入场 + 21 canvas FX + 5 页面级编排 recipe、打字机两场景、预算硬限、clip-path 例外条款）：`references/animation-fx-catalog.md`
-15. 视觉风格预设（41 套设计系统预设、mood 路由表、先预览再定稿选型流程、五维旋钮、72 组配色库、预设标注三字段、单一主色推导三步法）：`references/visual-style-presets.md`
+15. 视觉风格预设（41 套设计系统预设、mood 路由表、先预览再定稿选型流程、五维旋钮、72 组配色库、预设标注四字段、单一主色推导三步法）：`references/visual-style-presets.md`
 16. 登记版式系统（瑞士风 S01-S22 × 杂志风 M01-M10 版式锁定、结构骨架 px 锚定、选择索引、内容-数据类型匹配、禁止清单）：`references/swiss-layout-system.md`
 17. 演示 deck 排版阶梯（字号双约束与画布推荐值、字重阶梯、中文大标题分档、最小字号三层下限、中文排印细则与字体配对）：`references/typography.md`
 18. 多版本并行设计与选优（三方向硬门、7 Phase 工作流、6 视角 5 维评审、选择无效铁律、4 Pass 收敛、调参面板）：`references/multi-version-selection.md`

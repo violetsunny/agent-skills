@@ -227,7 +227,7 @@ grep -nE 'align-items:end|align-self:end|margin-top:auto|bottom: ?0' index.html
 
 多页 deck 按 `#/N` 深链逐页截图；Linux 环境用 `google-chrome --headless=new` 或 `chromium` 等价命令。截图逐页看：溢出、贴住、安全区侵入。
 
-**方法二：getBoundingClientRect 四值实测**（比截图精确，控制台执行）
+**方法二：getBoundingClientRect 四值实测**（比截图精确，控制台执行；批量逐页跑用 `scripts/measure_four_values.py`，深链逐页加载 + 动画 cancel + JSON 报告 + 阈值初判，下方代码是其口径真源）
 
 ```js
 document.querySelectorAll('section[data-layout]').forEach(sec => {

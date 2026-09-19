@@ -44,3 +44,4 @@ NODE_PATH=/tmp/svg2png-puppeteer/node_modules node "$SKILL_ROOT/scripts/svg2png.
 - `rsvg-convert` can omit complex CSS, filters, and `<foreignObject>` content.
 - CairoSVG can miss CJK or emoji glyphs when the selected system font lacks them.
 - Use Puppeteer when browser rendering is required; its viewport path preserves the SVG dimensions more reliably than a raw Chrome `--window-size` screenshot.
+- A zero exit code from any converter does not prove the PNG landed on disk. Verify each output with `[ -s output.png ]`; in batch runs, count failures and exit non-zero if any page is missing.

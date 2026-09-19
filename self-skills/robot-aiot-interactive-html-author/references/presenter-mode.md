@@ -47,7 +47,7 @@
 卡片交互规则：
 
 1. 拖 header 移动位置；拖右下角手柄调整大小
-2. 位置/尺寸写 `localStorage`（按 deck 文件名作 key），下次打开恢复
+2. 位置/尺寸写 `localStorage`（按 deck 文件名作 key），下次打开恢复；读回必须消毒——`JSON.parse` 包 try/catch，数值做范围校验（坐标出画布、宽/高 <120px、NaN 均判坏数据），坏数据整体回退默认布局，不带病恢复
 3. 提供"重置布局"按钮恢复默认排列
 4. 卡片布局用绝对定位 + transform，拖动不触发页面重排
 
@@ -221,6 +221,7 @@ window.__SPEAKER_NOTES__ = SPEAKER_NOTES;
 5. 图片/视频就绪：全部 `img.complete` 为 true；带 poster 的 video `readyState ≥ 1`
 6. 版面无溢出：当前页 `document.body.scrollWidth ≤ clientWidth` 且 `scrollHeight ≤ clientHeight`；预览 iframe 宽高比仍为 16:9（§3.2）
 7. 备注一致性：SPEAKER_NOTES 与页面数量/顺序/ID 一致（§10.6）；data-slide-id 无重复无缺失（§9.5）
+8. 时间预算：全部页都声明 `minutes` 时求和断言——总计划 > 目标时长 × 90% 报错（超时，留 10% 现场缓冲）；< 目标时长 × 55% 警告（脚本量不足）；部分页缺 `minutes` 时跳过本项并明示 "timing is partial"，禁止用局部数据凑总数（目标时长从面板输入或 deck 声明读取）。静态断言跑 `scripts/minutes_budget.py <deck.html> --target <分钟>`
 
 面板底部固定提示：检查结果不能证明外接屏物理连通，投影仪线缆与扩展模式必须目视确认。
 

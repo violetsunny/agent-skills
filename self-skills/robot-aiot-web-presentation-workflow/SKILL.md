@@ -1,6 +1,6 @@
 ---
 name: robot-aiot-web-presentation-workflow
-version: 2.5.0
+version: 2.6.0
 description: >
   交互式Web演示页面制作工作流。根据知识文档生成分页汇报母稿，按需制作架构图/流程图，
   逐页交互HTML（可翻页、带动画、数据动效，纯原生零依赖双击即用）委派 robot-aiot-interactive-html-author 编写。

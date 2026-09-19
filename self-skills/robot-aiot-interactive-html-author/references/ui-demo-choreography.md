@@ -61,7 +61,7 @@
 | ⑦ | 打字输入演示 | 字符事件表回放，光标常亮转闪烁 | catalog `typewriter` / `typewriter-multi` |
 | ⑧ | 滚动浏览演示 | 快滚急刹，刹车点才是内容 | — |
 
-选型纪律：一页以一种式为主角；多式同页按 §5 留呼吸帧；同一式全 deck 只当一次主角。独立播放时各式用自带 rAF/finished 链；接入 §9 调度器时改用统一时钟 `clock.t` 驱动（纯函数形态），setTimeout 链不可 seek。
+选型纪律：一页以一种式为主角；多式同页按 §5 留呼吸帧；同一式全 deck 只当一次主角。同 deck 多个演示页之间核心隐喻与视觉运动必须独立——八式取不同组合、换不同主视觉元素，判据：盖住文案只看视觉，能区分这是哪个 demo；区分不了就是偷懒换皮。独立播放时各式用自带 rAF/finished 链；接入 §9 调度器时改用统一时钟 `clock.t` 驱动（纯函数形态），setTimeout 链不可 seek。
 
 ### ① 光标引导点击
 
@@ -592,6 +592,7 @@ addEventListener('message', e => {
 - [ ] 两个演示动作间隔 ≥0.8s（含新信息 ≥1.5s）？每式之间 0.4-0.5s 呼吸帧？演示收尾 hold ≥1s 真静止、无尾漂？
 - [ ] 数据流包速 linear 匀速、iterations 有限？滚动演示刹车点有目标行强调、滚动期间无推近？
 - [ ] before/after 同布局同机位、before 是真实旧态？
+- [ ] 同 deck 多个演示页各自核心隐喻与视觉运动独立（盖住文案能区分是哪个 demo）？
 - [ ] 画廊墙 render(t) 是 t 的纯函数：无 setTimeout 链、无状态机，`window.__seek(t)` 任意时刻可复现同一画面？
 - [ ] 入场/涟漪/hover 三层 transform 分管（outer/body/inner），没有两个动画抢同一元素？
 - [ ] 画廊与涟漪 rAF 随页启停（slidechange），离页 cancelAnimationFrame，Performance 面板无残留？画廊页计入持续型特效预算？

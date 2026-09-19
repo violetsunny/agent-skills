@@ -82,6 +82,12 @@ Dark mode: frame fill `rgba(245,245,245,0.04)`, stroke `rgba(245,245,245,0.22)`,
 - Default: **one** fragment per diagram. A second only if both stay under the complexity budget.
 - Coral stays on **one** headline success message across the whole diagram (usually the happy-path return inside the first `alt` region, or the final success outside a loop). Do not coral both `alt` branches.
 
+### Section badge alignment
+- Section/frame label badges MUST be vertically centered with their first message arrow: `badge_y = first_arrow_y - badge_height / 2` (e.g. height=18 badge, first arrow y=840 → badge_y = 831).
+- When generating coordinates in Python lists, enforce the constraint with variables, never hand-written magic numbers: `sec_y = 840; badge_y = sec_y - 9  # height=18`.
+- After incrementally appending a new section to an existing diagram, re-verify the new section's badge alignment against existing ones — the most common regression when adding content incrementally.
+- Fragment operator tabs are exempt: they keep the top-left corner syntax.
+
 ### Out of scope (do not invent)
 - `par`, `critical`, `break`, `ref`, and other UML operators — second PR if needed.
 - Participant create/destroy, found/lost messages, duration timing bars.

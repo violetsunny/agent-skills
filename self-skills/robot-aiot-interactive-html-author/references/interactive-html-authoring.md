@@ -270,6 +270,19 @@ deck 需要常驻公司/产品 logo 时，声明一次、全 deck 生效，不�
 ```
 
 4. **不抢戏**：高度 40-48px、不透明度 ≤ 0.9、`pointer-events:none` 不挡翻页热区；不与页码/进度条及页内内容重叠，冲突时换角或对该页豁免；`alt` 写品牌名（装饰性内联 SVG 用 `aria-hidden="true"`）
+5. **打印态逐页 logo**：绝对定位的 `.deck-logo` 在打印展开时只锚定一次（落单页或消失），带 logo 的 deck 导出 PDF 必丢；print 态隐藏 logo 元素，改由伪元素逐页绘制（打印中一个 `.slide` 恰好一页，`data-no-logo` 豁免延续）：
+
+```css
+@media print {
+  .deck-logo { display: none !important; }
+  .slide:not([data-no-logo])::after {
+    content: ""; position: absolute; right: 40px; bottom: 40px;
+    width: 88px; height: 44px;              /* 按 logo 宽高比调整 */
+    background-image: var(--logo-print);    /* 编写期声明 --logo-print: url("data:image/svg+xml;base64,…")，与 .deck-logo 同源 */
+    background-repeat: no-repeat; background-position: right bottom; background-size: contain;
+  }
+}
+```
 
 ## 共享背景层
 
@@ -324,7 +337,7 @@ deck 需要常驻公司/产品 logo 时，声明一次、全 deck 生效，不�
 1. deck 全部文案禁 emoji：上屏文字、`.notes` 话术、caption、`alt`、按钮文案都算
 2. 文字符号只取对照表白名单；生僻符号（✦ ✧ 等）交付前实测字体栈覆盖，任一平台缺字形即降级为内联 SVG
 3. 不用 icon font（SKILL.md 硬约束 11 禁外部字体）；不为图标引任何外部请求
-4. 交付前自检加"上屏零 emoji"断言（浏览器控制台或 headless 跑；禁段覆盖 emoji 主块与 emoji 变体选择符 U+FE0F，白名单文字符号 ✓ ✕ ★ ✦ → ▸ · ‣ 不在其中）：
+4. 交付前自检加"上屏零 emoji"断言（浏览器控制台或 headless 跑，批量走 `scripts/emoji_audit.py`；禁段覆盖 emoji 主块与 emoji 变体选择符 U+FE0F，白名单文字符号 ✓ ✕ ★ ✦ → ▸ · ‣ 不在其中）：
 
 ```js
 (function () {
@@ -351,6 +364,7 @@ deck 需要常驻公司/产品 logo 时，声明一次、全 deck 生效，不�
 5. **正文不用 `<br>` 断行**：强制换行忽略实际渲染字宽，行已自然换行时多出一折造成重叠；用 max-width 控制自然换行。例外：短展示标题刻意每词一行
 6. **`.notes{display:none}` 漏写**：话术容器只在 HTML 挂了 class 而 CSS 规则漏写时，话术全文泄漏进观众视图且不报任何异常；CSS 规则必须显式落盘，验证时断言全量容器 `[...document.querySelectorAll('.notes')].every(n => getComputedStyle(n).display === 'none')`（每页一个容器，只查首个会漏检）
 7. **SVG 浮动标签与节点盒碰撞**：凭经验坐标放的 `<text>` 标签易压相邻节点盒或连线（实测中英混排标签 font 14 宽可达 80px+，纯 4 汉字仅 ≈56px，按字数估 gap 不可靠）；标签与任何盒边/连线净空 ≥8px，完成后逐页 headless 截图目检
+8. **`-clamp()`/`-min()`/`-max()` 负号前缀静默失效**：`margin-top: -clamp(20px, 4vw, 60px)` 整条声明被浏览器丢弃，无 console 错误，元素只是出现在错误位置；负值必须写 `calc(-1 * clamp(20px, 4vw, 60px))`
 
 ## prefers-reduced-motion
 
@@ -462,11 +476,12 @@ deck 需支持打印 / 导出 PDF（发给听众做资料）：
 ```
 
 - 打印态全部 slide 按序展开、一页一张；控件与进度条隐藏
+- `!important` 一个都不能省：作用域规则（如 `.tpl-name .slide`，特异性 (0,2,0)）会压过 `@media print` 里的裸 `.slide`（(0,1,0)），被压即多页缩到 1-2 页，且屏幕预览完全正常、只在打印时暴露；交付前导出一次 PDF 断言页数 == slide 数（chrome `--print-to-pdf` + python3 数页）
 - 截图 / 导出工具用 `?noscale` URL 参数跳过 scale-to-fit 壳，按设计画布原始尺寸渲染（fit 脚本检测该参数即不施加 transform）
 
 ## headless 验证方法论
 
-交互机制的自动化验证用 headless Chrome，八条确定性规则：
+交互机制的自动化验证用 headless Chrome，九条确定性规则：
 
 1. **交互断言加 reduced-motion**：`--virtual-time-budget` 下 View Transition 回调时序不确定（状态机正确但 DOM 落定延迟且不可复现）；翻页/frag/分支/回退等交互断言一律加 `--force-prefers-reduced-motion`，走 REDUCED 同步落 DOM 路径；VT 本体靠 `document.startViewTransition` 存在性检查 + CSS 中 `::view-transition` 规则文本存在性检查（grep 级），真实浏览器表现信任人工目检
 2. **截图矩阵**：深链 `#/N/M` 加载即对应步的即时终态，适合逐 frag 截图；分支页无深链，用全局索引 `?preview=N` 截图；拍完逐张目检话术零泄漏、标签碰撞、划线飞出、裁切
@@ -476,3 +491,15 @@ deck 需支持打印 / 导出 PDF（发给听众做资料）：
 6. **reduced-motion 核弹片段在无帧 headless 下冻结**：`*{animation-duration:.01ms!important;transition-duration:.01ms!important}` 依赖渲染帧推进；`--dump-dom`/`--screenshot` 无帧时动画/过渡启动后卡 progress=0，计算值冻结在起始帧——三个典型症状：`.slide.active` 的 visibility 停 hidden（截图全白）、scale-to-fit 内联 transform 停 none（画布不居中）、入场起始帧 `translateY` 位移垫偏 `.entered` 元素 rect（动画源优先级高于内联样式，titleGap 等四值测量被污染，实测偏差=起始帧位移量）。处置二选一：测量/截图前驱动里统一 `document.getAnimations().forEach(a=>a.cancel())`；或验证副本把该块改 `animation:none!important;transition:none!important`（前提：REDUCED 路径终态有内联兜底，如入场函数直置 opacity/transform）。真浏览器有帧，两种写法等价
 7. **截图用原始 deck + 深链**：不对注入断言脚本的临时副本截图——场景脚本会驱动 deck 状态（翻页/播放/调参），末态停在脚本最后一步而与 URL 深链无关，多页截图字节级全同、逐页目检失效；断言用注入副本、截图用原始文件，两者分开
 8. **跨窗口状态同步 headless 不可达，生产前真浏览器抽查**：BroadcastChannel/postMessage 双窗口同步（演讲者模式，见 `presenter-mode.md` §3.3）与调参双真源（URL+localStorage，见 `multi-version-selection.md`）这类跨窗口/跨标签链路在 headless 单页模式零覆盖，`--dump-dom` 断言全绿不代表同步可用；生产 deck 交付前必须真浏览器开双窗口抽查一次——S 键开演讲者窗口、双向翻页跟随、调参跨窗生效、刷新恢复翻页状态
+9. **截图输出文件存在性校验**：chrome `--screenshot` 退出码 0 不代表 PNG 落盘（路径不可写、深链无内容等场景静默失败）；每页截图后必须检查文件存在且非空（`[ -s OUT ]`），批量循环结束汇总失败数、>0 非零退出——某页没写出来时，目检环节会整页漏掉它
+
+以上方法论已固化为本 skill `scripts/` 下的可执行脚本，验证优先跑脚本、不手敲命令：
+
+| 脚本 | 覆盖条目 | 用途 |
+|---|---|---|
+| `scripts/headless_assert.py` | 条 1/3/6 | 通用注入断言：assert.js 经 rpartition 注入临时副本，结果写 `window.__ASSERT_RESULT__`，dump-dom 提取；含 getAnimations().cancel() 与 reduced-motion |
+| `scripts/screenshot_matrix.py` | 条 2/4/7/9 | 深链 `#/N/M`、`?preview=N`、多页形态三种截图矩阵，逐张存在性校验 |
+| `scripts/measure_four_values.py` | 条 6 + 四值实测 | overflowPx/bottomWhitespacePx/titleGapPx/navSafeIntrusionPx 逐页 JSON 报告（阈值见 `premium-review-fix.md`） |
+| `scripts/emoji_audit.py` | 禁用 emoji 节条 4 | 全文档 TreeWalker emoji 扫描（含 `.notes`） |
+| `scripts/minutes_budget.py` | `presenter-mode.md` §16 条 8 | 演讲时间预算静态断言 |
+| `scripts/fetch_images.py` / `scripts/preprocess_images.py` | `content-imagery-and-infographic.md` 真图纪律 | 批量取图（manifest 记来源许可）/ 压缩裁剪 base64 管线 |

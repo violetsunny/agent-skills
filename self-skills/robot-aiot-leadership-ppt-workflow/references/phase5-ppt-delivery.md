@@ -283,60 +283,24 @@ pdftoppm -png -r 54 "$OUT/out.pdf" "$OUT/page"
 
 ### 机械校验（不依赖渲染器，必做）
 
-1. 形状构成验证：按「可编辑 PPTX 硬规则」第 4 条的 python-pptx 递归展开执行，本节不重复
-2. 文字逐字比对：expected_text 抽取首选确定性脚本——headless 浏览器逐页加载 HTML，TreeWalker 按文档序收集上屏文字（跳过 `.notes` 话术容器与任何 `display:none` 内容），零 LLM 参与、可复现，单文件 deck 必用此路；脚本环境不可用才退回 sub agent 按同一口径抽取。落成 `projects/<任务名>/expected_text.txt`；生成层自动追加的页码/页脚文字按同一口径补进该文件，不得放宽为子串匹配来通过。比对脚本落 `projects/<任务名>/compare_text.py`：
-
-```python
-import re
-import sys
-
-from pptx import Presentation
-from pptx.enum.shapes import MSO_SHAPE_TYPE
-
-
-def iter_shapes(shapes):
-    for sp in shapes:
-        if sp.shape_type == MSO_SHAPE_TYPE.GROUP:
-            yield from iter_shapes(sp.shapes)
-        else:
-            yield sp
-
-
-def pptx_text(path):
-    prs = Presentation(path)
-    chunks = []
-    for slide in prs.slides:
-        for sp in iter_shapes(slide.shapes):
-            if sp.has_text_frame:
-                chunks.append(sp.text_frame.text)
-            if getattr(sp, "has_table", False) and sp.has_table:
-                for row in sp.table.rows:
-                    for cell in row.cells:
-                        chunks.append(cell.text)
-    return re.sub(r"\s+", "", "".join(chunks))
-
-
-def main():
-    actual = pptx_text(sys.argv[1])
-    with open(sys.argv[2], encoding="utf-8") as f:
-        expected = re.sub(r"\s+", "", f.read())
-    if actual != expected:
-        print("FAIL 文字逐字比对不一致")
-        print("expected 字数:", len(expected), "actual 字数:", len(actual))
-        sys.exit(1)
-    print("PASS 文字逐字比对一致")
-
-
-main()
-```
-
-运行方式：
+1. 文字逐字比对：expected_text 抽取首选确定性脚本——headless 浏览器逐页加载 HTML，TreeWalker 按文档序收集上屏文字（跳过 `.notes` 话术容器与任何 `display:none` 内容），零 LLM 参与、可复现，单文件 deck 必用此路；脚本环境不可用才退回 sub agent 按同一口径抽取。抽取与比对均用本 skill 自带脚本，不在 `projects/` 里重写：
 
 ```bash
-python3 projects/<任务名>/compare_text.py doc-ppt/项目.pptx projects/<任务名>/expected_text.txt
+SKILL=<本skill根目录>/scripts
+python3 "$SKILL/extract_expected_text.py" doc-ppt/pages/ -o projects/<任务名>/expected_text.txt
+python3 "$SKILL/compare_text.py" doc-ppt/项目.pptx projects/<任务名>/expected_text.txt
 ```
 
-3. 数量比对：图片数、形状数逐页对齐，由第 4 条递归展开统计覆盖，不另列
+`extract_expected_text.py` 支持 pages 目录与单文件 deck（自动探测 `.slide` 页数按 `#/N` 深链逐页抽取）；产物 expected_text.txt 带 `=== page N ===` 标记行，比对时自动剔除。生成层自动追加的页码/页脚文字按同一口径补进该文件，不得放宽为子串匹配来通过。`compare_text.py` 双方去除全部空白后严格相等比对，不一致时输出首个差异位置上下文。
+
+2. 形状构成验证（「可编辑 PPTX 硬规则」第 4 条）与书写侧 lint 同样走自带脚本：
+
+```bash
+python3 "$SKILL/verify_pptx_shapes.py" doc-ppt/项目.pptx        # 递归展开GROUP，TEXT_BOX>=8，无超尺寸PICTURE
+python3 "$SKILL/lint_pages_html.py" doc-ppt/pages/ doc-ppt/flow/ # 书写侧4硬约束静态检查
+```
+
+3. 数量比对：图片数、形状数逐页对齐，由 `verify_pptx_shapes.py` 递归展开统计覆盖，不另列
 
 ## 无 LibreOffice 环境的替代目检
 
