@@ -98,6 +98,8 @@ html,body{height:100%;overflow:hidden}
 }
 ```
 
+隐藏规则挂 `.js` 前缀类（JS 首行加到 `documentElement`），head 内配 `<noscript>` 顺序流回退样式：禁/受限 JS 环境降级为顺序可读全文，白屏判交付失败。入场动画同规则，触发用 `setTimeout` 不用 `requestAnimationFrame`（后台标签页 rAF 暂停）。
+
 不使用 `display: none`，否则 View Transition 无法捕获旧帧。
 
 ### View Transition
