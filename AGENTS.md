@@ -1,11 +1,11 @@
 # AGENTS.md — agent-skills repository
 
-Content repository (Markdown), not a code project. No build system, no test runner, no root `package.json`. Contains ~669 external skill copies + 17 user-authored skills + agents/commands/rules.
+Content repository (Markdown), not a code project. No build system, no test runner, no root `package.json`. Contains ~688 external skill copies + 17 user-authored skills + 20 agents + 20 commands + language-specific rules.
 
 ## Directory boundaries — critical
 
-- `self-skills/` — **user's original work, the only true source**. May freely modify. Each skill has `SKILL.md` + optional `references/`, `scripts/`, `modules/`.
-- `skills/` — **external skill copies, read-only**. Never modify directly; updates arrive only via the sync skill. Subdirectories: `generated/` (multi-agent pack exports), `in-progress/` (beta), `misc/` (rarely-used), `deprecated/` (empty, retired skills are deleted).
+- `self-skills/` — **user's original work, the only true source**. May freely modify. Each skill has `SKILL.md` + optional `references/`, `scripts/`, `modules/`. 12 of 17 use `robot-aiot-*` prefix; 5 use other names (`dev-paradigm-matt`, `easy-crawler`, `mac-safe-storage-cleaner`, `opsx-workflow-hooks`, `stock-replay-workbench`).
+- `skills/` — **external skill copies, read-only**. Never modify directly; updates arrive only via the sync skill. ~688 skill dirs + 4 meta-dirs: `generated/` (multi-agent pack exports), `in-progress/` (beta), `misc/` (rarely-used), `deprecated/` (contains only README.md; retired skills are deleted).
 - `agents/` — agent markdown files (reviewer/build-resolver personas).
 - `commands/` — slash command definitions; `commands/opsx/` is OpenSpec-generated (managed by module 2 of sync skill).
 - `rules/` — coding rules by language (`common/`, `java/`, `react/`, `typescript/`, `vue/`).
@@ -37,7 +37,7 @@ Key rules:
 
 - Use `template/SKILL.md` as the starting point for new skills.
 - SKILL.md frontmatter: `name` + `description` fields are required.
-- User-authored skills under `self-skills/` follow the `robot-aiot-*` naming convention.
+- User-authored skills under `self-skills/` predominantly follow the `robot-aiot-*` naming convention (12 of 17).
 - SKILL.md must not contain provenance lines ("拆分而来", "融合而成", etc.) — describe current capabilities only.
 - `archify`, `diagram-design`, `ui-ux-pro-max` are **required runtime dependencies** for diagram/presentation skills; dependency tables must mark them required, never "optional" or "fallback to built-in".
 - Python scripts in `self-skills/*/scripts/` use standard library only unless a `requirements.txt` exists in that skill.
@@ -56,3 +56,5 @@ Spec-driven change workflow lives in `openspec/`. Use OpenSpec skills (`openspec
 ## Protection directory
 
 `/Users/kangll13/aiot/java-code/self/gggggggood/` (the parent path, 7 g's) is user-maintained. No rollback, cleanup, overwrite, or automatic conflict resolution. On conflict, surface it and skip.
+
+**Before using this path in any find/grep/rsync pattern**, verify the g count: `basename <path> | tr -cd g | wc -c` must output `7`. Historical bugs used 6 g's (`ggggggood`), causing all path matching to silently fail.
