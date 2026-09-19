@@ -466,7 +466,7 @@ deck 需支持打印 / 导出 PDF（发给听众做资料）：
 
 ## headless 验证方法论
 
-交互机制的自动化验证用 headless Chrome，七条确定性规则：
+交互机制的自动化验证用 headless Chrome，八条确定性规则：
 
 1. **交互断言加 reduced-motion**：`--virtual-time-budget` 下 View Transition 回调时序不确定（状态机正确但 DOM 落定延迟且不可复现）；翻页/frag/分支/回退等交互断言一律加 `--force-prefers-reduced-motion`，走 REDUCED 同步落 DOM 路径；VT 本体靠 `document.startViewTransition` 存在性检查 + CSS 中 `::view-transition` 规则文本存在性检查（grep 级），真实浏览器表现信任人工目检
 2. **截图矩阵**：深链 `#/N/M` 加载即对应步的即时终态，适合逐 frag 截图；分支页无深链，用全局索引 `?preview=N` 截图；拍完逐张目检话术零泄漏、标签碰撞、划线飞出、裁切
@@ -475,3 +475,4 @@ deck 需支持打印 / 导出 PDF（发给听众做资料）：
 5. **捆绑 webfont 的产物**：截图/导出 PDF 前确保字体就绪或已超时锁定回系统栈——体积闸、子集化与 3500ms 超时锁定见 `typography.md` §5.7，此处不重述细节；命令模板的 `--virtual-time-budget=6000` 已覆盖该等待窗口，默认系统栈产物无此问题
 6. **reduced-motion 核弹片段在无帧 headless 下冻结**：`*{animation-duration:.01ms!important;transition-duration:.01ms!important}` 依赖渲染帧推进；`--dump-dom`/`--screenshot` 无帧时动画/过渡启动后卡 progress=0，计算值冻结在起始帧——三个典型症状：`.slide.active` 的 visibility 停 hidden（截图全白）、scale-to-fit 内联 transform 停 none（画布不居中）、入场起始帧 `translateY` 位移垫偏 `.entered` 元素 rect（动画源优先级高于内联样式，titleGap 等四值测量被污染，实测偏差=起始帧位移量）。处置二选一：测量/截图前驱动里统一 `document.getAnimations().forEach(a=>a.cancel())`；或验证副本把该块改 `animation:none!important;transition:none!important`（前提：REDUCED 路径终态有内联兜底，如入场函数直置 opacity/transform）。真浏览器有帧，两种写法等价
 7. **截图用原始 deck + 深链**：不对注入断言脚本的临时副本截图——场景脚本会驱动 deck 状态（翻页/播放/调参），末态停在脚本最后一步而与 URL 深链无关，多页截图字节级全同、逐页目检失效；断言用注入副本、截图用原始文件，两者分开
+8. **跨窗口状态同步 headless 不可达，生产前真浏览器抽查**：BroadcastChannel/postMessage 双窗口同步（演讲者模式，见 `presenter-mode.md` §3.3）与调参双真源（URL+localStorage，见 `multi-version-selection.md`）这类跨窗口/跨标签链路在 headless 单页模式零覆盖，`--dump-dom` 断言全绿不代表同步可用；生产 deck 交付前必须真浏览器开双窗口抽查一次——S 键开演讲者窗口、双向翻页跟随、调参跨窗生效、刷新恢复翻页状态

@@ -64,6 +64,7 @@
 2. 消息只携带页码与动作（`{type:'goto', idx:N}`），不携带 DOM 状态
 3. 频道在窗口关闭时 `close()`，避免泄漏
 4. `file://` 协议下 BroadcastChannel 跨窗消息在部分浏览器不可达（实测双窗不同步）：检测 `location.protocol === 'file:'` 时降级 `window.opener.postMessage` + `window.addEventListener('message')`（校验 `event.source` 为 opener 或被开窗，消息形状与本节契约一致）；http/https 部署仍以 BroadcastChannel 为主通道
+5. 生产交付前必须真浏览器抽查一次双窗口同步（S 键开演讲者窗口、双向翻页跟随）：headless 单页模式对 BroadcastChannel/postMessage 链路零覆盖，见 `interactive-html-authoring.md` headless 验证方法论条 8
 
 ### 3.4 键位
 

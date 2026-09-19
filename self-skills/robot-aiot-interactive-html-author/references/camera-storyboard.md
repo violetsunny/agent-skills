@@ -160,12 +160,13 @@ function counterFly(el, fromZoom, toZoom, durationMs) {
 }
 ```
 
-chrome 首选放 `.stage-hud`（零成本静止）；counter-transform 只给"必须指向 content 内具体元素"的标注。
+chrome 首选放 `.stage-hud`（零成本静止）；counter-transform 只给"必须指向 content 内具体元素"的标注；`.stage-hud` 与 deck 全局 chrome 的叠字冲突见下方施工坑「全局 chrome 叠字」。
 
 施工坑（镜头专属）：
 
 - **横移露边**：位移 >0 时 `.content` 必须沿位移方向外扩 ≥ 位移量 + 32px；远景（<1x）时 `.content` 世界尺寸 ≥2400×1350（四周各扩 12.5%），否则拉远露出 `.camera-stage` 底色
 - **perspective 被打断**：`.camera-layer` 与 `.content` 之间任何中间层加 `overflow: hidden`、`filter`、`opacity < 1` 都会杀掉 preserve-3d，3D 运镜瞬间变平；滤镜只加在最内层元素上
+- **全局 chrome 叠字**：相机页自有 `.stage-hud`（页码/角标/比例尺）与 deck 全局 chrome（`#hint` 快捷键提示、`#pageNum` 页码）同坐标，两者同时可见即叠字；相机页用 `body:has(#sN.active) #hint, body:has(#sN.active) #pageNum { opacity: 0; }` 隐藏全局件，由 `.stage-hud` 独占接管。每个相机页各写一条 `:has` 规则；相机页内需要快捷键提示时自绘进 `.stage-hud`，不依赖全局件回归
 - **与页间相机飞行的关系**：deck 采用 `keyframe-animation.md`"相机飞行过渡"（所有页在同一世界层）时，世界层即 deck 级相机层，本节结构是页内级；两级 transform 各归其层，页内运镜叠加在世界层飞行之上，互不抢写
 
 ## 5. 镜间三分律
@@ -490,6 +491,6 @@ deck 级运镜规划落成一张分镜卡表，每页一行、八字段一个不
 - [ ] 10. 相机参数是进度纯函数，深链直达/翻回页面可一帧重算（§9）？
 - [ ] 11. 派生 blur 只在运动瞬态，静止帧全部锐利（§9）？
 - [ ] 12. 运镜全部收口在 .camera-layer，没和元素动画抢同一个 transform；will-change 运镜前加、结束后移除（§4）？
-- [ ] 13. counter-transform 元素与相机同时间轴、字号恒定；横移与远景页 .content 外扩足够、全程无露边（§4）？
+- [ ] 13. counter-transform 元素与相机同时间轴、字号恒定；横移与远景页 .content 外扩足够、全程无露边；相机页全局 #hint/#pageNum 已隐藏、.stage-hud 无叠字（§4）？
 - [ ] 14. reduced-motion 下运镜/视差/派生信号全部降级为即时定位与静帧？
 - [ ] 15. thumbnail pass 已执行：能量节奏与 §12 骨架一致、相邻页构图不重复、每帧 160×90 可读（§14）？
