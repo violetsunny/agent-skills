@@ -283,6 +283,8 @@ function animateNumber(el, target, duration = 1200) {
 }
 ```
 
+headless 验证注意：无渲染帧环境（`--dump-dom`/`--screenshot`）下 .01ms 动画/过渡卡 progress=0、计算值冻结在起始帧（截图全白/画布不居中/rect 测量污染），处置见 `interactive-html-authoring.md` headless 验证方法论条 6。
+
 检测到减少动画偏好时：
 - 翻页改为即时切换
 - 数字直接显示最终值

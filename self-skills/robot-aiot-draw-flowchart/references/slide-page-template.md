@@ -334,7 +334,10 @@ font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
       color: var(--text-secondary);
       z-index: 10;
     }
-    /* reduced motion */
+    /* reduced motion
+       headless 无帧验证（--dump-dom/--screenshot）下 .01ms 动画/过渡卡 progress=0、
+       计算值冻结起始帧：测量截图前驱动里 document.getAnimations().forEach(a=>a.cancel())，
+       或验证副本改 animation:none/transition:none（前提 REDUCED 终态有内联兜底） */
     @media (prefers-reduced-motion: reduce) {
       *, *::before, *::after {
         animation-duration: 0.01ms !important;

@@ -253,6 +253,8 @@ document.querySelectorAll('section[data-layout]').forEach(sec => {
 
 隐藏页（display:none）rect 全 0，测量无效：逐页翻到当前页再量（控制台先执行 `location.hash = '#/3'`），或在 devtools 里临时移除非活跃页隐藏后整批量。
 
+**通栏结构容器豁免**：navSafeIntrusionPx 的 maxBottom 也计入通栏结构容器盒（cover 对开 `height:100%`、相机页 `content inset:0` 等），此类页恒报 ≈86（容器底即画布底），而可见内容其实停在安全区上。判读先定侵入源：已知通栏结构容器且其内无贴底可见内容 → 记 `[MEASURE-EXEMPT]` 不作阻塞；容器内确有贴底可见内容才按阻塞处理。正常流页面（内容块逐个落位）该值干净为 0。
+
 **修完反查**：修溢出后 bottomWhitespacePx 变大 = 修过头，恢复部分间距或放大最后一块再量；每轮只做一个档位的调整，改完重跑测量，不连改两轮再验。
 
 ### overflow 修正阶梯（按实测 overflowPx 分级处置）
@@ -271,7 +273,8 @@ document.querySelectorAll('section[data-layout]').forEach(sec => {
 
 - 两段式页面（顶部标题 + 下部长正文/引用/图表）：titleGapPx 实测 65-86px
 - 章节级标题-卡片间距 ≥97px（S15/S16 矩阵与微卡页）
-- titleGapPx <54px = 标题与正文贴住，阻塞
+- 封面/仪式页豁免 titleGapPx 阈值：标题+副题紧凑组合、下方无独立正文块时，65-86 区间不适用（该区间只约束两段式页面的标题块→正文块间距），封面改看标题块与对侧/下方信息块是否分离
+- titleGapPx <54px = 标题与正文贴住，阻塞（封面/仪式页除外）
 - titleGapPx >160px 且非刻意留白记 `[UI-WARN]`：多为修溢出的副产品，按修完反查处理
 
 ### 与现有流程的衔接
