@@ -131,6 +131,8 @@ function goTo(index) {
 
 CSS：
 
+> 规范副本：`templates/deck-skeleton.html` — 复制进交付物，以 templates 为准（下方代码块为参考摘录，规范副本另含 name 挂载与 fade keyframes 生效前提）
+
 ```css
 ::view-transition-old(slide) {
   animation: fade-out 400ms cubic-bezier(0.4, 0, 0.2, 1);
@@ -175,6 +177,8 @@ CSS：
 ### 数字滚动
 
 关键数字从 0 滚动到目标值：
+
+> 规范副本：`templates/animate-number.js` — 复制进交付物，以 templates 为准（下方代码块为参考摘录）
 
 ```js
 function animateNumber(el, target, duration = 1200) {

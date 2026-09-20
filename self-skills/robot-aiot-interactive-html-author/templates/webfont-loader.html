@@ -1,0 +1,36 @@
+<!-- ===========================================================================
+  webfont-loader.html — 自定义字体 @font-face + font-display:swap + 3500ms 超时锁
+
+  来源：references/typography.md §5.7 条 3（逐字提取）
+  用途：仅捆绑自定义字体时使用（默认交付用系统字体栈，不需要本模板）。
+        swap 先以系统栈渲染、字体就绪后替换；3500ms 内 webfont 未就绪则给
+        根元素加 .font-timeout 类锁定系统栈，防止字体迟到引发演讲中途回流
+  接线：<style> 段并入交付物样式表，<script> 段并入 <head> 或 body 尾部。
+        替换三处：font-family 名、woff2 子集路径（display 字体 ≤100KB、
+        正文子集 ≤2MB，按实际用字裁剪，构建期用 cn-font-split / pyftsubset）、
+        fallback 栈。自包含单文件交付时 woff2 改 base64 内嵌（体积按 1.33 倍
+        计入闸值）；多文件交付用同目录相对路径
+  纪律：全套字体族数 ≤2 族；捆绑后必须在 Windows 与 macOS 双端各实测一遍，
+        确认 fallback 栈在字体缺失时正确触发
+  自检：断网打开 → 3.5s 后 html 带 .font-timeout 类、文本为系统栈且不再闪换；
+        联网打开 → 字体就绪后正常替换、无中途回流
+============================================================================ -->
+<style>
+  @font-face {
+    font-family: "LXGW WenKai";
+    src: url("assets/lxgw-wenkai-subset.woff2") format("woff2");
+    font-weight: 400;
+    font-display: swap;
+  }
+  body { font-family: "LXGW WenKai", "Kaiti SC", "KaiTi", serif; }
+  /* 超时锁定后即使 webfont 迟到也不再替换，防演讲中途回流 */
+  html.font-timeout body { font-family: "Kaiti SC", "KaiTi", "PingFang SC", serif; }
+</style>
+<script>
+  Promise.race([
+    document.fonts.load('400 18px "LXGW WenKai"', '永字八法'),
+    new Promise(function (_, reject) { setTimeout(reject, 3500); })
+  ]).catch(function () {
+    document.documentElement.classList.add('font-timeout');
+  });
+</script>

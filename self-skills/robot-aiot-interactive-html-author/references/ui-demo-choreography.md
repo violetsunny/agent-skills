@@ -568,6 +568,8 @@ headless 自检用法：`?seek=0/1/2…` 逐步截图核对每步终态；`?auto
 - 成因：点击 iframe 内部后焦点进入 iframe 文档，键盘事件（←→ 翻页、S/O/N/F）全部落在 iframe 里，deck 快捷键失效，观众以为页面卡死
 - 规避：iframe 加 `tabindex="-1"`；自有页面 iframe 内转发导航键给父窗口（下方代码）；第三方页面无法转发即不嵌（回到坑一结论）；父窗口监听 `blur` 兜底收回焦点
 
+> 规范副本：`templates/deck-key-relay.js` — 复制进交付物，以 templates 为准（下方代码块为参考摘录，规范副本为自动识别 install 函数版）
+
 ```js
 // iframe 内（自有页面）：导航键转发给父窗口
 addEventListener('keydown', e => {
@@ -578,10 +580,11 @@ addEventListener('keydown', e => {
   }
 });
 // 父窗口：只信自有 iframe 发来的按键，重派发进 deck 既有键盘处理
+// （派发到 body 而非 document：合成事件 target=document 时 deck 键盘处理首行 e.target.closest 抛 TypeError）
 addEventListener('message', e => {
   const mine = [...document.querySelectorAll('iframe')].some(f => f.contentWindow === e.source);
   if (mine && e.data && e.data.type === 'deck-key') {
-    document.dispatchEvent(new KeyboardEvent('keydown', { key: e.data.key, bubbles: true }));
+    document.body.dispatchEvent(new KeyboardEvent('keydown', { key: e.data.key, bubbles: true }));
   }
 });
 ```

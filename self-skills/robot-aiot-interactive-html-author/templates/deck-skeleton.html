@@ -7,7 +7,9 @@
       （scale-to-fit 壳 + ?noscale）/ 翻页实现（.js 前缀降级 + View Transition +
       slidechange 事件 + 键盘绑定 + 点击区域）/ 入场动画（data-enter-order）/
       prefers-reduced-motion / 打印与导出（@media print + @page）
-    - references/typography.md §5.5：CJK 正文排印 CSS（逐字并入）
+     - references/typography.md §5.5：CJK 正文排印 CSS（逐字并入）
+     - references/interactive-mode-rules.md「实现方式」：View Transition
+       翻页 CSS（::view-transition-old/new(slide) + fade keyframes，逐字并入）
   用途：新 deck 的起点底盘——fit-viewport 缩放壳、翻页/键盘/点击热区、入场
         编排、noscript 顺序流降级、reduced-motion 降级、打印一页一张。
         双击即可在浏览器打开（含 2 页示例，替换为真实内容）。
@@ -87,6 +89,19 @@ body{margin:0;font-family:system-ui,-apple-system,"PingFang SC","Microsoft YaHei
   visibility: visible;
 }
 /* 不使用 display:none，否则 View Transition 无法捕获旧帧 */
+
+/* ===== View Transition 翻页动画（interactive-mode-rules.md「实现方式」CSS 段，逐字；
+   name 挂载与 keyframes 为其生效前提，一并固化。reduced-motion 由 JS 侧跳过
+   startViewTransition，此处无需再降级） ===== */
+.js .slide.active { view-transition-name: slide; }
+::view-transition-old(slide) {
+  animation: fade-out 400ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+::view-transition-new(slide) {
+  animation: fade-in 400ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+@keyframes fade-out { to { opacity: 0; } }
+@keyframes fade-in { from { opacity: 0; } }
 
 /* ===== 话术容器（静默布局坑 6：规则必须显式落盘） ===== */
 .notes{display:none}

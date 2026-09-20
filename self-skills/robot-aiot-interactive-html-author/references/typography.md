@@ -255,6 +255,8 @@ p + p { margin-top: 20px; }         /* 段间距替代首行缩进，取 16-24px
 2. **`font-display: swap`**：中文字体体积大下载慢，白屏等字体是最差体验；swap 先以系统栈渲染、字体就绪后替换，代价是一次文本闪换（FOUT），汇报页可接受
 3. **3500ms 超时锁定**：swap 只解决"先显示"，不解决"迟迟不到"。3500ms 内 webfont 未就绪则给根元素加类锁定系统栈，防止字体迟到引发演讲中途回流：
 
+> 规范副本：`templates/webfont-loader.html` — 复制进交付物，以 templates 为准（下方代码块为参考摘录）
+
 ```html
 <style>
   @font-face {

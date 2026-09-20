@@ -186,6 +186,8 @@ JS 在页面激活后按 order 依次添加 `.entered` 类，间隔 `100-200ms`�
 
 仅在元素首次进入视口或页面激活时触发一次：
 
+> 规范副本：`templates/animate-number.js` — 复制进交付物，以 templates 为准（下方代码块为参考摘录，规范副本为带 from 参数并含 reduced-motion 守卫的超集）
+
 ```js
 function animateNumber(el, target, duration = 1200) {
   const start = performance.now();
@@ -225,6 +227,8 @@ SVG 路径用 `stroke-dasharray` + `stroke-dashoffset`；柱状图从底部生�
 交互页面另加 lightbox 点击放大：纯原生零依赖，点击缩略图弹出全屏遮罩层显示放大图，Esc 键或点击遮罩关闭，打开时 body 锁定滚动。
 
 参考实现：
+
+> 规范副本：`templates/lightbox.js` — 复制进交付物，以 templates 为准（下方代码块为参考摘录，规范副本为自注入版，页面无需手写遮罩节点）
 
 ```html
 <div class="lightbox" id="lightbox"><img alt=""></div>
