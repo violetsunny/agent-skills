@@ -62,6 +62,7 @@
 - 当前页 `.active` 可见，其余 `visibility: hidden; position: absolute`
 - 内容可见性禁止依赖 JS 执行成功：隐藏规则（页切换 `visibility:hidden`、入场 `opacity:0`）一律挂 `.js` 前缀类（JS 首行 `document.documentElement.classList.add('js')`），head 内配 `<noscript>` 回退样式（section 改 `position:relative` 顺序流、隐藏导航组件）。禁/受限 JS 环境（Quick Look、编辑器预览、管控浏览器）必须降级为顺序可读全文，白屏判交付失败
 - 入场动画触发用 `setTimeout` 不用 `requestAnimationFrame`（后台标签页 rAF 暂停，切回前内容不可见）
+- 无 JS 验证的模拟页用"剥除全部 `<script>`"生成，不假设页面含 noscript 块：noscript 是页面侧回退、与验证手段正交；纯 CSS 动画页（无 noscript）同样适用，判据为剥除后内容顺序可读全可见
 - 不使用 `display: none`（会导致 View Transition 无法捕获旧帧）
 - `data-title` 供总览网格与深链展示使用
 - 每页话术写入 `.notes` 容器（`display: none`），演讲者专用文字禁止出现在可见区域；承载与显示机制见 `presenter-mode.md` §2

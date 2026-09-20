@@ -1,6 +1,6 @@
 # AGENTS.md — agent-skills repository
 
-Content repository (Markdown), not a code project. No build system, no test runner, no root `package.json`. Contains ~688 external skill copies + 17 user-authored skills + 20 agents + 20 root commands + 12 opsx commands + language-specific rules.
+Content repository (Markdown), not a code project. No build system, no test runner, no root `package.json`, no `WorkSpace.json`. Contains 688 external skill copies + 17 user-authored skills + 20 agents + 20 root commands + 12 opsx commands + language-specific rules. `skills-lock.json` tracks midea marketplace skill lock versions (currently only `i-have-adhd`).
 
 ## Directory boundaries — critical
 
@@ -51,7 +51,8 @@ Key rules:
 - `AGENTS.md` (this file) — primary repo-specific rules.
 - `RULES.md` — comprehensive Chinese version with Java/Spring project conventions (applies to Java backend projects, not this repo's skill content).
 - `PROJECT.md` — Java/Spring stack reference (same scope as RULES.md, not this repo's content).
-- `CLAUDE.md`, `AGENTS-2.md` — older duplicates of behavioral guidelines; superseded by the global `~/.agents/AGENTS.md`.
+- `CLAUDE.md` — older behavioral guidelines, superseded by the global `~/.agents/AGENTS.md`.
+- `AGENTS-2.md` — copy of `CLAUDE.md` with an added ADHD output-style section; also superseded by global `~/.agents/AGENTS.md` which already includes that section.
 
 ## OpenSpec
 

@@ -109,6 +109,8 @@ $ARGUMENTS
 2. 已决定是否需要 Spec / tickets / 架构设计
 3. 当前目标已经可以落到代码、配置、脚本或迁移等可执行改动上
 
+进入 `prototype` 或 `implement` 前，叠加 `ponytail` 模式（默认 full）压制编码期过度工程；用户明确要求完整实现或已关闭该模式时不叠加。
+
 如果是快速验证、POC、设计问题，或还没确定最终实现方案：
 
 1. 使用 `prototype`
@@ -152,7 +154,7 @@ $ARGUMENTS
 
 实现后统一做：
 
-1. `code-review`
+1. `code-review` + `ponytail-review`（第三轴过度工程审查，只找可删除的复杂度，不替代前两轴）
 2. 仓库已有 lint / typecheck / tests / build 验证
 
 Java 项目可叠加 `java-code-review`；需要中文审查报告时叠加 `zh-code-reviewer`（评分 + 分级中文结构化报告，与 `code-review` 互补，不替代）。
@@ -177,8 +179,10 @@ Java 项目可叠加 `java-code-review`；需要中文审查报告时叠加 `zh-
 
 1. 跨天/换人交接：`handoff`
 2. 架构整治 / 技术债清理：`improve-codebase-architecture`
-3. 迭代复盘：`retro`
-4. 技术调研：`research`
+3. 全仓过度工程审计：`ponytail-audit`（可与架构整治并行）
+4. 捷径台账收集（实现期留有 `ponytail:` 注释时）：`ponytail-debt`
+5. 迭代复盘：`retro`
+6. 技术调研：`research`
 
 出口标准：
 

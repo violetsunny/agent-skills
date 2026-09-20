@@ -143,14 +143,17 @@ Don't use the dot pattern when the diagram sits inside a product page, slide, or
 
 ### Arrow markers (define all three, always)
 
+**Arrow size standard (mandatory):** `markerWidth` = canvas viewBox width × 0.9375%, `markerHeight` = markerWidth × 0.7, with `markerUnits="userSpaceOnUse"` so arrows never scale with stroke-width. One size for all arrows — no large/small tiers. Keep the polygon geometry in its own coordinate system and scale it via the marker's `viewBox` (refX/refY stay in that system). Examples: 960-wide canvas → 9.0×6.3; 1000 → 9.4×6.6; 1200 → 11.2×7.9; 1600 → 15×10.5.
+
 ```svg
-<marker id="arrow" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+<!-- example for a 1000-wide canvas -->
+<marker id="arrow" markerWidth="9.4" markerHeight="6.6" viewBox="0 0 8 6" refX="7" refY="3" orient="auto" markerUnits="userSpaceOnUse">
   <polygon points="0 0, 8 3, 0 6" fill="#4f5d75"/>
 </marker>
-<marker id="arrow-accent" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+<marker id="arrow-accent" markerWidth="9.4" markerHeight="6.6" viewBox="0 0 8 6" refX="7" refY="3" orient="auto" markerUnits="userSpaceOnUse">
   <polygon points="0 0, 8 3, 0 6" fill="#eb6c36"/>
 </marker>
-<marker id="arrow-link" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+<marker id="arrow-link" markerWidth="9.4" markerHeight="6.6" viewBox="0 0 8 6" refX="7" refY="3" orient="auto" markerUnits="userSpaceOnUse">
   <polygon points="0 0, 8 3, 0 6" fill="#2e5aa8"/>
 </marker>
 ```

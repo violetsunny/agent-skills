@@ -208,6 +208,7 @@
 
 - `gradient-flow`：background-size 必须 200-400%（≤100% 时 position 动画静默无效）；百分比轴反向（100%→0% = 视觉左→右）；连续扫 1.2-3s **linear**（加缓动读作物体不像光）；逐词点亮变体 = 双层像素级相同副本 + 词间滞后 0.25-0.5s；色相扫变体 `hue-rotate(0→40-180deg)`（>180° 调色板解体）。`-webkit-background-clip:text` + `background-clip:text` + `color:transparent` 三者缺一不可
 - `path-draw`：单段 0.3-0.8s（>1s 拖沓）；多段 stagger = 下一段在前段 70-80% 处启动；末段时长 = 普通段 60-80%；cubic-out 或 linear（笔不弹，禁 back/elastic）；dasharray 用 `getTotalLength()` 实测，复杂路径可 ×1.05 高估（偏大仅起始不可见、偏小截尾）；连接线两端必须落在真实元素上
+- `path-draw` 三坑（r4 批次实测）：① `marker-end` 箭头不受 `stroke-dashoffset` 裁切，线体未画时箭头即渲染（"箭头先出"）——正解是箭头分离：去掉 marker-end，在 path 终点生成独立 polygon（按 d 末段终点+切线角定位旋转），delay = 线 delay + 描线时长，线画完箭头才落位；opacity 门控（path `opacity:0` + keyframes `0%`/`to` 双帧 `opacity:1`，`to` 帧漏写则 forwards 结束后回落 0 终态连线消失）只是下限，门控后描线窗口内箭头仍先于线体可见；② reduced-motion 分支的 `stroke-dashoffset:0` 会被 path 内联 style 覆盖（只剩箭头无线体），须 `!important`；③ 验证必须截早期帧（virtual-time-budget≈300）+ 终态帧 + reduced 帧三态，只看终态截图发现不了①②
 - `shimmer-sweep`：光带位置用注册自定义属性 `@property --shimmer-pos`（`syntax:"<percentage>"`）-20%→120%、1.2s smooth-inout、多元素 stagger 0.15s；--shimmer-width 默认 20%、--shimmer-angle 默认 120deg
 - `counter-up`：计数+缩放复合变体见 `count-scale`
 - `typewriter` / `typewriter-multi`：两场景（标题逐字 / 正文逐块）选型与参数范围见上方"打字机两场景"小节
@@ -239,6 +240,8 @@
 | `typewriter-multi` | 多行并发打字 + 光标闪烁（DOM 实现） | 终端风、Agent 启动日志 |
 | `counter-explosion` | 数字滚动到目标后粒子爆散，4s 重置 | KPI 揭示、创新高 |
 | `shader-fbm-bg` | WebGL FBM 噪声流场背景（余弦调色板+暗角） | 高级感封面、章节页；骨架见下 |
+
+数字类动效（counter-explosion / 数字滚动）公共约束：HTML 文本即终值、JS 仅增强（无 JS 与截图时刻读到的都是终值）；headless 截图场景用 `setInterval` + 步数上限保证 virtual-time 内收敛到终值，禁 rAF（后台标签页暂停、virtual-time 下不收敛，通规见 `interactive-html-authoring.md` 画布约束与 `interactive-mode-rules.md` 入场触发条）
 
 `shader-fbm-bg` 骨架（原生 WebGL 零依赖，全屏 quad + 单 fragment shader）：
 

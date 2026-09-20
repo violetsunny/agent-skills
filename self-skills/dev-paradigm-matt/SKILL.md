@@ -1,7 +1,7 @@
 ---
 name: dev-paradigm-matt
 description: >
-  面向日常工程开发的分层工作流路由 skill：根据任务所处阶段，把需求澄清、规格设计、架构规划、实现、调试、审查、交接和长期维护路由到合适的 matt-skills，而不是强迫所有任务走同一条固定流水线。适用于“这个需求该怎么推进”“从需求到代码怎么分阶段”“该先 grill 还是 to-spec”“Bug / 重构 / 新功能分别怎么走”“完整开发流程怎么编排”“开发范式”“dev-paradigm-matt”（曾用名“dev-paradigm”）等场景。也适用于接手陌生项目、需要先做 setup、领域建模、票据拆分、实现收尾或长期维护规划时的统一入口。
+  面向日常工程开发的分层工作流路由 skill：根据任务所处阶段，把需求澄清、规格设计、架构规划、实现、调试、审查、交接和长期维护路由到合适的 matt-skills，而不是强迫所有任务走同一条固定流水线。适用于“这个需求该怎么推进”“从需求到代码怎么分阶段”“该先 grill 还是 to-spec”“Bug / 重构 / 新功能分别怎么走”“完整开发流程怎么编排”“开发范式”“dev-paradigm-matt”（曾用名“dev-paradigm”）等场景。也适用于接手陌生项目、需要先做 setup、领域建模、票据拆分、实现收尾或长期维护规划时的统一入口。也适用于需要极简实现约束、过度工程审查、全仓膨胀审计或捷径台账跟踪的编排场景。
 ---
 
 # Dev Paradigm
@@ -26,6 +26,8 @@ s='<路由目标 skill>'
 ```
 
 路由目标（按需依赖，以 matt-skills 系列为主）：`setup-matt-pocock-skills`、`triage`、`grill-me`、`to-spec`、`to-tickets`、`domain-modeling`、`codebase-design`、`implement`、`tdd`、`diagnosing-bugs`、`code-review`、`java-code-review`、`zh-code-reviewer`、`improve-codebase-architecture`、`spring-boot-patterns`、`wayfinder`、`handoff`、`retro`。
+
+路由目标（按需依赖，ponytail 系列）：`ponytail`、`ponytail-review`、`ponytail-audit`、`ponytail-debt`、`ponytail-gain`、`ponytail-help`。其中 `ponytail-gain`、`ponytail-help` 为展示型，仅用户主动触发时使用，不进编排路径。
 
 - 目标存在 → 略过，正常路由
 - 出现 `[DEP-MISSING]` → 不私自安装，提示用户手动安装该 skill，或经用户确认改走其他可用路径
@@ -224,6 +226,13 @@ s='<路由目标 skill>'
 
 任一项不满足，就回到需求层或规格设计层，而不是硬写代码。
 
+### 极简实现约束
+
+进入 `prototype` 或 `implement` 前，叠加 `ponytail` 模式（默认 full），编码期按其自身规则压制过度工程：
+
+1. 刻意简化按 `ponytail` 规则以 `ponytail:` 注释标注天花板与升级路径，供收尾层 `ponytail-debt` 收集
+2. 用户明确要求完整实现、或已关闭 ponytail 模式时，不叠加
+
 ### 快速验证 / POC
 
 满足以下任一项时，用 `prototype` 而不是直接产出生产代码：
@@ -311,11 +320,13 @@ s='<路由目标 skill>'
 1. `code-review`
 2. Java 项目可叠加 `java-code-review`
 3. 需要中文审查报告时叠加 `zh-code-reviewer`（输出评分 + 分级中文结构化报告，与 `code-review` 双轴结论互补，不替代）
+4. 叠加 `ponytail-review`：第三轴过度工程审查，只找可删除、可简化、可用标准库替代的复杂度，与前两轴互补，不替代
 
-重点检查两轴：
+重点检查三轴：
 
 1. Standards：是否符合项目规范
 2. Spec：是否忠实实现需求
+3. 过度工程：是否存在可删除的复杂度（`ponytail-review`）
 
 ### 验证执行
 
@@ -369,6 +380,18 @@ s='<路由目标 skill>'
 
 1. `improve-codebase-architecture`
 
+### 全仓过度工程审计
+
+当目标是找出整个仓库的膨胀、冗余依赖和投机抽象，而不是单个 diff 时，用 `ponytail-audit`。可与 `improve-codebase-architecture` 并行：前者产出按削减量排序的删除清单，后者处理结构演进。
+
+1. `ponytail-audit`
+
+### 捷径台账收集
+
+实现期留下 `ponytail:` 注释时，收尾用 `ponytail-debt` 收集成台账，让每个刻意简化都有天花板与升级路径记录，防止延期项悄悄变成永久债。
+
+1. `ponytail-debt`
+
 ### 迭代复盘
 
 当用户要总结这轮开发中的问题、决策得失、流程改进点时，用 `retro`。
@@ -395,14 +418,16 @@ s='<路由目标 skill>'
 5. 生产代码优先 `implement`，高风险逻辑优先 `tdd`
 6. 复杂 Bug 优先 `diagnosing-bugs`，不要跳过复现和根因定位
 7. 收尾至少做验收、review、验证；是否交接取决于是否需要跨人/跨天继续
+8. 编码期叠加 `ponytail`，review 加 `ponytail-review` 第三轴，收尾有 `ponytail:` 注释就用 `ponytail-debt` 收台账
+9. 全仓膨胀审计用 `ponytail-audit`；`ponytail-gain` / `ponytail-help` 仅用户主动触发，不进编排路径
 
 ## 推荐路径
 
 ### 路径 A：小需求 / 明确改动
 
 1. 需求已清晰
-2. 直接 `implement`
-3. `code-review`
+2. 直接 `implement`（叠加 `ponytail`）
+3. `code-review` + `ponytail-review`
 4. 跑验证
 
 ### 路径 B：中大型功能
@@ -412,25 +437,27 @@ s='<路由目标 skill>'
 3. `to-spec`
 4. `to-tickets`
 5. `triage`
-6. `implement`
-7. `code-review`
+6. `implement`（叠加 `ponytail`）
+7. `code-review` + `ponytail-review`
 8. 跑验证
-9. `handoff`（如需）
+9. `ponytail-debt`（若留有 `ponytail:` 注释）
+10. `handoff`（如需）
 
 ### 路径 C：陌生项目 / 大规模重构
 
 1. `setup-matt-pocock-skills`（若未初始化）
 2. `wayfinder` 或 `codebase-design`
 3. `to-spec` / `to-tickets`（若需多人协作）
-4. `implement`
-5. `code-review`
+4. `implement`（叠加 `ponytail`）
+5. `code-review` + `ponytail-review`
 6. 跑验证
-7. `improve-codebase-architecture`（可作为收尾）
+7. `improve-codebase-architecture` 或 `ponytail-audit`（可作为收尾）
+8. `ponytail-debt`（若留有 `ponytail:` 注释）
 
 ### 路径 D：复杂 Bug / 回归
 
 1. `diagnosing-bugs`
-2. `code-review`
+2. `code-review` + `ponytail-review`
 3. 跑验证
 4. `handoff`（如需沉淀）
 

@@ -665,32 +665,31 @@ def parse_template_viewbox(template_type: str) -> tuple[float, float]:
     return DEFAULT_VIEWBOX.get(template_type, (960, 600))
 
 
-def render_defs(style_index: int, style: dict[str, object]) -> str:
-    marker_size = "8" if style_index == 4 else "12" if style_index == 11 else "10"
-    marker_height = "6" if style_index == 4 else "9" if style_index == 11 else "7"
-    ref_x = "7" if style_index == 4 else "11" if style_index == 11 else "9"
-    ref_y = "3" if style_index == 4 else "4.5" if style_index == 11 else "3.5"
-    marker_units = ' markerUnits="userSpaceOnUse"' if style_index == 11 else ""
+def render_defs(
+    style_index: int, style: dict[str, object], width: float = 960.0
+) -> str:
+    # Arrow size standard: markerWidth = viewBox width * 0.9375%, height = width * 0.7,
+    # fixed in user units (userSpaceOnUse) so arrows never scale with stroke-width.
+    marker_size = f"{width * 0.009375:.1f}"
+    marker_height = f"{width * 0.009375 * 0.7:.1f}"
+    if style_index == 4:
+        vb_w, vb_h, ref_x, ref_y = "8", "6", "7", "3"
+        points = "0 0, 8 3, 0 6"
+    elif style_index == 11:
+        vb_w, vb_h, ref_x, ref_y = "12", "9", "11", "4.5"
+        points = "0 0, 12 4.5, 0 9"
+    else:
+        vb_w, vb_h, ref_x, ref_y = "10", "7", "9", "3.5"
+        points = "0 0, 10 3.5, 0 7"
     color_map = style_value(style, "arrow_colors")
     marker_lines = []
     for key, color in color_map.items():
         marker_id = MARKER_IDS.get(key, "arrowA")
         marker_lines.append(
             f'    <marker id="{marker_id}" markerWidth="{marker_size}" markerHeight="{marker_height}" '
-            f'refX="{ref_x}" refY="{ref_y}" orient="auto"{marker_units}>'
+            f'viewBox="0 0 {vb_w} {vb_h}" refX="{ref_x}" refY="{ref_y}" orient="auto" markerUnits="userSpaceOnUse">'
         )
-        if style_index == 4:
-            marker_lines.append(
-                f'      <polygon points="0 0, 8 3, 0 6" fill="{color}"/>'
-            )
-        elif style_index == 11:
-            marker_lines.append(
-                f'      <polygon points="0 0, 12 4.5, 0 9" fill="{color}"/>'
-            )
-        else:
-            marker_lines.append(
-                f'      <polygon points="0 0, 10 3.5, 0 7" fill="{color}"/>'
-            )
+        marker_lines.append(f'      <polygon points="{points}" fill="{color}"/>')
         marker_lines.append("    </marker>")
 
     filters = []
@@ -3519,7 +3518,7 @@ def build_svg_with_report(
         for arrow_data in arrows_data:
             arrow_data.setdefault("_rough_seed", rough_seed)
 
-    defs = render_defs(style_index, style)
+    defs = render_defs(style_index, style, width)
     canvas = render_canvas(style_index, style, width, height)
     title_block, content_start_y = render_title_block(style, source_data, width)
     window_controls = render_window_controls(source_data, style_index, width)

@@ -568,19 +568,22 @@ def generate_html(
             start_colors.add(stroke)
 
     marker_defs = []
+    # Arrow size standard: markerWidth = canvas width * 0.9375%, height = width * 0.7.
+    arrow_w = f"{canvas_w * 0.009375:.1f}"
+    arrow_h = f"{canvas_w * 0.009375 * 0.7:.1f}"
     for color in sorted(end_colors):
         slug = _color_slug(color)
         marker_defs.append(
-            f'        <marker id="arrow-end-{slug}" markerWidth="11" markerHeight="8" '
-            f'refX="11" refY="4" orient="auto" markerUnits="userSpaceOnUse">\n'
+            f'        <marker id="arrow-end-{slug}" markerWidth="{arrow_w}" markerHeight="{arrow_h}" '
+            f'viewBox="0 0 11 8" refX="11" refY="4" orient="auto" markerUnits="userSpaceOnUse">\n'
             f'          <path d="M0,0 L0,8 L11,4 Z" fill="{color}" />\n'
             f"        </marker>"
         )
     for color in sorted(start_colors):
         slug = _color_slug(color)
         marker_defs.append(
-            f'        <marker id="arrow-start-{slug}" markerWidth="11" markerHeight="8" '
-            f'refX="0" refY="4" orient="auto" markerUnits="userSpaceOnUse">\n'
+            f'        <marker id="arrow-start-{slug}" markerWidth="{arrow_w}" markerHeight="{arrow_h}" '
+            f'viewBox="0 0 11 8" refX="0" refY="4" orient="auto" markerUnits="userSpaceOnUse">\n'
             f'          <path d="M11,0 L11,8 L0,4 Z" fill="{color}" />\n'
             f"        </marker>"
         )

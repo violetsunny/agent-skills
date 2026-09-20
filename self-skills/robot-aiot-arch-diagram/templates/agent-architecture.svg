@@ -1,15 +1,15 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 700">
   <defs>
-    <marker id="arrowBlue" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+    <marker id="arrowBlue" markerWidth="9.0" markerHeight="6.3" viewBox="0 0 10 7" refX="9" refY="3.5" orient="auto" markerUnits="userSpaceOnUse">
       <polygon points="0 0, 10 3.5, 0 7" fill="#2563eb"/>
     </marker>
-    <marker id="arrowPurple" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+    <marker id="arrowPurple" markerWidth="9.0" markerHeight="6.3" viewBox="0 0 10 7" refX="9" refY="3.5" orient="auto" markerUnits="userSpaceOnUse">
       <polygon points="0 0, 10 3.5, 0 7" fill="#7c3aed"/>
     </marker>
-    <marker id="arrowGreen" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+    <marker id="arrowGreen" markerWidth="9.0" markerHeight="6.3" viewBox="0 0 10 7" refX="9" refY="3.5" orient="auto" markerUnits="userSpaceOnUse">
       <polygon points="0 0, 10 3.5, 0 7" fill="#059669"/>
     </marker>
-    <marker id="arrowOrange" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+    <marker id="arrowOrange" markerWidth="9.0" markerHeight="6.3" viewBox="0 0 10 7" refX="9" refY="3.5" orient="auto" markerUnits="userSpaceOnUse">
       <polygon points="0 0, 10 3.5, 0 7" fill="#ea580c"/>
     </marker>
   </defs>

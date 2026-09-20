@@ -260,7 +260,7 @@
 3. 网格常用配比：6:6（对半分）/ 7:5（文字为主 + 辅助图）/ 8:4（大段文字 + 小图数据）/ 三列均分 / 3×2 六格；gap 水平 58px 竖直 43px（可单独覆写）
 4. 图片比例规范：左文右图主图 16:10 或 4:3；多图网格统一固定高度（281px 档，图注在框内占约 43px、实际图展示 ≈238px；标题更长或加说明行降到 238px）；小型面板组统一 173px 或 194px（同组必须同高）；左小图右文 1:1 或 3:2；全屏主视觉 16:9；信息图/截图再设计 16:9 或 16:10 + contain；图文混排小插图 3:2 或 3:4。禁止原图奇葩比例（如 2592/1798）
 5. 图片垂直对齐：图片跟正文内容区对齐，不默认贴大标题顶端——左列是"kicker + 大标题 + 正文 + callout"时，右列图片 `margin-top:76-97px`；横向长条截图不硬拉满宽，改极宽横图素材或拆 2-3 个局部面板拼排
-6. 图片定位反模式：`align-self:end` 在 grid 外无效会让图掉到文档流末尾堆底；`position:absolute;bottom:0` 会被脚注与分页遮挡；图文混排必须用 grid 结构（默认 `align-items:start` 图自然贴顶）；要"图片底对齐左列 callout"时，用左列 flex column + `justify-content:space-between`（callout 自己贴左列底），右列保持顶对齐
+6. 图片定位反模式：`align-self:end` 在 grid 外无效会让图掉到文档流末尾堆底；`position:absolute;bottom:0` 会被脚注与分页遮挡；图文混排必须用 grid 结构（默认 `align-items:start` 图自然贴顶）；要"图片底对齐左列 callout"时，用左列 flex column + `justify-content:space-between`（callout 自己贴左列底），右列保持顶对齐；图容器作 flex 子项时 `align-self:start` 只定位不防收缩，须显式 `width:100%`，否则图缩到内容宽；右栏/details 栏容器必须 `overflow-y:auto` + 细滚动条（`scrollbar-width:thin` + webkit 6px），展开内容超画布高度时裁切即不可读
 7. 两段式页面（顶部标题 + 下部长正文/引用/图表）标题-内容间距 65-86px；复杂内容页大标题与下方内容分层，下方内容用左右两端对齐的 grid，不全堆一条中轴线
 8. M 系 hero 页（M01/M02/M07/M08）大标题允许水平居中；正文页左对齐
 9. 动效 recipe 绑定原生体系：入场排序走 `data-enter-order`；M06 分步推进用 fragment 机制（见 `interactive-mode-rules.md` 页内分步揭示）；动效被禁用/跳过时所有内容必须可读（opacity 兜底为 1）
