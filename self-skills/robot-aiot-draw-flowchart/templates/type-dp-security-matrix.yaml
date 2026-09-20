@@ -59,4 +59,5 @@ cells:
   - { row: 7, col: 2, value: "Read",  level: "read" }
   - { row: 7, col: 3, value: "No access", level: "none" }
 
+none_label: "No access"                 # default text rendered when a cell is omitted
 dark: false

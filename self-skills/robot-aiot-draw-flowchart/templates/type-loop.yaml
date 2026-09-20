@@ -1,0 +1,26 @@
+# Loop — parametric document contract (canonical copy)
+# Reference: references/type-loop.md §1; copy and fill parameters by hand.
+# NOT an input to generate-from-template.py (that script only accepts containers/nodes/arrows JSON).
+
+title: "The self-improving loop"
+subtitle: "Every pass improves the shared operating record"
+
+hub:                                  # exactly one
+  name: "Shared memory"
+  sublabel: "one record, every loop"
+
+stations:                             # 5..8, clockwise from top
+  - { name: "Capture",  sublabel: "signals in",       spoke_label: "SIGNALS" }
+  - { name: "Research", sublabel: "evidence pulled" }
+  - { name: "Decide",   sublabel: "human approves",   focal: true }
+  - { name: "Act",      sublabel: "work ships",        spoke_label: "OUTCOMES" }
+  - { name: "Measure",  sublabel: "outcomes logged" }
+  - { name: "Learn",    sublabel: "playbook updated" }
+
+station_w: 160
+station_h: 64
+hub_w: 200
+hub_h: 104
+radius: 240
+margin: 64
+dark: false

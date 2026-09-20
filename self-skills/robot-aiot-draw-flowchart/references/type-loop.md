@@ -10,6 +10,7 @@ This type is **parametric**. The inputs in §1 determine station count, angles, 
 
 ## 1. Inputs — the parameter contract
 
+canonical 副本：`templates/type-loop.yaml` — 参数化文档契约，复制后手工填参绘图；不是 generate-from-template.py 的输入（该脚本只接受 containers/nodes/arrows JSON），以 templates 为准
 ```yaml
 title: "The self-improving loop"
 subtitle: "Every pass improves the shared operating record"

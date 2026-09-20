@@ -31,4 +31,14 @@ connectors:
   - { from: legacy-portal,    to: natstat-website, label: "WEB",                 style: neutral }
   - { from: natstat-website,  to: ministry,        label: "CSV DL", icon: csv,   style: link, dashed: true }
 
+footer:                       # 0..3 optional full-canvas-width bars (cross-cutting concerns)
+  - { name: "Identity Manager", sub: "Active Directory · LDAP · SSO", icon: active-directory }
+  - { name: "Observability",    sub: "logs · metrics · alerts",       icon: monitoring }
+
+legend:                       # auto-generated from styles used; user can override labels
+  - { swatch: link,    label: "data flow" }
+  - { swatch: accent,  label: "pain-point" }
+  - { swatch: dashed,  label: "external" }
+  - { swatch: focal,   label: "bottleneck" }
+
 dark: false
