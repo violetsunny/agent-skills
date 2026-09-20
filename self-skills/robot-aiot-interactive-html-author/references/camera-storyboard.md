@@ -100,6 +100,7 @@ function panDuration(distancePx, speed = 600) {
 
 镜头运动和元素动画不许抢同一个 transform（叠加冲突规则见 `keyframe-animation.md`）。所有镜头级运动收口到专职三层容器：
 
+> 规范副本：`templates/camera-layer.js` — 复制进交付物，以 templates 为准（下方代码块为参考摘录）
 ```html
 <div class="camera-stage">                    <!-- 视口层：固定 1920×1080，overflow hidden，不动 -->
   <div class="camera-layer">                  <!-- 相机层：只承载相机 transform，运镜全部收口在这 -->
@@ -254,6 +255,7 @@ if (!matchMedia('(prefers-reduced-motion: reduce)').matches) {
 
 鼠标驱动（rAF + 指数平滑；循环随页启停，契约见 `generative-art-and-canvas.md`）：
 
+> 规范副本：`templates/parallax.js` — 复制进交付物，以 templates 为准（下方代码块为参考摘录）
 ```javascript
 function mountParallax(stage, layers, amp = 20) {
   if (matchMedia('(prefers-reduced-motion: reduce)').matches) return () => {};

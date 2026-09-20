@@ -28,6 +28,7 @@
 
 动画帧内禁止 `Math.random()`——同一时刻会渲染出不同像素，翻回页面重触发时效果每次都不一样。两种原生实现：
 
+> 规范副本：`templates/deterministic-random.js` — 复制进交付物，以 templates 为准（下方代码块为参考摘录）
 ```javascript
 // 种子 PRNG：同一 seed 产出同一随机序列
 function mulberry32(seed) {
@@ -119,6 +120,7 @@ DOM/transform 侧的 render(t)（画廊墙）契约见 ui-demo-choreography.md �
 
 **路线一 · SVG 滤镜 data-URI（零 JS，CSS 背景平铺）**：
 
+> 规范副本：`templates/paper-texture.js` — 复制进交付物，以 templates 为准（下方代码块为参考摘录）
 ```css
 .paper::before {
   content: ''; position: absolute; inset: 0; pointer-events: none; z-index: 30;
@@ -209,6 +211,7 @@ function paperTexture({ size = 200, basePeriod = 170, seed = 42, ink = [20, 20, 
 
 四个 sin 项叠加取均值到 [-1,1]，时间因子 `t = 经过秒数 × 0.55`（慢是关键，快了显躁）：
 
+> 规范实现：`templates/ascii-bg.js` — 按本节规格实现的完整可运行代码（下方代码块为噪声场参考摘录）；复制进交付物，以 templates 为准
 ```javascript
 const n = (
   Math.sin(col * 0.18 + t) +

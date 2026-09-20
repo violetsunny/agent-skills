@@ -49,6 +49,7 @@
 | smooth-inout | (0.65, 0, 0.35, 1) | 移位对称 |
 
 ## 1c. 页面级入场编排 recipe（5 种）
+> 规范实现：`templates/entry-recipes.js` — 按本节规格实现的完整可运行代码；复制进交付物，以 templates 为准
 
 单个效果（§2）是叶子级动作，recipe 是页面级编排：页面激活时把一组 data-anim 元素按语义顺序播完。挂载属性分工：`<section>` 用 `data-animate="<recipe>"` 选编排；元素用裸 `data-anim`（无值）加入编排，或取角色值 `left / right / divider / line / step`。§2 的效果名值（如 `data-anim="fade-up"`）与 recipe 角色值互斥——页面带 data-animate 时整页按 recipe 时序播，不再单独播单效果名。一个 recipe 计入 §1.3"单页 CSS 入场 ≤ 2 种"预算时算 1 种。
 
@@ -209,6 +210,7 @@
 - `gradient-flow`：background-size 必须 200-400%（≤100% 时 position 动画静默无效）；百分比轴反向（100%→0% = 视觉左→右）；连续扫 1.2-3s **linear**（加缓动读作物体不像光）；逐词点亮变体 = 双层像素级相同副本 + 词间滞后 0.25-0.5s；色相扫变体 `hue-rotate(0→40-180deg)`（>180° 调色板解体）。`-webkit-background-clip:text` + `background-clip:text` + `color:transparent` 三者缺一不可
 - `path-draw`：单段 0.3-0.8s（>1s 拖沓）；多段 stagger = 下一段在前段 70-80% 处启动；末段时长 = 普通段 60-80%；cubic-out 或 linear（笔不弹，禁 back/elastic）；dasharray 用 `getTotalLength()` 实测，复杂路径可 ×1.05 高估（偏大仅起始不可见、偏小截尾）；连接线两端必须落在真实元素上
 - `path-draw` 三坑（r4 批次实测）：① `marker-end` 箭头不受 `stroke-dashoffset` 裁切，线体未画时箭头即渲染（"箭头先出"）——正解是箭头分离：去掉 marker-end，在 path 终点生成独立 polygon（按 d 末段终点+切线角定位旋转），delay = 线 delay + 描线时长，线画完箭头才落位；opacity 门控（path `opacity:0` + keyframes `0%`/`to` 双帧 `opacity:1`，`to` 帧漏写则 forwards 结束后回落 0 终态连线消失）只是下限，门控后描线窗口内箭头仍先于线体可见；② reduced-motion 分支的 `stroke-dashoffset:0` 会被 path 内联 style 覆盖（只剩箭头无线体），须 `!important`；③ 验证必须截早期帧（virtual-time-budget≈300）+ 终态帧 + reduced 帧三态，只看终态截图发现不了①②
+- 入场同步三条款（r4 批次实测，虚线/箭头瞬现根因）：① 无限流动动画（`anim-flow` 类 flowdash）禁止裸挂——元素无入场控制时虚线与 marker-end 箭头在页面加载即瞬现，与整体 `--i` 编排脱节；正解是双动画叠加 `animation:fadein .6s ease forwards,flowdash 1.6s linear infinite`，两个 `animation-delay` 均取 `calc(var(--i)*160ms)`（flowdash 可再加偏移），元素必须带 `--i`；② 带 dasharray 图案的虚线连接线禁用 `anim-draw`（dasharray 被覆盖、虚线变实线），用 `.anim-fade{opacity:0;animation:fadein .5s ease forwards;animation-delay:calc(var(--i)*160ms)}` 整体淡入，marker-end 箭头随线同帧淡入无需分离；③ reduced-motion 分支对新增入场类必须写 `animation:none;opacity:1`（只写 `animation:none` 会留 `opacity:0` 初值，元素永久隐藏）；SVG 图例组 `<g id="*-legend">` 必须挂入场类（anim-pop + `--i` 排在全图最后元素之后），裸 `<g>` 瞬现
 - `shimmer-sweep`：光带位置用注册自定义属性 `@property --shimmer-pos`（`syntax:"<percentage>"`）-20%→120%、1.2s smooth-inout、多元素 stagger 0.15s；--shimmer-width 默认 20%、--shimmer-angle 默认 120deg
 - `counter-up`：计数+缩放复合变体见 `count-scale`
 - `typewriter` / `typewriter-multi`：两场景（标题逐字 / 正文逐块）选型与参数范围见上方"打字机两场景"小节
@@ -245,6 +247,7 @@
 
 `shader-fbm-bg` 骨架（原生 WebGL 零依赖，全屏 quad + 单 fragment shader）：
 
+> 规范副本：`templates/shader-fbm-bg.glsl` — 复制进交付物，以 templates 为准（下方代码块为参考摘录）
 ```glsl
 precision mediump float;
 varying vec2 v_uv; uniform float u_time; uniform vec2 u_res;

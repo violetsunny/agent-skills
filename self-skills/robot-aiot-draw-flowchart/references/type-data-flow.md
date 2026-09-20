@@ -10,6 +10,7 @@ This type is **parametric** — the inputs schema in §1 drives every coordinate
 
 ## 1. Inputs — the parameter contract
 
+canonical 副本：`templates/type-data-flow.yaml` — 参数化文档契约，复制后手工填参绘图；不是 generate-from-template.py 的输入（该脚本只接受 containers/nodes/arrows JSON），以 templates 为准
 ```yaml
 lanes:                              # 1..4 horizontal swimlanes (top to bottom)
   - { name: ["DATA", "ADMINS"],     key: "ADM" }

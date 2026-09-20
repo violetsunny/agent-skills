@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 600" width="960" height="600">
+  <style>
+    text { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica Neue, 'PingFang SC', 'Microsoft YaHei', 'Microsoft JhengHei', 'SimHei', sans-serif; }
+  </style>
+  <defs>
+    <marker id="arrow-oai" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#71717a"/>
+    </marker>
+    <marker id="arrow-oai-green" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#10a37f"/>
+    </marker>
+  </defs>
+
+  <!-- White background -->
+  <rect width="960" height="600" fill="#ffffff"/>
+
+  <!-- Title -->
+  <text x="480" y="30" text-anchor="middle" fill="#0d0d0d"
+        font-size="20" font-weight="600">Diagram Title</text>
+
+  <!-- Standard node -->
+  <rect x="100" y="70" width="180" height="80" rx="8" ry="8"
+        fill="#ffffff" stroke="#e5e5e5" stroke-width="1.5"/>
+  <text x="190" y="100" text-anchor="middle" fill="#0d0d0d"
+        font-size="16" font-weight="600">Component</text>
+  <text x="190" y="120" text-anchor="middle" fill="#6e6e80"
+        font-size="13">Description</text>
+
+  <!-- Connection -->
+  <line x1="280" y1="110" x2="400" y2="110"
+        stroke="#71717a" stroke-width="1.5" marker-end="url(#arrow-oai)"/>
+  <text x="340" y="103" text-anchor="middle" fill="#6e6e80" font-size="12">label</text>
+</svg>

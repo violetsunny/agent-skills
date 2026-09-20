@@ -1,0 +1,50 @@
+<!-- ===========================================================================
+  mermaid-wrapper.html — Mermaid 无头渲染临时 HTML 包装页模板
+
+  来源：references/diagram-embed-rendering.md §1.3（逐字提取）
+  用途：headless Chrome（CDP Page.setDocumentContent 或 file:// 导航）渲染
+        Mermaid 图为 PNG/SVG 的包装页；轮询 window.__mermaidReady /
+        __mermaidError 判定渲染完成后测量 #host 包围盒截图
+  接线：替换三处占位——
+        1) background: <white | transparent | #hex>（默认 white；深色页面融合
+           用 transparent 并输出 PNG 透明通道，或直接内联 SVG 由 CSS 控制）
+        2) <已转义的Mermaid源码>（注入前必须转义 & < >，防止破坏页面结构）
+        3) theme: "<default|forest|dark|neutral|base>"
+        /* mermaid.min.js 全文内联 */ 处替换为 mermaid.min.js 源码全文
+        （自包含要求，禁 CDN）
+  要点：startOnLoad:false + 显式 mermaid.run()，Promise 回调置就绪/错误标志；
+        中文字体栈必须写进包装页，否则截图中文显示为豆腐块；#host 含 16px
+        padding 即截图区域；渲染缓存键与目录约定见 md §1.4
+============================================================================ -->
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<style>
+  html, body {
+    margin: 0; padding: 0;
+    background: <white | transparent | #hex>;
+    font-family: -apple-system, BlinkMacSystemFont, "PingFang SC",
+      "Microsoft YaHei", "Hiragino Sans GB", "Noto Sans CJK SC", sans-serif;
+  }
+  #host { display: inline-block; padding: 16px; }
+  #host svg { max-width: none !important; }
+</style>
+</head>
+<body>
+<div id="host"><div class="mermaid"><已转义的Mermaid源码></div></div>
+<script>/* mermaid.min.js 全文内联 */</script>
+<script>
+  window.__mermaidReady = false;
+  window.__mermaidError = null;
+  try {
+    mermaid.initialize({ startOnLoad: false, theme: "<default|forest|dark|neutral|base>", securityLevel: "loose" });
+    mermaid.run({ querySelector: ".mermaid" })
+      .then(function () { window.__mermaidReady = true; })
+      .catch(function (err) { window.__mermaidError = String(err && err.message || err); });
+  } catch (err) {
+    window.__mermaidError = String(err && err.message || err);
+  }
+</script>
+</body>
+</html>

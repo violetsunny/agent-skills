@@ -6,6 +6,7 @@
 
 最终交付物为单个 HTML 文件，包含所有页面：
 
+> 规范副本：`templates/deck-skeleton.html` — 复制进交付物，以 templates 为准（下方代码块为参考摘录）
 ```html
 <!DOCTYPE html>
 <html lang="zh-CN">
@@ -370,6 +371,7 @@ deck 需要常驻公司/产品 logo 时，声明一次、全 deck 生效，不�
 
 ## prefers-reduced-motion
 
+> 规范副本：`templates/deck-skeleton.html` — 复制进交付物，以 templates 为准（下方代码块为参考摘录）
 ```css
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
@@ -460,6 +462,7 @@ window.DECK_MANIFEST = [
 
 deck 需支持打印 / 导出 PDF（发给听众做资料）：
 
+> 规范副本：`templates/deck-skeleton.html` — 复制进交付物，以 templates 为准（下方代码块为参考摘录）
 ```css
 @media print {
   .canvas { transform: none !important; } /* scale-to-fit 缩放禁用 */

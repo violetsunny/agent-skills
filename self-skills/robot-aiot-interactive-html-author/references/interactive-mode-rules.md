@@ -68,6 +68,7 @@
 - 每页话术写入 `.notes` 容器（`display: none`），演讲者专用文字禁止出现在可见区域；承载与显示机制见 `presenter-mode.md` §2
 
 ### 页内分步揭示（fragment）
+> 规范实现：`templates/deck-nav.js` — 按本节规格实现的完整可运行代码；复制进交付物，以 templates 为准
 
 同一页要分多次揭示内容（先给结论、再逐条给证据）时，用 fragment 停留点，不拆成多页：
 
@@ -269,6 +270,7 @@ function animateNumber(el, target, duration = 1200) {
 - 页码显示：`当前页 / 总页数`，右下角
 
 ## 内联文本编辑模式
+> 规范实现：`templates/inline-editor.js` — 按本节规格实现的完整可运行代码；复制进交付物，以 templates 为准
 
 草稿生成后默认内置的轻量微调能力：浏览器内直接点上屏文字修改，不回源码。生成前不问用户要不要——用户明确要锁定版/仅导出版时才省略。
 

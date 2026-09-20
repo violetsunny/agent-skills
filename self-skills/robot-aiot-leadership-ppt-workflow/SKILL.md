@@ -198,14 +198,13 @@ Phase 4 的逐页 HTML 编写能力已内化到 `robot-aiot-draw-flowchart` 的�
 
 ### 品牌与页面
 6. 需要品牌资源使用规则时，读 `references/brand-assets.md`
-7. 需要页面 HTML 模板骨架时，读 `references/page-html-template.md`
 
 ### 增强能力
-8. 需要布局策略/Deck叙事/文案公式时，读 `references/slide-layout-strategies.md`
-9. 需要AI图像生成/封面设计规则时，读 `references/ppt-image-and-cover.md`
+7. 需要布局策略/Deck叙事/文案公式时，读 `references/slide-layout-strategies.md`
+8. 需要AI图像生成/封面设计规则时，读 `references/ppt-image-and-cover.md`
 
 ### 治理
-10. 需要交叉校验/重生链/协作关系时，读 `references/governance-and-iteration.md`
+9. 需要交叉校验/重生链/协作关系时，读 `references/governance-and-iteration.md`
 
 ## 治理与迭代
 

@@ -192,4 +192,4 @@ rounded=1;fillColor=#E8F4FD;strokeColor=#0078D4;strokeWidth=2;dashed=1;arcSize=8
 
 ## PPT 场景配色对齐声明
 
-**PPT 领导汇报场景默认色**：主色 `#0078D4`，与 robot-aiot-leadership-ppt-workflow 的 page-html-template.md CSS 变量 `--primary-color` 保持一致。在 PPT 汇报图表场景中，应使用科技蓝（Tech Blue）`#0078D4` 作为主色，以确保图表 HTML 与逐页 HTML 的配色体系统一。
+**PPT 领导汇报场景默认色**：主色 `#0078D4`（科技蓝 Tech Blue）。在 PPT 汇报图表场景中，应使用该色作为主色，以确保图表 HTML 与汇报逐页 HTML 的配色体系统一。

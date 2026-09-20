@@ -717,6 +717,8 @@ function derivePalette(hex) {
 
 推导后自检：① `--text-primary` 对 `--surface-color` 对比度实算 ≥ 4.5:1，不足把 text 的 L 压到 0.10 重算；② 交付说明写一句"为什么是这个色"（主色来源：品牌 logo / 内容真图 / 主题文化语境），写不出 = 在抽签，回 §1 路由表重选；③ 推导色板与下方 72 组是两条平行路径——有主色走推导，无主色从色板组选，同一 deck 不混用两条路径的产物。
 
+canonical 数据：`assets/palettes.json`（下方 72 组与该 JSON 同源，程序化消费读 JSON，修改时两处同步）
+
 ### bold-energetic（8 组）
 
 1. `#FFBE0B #FB5607 #FF006E #8338EC #3A86FF`

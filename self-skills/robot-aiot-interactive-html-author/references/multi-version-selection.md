@@ -236,6 +236,7 @@ signature 元素：<1 个>
 
 ### deck 侧接线（必须写进页面 CSS）
 
+> 规范副本：`templates/tweaks-panel.js` — 复制进交付物，以 templates 为准（下方代码块为参考摘录）
 ```css
 :root {
   --tw-font-scale: 1;

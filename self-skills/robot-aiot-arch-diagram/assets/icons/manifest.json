@@ -1,0 +1,1216 @@
+[
+  {
+    "name": "laptop",
+    "file": "icons/laptop.svg",
+    "category": "Compute",
+    "viewBox": "0 0 24 24",
+    "keywords": [
+      "laptop",
+      "user",
+      "workstation",
+      "device"
+    ],
+    "description": "User laptop or workstation.",
+    "source": "Tabler Icons / `device-laptop` (MIT)"
+  },
+  {
+    "name": "phone",
+    "file": "icons/phone.svg",
+    "category": "Compute",
+    "viewBox": "0 0 24 24",
+    "keywords": [
+      "phone",
+      "mobile",
+      "tablet",
+      "client",
+      "device"
+    ],
+    "description": "Mobile phone or tablet client.",
+    "source": "Tabler Icons / `device-mobile` (MIT)"
+  },
+  {
+    "name": "desktop",
+    "file": "icons/desktop.svg",
+    "category": "Compute",
+    "viewBox": "0 0 24 24",
+    "keywords": [
+      "desktop",
+      "computer",
+      "device"
+    ],
+    "description": "Desktop computer.",
+    "source": "Tabler Icons / `device-desktop` (MIT)"
+  },
+  {
+    "name": "server",
+    "file": "icons/server.svg",
+    "category": "Compute",
+    "viewBox": "0 0 24 24",
+    "keywords": [
+      "server",
+      "physical",
+      "vm",
+      "host"
+    ],
+    "description": "Physical server or VM host.",
+    "source": "Tabler Icons / `server` (MIT)"
+  },
+  {
+    "name": "container",
+    "file": "icons/container.svg",
+    "category": "Compute",
+    "viewBox": "0 0 24 24",
+    "keywords": [
+      "container",
+      "image",
+      "running",
+      "instance",
+      "package"
+    ],
+    "description": "Container image or running instance.",
+    "source": "Tabler Icons / `package` (MIT)"
+  },
+  {
+    "name": "vm",
+    "file": "icons/vm.svg",
+    "category": "Compute",
+    "viewBox": "0 0 24 24",
+    "keywords": [
+      "vm",
+      "virtual",
+      "machine",
+      "cube"
+    ],
+    "description": "Virtual machine.",
+    "source": "Tabler Icons / `cube` (MIT)"
+  },
+  {
+    "name": "user",
+    "file": "icons/user.svg",
+    "category": "People",
+    "viewBox": "0 0 24 24",
+    "keywords": [
+      "user",
+      "end",
+      "actor"
+    ],
+    "description": "End user or single actor.",
+    "source": "Tabler Icons / `user` (MIT)"
+  },
+  {
+    "name": "users",
+    "file": "icons/users.svg",
+    "category": "People",
+    "viewBox": "0 0 24 24",
+    "keywords": [
+      "users",
+      "group",
+      "cohort",
+      "team"
+    ],
+    "description": "Group / cohort / team.",
+    "source": "Tabler Icons / `users` (MIT)"
+  },
+  {
+    "name": "admin",
+    "file": "icons/admin.svg",
+    "category": "People",
+    "viewBox": "0 0 24 24",
+    "keywords": [
+      "admin",
+      "privileged",
+      "user",
+      "shield"
+    ],
+    "description": "Privileged user / admin.",
+    "source": "Tabler Icons / `user-shield` (MIT)"
+  },
+  {
+    "name": "robot",
+    "file": "icons/robot.svg",
+    "category": "People",
+    "viewBox": "0 0 24 24",
+    "keywords": [
+      "robot",
+      "bot",
+      "agent",
+      "automated",
+      "process"
+    ],
+    "description": "Bot, agent, or automated process.",
+    "source": "Tabler Icons / `robot` (MIT)"
+  },
+  {
+    "name": "cloud",
+    "file": "icons/cloud.svg",
+    "category": "Network",
+    "viewBox": "0 0 24 24",
+    "keywords": [
+      "cloud",
+      "provider",
+      "boundary"
+    ],
+    "description": "Cloud provider or boundary.",
+    "source": "Tabler Icons / `cloud` (MIT)"
+  },
+  {
+    "name": "internet",
+    "file": "icons/internet.svg",
+    "category": "Network",
+    "viewBox": "0 0 24 24",
+    "keywords": [
+      "internet",
+      "public",
+      "world"
+    ],
+    "description": "Public internet.",
+    "source": "Tabler Icons / `world` (MIT)"
+  },
+  {
+    "name": "cdn",
+    "file": "icons/cdn.svg",
+    "category": "Network",
+    "viewBox": "0 0 24 24",
+    "keywords": [
+      "cdn",
+      "edge",
+      "cache",
+      "world",
+      "www"
+    ],
+    "description": "CDN or edge cache.",
+    "source": "Tabler Icons / `world-www` (MIT)"
+  },
+  {
+    "name": "firewall",
+    "file": "icons/firewall.svg",
+    "category": "Network",
+    "viewBox": "0 0 24 24",
+    "keywords": [
+      "firewall",
+      "perimeter",
+      "control",
+      "wall"
+    ],
+    "description": "Firewall or perimeter control.",
+    "source": "Tabler Icons / `wall` (MIT)"
+  },
+  {
+    "name": "vpn",
+    "file": "icons/vpn.svg",
+    "category": "Network",
+    "viewBox": "0 0 24 24",
+    "keywords": [
+      "vpn",
+      "encrypted",
+      "tunnel",
+      "shield",
+      "lock"
+    ],
+    "description": "VPN or encrypted tunnel.",
+    "source": "Tabler Icons / `shield-lock` (MIT)"
+  },
+  {
+    "name": "load-balancer",
+    "file": "icons/load-balancer.svg",
+    "category": "Network",
+    "viewBox": "0 0 24 24",
+    "keywords": [
+      "load",
+      "balancer",
+      "traffic",
+      "split",
+      "arrows"
+    ],
+    "description": "Load balancer / traffic split.",
+    "source": "Tabler Icons / `arrows-split` (MIT)"
+  },
+  {
+    "name": "gateway",
+    "file": "icons/gateway.svg",
+    "category": "Network",
+    "viewBox": "0 0 24 24",
+    "keywords": [
+      "gateway",
+      "api",
+      "ingress",
+      "door",
+      "enter"
+    ],
+    "description": "API gateway or ingress door.",
+    "source": "Tabler Icons / `door-enter` (MIT)"
+  },
+  {
+    "name": "dns",
+    "file": "icons/dns.svg",
+    "category": "Network",
+    "viewBox": "0 0 24 24",
+    "keywords": [
+      "dns",
+      "name",
+      "resolution",
+      "tag"
+    ],
+    "description": "DNS / name resolution.",
+    "source": "Tabler Icons / `tag` (MIT)"
+  },
+  {
+    "name": "database",
+    "file": "icons/database.svg",
+    "category": "Data",
+    "viewBox": "0 0 24 24",
+    "keywords": [
+      "database",
+      "relational",
+      "document"
+    ],
+    "description": "Relational or document database.",
+    "source": "Tabler Icons / `database` (MIT)"
+  },
+  {
+    "name": "file",
+    "file": "icons/file.svg",
+    "category": "Data",
+    "viewBox": "0 0 24 24",
+    "keywords": [
+      "file",
+      "generic"
+    ],
+    "description": "Generic file.",
+    "source": "Tabler Icons / `file` (MIT)"
+  },
+  {
+    "name": "log",
+    "file": "icons/log.svg",
+    "category": "Data",
+    "viewBox": "0 0 24 24",
+    "keywords": [
+      "log",
+      "file",
+      "event",
+      "stream",
+      "text"
+    ],
+    "description": "Log file / event stream.",
+    "source": "Tabler Icons / `file-text` (MIT)"
+  },
+  {
+    "name": "queue",
+    "file": "icons/queue.svg",
+    "category": "Data",
+    "viewBox": "0 0 24 24",
+    "keywords": [
+      "queue",
+      "message",
+      "fifo",
+      "stack"
+    ],
+    "description": "Message queue / FIFO.",
+    "source": "Tabler Icons / `stack-2` (MIT)"
+  },
+  {
+    "name": "cache",
+    "file": "icons/cache.svg",
+    "category": "Data",
+    "viewBox": "0 0 24 24",
+    "keywords": [
+      "cache",
+      "layer",
+      "bolt"
+    ],
+    "description": "Cache layer.",
+    "source": "Tabler Icons / `bolt` (MIT)"
+  },
+  {
+    "name": "bucket",
+    "file": "icons/bucket.svg",
+    "category": "Data",
+    "viewBox": "0 0 24 24",
+    "keywords": [
+      "bucket",
+      "object",
+      "storage",
+      "s3"
+    ],
+    "description": "Object storage / S3 bucket.",
+    "source": "Tabler Icons / `bucket` (MIT)"
+  },
+  {
+    "name": "backup",
+    "file": "icons/backup.svg",
+    "category": "Data",
+    "viewBox": "0 0 24 24",
+    "keywords": [
+      "backup",
+      "snapshot",
+      "device",
+      "floppy"
+    ],
+    "description": "Backup or snapshot.",
+    "source": "Tabler Icons / `device-floppy` (MIT)"
+  },
+  {
+    "name": "search",
+    "file": "icons/search.svg",
+    "category": "Data",
+    "viewBox": "0 0 24 24",
+    "keywords": [
+      "search",
+      "index",
+      "query"
+    ],
+    "description": "Search index / query.",
+    "source": "Tabler Icons / `search` (MIT)"
+  },
+  {
+    "name": "pod",
+    "file": "icons/pod.svg",
+    "category": "Kubernetes",
+    "viewBox": "0 0 24 24",
+    "keywords": [
+      "pod",
+      "smallest",
+      "deployable",
+      "unit",
+      "hexagon"
+    ],
+    "description": "Pod (smallest deployable unit).",
+    "source": "Tabler Icons / `hexagon` (MIT)"
+  },
+  {
+    "name": "node",
+    "file": "icons/node.svg",
+    "category": "Kubernetes",
+    "viewBox": "0 0 24 24",
+    "keywords": [
+      "node",
+      "cluster",
+      "topology",
+      "star"
+    ],
+    "description": "Cluster node.",
+    "source": "Tabler Icons / `topology-star` (MIT)"
+  },
+  {
+    "name": "service",
+    "file": "icons/service.svg",
+    "category": "Kubernetes",
+    "viewBox": "0 0 24 24",
+    "keywords": [
+      "service",
+      "k8s",
+      "virtual",
+      "endpoint",
+      "world",
+      "cog"
+    ],
+    "description": "K8s service / virtual endpoint.",
+    "source": "Tabler Icons / `world-cog` (MIT)"
+  },
+  {
+    "name": "deployment",
+    "file": "icons/deployment.svg",
+    "category": "Kubernetes",
+    "viewBox": "0 0 24 24",
+    "keywords": [
+      "deployment",
+      "rollout",
+      "rocket"
+    ],
+    "description": "Deployment rollout.",
+    "source": "Tabler Icons / `rocket` (MIT)"
+  },
+  {
+    "name": "ingress",
+    "file": "icons/ingress.svg",
+    "category": "Kubernetes",
+    "viewBox": "0 0 24 24",
+    "keywords": [
+      "ingress",
+      "controller",
+      "route",
+      "arrow",
+      "right",
+      "rhombus"
+    ],
+    "description": "Ingress controller / route in.",
+    "source": "Tabler Icons / `arrow-right-rhombus` (MIT)"
+  },
+  {
+    "name": "volume",
+    "file": "icons/volume.svg",
+    "category": "Kubernetes",
+    "viewBox": "0 0 24 24",
+    "keywords": [
+      "volume",
+      "persistent",
+      "device",
+      "sd",
+      "card"
+    ],
+    "description": "Persistent volume.",
+    "source": "Tabler Icons / `device-sd-card` (MIT)"
+  },
+  {
+    "name": "api",
+    "file": "icons/api.svg",
+    "category": "Action",
+    "viewBox": "0 0 24 24",
+    "keywords": [
+      "api",
+      "surface",
+      "endpoint",
+      "braces"
+    ],
+    "description": "API surface / endpoint.",
+    "source": "Tabler Icons / `braces` (MIT)"
+  },
+  {
+    "name": "request",
+    "file": "icons/request.svg",
+    "category": "Action",
+    "viewBox": "0 0 24 24",
+    "keywords": [
+      "request",
+      "outbound",
+      "arrow",
+      "right"
+    ],
+    "description": "Outbound request.",
+    "source": "Tabler Icons / `arrow-right` (MIT)"
+  },
+  {
+    "name": "response",
+    "file": "icons/response.svg",
+    "category": "Action",
+    "viewBox": "0 0 24 24",
+    "keywords": [
+      "response",
+      "inbound",
+      "arrow",
+      "left"
+    ],
+    "description": "Inbound response.",
+    "source": "Tabler Icons / `arrow-left` (MIT)"
+  },
+  {
+    "name": "sync",
+    "file": "icons/sync.svg",
+    "category": "Action",
+    "viewBox": "0 0 24 24",
+    "keywords": [
+      "sync",
+      "reconcile",
+      "loop",
+      "refresh"
+    ],
+    "description": "Sync / reconcile loop.",
+    "source": "Tabler Icons / `refresh` (MIT)"
+  },
+  {
+    "name": "lock",
+    "file": "icons/lock.svg",
+    "category": "Action",
+    "viewBox": "0 0 24 24",
+    "keywords": [
+      "lock",
+      "locked",
+      "authenticated"
+    ],
+    "description": "Locked / authenticated.",
+    "source": "Tabler Icons / `lock` (MIT)"
+  },
+  {
+    "name": "key",
+    "file": "icons/key.svg",
+    "category": "Action",
+    "viewBox": "0 0 24 24",
+    "keywords": [
+      "key",
+      "secret"
+    ],
+    "description": "Key / secret.",
+    "source": "Tabler Icons / `key` (MIT)"
+  },
+  {
+    "name": "alert",
+    "file": "icons/alert.svg",
+    "category": "Action",
+    "viewBox": "0 0 24 24",
+    "keywords": [
+      "alert",
+      "warning",
+      "paged",
+      "triangle"
+    ],
+    "description": "Warning / paged alert.",
+    "source": "Tabler Icons / `alert-triangle` (MIT)"
+  },
+  {
+    "name": "git-branch",
+    "file": "icons/git-branch.svg",
+    "category": "DevOps",
+    "viewBox": "0 0 24 24",
+    "keywords": [
+      "git",
+      "branch",
+      "fork",
+      "point"
+    ],
+    "description": "Branch / fork point.",
+    "source": "Tabler Icons / `git-branch` (MIT)"
+  },
+  {
+    "name": "terminal",
+    "file": "icons/terminal.svg",
+    "category": "DevOps",
+    "viewBox": "0 0 24 24",
+    "keywords": [
+      "terminal",
+      "shell",
+      "cli"
+    ],
+    "description": "Shell / CLI.",
+    "source": "Tabler Icons / `terminal` (MIT)"
+  },
+  {
+    "name": "pipeline",
+    "file": "icons/pipeline.svg",
+    "category": "DevOps",
+    "viewBox": "0 0 24 24",
+    "keywords": [
+      "pipeline",
+      "ci",
+      "cd",
+      "git",
+      "merge"
+    ],
+    "description": "CI/CD pipeline.",
+    "source": "Tabler Icons / `git-merge` (MIT)"
+  },
+  {
+    "name": "bug",
+    "file": "icons/bug.svg",
+    "category": "DevOps",
+    "viewBox": "0 0 24 24",
+    "keywords": [
+      "bug",
+      "defect"
+    ],
+    "description": "Bug / defect.",
+    "source": "Tabler Icons / `bug` (MIT)"
+  },
+  {
+    "name": "monitoring",
+    "file": "icons/monitoring.svg",
+    "category": "DevOps",
+    "viewBox": "0 0 24 24",
+    "keywords": [
+      "monitoring",
+      "metrics",
+      "observability",
+      "chart",
+      "line"
+    ],
+    "description": "Metrics / observability.",
+    "source": "Tabler Icons / `chart-line` (MIT)"
+  },
+  {
+    "name": "test",
+    "file": "icons/test.svg",
+    "category": "DevOps",
+    "viewBox": "0 0 24 24",
+    "keywords": [
+      "test",
+      "experiment",
+      "pipe"
+    ],
+    "description": "Test / experiment.",
+    "source": "Tabler Icons / `test-pipe` (MIT)"
+  },
+  {
+    "name": "docker",
+    "file": "icons/docker.svg",
+    "category": "Brand",
+    "viewBox": "0 0 24 24",
+    "keywords": [
+      "docker",
+      "engine",
+      "image",
+      "brand"
+    ],
+    "description": "Docker engine / image.",
+    "source": "Tabler Icons / `brand-docker` (MIT)"
+  },
+  {
+    "name": "terraform",
+    "file": "icons/terraform.svg",
+    "category": "Brand",
+    "viewBox": "0 0 24 24",
+    "keywords": [
+      "terraform",
+      "iac",
+      "brand"
+    ],
+    "description": "Terraform IaC.",
+    "source": "Tabler Icons / `brand-terraform` (MIT)"
+  },
+  {
+    "name": "aws",
+    "file": "icons/aws.svg",
+    "category": "Brand",
+    "viewBox": "0 0 24 24",
+    "keywords": [
+      "aws",
+      "amazon",
+      "web",
+      "services",
+      "brand"
+    ],
+    "description": "Amazon Web Services.",
+    "source": "Tabler Icons / `brand-aws` (MIT)"
+  },
+  {
+    "name": "azure",
+    "file": "icons/azure.svg",
+    "category": "Brand",
+    "viewBox": "0 0 24 24",
+    "keywords": [
+      "azure",
+      "microsoft",
+      "brand"
+    ],
+    "description": "Microsoft Azure.",
+    "source": "Tabler Icons / `brand-azure` (MIT)"
+  },
+  {
+    "name": "github",
+    "file": "icons/github.svg",
+    "category": "Brand",
+    "viewBox": "0 0 24 24",
+    "keywords": [
+      "github",
+      "brand"
+    ],
+    "description": "GitHub.",
+    "source": "Tabler Icons / `brand-github` (MIT)"
+  },
+  {
+    "name": "kubernetes",
+    "file": "icons/kubernetes.svg",
+    "category": "Brand",
+    "viewBox": "0 0 24 24",
+    "keywords": [
+      "kubernetes"
+    ],
+    "description": "Kubernetes.",
+    "source": "Simple Icons / `kubernetes` (CC0)"
+  },
+  {
+    "name": "gcp",
+    "file": "icons/gcp.svg",
+    "category": "Brand",
+    "viewBox": "0 0 24 24",
+    "keywords": [
+      "gcp",
+      "google",
+      "cloud",
+      "googlecloud"
+    ],
+    "description": "Google Cloud.",
+    "source": "Simple Icons / `googlecloud` (CC0)"
+  },
+  {
+    "name": "postgres",
+    "file": "icons/postgres.svg",
+    "category": "Brand",
+    "viewBox": "0 0 24 24",
+    "keywords": [
+      "postgres",
+      "postgresql"
+    ],
+    "description": "PostgreSQL.",
+    "source": "Simple Icons / `postgresql` (CC0)"
+  },
+  {
+    "name": "redis",
+    "file": "icons/redis.svg",
+    "category": "Brand",
+    "viewBox": "0 0 100 100",
+    "keywords": [
+      "redis"
+    ],
+    "description": "Redis.",
+    "source": "log-z/logos / `redis` (MIT)"
+  },
+  {
+    "name": "nginx",
+    "file": "icons/nginx.svg",
+    "category": "Brand",
+    "viewBox": "0 0 24 24",
+    "keywords": [
+      "nginx"
+    ],
+    "description": "Nginx.",
+    "source": "Simple Icons / `nginx` (CC0)"
+  },
+  {
+    "name": "gitea",
+    "file": "icons/gitea.svg",
+    "category": "Brand",
+    "viewBox": "0 0 24 24",
+    "keywords": [
+      "gitea",
+      "self",
+      "hosted",
+      "git"
+    ],
+    "description": "Gitea self-hosted git.",
+    "source": "Simple Icons / `gitea` (CC0)"
+  },
+  {
+    "name": "keycloak",
+    "file": "icons/keycloak.svg",
+    "category": "Brand",
+    "viewBox": "0 0 24 24",
+    "keywords": [
+      "keycloak",
+      "identity",
+      "sso"
+    ],
+    "description": "Keycloak identity / SSO.",
+    "source": "Simple Icons / `keycloak` (CC0)"
+  },
+  {
+    "name": "active-directory",
+    "file": "icons/active-directory.svg",
+    "category": "Brand",
+    "viewBox": "0 0 24 24",
+    "keywords": [
+      "active",
+      "directory",
+      "ldap",
+      "identity",
+      "address",
+      "book"
+    ],
+    "description": "Active Directory / LDAP identity directory.",
+    "source": "Tabler Icons / `address-book` (MIT)"
+  },
+  {
+    "name": "minio",
+    "file": "icons/minio.svg",
+    "category": "Brand",
+    "viewBox": "0 0 24 24",
+    "keywords": [
+      "minio",
+      "s3",
+      "compatible",
+      "object",
+      "storage"
+    ],
+    "description": "MinIO S3-compatible object storage.",
+    "source": "Simple Icons / `minio` (CC0)"
+  },
+  {
+    "name": "mysql",
+    "file": "icons/mysql.svg",
+    "category": "Brand",
+    "viewBox": "0 0 100 100",
+    "keywords": [
+      "mysql"
+    ],
+    "description": "MySQL.",
+    "source": "log-z/logos / `mysql` (MIT)"
+  },
+  {
+    "name": "oracle",
+    "file": "icons/oracle.svg",
+    "category": "Brand",
+    "viewBox": "0 0 24 24",
+    "keywords": [
+      "oracle",
+      "database"
+    ],
+    "description": "Oracle Database.",
+    "source": "Simple Icons / `oracle` (CC0)"
+  },
+  {
+    "name": "sqlserver",
+    "file": "icons/sqlserver.svg",
+    "category": "Brand",
+    "viewBox": "0 0 24 24",
+    "keywords": [
+      "sqlserver",
+      "microsoft",
+      "sql",
+      "server",
+      "microsoftsqlserver"
+    ],
+    "description": "Microsoft SQL Server.",
+    "source": "Simple Icons / `microsoftsqlserver` (CC0)"
+  },
+  {
+    "name": "sqlite",
+    "file": "icons/sqlite.svg",
+    "category": "Brand",
+    "viewBox": "0 0 24 24",
+    "keywords": [
+      "sqlite",
+      "embedded",
+      "database"
+    ],
+    "description": "SQLite embedded database.",
+    "source": "Simple Icons / `sqlite` (CC0)"
+  },
+  {
+    "name": "hive",
+    "file": "icons/hive.svg",
+    "category": "Brand",
+    "viewBox": "0 0 24 24",
+    "keywords": [
+      "hive",
+      "apache",
+      "data",
+      "warehouse",
+      "apachehive"
+    ],
+    "description": "Apache Hive data warehouse.",
+    "source": "Simple Icons / `apachehive` (CC0)"
+  },
+  {
+    "name": "starrocks",
+    "file": "icons/starrocks.svg",
+    "category": "Brand",
+    "viewBox": "0 0 100 100",
+    "keywords": [
+      "starrocks",
+      "mpp",
+      "analytical",
+      "db"
+    ],
+    "description": "StarRocks MPP analytical DB.",
+    "source": "log-z/logos / `starrocks` (MIT)"
+  },
+  {
+    "name": "nifi",
+    "file": "icons/nifi.svg",
+    "category": "Data stack",
+    "viewBox": "0 0 24 24",
+    "keywords": [
+      "nifi",
+      "apache",
+      "data",
+      "flow",
+      "apachenifi"
+    ],
+    "description": "Apache NiFi data flow.",
+    "source": "Simple Icons / `apachenifi` (CC0)"
+  },
+  {
+    "name": "airflow",
+    "file": "icons/airflow.svg",
+    "category": "Data stack",
+    "viewBox": "0 0 24 24",
+    "keywords": [
+      "airflow",
+      "apache",
+      "scheduler",
+      "dag",
+      "runner",
+      "apacheairflow"
+    ],
+    "description": "Apache Airflow scheduler / DAG runner.",
+    "source": "Simple Icons / `apacheairflow` (CC0)"
+  },
+  {
+    "name": "hop",
+    "file": "icons/hop.svg",
+    "category": "Data stack",
+    "viewBox": "0 0 440.00003 506.47376",
+    "keywords": [
+      "hop",
+      "apache",
+      "data",
+      "orchestration",
+      "etl",
+      "hop.apache.org"
+    ],
+    "description": "Apache Hop data orchestration / ETL.",
+    "source": "Direct fetch / `hop.apache.org` — verify license before use"
+  },
+  {
+    "name": "pentaho",
+    "file": "icons/pentaho.svg",
+    "category": "Data stack",
+    "viewBox": "47.71126037 35.82 381.14207297 108.26",
+    "keywords": [
+      "pentaho",
+      "pdi",
+      "kettle",
+      "etl",
+      "data",
+      "integration",
+      "cdn.worldvectorlogo.com"
+    ],
+    "description": "Pentaho PDI (Kettle) ETL & data integration.",
+    "source": "Direct fetch / `cdn.worldvectorlogo.com` — verify license before use"
+  },
+  {
+    "name": "dagster",
+    "file": "icons/dagster.svg",
+    "category": "Data stack",
+    "viewBox": "0 0 483 483",
+    "keywords": [
+      "dagster",
+      "data",
+      "orchestration",
+      "platform",
+      "cdn.prod.website",
+      "files.com"
+    ],
+    "description": "Dagster data orchestration platform.",
+    "source": "Direct fetch / `cdn.prod.website-files.com` — verify license before use"
+  },
+  {
+    "name": "trino",
+    "file": "icons/trino.svg",
+    "category": "Data stack",
+    "viewBox": "0 0 24 24",
+    "keywords": [
+      "trino",
+      "distributed",
+      "sql",
+      "query",
+      "engine"
+    ],
+    "description": "Trino distributed SQL query engine.",
+    "source": "Simple Icons / `trino` (CC0)"
+  },
+  {
+    "name": "superset",
+    "file": "icons/superset.svg",
+    "category": "Data stack",
+    "viewBox": "0 0 24 24",
+    "keywords": [
+      "superset",
+      "apache",
+      "bi",
+      "dashboards",
+      "apachesuperset"
+    ],
+    "description": "Apache Superset BI / dashboards.",
+    "source": "Simple Icons / `apachesuperset` (CC0)"
+  },
+  {
+    "name": "redash",
+    "file": "icons/redash.svg",
+    "category": "Data stack",
+    "viewBox": "0 0 24 24",
+    "keywords": [
+      "redash",
+      "open",
+      "source",
+      "bi",
+      "dashboards"
+    ],
+    "description": "Redash open-source BI & dashboards.",
+    "source": "Simple Icons / `redash` (CC0)"
+  },
+  {
+    "name": "tableau",
+    "file": "icons/tableau.svg",
+    "category": "Data stack",
+    "viewBox": "0 0 24 24",
+    "keywords": [
+      "tableau",
+      "data",
+      "visualization"
+    ],
+    "description": "Tableau data visualization.",
+    "source": "Simple Icons / `tableau` (CC0)"
+  },
+  {
+    "name": "powerbi",
+    "file": "icons/powerbi.svg",
+    "category": "Data stack",
+    "viewBox": "0 0 24 24",
+    "keywords": [
+      "powerbi",
+      "microsoft",
+      "power",
+      "bi"
+    ],
+    "description": "Microsoft Power BI.",
+    "source": "Simple Icons / `powerbi` (CC0)"
+  },
+  {
+    "name": "jupyter",
+    "file": "icons/jupyter.svg",
+    "category": "Data stack",
+    "viewBox": "0 0 24 24",
+    "keywords": [
+      "jupyter",
+      "jupyterlab",
+      "notebooks"
+    ],
+    "description": "Jupyter / JupyterLab notebooks.",
+    "source": "Simple Icons / `jupyter` (CC0)"
+  },
+  {
+    "name": "python",
+    "file": "icons/python.svg",
+    "category": "Language",
+    "viewBox": "0 0 24 24",
+    "keywords": [
+      "python"
+    ],
+    "description": "Python.",
+    "source": "Simple Icons / `python` (CC0)"
+  },
+  {
+    "name": "r",
+    "file": "icons/r.svg",
+    "category": "Language",
+    "viewBox": "0 0 24 24",
+    "keywords": [
+      "statistical",
+      "language"
+    ],
+    "description": "R statistical language.",
+    "source": "Simple Icons / `r` (CC0)"
+  },
+  {
+    "name": "sql",
+    "file": "icons/sql.svg",
+    "category": "Language",
+    "viewBox": "0 0 24 24",
+    "keywords": [
+      "sql",
+      "generic",
+      "relational",
+      "query"
+    ],
+    "description": "SQL / generic relational query.",
+    "source": "Tabler Icons / `sql` (MIT)"
+  },
+  {
+    "name": "spss",
+    "file": "icons/spss.svg",
+    "category": "Statistical tools",
+    "viewBox": "0 0 128 128",
+    "keywords": [
+      "spss",
+      "ibm",
+      "statistics",
+      "plain"
+    ],
+    "description": "IBM SPSS Statistics.",
+    "source": "Devicon / `spss-plain` (MIT)"
+  },
+  {
+    "name": "sas",
+    "file": "icons/sas.svg",
+    "category": "Statistical tools",
+    "viewBox": "0 0 129.24898 53.067852",
+    "keywords": [
+      "sas",
+      "analytics",
+      "platform",
+      "upload.wikimedia.org"
+    ],
+    "description": "SAS analytics platform.",
+    "source": "Direct fetch / `upload.wikimedia.org` — verify license before use"
+  },
+  {
+    "name": "stata",
+    "file": "icons/stata.svg",
+    "category": "Statistical tools",
+    "viewBox": "0 0 128 128",
+    "keywords": [
+      "stata",
+      "statistical",
+      "software",
+      "icon.icepanel.io"
+    ],
+    "description": "Stata statistical software.",
+    "source": "Direct fetch / `icon.icepanel.io` — verify license before use"
+  },
+  {
+    "name": "rstudio",
+    "file": "icons/rstudio.svg",
+    "category": "Statistical tools",
+    "viewBox": "0 0 128 128",
+    "keywords": [
+      "rstudio",
+      "posit",
+      "ide",
+      "python",
+      "plain"
+    ],
+    "description": "RStudio / Posit IDE for R and Python.",
+    "source": "Devicon / `rstudio-plain` (MIT)"
+  },
+  {
+    "name": "qgis",
+    "file": "icons/qgis.svg",
+    "category": "Statistical tools",
+    "viewBox": "0 0 24 24",
+    "keywords": [
+      "qgis",
+      "open",
+      "source",
+      "gis",
+      "platform"
+    ],
+    "description": "QGIS open-source GIS platform.",
+    "source": "Simple Icons / `qgis` (CC0)"
+  },
+  {
+    "name": "excel",
+    "file": "icons/excel.svg",
+    "category": "File formats",
+    "viewBox": "0 0 24 24",
+    "keywords": [
+      "excel",
+      "microsoft",
+      "spreadsheet",
+      "file",
+      "type",
+      "xls"
+    ],
+    "description": "Microsoft Excel spreadsheet.",
+    "source": "Tabler Icons / `file-type-xls` (MIT)"
+  },
+  {
+    "name": "csv",
+    "file": "icons/csv.svg",
+    "category": "File formats",
+    "viewBox": "0 0 24 24",
+    "keywords": [
+      "csv",
+      "comma",
+      "separated",
+      "values",
+      "file",
+      "type"
+    ],
+    "description": "Comma-separated values file.",
+    "source": "Tabler Icons / `file-type-csv` (MIT)"
+  },
+  {
+    "name": "txt",
+    "file": "icons/txt.svg",
+    "category": "File formats",
+    "viewBox": "0 0 24 24",
+    "keywords": [
+      "txt",
+      "plain",
+      "text",
+      "file",
+      "type"
+    ],
+    "description": "Plain text file.",
+    "source": "Tabler Icons / `file-type-txt` (MIT)"
+  }
+]

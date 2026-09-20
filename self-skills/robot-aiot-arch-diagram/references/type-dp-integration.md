@@ -10,6 +10,7 @@ This type is **parametric** — like `type-high-level.md`, every coord is derive
 
 ## 1. Inputs — the parameter contract
 
+canonical 副本：`templates/type-dp-integration.yaml` — 参数化文档契约，复制后手工填参绘图；不是 generate-from-template.py 的输入（该脚本只接受 containers/nodes/arrows JSON），以 templates 为准
 ```yaml
 sources:                            # left column, 0..6 nodes
   - { name: "Databases",  type: "db",        subtitle: "SQL · MariaDB",

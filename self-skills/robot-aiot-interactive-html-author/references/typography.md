@@ -198,6 +198,7 @@ font-family: "Newsreader", "Noto Serif SC", "Songti SC", "SimSun", serif;
 7. **强调手段**：中文正文强调只用字重 / 颜色（§15 条 6/9）；着重号 `text-emphasis: dot` 是中文原生强调（Chromium / Safari 可用，Firefox 不支持时降级字重强调）；引文块可整段换楷体——楷体即中文的"引用语气"，段间换字体不违反 §15 条 9（该条禁的是一句话内切换）
 8. **正文兜底**：`text-wrap: pretty`（消灭行尾孤词，西文效果明显、中文轻微，全局给正文无副作用）
 
+> 规范副本：`templates/deck-skeleton.html` — 复制进交付物，以 templates 为准（下方代码块为参考摘录）
 ```css
 :root {
   line-break: strict;

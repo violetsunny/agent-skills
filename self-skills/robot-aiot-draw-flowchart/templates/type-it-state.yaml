@@ -1,0 +1,34 @@
+title:    "Current IT Landscape"
+subtitle: "Data pipeline before the platform"
+eyebrow:  "NatStat · Before the platform"
+
+orientation: horizontal
+
+zones:
+  - name: "COLLECTION"
+    components:
+      - { id: survey-solutions, name: "Survey Solutions", sub: "CAPI · PostgreSQL",          icon: postgres }
+      - { id: aspnet,           name: "ASP.NET Apps",     sub: "migration · admin portals", icon: server   }
+      - { id: civil-reg,        name: "Civil Registry",   sub: "external · CRVS data",      icon: database, kind: external }
+  - name: "PROCESSING"
+    components:
+      - { id: shared-drive,  name: "Shared Drive",     sub: "No version control · Windows file share", icon: file,      kind: focal }
+      - { id: analyst-mach,  name: "Analyst Machines", sub: "SPSS · SAS · Stata · Excel",              icon: desktop }
+      - { id: sql-server,    name: "SQL Server",       sub: "on-premises · core RDBMS",                icon: sqlserver, color: "#7a8c47" }
+  - name: "DISSEMINATION"
+    components:
+      - { id: legacy-portal,   name: "LegacyPortal",      sub: "manual bottleneck",     icon: cloud,    kind: focal }
+      - { id: natstat-website, name: "NatStat Website",   sub: "public · static pages", icon: internet }
+      - { id: ministry,        name: "Ministry Partners", sub: "~6 ministries",         icon: users,    kind: external }
+
+connectors:
+  - { from: survey-solutions, to: shared-drive,   label: "CSV",    icon: csv,   style: link }
+  - { from: aspnet,           to: shared-drive,   label: "EMAIL",  icon: file,  style: link }
+  - { from: civil-reg,        to: shared-drive,   label: "EXCEL",  icon: excel, style: link, dashed: true }
+  - { from: shared-drive,     to: analyst-mach,   label: "COPY",                style: accent, dashed: true }
+  - { from: analyst-mach,     to: sql-server,     label: "LOAD",                style: neutral }
+  - { from: analyst-mach,     to: legacy-portal,   label: "EXCEL",  icon: excel, style: accent }
+  - { from: legacy-portal,    to: natstat-website, label: "WEB",                 style: neutral }
+  - { from: natstat-website,  to: ministry,        label: "CSV DL", icon: csv,   style: link, dashed: true }
+
+dark: false

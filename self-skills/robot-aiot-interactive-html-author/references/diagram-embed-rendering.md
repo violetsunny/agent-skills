@@ -65,6 +65,7 @@
 
 ### 1.3 临时 HTML 包装页模板
 
+> 规范副本：`templates/mermaid-wrapper.html` — 复制进交付物，以 templates 为准（下方代码块为参考摘录）
 ```html
 <!doctype html>
 <html>
@@ -206,3 +207,18 @@ PlantUML 不走本地浏览器，走 **PlantUML 服务器**渲染：
 | Node 无关 | 渲染管线（Chrome/CDP、PlantUML fetch）全部发生在构建期，最终产物不依赖任何运行时 |
 
 冲突裁决：两文件冲突时，以 self-contained-html.md 的自包含与体积约束为准，本文件提供达成手段。
+
+---
+
+## 六、图表元素入场动画条款（手绘 SVG 与嵌入 SVG 通用）
+
+元素级动画类一律用 `templates/deck-skeleton.html` 的标准底座 CSS（`anim-pop/draw/head/fade/flow` + reduced-motion 分支），禁止手写改写参数；时序统一挂 `--i`（delay = --i×160ms）。
+
+1. **节点/分组**：`.anim-pop`。
+2. **实线连接器**：`.anim-draw`（`--L` 传 `getTotalLength()` 实测值）+ 终点独立 polygon 挂 `.anim-head`（箭头分离；禁 `marker-end`，否则线未画完箭头先现）。
+3. **虚线连接器**（自带 dasharray 图案）：禁 `.anim-draw`（dasharray 被覆盖、虚线变实线）。静态虚线用 `.anim-fade` 整线淡入；流动虚线用 `.anim-flow`（入场 fadein + 无限 flowdash 双动画，两个 delay 均取 `--i` 派生值）。此两类可保留 `marker-end`（箭头随整线同帧淡入，无分离问题）。
+4. **图例组** `<g id="*-legend">`：必须挂 `.anim-pop`，`--i` 排在全图最后元素之后；裸 `<g>` 瞬现属缺陷。
+5. **编排顺序**：节点 → 连接器 → 标注文字 → 图例；同批同步元素共用同一 `--i`。
+6. **验证三态**：早期帧（`--virtual-time-budget`≈100-300）+ 终态帧 + reduced-motion 帧截图比对；早期帧中连接器/图例必须不可见，终态帧必须完整。只截终态发现不了瞬现缺陷。
+
+参数细则与坑位清单见 `animation-fx-catalog.md`「入场同步三条款」与「path-draw 三坑」。

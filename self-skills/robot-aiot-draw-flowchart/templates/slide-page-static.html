@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>第 N 页：页面标题</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    :root {
+      --primary-color: #0078D4;
+      --on-primary-color: #FFFFFF;
+      --secondary-color: #4F6BED;
+      --tertiary-color: #00A389;
+      --bg-color: #EEF2F7;
+      --surface-color: #FFFFFF;
+      --surface-muted: #F5F7FB;
+      --outline-color: #D7DFEA;
+      --text-primary: #16324F;
+      --text-secondary: #5B6B7F;
+      --text-tertiary: #8A99AC;
+      --space-sm: 8px;
+      --space-md: 16px;
+      --space-lg: 24px;
+      --space-xl: 32px;
+      --space-2xl: 48px;
+      --radius-md: 12px;
+      --radius-lg: 16px;
+      --radius-full: 9999px;
+      --shadow-soft: 0 6px 24px rgba(18, 52, 86, 0.08);
+    }
+    html, body { height: 100%; overflow: hidden; }
+    body {
+      background: var(--bg-color);
+      font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
+    }
+    .fit-viewport {
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .canvas {
+      position: relative;
+      width: 1920px;
+      height: 1080px;
+      flex-shrink: 0;
+      transform-origin: center center;
+      background: var(--surface-color);
+      overflow: hidden;
+      box-shadow: var(--shadow-soft);
+    }
+    .notes { display: none; }
+  </style>
+</head>
+<body>
+  <div class="fit-viewport">
+  <div class="canvas">
+    <!-- 标题区 -->
+    <!-- 结论区 -->
+    <!-- 主内容区 -->
+    <!-- 说明区 -->
+    <!-- 品牌区 -->
+    <div class="notes"><!-- 本页汇报话术，仅供演讲者，永不上屏 --></div>
+  </div>
+  </div>
+  <script>
+  (function () {
+    var canvas = document.querySelector('.canvas');
+    function fit() {
+      var s = Math.min(window.innerWidth / 1920, window.innerHeight / 1080);
+      canvas.style.transform = 'scale(' + s + ')';
+    }
+    window.addEventListener('resize', fit);
+    fit();
+  })();
+  </script>
+</body>
+</html>

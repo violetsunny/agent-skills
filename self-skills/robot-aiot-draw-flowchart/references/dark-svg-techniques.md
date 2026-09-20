@@ -88,16 +88,18 @@ SVG 后画者在上，严格按此顺序输出：
 
 八个语义类别，每类 = 深色 rgba 半透明填充 + 同色系亮色描边：
 
-| 类别 | 填充 | 描边 | 用途 |
-|---|---|---|---|
-| Primary | `rgba(8,51,68,0.4)` | `#22d3ee` cyan | 前端、用户侧、入口 |
-| Secondary | `rgba(6,78,59,0.4)` | `#34d399` emerald | 后端、服务、处理 |
-| Tertiary | `rgba(76,29,149,0.4)` | `#a78bfa` violet | 数据库、存储、持久化 |
-| Accent | `rgba(120,53,15,0.3)` | `#fbbf24` amber | 云、基础设施、区域、决策 |
-| Alert | `rgba(136,19,55,0.4)` | `#fb7185` rose | 安全、错误、警告 |
-| Connector | `rgba(251,146,60,0.3)` | `#fb923c` orange | 总线、队列、中间件 |
-| Neutral | `rgba(30,41,59,0.5)` | `#94a3b8` slate | 外部系统、通用、未知 |
-| Highlight | `rgba(59,130,246,0.3)` | `#60a5fa` blue | 激活态、焦点、当前步骤、起止节点 |
+canonical 数据：`assets/dark-palette.json` — 以 json 为准（8 条，字段 category/fill/stroke/stroke_name/usage）。简表：
+
+| 类别 | 描边 |
+|---|---|
+| Primary | `#22d3ee` cyan |
+| Secondary | `#34d399` emerald |
+| Tertiary | `#a78bfa` violet |
+| Accent | `#fbbf24` amber |
+| Alert | `#fb7185` rose |
+| Connector | `#fb923c` orange |
+| Neutral | `#94a3b8` slate |
+| Highlight | `#60a5fa` blue |
 
 使用规则：
 

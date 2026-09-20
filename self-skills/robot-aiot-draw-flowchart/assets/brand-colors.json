@@ -1,0 +1,605 @@
+[
+  {
+    "product": "OpenAI / ChatGPT",
+    "category": "AI / ML Products",
+    "hex": "#10A37F",
+    "badge": "OAI"
+  },
+  {
+    "product": "Anthropic / Claude",
+    "category": "AI / ML Products",
+    "hex": "#D97757",
+    "badge": "Claude"
+  },
+  {
+    "product": "Google Gemini",
+    "category": "AI / ML Products",
+    "hex": "#4285F4",
+    "badge": "Gemini"
+  },
+  {
+    "product": "Meta LLaMA",
+    "category": "AI / ML Products",
+    "hex": "#0467DF",
+    "badge": "LLaMA"
+  },
+  {
+    "product": "Mistral",
+    "category": "AI / ML Products",
+    "hex": "#FF7000",
+    "badge": "Mistral"
+  },
+  {
+    "product": "Cohere",
+    "category": "AI / ML Products",
+    "hex": "#39594D",
+    "badge": "Cohere"
+  },
+  {
+    "product": "Groq",
+    "category": "AI / ML Products",
+    "hex": "#F55036",
+    "badge": "Groq"
+  },
+  {
+    "product": "Together AI",
+    "category": "AI / ML Products",
+    "hex": "#6366F1",
+    "badge": "Together"
+  },
+  {
+    "product": "Replicate",
+    "category": "AI / ML Products",
+    "hex": "#191919",
+    "badge": "Rep"
+  },
+  {
+    "product": "Hugging Face",
+    "category": "AI / ML Products",
+    "hex": "#FFD21E",
+    "badge": "HF",
+    "note": "(text dark)"
+  },
+  {
+    "product": "Mem0",
+    "category": "AI Memory & RAG Products",
+    "hex": "#6366F1",
+    "badge": "mem0"
+  },
+  {
+    "product": "LangChain",
+    "category": "AI Memory & RAG Products",
+    "hex": "#1C3C3C",
+    "badge": "🦜 or LC"
+  },
+  {
+    "product": "LlamaIndex",
+    "category": "AI Memory & RAG Products",
+    "hex": "#8B5CF6",
+    "badge": "LI"
+  },
+  {
+    "product": "LangGraph",
+    "category": "AI Memory & RAG Products",
+    "hex": "#1C3C3C",
+    "badge": "LG"
+  },
+  {
+    "product": "CrewAI",
+    "category": "AI Memory & RAG Products",
+    "hex": "#EF4444",
+    "badge": "Crew"
+  },
+  {
+    "product": "AutoGen",
+    "category": "AI Memory & RAG Products",
+    "hex": "#0078D4",
+    "badge": "AG"
+  },
+  {
+    "product": "Haystack",
+    "category": "AI Memory & RAG Products",
+    "hex": "#FF6D00",
+    "badge": "🌾 or HS"
+  },
+  {
+    "product": "DSPy",
+    "category": "AI Memory & RAG Products",
+    "hex": "#7C3AED",
+    "badge": "DSPy"
+  },
+  {
+    "product": "Pinecone",
+    "category": "Vector Databases",
+    "hex": "#1C1C2E",
+    "badge": "Pine",
+    "note": "+ green"
+  },
+  {
+    "product": "Weaviate",
+    "category": "Vector Databases",
+    "hex": "#FA0050",
+    "badge": "Wea"
+  },
+  {
+    "product": "Qdrant",
+    "category": "Vector Databases",
+    "hex": "#DC244C",
+    "badge": "Qdrant"
+  },
+  {
+    "product": "Chroma",
+    "category": "Vector Databases",
+    "hex": "#FF6B35",
+    "badge": "Chr"
+  },
+  {
+    "product": "Milvus",
+    "category": "Vector Databases",
+    "hex": "#00A1EA",
+    "badge": "Milvus"
+  },
+  {
+    "product": "pgvector",
+    "category": "Vector Databases",
+    "hex": "#336791",
+    "badge": "pgv"
+  },
+  {
+    "product": "Faiss",
+    "category": "Vector Databases",
+    "hex": "#0467DF",
+    "badge": "FAISS"
+  },
+  {
+    "product": "PostgreSQL",
+    "category": "Classic Databases & Storage",
+    "hex": "#336791"
+  },
+  {
+    "product": "MySQL",
+    "category": "Classic Databases & Storage",
+    "hex": "#4479A1"
+  },
+  {
+    "product": "MongoDB",
+    "category": "Classic Databases & Storage",
+    "hex": "#47A248"
+  },
+  {
+    "product": "Redis",
+    "category": "Classic Databases & Storage",
+    "hex": "#DC382D"
+  },
+  {
+    "product": "Elasticsearch",
+    "category": "Classic Databases & Storage",
+    "hex": "#005571"
+  },
+  {
+    "product": "Cassandra",
+    "category": "Classic Databases & Storage",
+    "hex": "#1287B1"
+  },
+  {
+    "product": "Neo4j",
+    "category": "Classic Databases & Storage",
+    "hex": "#008CC1"
+  },
+  {
+    "product": "SQLite",
+    "category": "Classic Databases & Storage",
+    "hex": "#003B57"
+  },
+  {
+    "product": "Apache Kafka",
+    "category": "Message Queues & Streaming",
+    "hex": "#231F20"
+  },
+  {
+    "product": "RabbitMQ",
+    "category": "Message Queues & Streaming",
+    "hex": "#FF6600"
+  },
+  {
+    "product": "AWS SQS",
+    "category": "Message Queues & Streaming",
+    "hex": "#FF9900"
+  },
+  {
+    "product": "NATS",
+    "category": "Message Queues & Streaming",
+    "hex": "#27AAE1"
+  },
+  {
+    "product": "Pulsar",
+    "category": "Message Queues & Streaming",
+    "hex": "#188FFF"
+  },
+  {
+    "product": "AWS",
+    "category": "Cloud & Infra",
+    "hex": "#FF9900"
+  },
+  {
+    "product": "GCP",
+    "category": "Cloud & Infra",
+    "hex": "#4285F4"
+  },
+  {
+    "product": "Azure",
+    "category": "Cloud & Infra",
+    "hex": "#0089D6"
+  },
+  {
+    "product": "Cloudflare",
+    "category": "Cloud & Infra",
+    "hex": "#F48120"
+  },
+  {
+    "product": "Vercel",
+    "category": "Cloud & Infra",
+    "hex": "#000000"
+  },
+  {
+    "product": "Docker",
+    "category": "Cloud & Infra",
+    "hex": "#2496ED"
+  },
+  {
+    "product": "Kubernetes",
+    "category": "Cloud & Infra",
+    "hex": "#326CE5"
+  },
+  {
+    "product": "Terraform",
+    "category": "Cloud & Infra",
+    "hex": "#7B42BC"
+  },
+  {
+    "product": "Nginx",
+    "category": "Cloud & Infra",
+    "hex": "#009639"
+  },
+  {
+    "product": "FastAPI",
+    "category": "Cloud & Infra",
+    "hex": "#009688"
+  },
+  {
+    "product": "Grafana",
+    "category": "Observability",
+    "hex": "#F46800"
+  },
+  {
+    "product": "Prometheus",
+    "category": "Observability",
+    "hex": "#E6522C"
+  },
+  {
+    "product": "Datadog",
+    "category": "Observability",
+    "hex": "#632CA6"
+  },
+  {
+    "product": "LangSmith",
+    "category": "Observability",
+    "hex": "#1C3C3C"
+  },
+  {
+    "product": "Langfuse",
+    "category": "Observability",
+    "hex": "#6366F1"
+  },
+  {
+    "product": "Arize",
+    "category": "Observability",
+    "hex": "#6B48FF"
+  },
+  {
+    "product": "Azure Functions",
+    "category": "Azure Compute",
+    "hex": "#0062AD",
+    "badge": "Func"
+  },
+  {
+    "product": "Azure App Service",
+    "category": "Azure Compute",
+    "hex": "#0072C6",
+    "badge": "App"
+  },
+  {
+    "product": "Azure Container Apps",
+    "category": "Azure Compute",
+    "hex": "#3F8624",
+    "badge": "ACA"
+  },
+  {
+    "product": "Azure Container Instances",
+    "category": "Azure Compute",
+    "hex": "#0078D4",
+    "badge": "ACI"
+  },
+  {
+    "product": "Azure Kubernetes Service (AKS)",
+    "category": "Azure Compute",
+    "hex": "#326CE5",
+    "badge": "AKS"
+  },
+  {
+    "product": "Azure Virtual Machines",
+    "category": "Azure Compute",
+    "hex": "#0078D4",
+    "badge": "VM"
+  },
+  {
+    "product": "Azure Batch",
+    "category": "Azure Compute",
+    "hex": "#0072C6",
+    "badge": "Batch"
+  },
+  {
+    "product": "Azure Spring Apps",
+    "category": "Azure Compute",
+    "hex": "#6DB33F",
+    "badge": "Spring"
+  },
+  {
+    "product": "Azure SQL Database",
+    "category": "Azure Data & Analytics",
+    "hex": "#0066A1",
+    "badge": "SQL"
+  },
+  {
+    "product": "Azure Cosmos DB",
+    "category": "Azure Data & Analytics",
+    "hex": "#3D7AB3",
+    "badge": "Cosmos"
+  },
+  {
+    "product": "Azure Database for PostgreSQL",
+    "category": "Azure Data & Analytics",
+    "hex": "#336791",
+    "badge": "pg"
+  },
+  {
+    "product": "Azure Database for MySQL",
+    "category": "Azure Data & Analytics",
+    "hex": "#4479A1",
+    "badge": "MySQL"
+  },
+  {
+    "product": "Azure Synapse Analytics",
+    "category": "Azure Data & Analytics",
+    "hex": "#0078D4",
+    "badge": "Syn"
+  },
+  {
+    "product": "Azure Data Factory",
+    "category": "Azure Data & Analytics",
+    "hex": "#0078D4",
+    "badge": "ADF"
+  },
+  {
+    "product": "Azure Databricks",
+    "category": "Azure Data & Analytics",
+    "hex": "#FF3621",
+    "badge": "Bricks"
+  },
+  {
+    "product": "Azure Stream Analytics",
+    "category": "Azure Data & Analytics",
+    "hex": "#0072C6",
+    "badge": "Stream"
+  },
+  {
+    "product": "Azure Data Explorer (Kusto)",
+    "category": "Azure Data & Analytics",
+    "hex": "#1E5180",
+    "badge": "Kusto"
+  },
+  {
+    "product": "Azure Cache for Redis",
+    "category": "Azure Data & Analytics",
+    "hex": "#DC382D",
+    "badge": "Redis"
+  },
+  {
+    "product": "Azure Blob Storage",
+    "category": "Azure Storage",
+    "hex": "#0078D4",
+    "badge": "Blob"
+  },
+  {
+    "product": "Azure Queue Storage",
+    "category": "Azure Storage",
+    "hex": "#0078D4",
+    "badge": "Queue"
+  },
+  {
+    "product": "Azure Table Storage",
+    "category": "Azure Storage",
+    "hex": "#0078D4",
+    "badge": "Table"
+  },
+  {
+    "product": "Azure Files",
+    "category": "Azure Storage",
+    "hex": "#0078D4",
+    "badge": "Files"
+  },
+  {
+    "product": "Azure Data Lake Storage Gen2",
+    "category": "Azure Storage",
+    "hex": "#0078D4",
+    "badge": "Lake"
+  },
+  {
+    "product": "Azure OpenAI Service",
+    "category": "Azure AI",
+    "hex": "#10A37F",
+    "badge": "AOAI"
+  },
+  {
+    "product": "Azure AI Search (Cognitive Search)",
+    "category": "Azure AI",
+    "hex": "#0078D4",
+    "badge": "AISrch"
+  },
+  {
+    "product": "Azure AI Foundry",
+    "category": "Azure AI",
+    "hex": "#742774",
+    "badge": "Foundry"
+  },
+  {
+    "product": "Azure Machine Learning",
+    "category": "Azure AI",
+    "hex": "#0078D4",
+    "badge": "AML"
+  },
+  {
+    "product": "Azure AI Content Safety",
+    "category": "Azure AI",
+    "hex": "#107C10",
+    "badge": "Safety"
+  },
+  {
+    "product": "Azure Speech / Translator",
+    "category": "Azure AI",
+    "hex": "#0078D4",
+    "badge": "Speech"
+  },
+  {
+    "product": "Azure Service Bus",
+    "category": "Azure Messaging & Eventing",
+    "hex": "#0078D4",
+    "badge": "SB"
+  },
+  {
+    "product": "Azure Event Grid",
+    "category": "Azure Messaging & Eventing",
+    "hex": "#0078D4",
+    "badge": "Grid"
+  },
+  {
+    "product": "Azure Event Hubs",
+    "category": "Azure Messaging & Eventing",
+    "hex": "#0078D4",
+    "badge": "Hubs"
+  },
+  {
+    "product": "Azure Notification Hubs",
+    "category": "Azure Messaging & Eventing",
+    "hex": "#0078D4",
+    "badge": "Notif"
+  },
+  {
+    "product": "Azure SignalR Service",
+    "category": "Azure Messaging & Eventing",
+    "hex": "#0078D4",
+    "badge": "SignalR"
+  },
+  {
+    "product": "Azure Front Door",
+    "category": "Azure Networking & Edge",
+    "hex": "#0078D4",
+    "badge": "AFD"
+  },
+  {
+    "product": "Azure Application Gateway",
+    "category": "Azure Networking & Edge",
+    "hex": "#0078D4",
+    "badge": "AppGW"
+  },
+  {
+    "product": "Azure Load Balancer",
+    "category": "Azure Networking & Edge",
+    "hex": "#0078D4",
+    "badge": "LB"
+  },
+  {
+    "product": "Azure API Management",
+    "category": "Azure Networking & Edge",
+    "hex": "#1FBA9F",
+    "badge": "APIM"
+  },
+  {
+    "product": "Azure Virtual Network",
+    "category": "Azure Networking & Edge",
+    "hex": "#0078D4",
+    "badge": "VNet"
+  },
+  {
+    "product": "Azure Private Link",
+    "category": "Azure Networking & Edge",
+    "hex": "#0078D4",
+    "badge": "PL"
+  },
+  {
+    "product": "Azure CDN",
+    "category": "Azure Networking & Edge",
+    "hex": "#0078D4",
+    "badge": "CDN"
+  },
+  {
+    "product": "Azure DNS",
+    "category": "Azure Networking & Edge",
+    "hex": "#0078D4",
+    "badge": "DNS"
+  },
+  {
+    "product": "Microsoft Entra ID (Azure AD)",
+    "category": "Azure Identity & Security",
+    "hex": "#0072C6",
+    "badge": "Entra"
+  },
+  {
+    "product": "Azure Key Vault",
+    "category": "Azure Identity & Security",
+    "hex": "#FFB900",
+    "badge": "KV"
+  },
+  {
+    "product": "Azure Sentinel",
+    "category": "Azure Identity & Security",
+    "hex": "#0072C6",
+    "badge": "Sentinel"
+  },
+  {
+    "product": "Microsoft Defender for Cloud",
+    "category": "Azure Identity & Security",
+    "hex": "#0078D4",
+    "badge": "Defender"
+  },
+  {
+    "product": "Azure DevOps Pipelines",
+    "category": "Azure DevOps & Operations",
+    "hex": "#0078D4",
+    "badge": "Pipelines"
+  },
+  {
+    "product": "GitHub Actions (Azure target)",
+    "category": "Azure DevOps & Operations",
+    "hex": "#181717",
+    "badge": "GHA"
+  },
+  {
+    "product": "Azure Monitor",
+    "category": "Azure DevOps & Operations",
+    "hex": "#0078D4",
+    "badge": "Monitor"
+  },
+  {
+    "product": "Application Insights",
+    "category": "Azure DevOps & Operations",
+    "hex": "#0072C6",
+    "badge": "AppI"
+  },
+  {
+    "product": "Azure Log Analytics",
+    "category": "Azure DevOps & Operations",
+    "hex": "#0078D4",
+    "badge": "Logs"
+  }
+]

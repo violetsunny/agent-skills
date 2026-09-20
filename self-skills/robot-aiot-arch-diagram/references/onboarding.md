@@ -189,52 +189,7 @@ Or the gate offers this as option (b) and the user names the skill.
 
 Use the installed-skill location exposed by the current agent when available. Otherwise search locations for the active harness:
 
-**Pi:**
-
-1. `~/.pi/agent/skills/<skill-name>/` and `~/.agents/skills/<skill-name>/` (user installs)
-2. `.pi/skills/<skill-name>/` in the current directory, plus `.agents/skills/<skill-name>/` from the current directory through the repo root (project installs)
-3. Package paths listed in `~/.pi/agent/settings.json` or `.pi/settings.json`; managed packages live under `~/.pi/agent/git/`, `~/.pi/agent/npm/`, `.pi/git/`, or `.pi/npm/`
-
-**Claude Code:**
-
-1. `~/.claude/skills/<skill-name>/` (user install)
-2. `.claude/skills/<skill-name>/` (project install)
-
-**Kiro:**
-
-1. `.kiro/skills/<skill-name>/` (workspace install)
-2. `~/.kiro/skills/<skill-name>/` (global install)
-
-**OpenCode:**
-
-1. `.opencode/skills/<skill-name>/` (project install)
-2. `~/.config/opencode/skills/<skill-name>/` (global install)
-
-**Cursor:**
-
-1. `.cursor/skills/<skill-name>/` or `.agents/skills/<skill-name>/` (project install)
-2. `~/.cursor/skills/<skill-name>/` or `~/.agents/skills/<skill-name>/` (user install)
-
-**Cline (CLI or VS Code):**
-
-1. `.cline/skills/<skill-name>/` or `.agents/skills/<skill-name>/` (workspace install)
-2. `~/.cline/skills/<skill-name>/` or `~/.agents/skills/<skill-name>/` (user install)
-
-**Codex:**
-
-1. The skill root exposed by an active marketplace plugin
-2. `~/.agents/skills/<skill-name>/` (user install or editable-clone link)
-
-**GitHub Copilot:**
-
-1. `.github/skills/<skill-name>/`, `.agents/skills/<skill-name>/`, or `.claude/skills/<skill-name>/` (project install)
-2. `~/.copilot/skills/<skill-name>/`, `~/.agents/skills/<skill-name>/`, or `~/.claude/skills/<skill-name>/` (user install)
-
-**Factory Droid:**
-
-1. `~/.factory/skills/<skill-name>/` (personal install)
-2. `.factory/skills/<skill-name>/` from the current directory through the repo root (folder-specific or project install)
-3. The active path shown in `/skills` under **Plugins**; installed plugins keep the shared `skills/<skill-name>/` directory inside Droid's plugin cache
+各 harness 的搜索路径：`assets/onboarding-map.json` 字段 `harness_skill_paths`（键 = harness 名，值 = 按序搜索路径列表）— 以 json 为准。
 
 Finally, check any path the user provides explicitly. If the skill is still not found, ask the user to confirm the name or provide its path.
 
@@ -257,14 +212,7 @@ Read all matches and merge — CSS custom properties take priority over inferred
 **From CSS custom properties:**
 Map variable names to semantic roles using name-heuristics:
 
-| If the variable name contains… | Map to role |
-|---|---|
-| `background`, `bg`, `paper`, `surface`, `canvas` | `paper` |
-| `foreground`, `text`, `body`, `ink`, `on-surface` | `ink` |
-| `muted`, `subtle`, `secondary`, `caption` | `muted` |
-| `accent`, `brand`, `primary`, `cta`, `highlight` | `accent` |
-| `border`, `rule`, `divider`, `outline` | `rule` |
-| `mono`, `code`, `pre` | `sublabel` font |
+变量名 → 角色映射：`assets/onboarding-map.json` 字段 `css_variable_role_map`（contains 命中任一子串即映射到 role）— 以 json 为准。
 
 **From JSON tokens:** follow the same heuristics on key names. If the JSON follows Style Dictionary format (`{ "color": { "brand": { "value": "#…" } } }`), flatten the path and apply heuristics to the leaf key.
 

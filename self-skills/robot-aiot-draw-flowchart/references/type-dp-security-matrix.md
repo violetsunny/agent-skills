@@ -301,6 +301,7 @@ Before emitting SVG, verify **every** item:
 
 The complete inputs that map to the shipped canonical example. Every coordinate in that SVG is derivable from §2 applied to these inputs.
 
+canonical 副本：`templates/type-dp-security-matrix.yaml` — 参数化文档契约，复制后手工填参绘图；不是 generate-from-template.py 的输入（该脚本只接受 containers/nodes/arrows JSON），以 templates 为准
 ```yaml
 title:    "Platform Access Matrix"
 subtitle: "Four canonical groups × platform components"

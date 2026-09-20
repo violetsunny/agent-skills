@@ -10,6 +10,7 @@ This type is **parametric**. The diagram is fully determined by a small list of 
 
 Before drawing, collect these from the user (or accept them as a YAML/JSON block). Everything in this reference is derived from these inputs. Don't invent geometry on the fly.
 
+canonical 副本：`templates/type-high-level.yaml` — 参数化文档契约，复制后手工填参绘图；不是 generate-from-template.py 的输入（该脚本只接受 containers/nodes/arrows JSON），以 templates 为准
 ```yaml
 chevrons:                       # ordered left → right; reserved names auto-promote to vertical
   - { name: "Data sources",         columns: 1 }

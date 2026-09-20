@@ -157,6 +157,7 @@ font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
 
 ### 静态版模板骨架
 
+canonical 副本：`templates/slide-page-static.html` — 复制使用，以 templates 为准
 ```html
 <!DOCTYPE html>
 <html lang="zh-CN">
@@ -240,6 +241,7 @@ font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
 
 ### 交互版模板骨架
 
+canonical 副本：`templates/slide-deck-interactive.html` — 复制使用，以 templates 为准
 ```html
 <!DOCTYPE html>
 <html lang="zh-CN">

@@ -1,0 +1,62 @@
+title:    "Platform Access Matrix"
+subtitle: "Four canonical groups × platform components"
+
+roles:
+  - { name: "Data Administrators", code: "DL-DataAdmins"      }
+  - { name: "Data Engineers",      code: "DL-DataEngineers"   }
+  - { name: "Data Scientists",     code: "DL-DataScientists"  }
+  - { name: "Data Consumers",      code: "DL-DataConsumers"   }
+
+components:
+  - { name: "Keycloak",                          hint: "SSO" }
+  - { name: "MinIO · raw bucket" }
+  - { name: "MinIO · anon · staging · agg" }
+  - { name: "Trino · raw catalog" }
+  - { name: "Trino · anon-staging" }
+  - { name: "Trino · aggregated" }
+  - { name: "JupyterHub" }
+  - { name: "NiFi" }
+
+cells:
+  # Row 0 — Keycloak
+  - { row: 0, col: 0, value: "Admin", level: "full" }
+  - { row: 0, col: 1, value: "Login", level: "read" }
+  - { row: 0, col: 2, value: "Login", level: "read" }
+  - { row: 0, col: 3, value: "Login", level: "read" }
+  # Row 1 — MinIO raw
+  - { row: 1, col: 0, value: "Full", level: "full" }
+  - { row: 1, col: 1, value: "R/W",  level: "rw"   }
+  - { row: 1, col: 2, value: "No access", level: "none" }
+  - { row: 1, col: 3, value: "No access", level: "none" }
+  # Row 2 — MinIO anon/staging/agg
+  - { row: 2, col: 0, value: "Full", level: "full" }
+  - { row: 2, col: 1, value: "R/W",  level: "rw"   }
+  - { row: 2, col: 2, value: "Read", level: "read" }
+  - { row: 2, col: 3, value: "No access", level: "none" }
+  # Row 3 — Trino raw catalog
+  - { row: 3, col: 0, value: "Full", level: "full" }
+  - { row: 3, col: 1, value: "R/W",  level: "rw"   }
+  - { row: 3, col: 2, value: "No access", level: "none" }
+  - { row: 3, col: 3, value: "No access", level: "none" }
+  # Row 4 — Trino anon-staging
+  - { row: 4, col: 0, value: "Full",   level: "full" }
+  - { row: 4, col: 1, value: "R/W",    level: "rw"   }
+  - { row: 4, col: 2, value: "SELECT", level: "read" }
+  - { row: 4, col: 3, value: "No access", level: "none" }
+  # Row 5 — Trino aggregated (focal cell at col 3)
+  - { row: 5, col: 0, value: "Full",        level: "full" }
+  - { row: 5, col: 1, value: "R/W",         level: "rw"   }
+  - { row: 5, col: 2, value: "SELECT",      level: "read" }
+  - { row: 5, col: 3, value: "SELECT only", sub: "sole consumer access", focal: true }
+  # Row 6 — JupyterHub
+  - { row: 6, col: 0, value: "Admin", level: "full" }
+  - { row: 6, col: 1, value: "R/W",   level: "rw"   }
+  - { row: 6, col: 2, value: "R/W",   level: "rw"   }
+  - { row: 6, col: 3, value: "No access", level: "none" }
+  # Row 7 — NiFi
+  - { row: 7, col: 0, value: "Admin", level: "full" }
+  - { row: 7, col: 1, value: "R/W",   level: "rw"   }
+  - { row: 7, col: 2, value: "Read",  level: "read" }
+  - { row: 7, col: 3, value: "No access", level: "none" }
+
+dark: false

@@ -1,0 +1,76 @@
+{
+  "harness_skill_paths": {
+    "Pi": [
+      "`~/.pi/agent/skills/<skill-name>/` and `~/.agents/skills/<skill-name>/` (user installs)",
+      "`.pi/skills/<skill-name>/` in the current directory, plus `.agents/skills/<skill-name>/` from the current directory through the repo root (project installs)",
+      "Package paths listed in `~/.pi/agent/settings.json` or `.pi/settings.json`; managed packages live under `~/.pi/agent/git/`, `~/.pi/agent/npm/`, `.pi/git/`, or `.pi/npm/`"
+    ],
+    "Claude Code": [
+      "`~/.claude/skills/<skill-name>/` (user install)",
+      "`.claude/skills/<skill-name>/` (project install)"
+    ],
+    "Factory Droid": [
+      "`~/.factory/skills/<skill-name>/` (personal install)",
+      "`.factory/skills/<skill-name>/` from the current directory through the repo root (folder-specific or project install)",
+      "The active path shown in `/skills` under **Plugins**; installed plugins keep the shared `skills/<skill-name>/` directory inside Droid's plugin cache"
+    ]
+  },
+  "css_variable_role_map": [
+    {
+      "contains": [
+        "background",
+        "bg",
+        "paper",
+        "surface",
+        "canvas"
+      ],
+      "role": "paper"
+    },
+    {
+      "contains": [
+        "foreground",
+        "text",
+        "body",
+        "ink",
+        "on-surface"
+      ],
+      "role": "ink"
+    },
+    {
+      "contains": [
+        "muted",
+        "subtle",
+        "secondary",
+        "caption"
+      ],
+      "role": "muted"
+    },
+    {
+      "contains": [
+        "accent",
+        "brand",
+        "primary",
+        "cta",
+        "highlight"
+      ],
+      "role": "accent"
+    },
+    {
+      "contains": [
+        "border",
+        "rule",
+        "divider",
+        "outline"
+      ],
+      "role": "rule"
+    },
+    {
+      "contains": [
+        "mono",
+        "code",
+        "pre"
+      ],
+      "role": "sublabel font"
+    }
+  ]
+}

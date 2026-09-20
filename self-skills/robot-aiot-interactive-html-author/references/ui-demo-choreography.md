@@ -70,6 +70,7 @@
 - 关键帧序列：0ms 光标弧线出发（±2px 手抖随接近收敛）→ 600ms 到达目标中心 → 680ms 按压 scale 0.85 → 800ms 双圈涟漪扩散 + 目标同帧亮起（brightness 1→1.08）→ 1050ms 光标回弹 → 1450ms 停顿结束
 - 涟漪/按压的元素级参数以 catalog 为准，本式只管轨迹与时序；轨迹是二次贝塞尔 + 两条不可通约频率正弦叠加的确定性手抖
 
+> 规范副本：`templates/ui-demo-fx.js` — 复制进交付物，以 templates 为准（下方代码块为参考摘录）
 ```js
 // 光标外层管轨迹 translate，内层管按压 scale——两层两职，不抢同一 transform
 function moveCursor(cursor, p0, p2, dur = 800) {
@@ -304,6 +305,7 @@ deck 能量曲线：`封面峰 → 下行陈述 → 铺垫谷（背景/问题/�
 
 预算与生命周期：画廊墙属持续动效页，仅用户明确要求陈列展示时启用，计入 `animation-fx-catalog.md` §1 持续型预算（全套 ≤3 页）；卡片数 12-30（24 卡 × 4 节点 ≈ 100 DOM，不破单页 ≤500）；rAF 随页启停（`slidechange` 事件，`generative-art-and-canvas.md` 契约）。
 
+> 规范副本：`templates/gallery-wall.js` — 复制进交付物，以 templates 为准（下方代码块为参考摘录）
 ```css
 .gallery-viewport{position:absolute;inset:0;overflow:hidden;perspective:2400px;perspective-origin:50% 45%}
 .gallery-canvas{position:absolute;left:50%;top:50%;width:1600px;margin:-360px 0 0 -800px;
@@ -376,6 +378,7 @@ window.__seek = t => { stop(); render(t); };                  // 调试与 headl
 
 鼠标位置驱动邻近卡片位移/缩放衰减：写在 §6 的 body 中间层，与入场（outer）、hover（inner）互不抢 transform。衰减用平方曲线（近强远弱、边缘柔和）；位移方向为鼠标→卡片的外推方向，配合小幅 scale 提升，读作"磁场"。卡片中心一次性缓存——每帧 `getBoundingClientRect` 会强制同步布局。
 
+> 规范副本：`templates/gallery-ripple.js` — 复制进交付物，以 templates 为准（下方代码块为参考摘录）
 ```js
 const RADIUS = 320, PUSH = 18, LIFT = 0.06, SMOOTH = 0.15;   // 半径px / 最大位移px / 最大放大 / 平滑系数
 const pointer = { x: -1e4, y: -1e4, sx: -1e4, sy: -1e4 };
@@ -424,6 +427,7 @@ function stopRipple()  { cancelAnimationFrame(ripRaf); ripRaf = 0; }
 
 时序：0ms 遮罩 opacity 0→1（300ms cubic-out）→ 卡片 i 入场 delay 200+i×120ms（500ms expo-out，y 24px + scale 0.96）→ 每卡落定后 300ms 数字滚动（1200ms cubic-out，`tabular-nums` 防抖）→ 后缀符号 back-out 弹入 → 图表 polyline dashoffset 绘制（delay 600ms，1400ms cubic-out）→ 全部落定 hold ≥1s（§5 铁律 6）。
 
+> 规范副本：`templates/dashboard-overlay.js` — 复制进交付物，以 templates 为准（下方代码块为参考摘录）
 ```html
 <div class="dash-overlay" id="dash">
   <div class="dash-card" data-count="1284">
@@ -503,6 +507,7 @@ function playDashboard(root) {
 
 三个参数作用于**同一个演示时钟**：倍速改时钟流速（不改各动画 duration），seek 重放 cue 表并把 WAAPI 动画快进到终态。与既有参数分工：`#/N/M` 是页级/fragment 级深链（`presenter-mode.md` §5），`?seek` 是页内演示步级；`?preview=N`（演讲者预览）优先于 autoplay；`?noscale`（截图导出）并存不冲突。前提：所有演示动作触发即确定（§3 各式；⑦⑧的纯函数形态直接由 `clock.t` 驱动），`fired` 集合是唯一副作用，seek 时重置重放——与 `generative-art-and-canvas.md` state-proxy 模式一致。
 
+> 规范副本：`templates/demo-clock.js` — 复制进交付物，以 templates 为准（下方代码块为参考摘录）
 ```js
 const params = new URLSearchParams(location.search);
 const AUTOPLAY = params.get('autoplay') === '1' && params.get('preview') === null;

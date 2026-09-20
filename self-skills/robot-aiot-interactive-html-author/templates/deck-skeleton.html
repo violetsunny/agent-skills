@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<!-- ===========================================================================
+  deck-skeleton.html — 单文件交互 deck 底盘骨架（合并自多处 canonical 代码块）
+
+  来源（合并，保证自洽可运行）：
+    - references/interactive-html-authoring.md：总体结构 / Token 体系 / 画布约束
+      （scale-to-fit 壳 + ?noscale）/ 翻页实现（.js 前缀降级 + View Transition +
+      slidechange 事件 + 键盘绑定 + 点击区域）/ 入场动画（data-enter-order）/
+      prefers-reduced-motion / 打印与导出（@media print + @page）
+    - references/typography.md §5.5：CJK 正文排印 CSS（逐字并入）
+  用途：新 deck 的起点底盘——fit-viewport 缩放壳、翻页/键盘/点击热区、入场
+        编排、noscript 顺序流降级、reduced-motion 降级、打印一页一张。
+        双击即可在浏览器打开（含 2 页示例，替换为真实内容）。
+  接线：token 值按 Phase 3 派生结果替换（当前为中性默认值）；标题占位字体栈
+        按 typography.md 选型替换。扩展模板在本底盘之上叠加：
+        - templates/deck-nav.js      → fragment/分支/导航栈/#/N/M 深链（接管翻页）
+        - templates/presenter-window.js → S 演讲者窗口/N 抽屉/O 总览/T 主题/预览模式
+        - templates/inline-editor.js → E 内联文本编辑
+        - templates/entry-recipes.js → data-animate 页面级入场编排
+        叠加时删除本文件 script 内的键盘绑定与 goTo/next/prev 段，由扩展接管，
+        避免双绑；本底盘保留 fit/降级/打印/slidechange 派发职责。
+  可调参数：入场间隔 ENTER_STAGGER=150ms（纪律区间 100-200ms）；画布 1920×1080
+        （竖版社交 deck 改 810×1080，fit 分母与 @page 同步改）；安全边距 48px
+  降级契约：隐藏规则挂 .js 前缀类（JS 首行加到 documentElement），noscript
+        顺序流回退——禁/受限 JS 环境降级为顺序可读全文，白屏判交付失败；
+        入场触发用 setTimeout 不用 rAF（后台标签页 rAF 暂停）
+============================================================================ -->
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <title>演示标题</title>
+  <script>document.documentElement.classList.add('js');</script>
+  <style>/* 全局样式 + token */
+
+/* ===== Token 体系（interactive-html-authoring.md「Token 体系」；值按 Phase 3 派生替换） ===== */
+:root {
+  --primary-color: #2563eb;
+  --secondary-color: #0f766e;
+  --tertiary-color: #b45309;
+  --surface-color: #ffffff;
+  --surface-muted: #f5f5f4;
+  --text-primary: #1c1917;
+  --text-secondary: #545458;
+  --outline-color: #e7e5e4;
+  --border-color: #e5e5ea;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+}
+
+/* ===== CJK 正文排印（typography.md §5.5，逐字） ===== */
+:root {
+  line-break: strict;
+  overflow-wrap: break-word;
+  font-synthesis: none;   /* 禁合成斜体/加粗，§15 条 6 的保险丝 */
+}
+body {
+  font-size: 18px;        /* 中文正文基准，守住第四节 18/16/14px 下限 */
+  line-height: 1.8;
+  text-indent: 0;
+}
+p { text-wrap: pretty; }
+p + p { margin-top: 20px; }         /* 段间距替代首行缩进，取 16-24px 档 */
+.quote-hang { text-indent: -0.5em; } /* 段首开引号悬挂兜底 */
+.cjk-display { font-feature-settings: "halt" 1; } /* 展示大字全角标点挤压 */
+
+/* ===== 画布与 scale-to-fit 壳（interactive-html-authoring.md「画布约束」） ===== */
+html,body{height:100%;overflow:hidden}
+.fit-viewport{height:100vh;display:flex;align-items:center;justify-content:center}
+.canvas{transform-origin:center center;flex-shrink:0}
+body{margin:0;font-family:system-ui,-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;
+  color:var(--text-primary);background:var(--surface-muted)}
+.canvas{width:1920px;height:1080px;position:relative;background:var(--surface-color);overflow:hidden}
+
+/* ===== 页面切换（隐藏规则挂 .js 前缀，noscript 顺序流回退） ===== */
+.slide {
+  position: absolute;
+  inset: 0;
+  padding: 48px;                 /* 内容区四周 32-48px 安全边距 */
+  box-sizing: border-box;
+}
+.js .slide {
+  visibility: hidden;
+}
+.js .slide.active {
+  visibility: visible;
+}
+/* 不使用 display:none，否则 View Transition 无法捕获旧帧 */
+
+/* ===== 话术容器（静默布局坑 6：规则必须显式落盘） ===== */
+.notes{display:none}
+
+/* ===== 入场动画（interactive-html-authoring.md「入场动画」，挂 .js 前缀） ===== */
+.js .slide .enter {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 500ms, transform 500ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+.js .slide.active .enter.entered {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ===== 导航控件与进度条 ===== */
+.controls{position:fixed;right:24px;bottom:24px;z-index:90;display:flex;gap:8px;align-items:center;
+  font:14px/1 system-ui,-apple-system,"PingFang SC",sans-serif;color:var(--text-secondary)}
+.controls button{min-width:44px;min-height:44px;border:1px solid var(--outline-color);border-radius:var(--radius-sm);
+  background:var(--surface-color);color:inherit;font:inherit;cursor:pointer;opacity:.6;transition:opacity 200ms}
+.controls button:hover{opacity:1}
+.controls button:focus-visible{outline:2px solid var(--primary-color);outline-offset:2px}
+#pageNum{font-variant-numeric:tabular-nums;padding:0 8px}
+.progress-bar{position:fixed;left:0;right:0;bottom:0;height:6px;z-index:95;background:var(--outline-color);cursor:pointer}
+.progress-fill{height:100%;width:0;background:var(--primary-color);transition:width 300ms cubic-bezier(0.4,0,0.2,1)}
+
+/* ===== 元素级 SVG 动画类（图表页标准底座；禁止手写改写参数） =====
+   时序：元素挂 --i，delay = --i*160ms（[data-enter] 为 90ms）；同批元素共用 --i 即同步。
+   用法：节点/分组 = .anim-pop；实线连接 = .anim-draw（--L 传实测长度）+ 终点独立
+   polygon 挂 .anim-head（箭头分离，禁 marker-end）；带 dasharray 图案的虚线禁
+   .anim-draw（dash 被覆盖变实线），整线淡入用 .anim-fade，流动虚线用 .anim-flow
+   （入场 fadein + 无限 flowdash 双动画）；图例组 <g id="*-legend"> 必须挂 .anim-pop，
+   --i 排在全图最后元素之后。细则见 references/animation-fx-catalog.md「入场同步三条款」。 */
+[data-enter]{opacity:0;animation:rise .55s cubic-bezier(.2,.7,.3,1) forwards;animation-delay:calc(var(--i)*90ms)}
+@keyframes rise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+.anim-pop{opacity:0;animation:pop .5s cubic-bezier(.2,.7,.3,1) forwards;animation-delay:calc(var(--i)*160ms);
+transform-box:fill-box;transform-origin:center}
+@keyframes pop{from{opacity:0;transform:scale(.92)}to{opacity:1;transform:none}}
+.anim-draw{stroke-dasharray:var(--L,60);stroke-dashoffset:var(--L,60);opacity:0;animation:draw 1s ease forwards;animation-delay:calc(var(--i)*160ms)}
+@keyframes draw{0%{opacity:1}to{opacity:1;stroke-dashoffset:0}}
+.anim-head{opacity:0;animation:headin .12s linear forwards;animation-delay:calc(var(--i)*160ms + 1000ms)}
+@keyframes headin{to{opacity:1}}
+.anim-fade{opacity:0;animation:fadein .5s ease forwards;animation-delay:calc(var(--i)*160ms)}
+@keyframes fadein{to{opacity:1}}
+.anim-flow{stroke-dasharray:8,6;opacity:0;animation:fadein .6s ease forwards,flowdash 1.6s linear infinite;animation-delay:calc(var(--i)*160ms),calc(var(--i)*160ms + 600ms)}
+@keyframes flowdash{to{stroke-dashoffset:-14}}
+@media (prefers-reduced-motion:reduce){[data-enter],.anim-pop{animation:none;opacity:1}
+.anim-draw{animation:none;stroke-dashoffset:0!important;opacity:1}.anim-head{animation:none;opacity:1}
+.anim-fade{animation:none;opacity:1}.anim-flow{animation:none;opacity:1}}
+
+/* ===== prefers-reduced-motion（interactive-html-authoring.md，逐字） ===== */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ===== 打印与导出（interactive-html-authoring.md，逐字；!important 一个都不能省） ===== */
+@media print {
+  .canvas { transform: none !important; } /* scale-to-fit 缩放禁用 */
+  .nav-ui, .progress-bar { display: none !important; }
+  .slide {
+    position: relative !important;
+    display: block !important;
+    opacity: 1 !important;
+    width: 1920px; height: 1080px;
+    page-break-after: always;
+    break-after: page;
+  }
+  .slide .enter { opacity: 1 !important; transform: none !important; } /* 入场动画元素强制可见 */
+}
+@page { size: 1920px 1080px; margin: 0; } /* 竖版 deck 同步改 810×1080 */
+  </style>
+  <noscript><style>
+    /* 禁/受限 JS 环境降级为顺序可读全文（白屏判交付失败） */
+    html,body{height:auto;overflow:visible}
+    .fit-viewport{height:auto;display:block}
+    .canvas{width:auto;height:auto;transform:none}
+    .slide{position:relative;inset:auto;visibility:visible;page-break-after:always}
+    .controls,.progress-bar{display:none}
+  </style></noscript>
+</head>
+<body>
+  <div class="fit-viewport">
+    <div class="canvas deck">
+      <section class="slide active" data-index="0" data-title="封面">
+        <!-- Page 1 -->
+        <h1 class="enter" data-enter-order="1">演示标题</h1>
+        <p class="lead enter" data-enter-order="2">结论先行的副标题。</p>
+        <div class="notes"><p>本页话术（观众不可见，仅供演讲者窗口/抽屉）。</p></div>
+      </section>
+      <section class="slide" data-index="1" data-title="第二页">
+        <!-- Page 2 -->
+        <h2 class="enter" data-enter-order="1">第二页标题</h2>
+        <p class="body enter" data-enter-order="2">正文内容，约 32 个中文字一行。</p>
+        <div class="notes"><p>第二页话术。</p></div>
+      </section>
+      <!-- ... -->
+    </div>
+  </div>
+  <nav class="controls nav-ui"><!-- 导航控件 -->
+    <button type="button" id="btnPrev" aria-label="上一页">←</button>
+    <span id="pageNum">1 / 2</span>
+    <button type="button" id="btnNext" aria-label="下一页">→</button>
+  </nav>
+  <div class="progress-bar" id="progressBar" role="presentation"><div class="progress-fill" id="progressFill"></div></div>
+  <script>/* 翻页 + 动画 + 交互 */
+(function () {
+  'use strict';
+  var params = new URLSearchParams(location.search);
+  var NOSCALE = params.has('noscale');            // 截图/导出：跳过 scale-to-fit 壳
+  var REDUCED = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var ENTER_STAGGER = 150;                        // 入场间隔，纪律区间 100-200ms
+
+  /* ----- scale-to-fit 视口自适应壳 ----- */
+  var canvas = document.querySelector('.canvas');
+  function fit() {
+    if (NOSCALE) { canvas.style.transform = 'none'; return; }
+    var s = Math.min(innerWidth / 1920, innerHeight / 1080);
+    canvas.style.transform = 'scale(' + s + ')';
+  }
+  addEventListener('resize', fit);
+  fit();
+
+  /* ----- 翻页状态 ----- */
+  var slides = Array.prototype.slice.call(document.querySelectorAll('.slide'));
+  var totalSlides = slides.length;
+  var current = slides.findIndex(function (s) { return s.classList.contains('active'); });
+  if (current < 0) current = 0;
+
+  function updateChrome() {
+    var num = document.getElementById('pageNum');
+    var fill = document.getElementById('progressFill');
+    if (num) num.textContent = (current + 1) + ' / ' + totalSlides;
+    if (fill) fill.style.width = (totalSlides > 1 ? current / (totalSlides - 1) * 100 : 100) + '%';
+  }
+
+  /* ----- 入场编排：按 data-enter-order 依次加 .entered，setTimeout 不用 rAF ----- */
+  function clearEnter(slide) {
+    (slide.__enterTimers || []).forEach(clearTimeout);
+    slide.__enterTimers = [];
+    slide.querySelectorAll('.enter').forEach(function (el) { el.classList.remove('entered'); });
+  }
+  function playEnter(slide) {
+    clearEnter(slide);
+    var els = Array.prototype.slice.call(slide.querySelectorAll('.enter'))
+      .sort(function (a, b) { return (+a.dataset.enterOrder || 0) - (+b.dataset.enterOrder || 0); });
+    if (REDUCED) { els.forEach(function (el) { el.classList.add('entered'); }); return; }
+    els.forEach(function (el, i) {
+      slide.__enterTimers.push(setTimeout(function () { el.classList.add('entered'); }, ENTER_STAGGER * i));
+    });
+  }
+
+  function swapSlide(index) {
+    slides.forEach(function (s, i) {
+      if (i === index) { s.classList.add('active'); playEnter(s); }
+      else { s.classList.remove('active'); clearEnter(s); }
+    });
+    current = index;
+    updateChrome();
+  }
+
+  /* ----- 翻页落定后派发 slidechange（ambient/数字滚动/定时器一律订阅此事件启停） ----- */
+  function afterChange(reason) {
+    document.dispatchEvent(new CustomEvent('slidechange', {
+      detail: { index: current, reason: reason } // reason: 'key' | 'click' | 'hash' | 'auto'
+    }));
+  }
+
+  // View Transition；不支持时降级为 class 切换 + CSS transition
+  function goTo(index, reason) {
+    index = Math.max(0, Math.min(totalSlides - 1, index));
+    reason = reason || 'click';
+    if (index === current) return;
+    if (!document.startViewTransition || REDUCED) {
+      swapSlide(index);
+      afterChange(reason);
+      return;
+    }
+    document.startViewTransition(function () { swapSlide(index); })
+      .finished.then(function () { afterChange(reason); })
+      .catch(function () { afterChange(reason); });
+  }
+  function next(reason) { goTo(current + 1, reason); }
+  function prev(reason) { goTo(current - 1, reason); }
+
+  function toggleFullscreen() {
+    if (!document.fullscreenElement) { if (document.documentElement.requestFullscreen) document.documentElement.requestFullscreen(); }
+    else exitFullscreen();
+  }
+  function exitFullscreen() {
+    if (document.fullscreenElement && document.exitFullscreen) document.exitFullscreen();
+  }
+
+  /* ----- 键盘绑定 ----- */
+  document.addEventListener('keydown', (e) => {
+    if (e.target.closest('input,textarea,select,[contenteditable]')) {
+      if (e.key === 'Escape') e.target.blur();
+      return; // 输入态除 Escape 外不触发翻页
+    }
+    if (/^[1-9]$/.test(e.key)) { goTo(Math.min(+e.key - 1, totalSlides - 1), 'key'); return; }
+    switch (e.key) {
+      case 'ArrowRight': case ' ': case 'PageDown': next('key'); break;
+      case 'ArrowLeft': case 'PageUp': prev('key'); break;
+      case 'Home': goTo(0, 'key'); break;
+      case 'End': goTo(totalSlides - 1, 'key'); break;
+      case 'r': case 'R': goTo(0, 'key'); break; // 重置回首页
+      case 'f': case 'F': toggleFullscreen(); break;
+      case 'Escape': exitFullscreen(); break;
+    }
+  });
+
+  /* ----- 点击区域：鼠标左右半区；触屏三分区（中间死区防持握误触） ----- */
+  document.querySelector('.fit-viewport').addEventListener('click', function (e) {
+    if (e.target.closest('button,a,input,textarea,select,[contenteditable],[data-interactive]')) return;
+    var coarse = matchMedia('(pointer: coarse)').matches;
+    var x = e.clientX / innerWidth;
+    if (coarse) {
+      if (x < 1 / 3) prev('click');
+      else if (x > 2 / 3) next('click');
+      // 中间 1/3 死区
+    } else {
+      if (x < 0.5) prev('click'); else next('click');
+    }
+  });
+
+  /* ----- 导航控件与进度条 ----- */
+  document.getElementById('btnPrev').addEventListener('click', function () { prev('click'); });
+  document.getElementById('btnNext').addEventListener('click', function () { next('click'); });
+  document.getElementById('progressBar').addEventListener('click', function (e) {
+    var ratio = e.clientX / innerWidth;
+    goTo(Math.round(ratio * (totalSlides - 1)), 'click');
+  });
+
+  /* ----- 对外集成面（deck-nav.js / presenter-window.js 叠加时接管翻页） ----- */
+  window.deckSkeleton = {
+    goTo: goTo, next: next, prev: prev,
+    current: function () { return current; },
+    total: function () { return totalSlides; },
+    slides: slides
+  };
+
+  /* ----- 初始态 ----- */
+  updateChrome();
+  playEnter(slides[current]);
+  afterChange('hash');
+})();
+  </script>
+</body>
+</html>

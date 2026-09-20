@@ -203,6 +203,8 @@ grep -n '<text' index.html
 
 `<svg>` 内命中即阻塞：删除 `<text>`，标签改 HTML 元素按网格落位；引线保留在 SVG 里，标签文字一律 HTML。
 
+豁免：带 `role="img"` 的预渲染 diagram SVG（`diagram-embed-rendering.md` 嵌入产物、画图 skill 输出）整图视为图片，其图内 `<text>` 不适用本条；本条约束页面内手绘的装饰/版式 SVG。
+
 #### 4. nav-safe 底部安全区校验
 
 分页圆点 bottom 22px，登记版式统一预留底部 86px 安全区（规则见 `web-slide-strategies.md` nav-safe 节，此处只做机器查与实测，不重述）。

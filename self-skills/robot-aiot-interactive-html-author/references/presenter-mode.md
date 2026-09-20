@@ -32,6 +32,7 @@
 5. 观众窗口永不显示备注编辑内容；`.notes` 仍 `display:none`
 
 ## 3. S 键演讲者窗口
+> 规范实现：`templates/presenter-window.js` — 按本节规格实现的完整可运行代码；复制进交付物，以 templates 为准
 
 按 `S` 用 `window.open` 弹出独立窗口（键盘事件属用户手势，不会被弹窗拦截；仍须提供拦截兜底提示）。原页面保持观众视图。
 

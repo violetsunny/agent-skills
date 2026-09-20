@@ -158,6 +158,7 @@ Position: bottom-right, 20px margin from edges.
 
 ## SVG Template
 
+canonical 副本：`templates/style-6-claude.svg` — 复制使用，以 templates 为准
 ```xml
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 600"
      width="960" height="600">

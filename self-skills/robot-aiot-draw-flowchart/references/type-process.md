@@ -392,6 +392,7 @@ Above 6 lanes or 12 steps: split into two diagrams (overview + detail).
 
 The extended example diagram is fully described by the following inputs. Every coordinate in the rendered SVG is derivable from this block via §2 + §3 + §4. This is the canonical proof that the parametric contract works end-to-end.
 
+canonical 副本：`templates/type-process.yaml` — 参数化文档契约，复制后手工填参绘图；不是 generate-from-template.py 的输入（该脚本只接受 containers/nodes/arrows JSON），以 templates 为准
 ```yaml
 # Quarterly survey — end-to-end workflow (extended variant)
 # 6 lanes × 11 steps, 1 focal step + 1 focal node + 3 custom-colored nodes

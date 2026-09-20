@@ -206,3 +206,12 @@ python3 -c "import xml.etree.ElementTree as ET; ET.parse('file.svg')" && echo "�
 # Or use cairosvg as a render-time check:
 python3 -c "import cairosvg; cairosvg.svg2png(url='file.svg', write_to='/tmp/test.png')" && echo "✓ Renders" && rm /tmp/test.png
 ```
+
+## SVG 文本字形安全（CairoSVG 导出）
+
+CairoSVG 是默认 PNG 导出渲染器（png-export.md）。macOS 下 fontconfig 常无法解析系统中文字体名，以下字符在 SVG `<text>` 中渲染为豆腐块：`≈ × → ① ② ③ …`。
+
+- SVG 文本只用安全字形集：`—— 、，。（）【】：+ / · “”` 与普通中日韩/拉丁/数字。
+- 语义改用文字表达：`→` 写"演进到/导向"，`×` 写"与/对应"，`≈` 写"约"，圈号写"问题1/第1项"。
+- HTML 页面文本不受限（浏览器逐字形回退）；本规则只约束 SVG 文本与经 CairoSVG 导出的 PNG。
+- 导出后目检 PNG 一次确认无豆腐；必需符号无法回避时改用 Puppeteer 渲染器（png-export.md）。

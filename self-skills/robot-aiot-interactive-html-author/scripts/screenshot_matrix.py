@@ -6,9 +6,16 @@
   python3 screenshot_matrix.py <deck.html> --steps 3:2,5:1        # 页3有2步: #/3/1 #/3/2
   python3 screenshot_matrix.py <deck.html> --preview 1-12          # 分支页 ?preview=N
   python3 screenshot_matrix.py <pages目录> --multi                 # 多页形态逐文件截图
+  python3 screenshot_matrix.py <deck.html> --pages 8 --portrait    # 竖版 810×1080（小红书图文形态）
+  python3 screenshot_matrix.py <deck.html> --pages 8 --size 1080x1080  # 自定义画布 WxH
 
 条 9: chrome --screenshot 退出码 0 不代表 PNG 落盘；每张截图后校验文件存在且非空，
 批量结束汇总失败数，>0 非零退出。截图一律用原始文件，不用注入断言的临时副本（条 7）。
+
+竖版契约（content-imagery-and-infographic.md 竖版 deck 画布条 1）: 画布固定 810×1080（3:4），
+出图按 4/3 线性放大 → --window-size=810,1080 --force-device-scale-factor=1.3333；
+--portrait 即该组合，--size 810x1080 同样自动附加 1.3333；其余自定义尺寸不加 dsf。
+默认 1920×1080 行为不变。
 """
 
 import argparse
@@ -35,13 +42,17 @@ def find_chrome():
     sys.exit(2)
 
 
-def shoot(chrome, url, out, budget):
+def shoot(chrome, url, out, budget, size="1920,1080", dsf=None):
     cmd = [
         chrome,
         "--headless=new",
         "--disable-gpu",
         "--hide-scrollbars",
-        "--window-size=1920,1080",
+        f"--window-size={size}",
+    ]
+    if dsf:
+        cmd.append(f"--force-device-scale-factor={dsf}")
+    cmd += [
         f"--virtual-time-budget={budget}",
         f"--screenshot={out}",
         url,
@@ -57,9 +68,34 @@ def main():
     ap.add_argument("--steps", default="")
     ap.add_argument("--preview", default="")
     ap.add_argument("--multi", action="store_true")
+    ap.add_argument(
+        "--portrait",
+        action="store_true",
+        help="竖版 810×1080 + dsf 1.3333（content-imagery-and-infographic.md 竖版契约）",
+    )
+    ap.add_argument(
+        "--size",
+        default="",
+        help="自定义画布 WxH（如 1080x1080；810x1080 自动加 dsf 1.3333）",
+    )
     ap.add_argument("-o", "--outdir", default="shots")
     ap.add_argument("--budget", type=int, default=6000)
     args = ap.parse_args()
+
+    size, dsf = "1920,1080", None
+    if args.portrait and args.size:
+        print("FAIL --portrait 与 --size 互斥", file=sys.stderr)
+        sys.exit(2)
+    if args.portrait:
+        size, dsf = "810,1080", "1.3333"
+    elif args.size:
+        m = re.fullmatch(r"(\d+)[xX,](\d+)", args.size.strip())
+        if not m:
+            print(f"FAIL --size 格式 WxH: {args.size}", file=sys.stderr)
+            sys.exit(2)
+        size = f"{m.group(1)},{m.group(2)}"
+        if size == "810,1080":
+            dsf = "1.3333"
 
     chrome = find_chrome()
     os.makedirs(args.outdir, exist_ok=True)
@@ -104,7 +140,7 @@ def main():
     failures = []
     for url, name in jobs:
         out = os.path.join(args.outdir, name)
-        ok = shoot(chrome, url, out, args.budget)
+        ok = shoot(chrome, url, out, args.budget, size, dsf)
         print(("OK  " if ok else "MISS") + f" {name}")
         if not ok:
             failures.append(name)
