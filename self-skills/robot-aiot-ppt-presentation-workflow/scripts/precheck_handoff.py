@@ -17,7 +17,7 @@
 
 假设（md 未明确，按契约精神决定）:
   - 母稿识别: 工作目录下 glob `*母稿*.md`，取第一个
-  - 页数标记: 母稿中 `^## Page N` 行（与 phase2-pagination.md 母稿模板一致）
+  - 页数标记: 母稿中 `^## Page N` 行（与 templates/ppt-manuscript.md 母稿骨架一致）
   - 零宽字符集: U+200B/200C/200D/200E/200F/2060/FEFF/00AD
   - 数据一致性/四要素/配色体系等语义项不可机判，不在本脚本范围
 """
@@ -173,7 +173,10 @@ def check_inputs(workdir, skip_logo, findings):
     logo = os.path.join(workdir, "assets", "midea-logo.png")
     if skip_logo:
         findings.append(
-            ("OK", "甲方模板继承路线，跳过 midea-logo.png 校验（phase5「甲方模板继承」继承规则 3）")
+            (
+                "OK",
+                "甲方模板继承路线，跳过 midea-logo.png 校验（phase5「甲方模板继承」继承规则 3）",
+            )
         )
     elif os.path.isfile(logo):
         findings.append(("OK", f"logo 就位: {logo}"))

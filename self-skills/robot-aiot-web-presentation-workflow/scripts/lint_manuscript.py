@@ -19,7 +19,8 @@
      light/dark 两系混排 → FAIL（全 deck 单色系）；连续 3 页以上 hero → FAIL；
      8 页以上无 hero 档 → FAIL
   7. 疑似未替换模板占位符（<...> 尖括号占位） → WARN
-  8. 头部元信息缺 汇报对象/结构形态 → WARN
+  8. 头部元信息缺 汇报对象/结构形态/汇报范围 → WARN
+  9. 每页缺"动效与交互备注"节 → FAIL
 
 退出码: 有 FAIL → 1，否则 0。
 """
@@ -140,7 +141,7 @@ def main():
 
     # 8. 头部元信息
     header_text = "\n".join(header)
-    for field in ("汇报对象", "结构形态"):
+    for field in ("汇报对象", "结构形态", "汇报范围"):
         if field not in header_text:
             warn(f"头部元信息缺「{field}」")
 
@@ -177,6 +178,11 @@ def main():
                 fail(f"{tag} 图表类型为「{m.group(1)}」但缺「名称」")
             if "配套素材图" not in body:
                 warn(f"{tag} 图表需求缺「配套素材图」标注（无素材应显式写 无）")
+        # 9. 动效与交互备注（Web 母稿特有，阻塞条件）
+        if not [k for k in p["subs"] if k.startswith("动效")]:
+            fail(
+                f'{tag} 缺「动效与交互备注」节（Web 母稿必备；静态页写"静态页，仅转场"）'
+            )
 
     # 4. 连续同类型
     run_type, run_start, run_len = None, None, 0

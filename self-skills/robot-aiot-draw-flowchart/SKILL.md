@@ -7,7 +7,7 @@ author: kangll13
 license: MIT
 metadata:
   hermes:
-    tags: [flowchart, draw.io, robot-vacuum, diagram, xml, architecture, layered-architecture, svg, sequence, state-machine, er, uml, network-topology, timeline, png-export, gif-motion, xml-to-html, slide-html, leadership-ppt]
+    tags: [flowchart, draw.io, robot-vacuum, diagram, xml, architecture, layered-architecture, svg, sequence, state-machine, er, uml, network-topology, timeline, png-export, gif-motion, xml-to-html, slide-html, slide-deck]
     related_skills: []
 ---
 
@@ -212,14 +212,14 @@ bash "$HOME/.agents/skills/robot-aiot-draw-flowchart/scripts/precheck_deps.sh"
 
 ## 静态页面 HTML
 
-本章负责把汇报母稿或页面草图落成可审查、可交付给 `ppt-master` 的逐页静态 HTML。设计规范已全部内化到本技能 `references/` 下，运行时不再额外依赖任何外部设计规范技能。
+本章负责把汇报母稿或页面草图落成可审查、可交付给下游 PPT 生成环节的逐页静态 HTML。设计规范已全部内化到本技能 `references/` 下，运行时不再额外依赖任何外部设计规范技能。
 
 ### 上游工作流定位
 
 1. 绘制图表 XML（图表真源）
 2. XML→HTML 桥接转换（前置工作，先画图再转 HTML）
 3. 以图表 HTML 为冻结输入，负责页面级 HTML 的绘制和优化
-4. 产出交付 `ppt-master` 生成 PPT
+4. 产出逐页静态 HTML，交付下游 PPT 生成环节
 
 不做图表 XML→HTML 转换（由上方桥接章节负责），只引用已产出的图表 HTML 做页面编排；页面壳层的绘制、配色、排版、留白和高级感优化全部由本章负责。
 

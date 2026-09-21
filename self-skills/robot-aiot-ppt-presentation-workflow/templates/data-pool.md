@@ -1,6 +1,6 @@
 # 数据池模板（Phase 1）
 
-契约来源：`references/phase1-data-pool.md`。使用方式：复制到项目 `doc-ppt/` 后按实际数据填充，单数据源用模板一，多数据源用模板二，二选一。
+契约来源：`references/phase1-source-analysis.md`。使用方式：复制到项目 `doc-ppt/` 后按实际数据填充，单数据源用模板一，多数据源用模板二，二选一。
 
 ## 模板一：单数据源
 

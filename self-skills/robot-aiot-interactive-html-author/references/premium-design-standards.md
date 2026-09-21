@@ -22,7 +22,7 @@
 3. 既有品牌资产：Logo、首页架构图主色、既有图表 HTML（真源，不可动）
 4. 隐性约束：数据必须真实可溯源，不追求网页感
 
-上游 form 五问（受众 / 场景 / 核心主张 / 情绪基调 / 交付形态）由 `robot-aiot-web-presentation-workflow` 的 `phase1-content-analysis.md` 采集，本节消费其产物映射到设计决策：受众→礼让观众维（§12）、情绪基调→风格基调与预设温度（`visual-style-presets.md` §2 预设标注四字段）、核心主张→结论先于细节、交付形态→画布与导出规格（`content-imagery-and-infographic.md` 衍生交付形态规格）；不在此重复五问表。
+上游 form 五问（受众 / 场景 / 核心主张 / 情绪基调 / 交付形态）由上层 workflow 采集，本节消费其产物映射到设计决策：受众→礼让观众维（§12）、情绪基调→风格基调与预设温度（`visual-style-presets.md` §2 预设标注四字段）、核心主张→结论先于细节、交付形态→画布与导出规格（`content-imagery-and-infographic.md` 衍生交付形态规格）；不在此重复五问表。
 
 解读不明确时最多问一个问题；能从上下文推断就直接声明并继续。
 

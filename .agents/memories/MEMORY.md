@@ -8,12 +8,14 @@
 - slide 类 skill 的受众是用户指定的（领导层/技术同行/外部客户/大众），不恒定为领导层；未指定时才默认领导层。受众→风格基调/表达策略映射能力已内化。
 - adhd 指令只做 i-have-adhd 的纯内化，禁止再并入 handoff/交接落盘能力；用户实测压缩时不会触发总结，判定无用已删除。
 - 验证产物（测试 deck/截图/测量报告）落盘交付项目的 test-run/<批次>/（如 doc-web/test-run/、doc-ppt/test-run/），不放 skill 仓库、不放 /tmp；人工确认前禁止清理。/tmp 只放过程性临时文件。
+- 2026-09-21 裁决：5 个演示类 skill 各自自包含——禁跨工作流区别说明与能力委派指针，依赖 skill 不指向上层 workflow 名，所需外部规则一律内化。
 
 ## 项目背景
 
 - 2026-09-19 用户裁决：生产 deck 存在技术评审/方案汇报场景，S23 代码版式/S24 Diff 对照登记保留；验证 deck 样本自指（deck 自身代码）可接受，因其定位是测试用例非交付物。
 - agent-skills 仓库 self-skills/robot-aiot-arch-diagram 是 ~/.agents/skills 安装副本的源，改安装副本后须镜像回仓库（_mideameta.json 仅安装侧有）。
 - 用户裁决 r4-anim-p01-p10 为 deck 风格真源且主题单色系（全 light 或全 dark，禁交替），已改母稿表/lint/phase2/style-lock/web-slide-strategies；验证批次只放 test-run/，写生产目录须用户明示。
+- 2026-09-21 裁决：两演示 workflow 统一为 源文件→反问(页数/对象/范围)→母稿G1→图表G2→回写母稿→生成；PPT母稿禁动效标注，Web母稿每页必带动效备注节。
 
 ## 踩坑记录
 

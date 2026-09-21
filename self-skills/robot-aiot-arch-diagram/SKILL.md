@@ -30,7 +30,7 @@ bash "$HOME/.agents/skills/robot-aiot-arch-diagram/scripts/precheck_deps.sh"
 
 ## 概述
 
-本 Skill 专注非 PPT 场景的技术图表绘制，提供两条输出路径：直绘 SVG/HTML（B，主路径）与 archify 运行时渲染（C）；需要可编辑 draw.io XML 时使用 robot-aiot-draw-flowchart。
+本 Skill 专注技术图表绘制，提供两条输出路径：直绘 SVG/HTML（B，主路径）与 archify 运行时渲染（C）；不含可编辑 draw.io XML 能力。
 
 核心能力：
 
@@ -302,7 +302,7 @@ archify 渲染引擎由运行时部署的 archify skill 提供（node ≥ 18）�
 
 ## 硬约束
 
-1. 本 skill 不包含 draw.io XML 路径能力，需要可编辑 XML 时使用 robot-aiot-draw-flowchart
+1. 本 skill 不包含 draw.io XML 路径能力，不承诺可编辑 XML 产物；用户要求可编辑 XML 时如实告知本技能不具备该能力
 2. 交付前必须通过对应路径的校验：B=`validate-svg.sh`+视觉复查状态报告；C=archify validate/check
 3. 动图不改变静态语义，不提高复杂度预算；GIF 为唯一动图媒介
 4. 导入重绘不得发明或静默丢弃组件

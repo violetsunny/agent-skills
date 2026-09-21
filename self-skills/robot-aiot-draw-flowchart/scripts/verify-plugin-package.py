@@ -17,9 +17,9 @@ that role, so it implements package integrity at the plain meaning:
    path. When neither tree exists the wiring check is not applicable (the
    installed-skill layout), which doctor.md explicitly says is not a failure.
 
-Assumption: side-specific runtime scripts (e.g. excalidraw_extract.py, which
-only the arch-diagram side's doctor.md requires) are doctor's own check, not
-a package-integrity concern, so they are not re-verified here.
+Assumption: side-specific runtime scripts (e.g. excalidraw_extract.py) are
+doctor's own check, not a package-integrity concern, so they are not
+re-verified here.
 
 Usage:
     python3 verify-plugin-package.py [SKILL_ROOT]

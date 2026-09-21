@@ -63,17 +63,17 @@
 3. 两个模块在同一 SKILL 内协作，但职责不交叉：桥接模块不修改 XML，XML 生成模块不生成 HTML
 4. 若页面工作流要继续做轻量 MD3 规范化，应以桥接模块已冻结的图表 HTML 为上限，不得重新解释图表结构
 
-### 与下游工作流（leadership-ppt-workflow / dynamic-presentation）
+### 与下游页面工作流
 
 1. 桥接模块产出的 HTML 是下游工作流的视觉约束输入
-2. 没有完成图表 HTML，不允许进入 PPT 或交互页面生成阶段
+2. 没有完成图表 HTML，不允许进入页面生成阶段
 3. 页面级 `doc-ppt/pages/*.html` 引用桥接模块输出的图表 HTML
 
-### 与 ppt-master
+### PPTX 边界
 
 1. 本 SKILL 不生成最终 PPTX
 2. 桥接模块只提供稳定、可审查、可冻结的 HTML 约束输入
-3. ppt-master 以桥接 HTML 和静态页面 HTML 为直接输入
+3. 最终 PPTX 由下游 PPT 生成环节产出，以桥接 HTML 和静态页面 HTML 为直接输入
 
 ## 最终验证清单
 

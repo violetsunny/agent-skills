@@ -30,10 +30,7 @@
 ## 形态选择与批量节奏
 
 1. 默认形态为单文件（"合并为单文件"节）；仅上层 workflow 明确要求时才走 `INDEX.html` + `pages/` 多页形态（SKILL.md 硬约束 10），细则见"多页形态（INDEX + pages/）细则"节
-2. deck 页数较多且风格基调尚未经用户确认时，禁止从第 1 页直接写到最后一页：先做 2 页代表性 showcase（选视觉结构差异最大的两页，通常是封面 + 核心内容页）交用户确认，锁定视觉语法（版式/字体/色彩/间距/中英双语比例），再批量铺开其余页——方向性返工成本封顶在 2 页，不放大到全套 N 页
-3. 触发阈值、showcase 页选择标准、确认点与未过处置以下列两处真源为准，本文件不重述：
-   - PPT 汇报语境：`robot-aiot-leadership-ppt-workflow` 的 `phase4-page-authoring.md`"两页 showcase 门"
-   - Web 演示语境：`robot-aiot-web-presentation-workflow` 的 `phase2-pagination.md`"两页 showcase 确认门"
+2. deck 页数较多且风格基调尚未经用户确认时，禁止从第 1 页直接写到最后一页：先做 2 页代表性 showcase（选视觉结构差异最大的两页，通常是封面 + 核心内容页）交用户确认，锁定视觉语法（版式/字体/色彩/间距/中英双语比例），再批量铺开其余页——方向性返工成本封顶在 2 页，不放大到全套 N 页；被上层 workflow 委派时，showcase 触发阈值与确认门以调用方规则为准
 
 ## Token 体系
 

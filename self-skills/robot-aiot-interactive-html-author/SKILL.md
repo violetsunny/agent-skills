@@ -22,7 +22,7 @@ description: >
   "演讲者模式/提词器/双屏演示""分步揭示/分支导航/内容热点""风格预设/deck 换肤"
   "瑞士风/杂志风 deck/登记版式""多版本对比/方向选优""运镜/分镜/镜头语言""UI 演示编排"
   "品牌主色推导套色""落地页/文档 PDF 衍生形态""浏览器内直接改文字/内联编辑"，
-  或 robot-aiot-web-presentation-workflow 委派 Phase 4 编写时触发。
+  或上层 workflow 委派页面编写时触发。
 ---
 
 # Robot AIoT 交互式动画特效 HTML 编写
@@ -30,9 +30,8 @@ description: >
 只负责"把一页或多页内容写成交互动画特效 HTML"这一能力：token 体系、画布、翻页、
 入场、数据动效、交互图表、动效接缝、单文件合并、设计标准与交付前审查。
 
-不负责：知识文档分析、分页母稿、图表调度与阶段编排 —— 这些属于
-`robot-aiot-web-presentation-workflow` 的职责；被委派时只接收其给出的页面四要素、
-图表 HTML 与主色基调。
+不负责：知识文档分析、分页母稿、图表调度与阶段编排 —— 这些属于上层 workflow
+的职责；被委派时只接收调用方给出的页面四要素、图表 HTML 与主色基调。
 
 ## 执行前依赖检查
 
@@ -51,7 +50,7 @@ bash "$HOME/.agents/skills/robot-aiot-interactive-html-author/scripts/precheck_d
 ## 输入
 
 1. 页面内容：四要素（标题、结论、上屏内容、话术）或母稿片段
-2. 图表 HTML/SVG（可选，由 robot-aiot-arch-diagram 产出；内联其 SVG，不改节点坐标与数据语义）；Mermaid/PlantUML 源码输入时按 `references/diagram-embed-rendering.md` 构建期渲染为 PNG/SVG 后嵌入
+2. 图表 HTML/SVG（可选，由调用方产出；内联其 SVG，不改节点坐标与数据语义）；Mermaid/PlantUML 源码输入时按 `references/diagram-embed-rendering.md` 构建期渲染为 PNG/SVG 后嵌入
 3. 主色基调（可选；缺省时按 `references/design-system-standards.md` 派生）
 
 ## 输出

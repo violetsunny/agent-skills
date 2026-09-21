@@ -6,7 +6,7 @@ archify 渲染引擎由**运行时部署**的 archify skill 提供（`~/.agents/
 
 ## 输出路径选型指南
 
-本 SKILL 有两条输出路径：直绘 SVG/HTML（B，主路径，见 SKILL.md「生成工作流 · 路径 B」）、archify 运行时渲染（C）；需要可编辑 draw.io XML 时使用 robot-aiot-draw-flowchart（本 SKILL 不含路径 A）。B/C 对比表与决策规则以 SKILL.md「输出路径选型」为唯一权威，此处不复述。
+本 SKILL 有两条输出路径：直绘 SVG/HTML（B，主路径，见 SKILL.md「生成工作流 · 路径 B」）、archify 运行时渲染（C）；不含可编辑 draw.io XML 路径（路径 A）。B/C 对比表与决策规则以 SKILL.md「输出路径选型」为唯一权威，此处不复述。
 
 archify 产物为自包含 HTML（内联 SVG），带暗/亮主题切换（localStorage + prefers-color-scheme）与导出菜单（PNG 剪贴板、PNG/JPEG/WebP 最高 4x、双主题 SVG），交付前必须通过 archify fail-fast 校验（重叠/标签碰撞/越界）。
 
@@ -58,7 +58,7 @@ archify 产物为自包含 HTML（内联 SVG），带暗/亮主题切换（local
 ## 环境自检与降级
 
 - 自检：`node $ARCHIFY doctor`；示例一览：`node $ARCHIFY examples`；本地演示：`node $ARCHIFY demo <目录>`
-- node 不可用或 doctor 失败时：降级为直绘 SVG/HTML（B），并如实告知用户降级原因；需要可编辑 XML 时指引使用 robot-aiot-draw-flowchart
+- node 不可用或 doctor 失败时：降级为直绘 SVG/HTML（B），并如实告知用户降级原因；需要可编辑 XML 时如实告知本 SKILL 不具备该能力
 
 ## 如实交付报告
 

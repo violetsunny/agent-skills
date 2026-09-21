@@ -6,9 +6,11 @@
 doc-ppt/
 ├── assets/
 │   └── midea-logo.png
-├── <chart-name>.xml
-├── <chart-name>.html
+├── <project>_数据池.md
 ├── <project>_PPT母稿.md
+├── flow/
+│   ├── <chart-name>.xml
+│   └── <chart-name>.html
 ├── pages/
 │   ├── 01-cover.html
 │   ├── 02-overview.html
@@ -28,7 +30,7 @@ doc-ppt/
 
 ## HTML 引用方式
 
-Phase 4 开始前先复制品牌资源：
+Phase 2（母稿产出）开始前先复制品牌资源：
 
 ```bash
 mkdir -p doc-ppt/assets
@@ -133,7 +135,7 @@ Logo 例外：有就必须用，不适用 5-10-2-8；没有就停下问用户。
 
 1. 页面 HTML 必须引用 brand-spec 登记的真实文件路径，不得用手绘图形或通用渐变代替
 2. 色值/字体从 brand-spec 注入 CSS 变量（`:root { --brand-primary: ...; }`），页面只用 `var(--brand-*)`；想临时加色，先改 brand-spec
-3. 与 Phase 4 前复制资产约定的关系：内置美的 Logo 仍按上文「HTML 引用方式」在 Phase 4 前复制；本协议获取的资产已直接落盘 `doc-ppt/assets/`，无需二次复制
+3. 与 Phase 2 前复制资产约定的关系：内置美的 Logo 仍按上文「HTML 引用方式」在 Phase 2（母稿产出）前复制；本协议获取的资产已直接落盘 `doc-ppt/assets/`，无需二次复制
 
 ### 失败兜底表
 

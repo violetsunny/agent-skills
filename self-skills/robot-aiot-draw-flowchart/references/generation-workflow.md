@@ -41,7 +41,7 @@
 1. 写入 `doc-ppt/flow/*.xml`
 2. 返回本地文件路径和重命名方式（`.xml` → `.drawio`）
 
-被 `robot-aiot-leadership-ppt-workflow` 调用时：
+被上层 workflow 调用时：
 
 1. 只返回本地 `doc-ppt/flow/*.xml` 文件路径
 

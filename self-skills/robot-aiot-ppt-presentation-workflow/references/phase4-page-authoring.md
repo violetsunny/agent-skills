@@ -1,14 +1,21 @@
-# Phase 4: 母稿与逐页 HTML
+# Phase 4: 图表回写母稿与逐页 HTML
 
-Phase 4 仍然负责把前面收敛出的数据、结论和图表落成可审查的母稿与单页 HTML，逐页 HTML 的规则所有权已内化到 `robot-aiot-draw-flowchart` 的静态页面 HTML 能力中。
+母稿已在 Phase 2 产出并经 G1 确认，图表已在 Phase 3/3.5 产出并经 G2 确认。Phase 4 负责：先把确认后的图表回写母稿对应页，再把母稿逐页落成单页 HTML；逐页 HTML 的规则所有权已内化到 `robot-aiot-draw-flowchart` 的静态页面 HTML 能力中。
 
-## 本文件只保留 Phase 4 入口约束
+## 图表回写（先于一切页面工作，阻塞性）
 
-1. 先写 Markdown 母稿，聚焦"说什么"
-2. 再调用 `robot-aiot-draw-flowchart` 的静态页面 HTML 能力把每页落成 HTML，调用时必须传递 Phase 2 确认的目标受众（受众→刻度/风格基调映射由 `slide-premium-design.md` 决定，未指定默认领导层）
+1. 回写内容：每张图表的产物路径（`flow/<chart-name>.xml` / `flow/<chart-name>.html`）与确认状态（G2 通过日期）写入母稿"图表需求总表"对应行；对应 `## Page N` 块的 `### 图表需求` 节补"产物路径"字段
+2. 回写完整性校验：图表需求总表中类型非"无"的行必须有产物路径与确认状态；任何页缺图表路径、或路径指向不存在/未确认的产物，不得开始逐页 HTML
+3. 回写只做登记，不得借机改动母稿的标题/结论/上屏内容/话术；发现内容问题回 Phase 2 修订母稿并重过 G1
+4. 回写完成后母稿即"整体准备好"的完整内容源，逐页 HTML 与 ppt-master 只消费该母稿
+
+## 本文件只保留逐页 HTML 入口约束
+
+1. 母稿回写完成前不得开始写任何页面 HTML
+2. 调用 `robot-aiot-draw-flowchart` 的静态页面 HTML 能力把每页落成 HTML，调用时必须传递 Phase 1 确认的目标受众（受众→刻度/风格基调映射由 `slide-premium-design.md` 决定，未指定默认领导层）
 3. 每页必须满足"标题 / 结论 / 上屏内容 / 话术"四要素
 4. 话术按逐字稿三铁律写作（每页 150-300 字、口语化、关键词加粗提示信号，规则见 `slide-layout-strategies.md`），并随页面 HTML 写入 `display:none` 的 `.notes` 容器，禁止出现在页面可见区域
-5. 页面 HTML 落 `doc-ppt/pages/`，图表优先引用 `doc-ppt/flow/<图表名>.html`，页面内引用图表用 `../flow/<图表名>.html` 相对路径
+5. 页面 HTML 落 `doc-ppt/pages/`，图表只引用已回写母稿且 G2 确认的 `doc-ppt/flow/<图表名>.html`，页面内引用图表用 `../flow/<图表名>.html` 相对路径
 6. 页面画布外包 scale-to-fit 视口自适应壳：浏览器任意窗口尺寸下画布等比缩放居中、无滚动条完整可见，`1920x1080` 视口时 scale=1（实现见 `slide-page-authoring.md`）
 7. 素材图盘点：母稿素材图映射表中有的必须上屏；母稿未指定但资源目录存在素材图时，向用户确认是否选配，不得静默忽略。静态交付形态不加 lightbox JS 交互
 8. 母稿排页后逐对检查相邻两页布局模式不得相同（见 `slide-layout-strategies.md` Deck 级硬规则）
@@ -17,7 +24,7 @@ Phase 4 仍然负责把前面收敛出的数据、结论和图表落成可审查
 
 ## 两页 showcase 门（阻塞性）
 
-交互演示路径（`robot-aiot-web-presentation-workflow` / `robot-aiot-interactive-html-author`）已有"先预览再定稿"选型流程：出 3 个真实标题页供用户预览定稿后全套锁定。PPT 语境落地为两页 showcase 门，差异在于：不只预览标题页风格，而是用 2 页真实页面（封面 + 一个核心内容页）同时验证版式、图表语法与配色落地。目的是把方向性返工的成本封顶在 2 页，不让它放大成整套 N 页。
+showcase 门是"先预览再定稿"的选型流程：用 2 页真实页面（封面 + 一个核心内容页）同时验证风格、版式、图表语法与配色落地，经用户确认后再批量铺开其余页。目的是把方向性返工的成本封顶在 2 页，不让它放大成整套 N 页。
 
 ### 触发条件
 
@@ -62,6 +69,6 @@ Phase 4 仍然负责把前面收敛出的数据、结论和图表落成可审查
 
 Phase 4 页面编写时，改为读取：
 
-1. `skills/robot-aiot-draw-flowchart/SKILL.md`（静态页面 HTML 能力部分）
-2. `skills/robot-aiot-draw-flowchart/references/slide-page-authoring.md`
-3. `skills/robot-aiot-draw-flowchart/references/slide-page-template.md`
+1. `~/.agents/skills/robot-aiot-draw-flowchart/SKILL.md`（静态页面 HTML 能力部分）
+2. `~/.agents/skills/robot-aiot-draw-flowchart/references/slide-page-authoring.md`
+3. `~/.agents/skills/robot-aiot-draw-flowchart/references/slide-page-template.md`

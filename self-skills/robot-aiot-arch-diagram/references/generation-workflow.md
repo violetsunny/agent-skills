@@ -41,7 +41,7 @@
 1. 写入 `.svg` + `.html`（或调用方指定目录）
 2. 返回本地文件路径
 
-被上层 workflow（如 `robot-aiot-leadership-ppt-workflow`、`robot-aiot-web-presentation-workflow`）调用时：
+被上层 workflow 调用时：
 
 1. 按调用方契约返回本地 `.svg`/`.html` 文件路径
 

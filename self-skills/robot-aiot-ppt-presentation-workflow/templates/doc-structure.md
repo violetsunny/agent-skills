@@ -1,6 +1,6 @@
-# 两份文档结构骨架（Phase 2）
+# 两份文档结构骨架（Phase 1 受众分层，可选留档）
 
-契约来源：`references/phase2-audience-layering.md`。使用方式：先写技术明细版，再按受众表达策略提炼汇报版，两份共用同一数据池。
+契约来源：`references/phase1-source-analysis.md`。使用方式：需要独立留档两份分析文档时使用（受众分层现为 Phase 1 分析步骤、Phase 2 母稿的内部输入）；先写技术明细版，再按受众表达策略提炼汇报版，两份共用同一数据池。
 
 ## 技术明细版
 

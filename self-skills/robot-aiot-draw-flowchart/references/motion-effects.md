@@ -299,14 +299,9 @@ SVG-to-GIF export needs Node.js 18+, FFmpeg/FFprobe, Chrome/Chromium, and either
 
 ```bash
 brew install ffmpeg
-for SKILL_ROOT in \
-  "$HOME/.agents/skills/robot-aiot-arch-diagram" \
-  "$HOME/.agents/skills/robot-aiot-draw-flowchart"
-do
-  [ -d "$SKILL_ROOT" ] || continue
-  npm install --prefix "$SKILL_ROOT" --ignore-scripts --no-save --package-lock=false puppeteer-core@25.3.0
-  python3 "$SKILL_ROOT/scripts/fireworks.py" doctor
-done
+SKILL_ROOT="$HOME/.agents/skills/robot-aiot-draw-flowchart"
+npm install --prefix "$SKILL_ROOT" --ignore-scripts --no-save --package-lock=false puppeteer-core@25.3.0
+python3 "$SKILL_ROOT/scripts/fireworks.py" doctor
 ```
 
 Set `FIREWORKS_CHROME_PATH` for a nonstandard Chrome install. Set
