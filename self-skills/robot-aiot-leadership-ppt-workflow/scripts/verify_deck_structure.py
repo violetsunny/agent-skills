@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """交付后结构验证：PPTX 页数 + 每页标题与母稿 MD 比对（标准库 zipfile+xml.etree 解析）。
 
-契约来源: references/phase5-ppt-delivery.md:208-214（结构验证第 1/2 条）。
+契约来源: references/phase5-ppt-delivery.md「交付后验证·结构验证」第 1/2 条。
 
 用法:
   python3 verify_deck_structure.py <deck.pptx> <母稿.md>

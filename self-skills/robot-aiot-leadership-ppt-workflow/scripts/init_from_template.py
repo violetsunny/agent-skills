@@ -1,14 +1,14 @@
 #!/usr/bin/env python3
 """甲方模板基底重建：删示例页 / 列版式 / 删全屏遮罩 / 删空占位符。
 
-契约来源: references/phase5-ppt-delivery.md:149-193（甲方模板继承 + 基底重建脚本）。
+契约来源: references/phase5-ppt-delivery.md「甲方模板继承」节。
 
 用法:
   python3 init_from_template.py <甲方模板.pptx>                    # 仅打印版式名清单
   python3 init_from_template.py <甲方模板.pptx> --layout-index 1 \
       [--output base_from_template.pptx]                           # 重建基底
 
-规则（phase5:155-159）:
+规则（phase5「甲方模板继承」继承规则 1/2/5）:
   1. 删掉模板自带示例页，母版/版式/主题/色板一律不动
   2. 版式里铺满全屏的纯色遮罩（>=99% 画布宽高）删除
   3. 新页上版式带来的空占位符删除

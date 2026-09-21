@@ -1,13 +1,18 @@
 #!/usr/bin/env python3
-"""PPTX 文字与 expected_text.txt 逐字比对（机械校验，不依赖渲染器）。
+"""PPTX 文字与 expected_text.txt 比对（机械校验，不依赖渲染器）。
 
 用法:
-  python3 compare_text.py <文件.pptx> <expected_text.txt>
+  python3 compare_text.py <文件.pptx> <expected_text.txt> [--mode exact|coverage] [--min-coverage 0.8]
 
 - expected_text.txt 由 extract_expected_text.py 生成，页标记行（=== ... ===）自动剔除
-- 双方均去除全部空白后严格相等比对，不做子串放宽
+- exact（默认）: 双方去除全部空白后严格相等比对，不做子串放宽。
+  适用桥接逐字路线（HTML→PPTX 文字逐字保留）
+- coverage: expected 按句拆分（。！？；换行分隔，<4 字短句忽略），逐句检查是否
+  出现在 PPTX 文字中，输出覆盖率与缺失句清单；覆盖率 < min-coverage 判 FAIL。
+  适用 SVG 重绘路线（页内重组允许改写屏上文字，校验目标=关键信息点不丢）
 """
 
+import argparse
 import re
 import sys
 
@@ -37,13 +42,44 @@ def pptx_text(path):
     return re.sub(r"\s+", "", "".join(chunks))
 
 
+def coverage_check(actual, raw, min_coverage):
+    body = re.sub(r"^===.*===\s*$", "", raw, flags=re.M)
+    sentences = [
+        re.sub(r"\s+", "", s)
+        for s in re.split(r"[。！？；\n]", body)
+        if len(re.sub(r"\s+", "", s)) >= 4
+    ]
+    if not sentences:
+        print("FAIL expected 无有效句子")
+        sys.exit(1)
+    miss = [s for s in sentences if s not in actual]
+    hit = len(sentences) - len(miss)
+    ratio = hit / len(sentences)
+    print(f"coverage: {hit}/{len(sentences)} = {ratio:.1%}")
+    if miss:
+        print("缺失句:")
+        for m in miss:
+            print("  -", m[:60])
+    if ratio < min_coverage:
+        print(f"FAIL 覆盖率 {ratio:.1%} < {min_coverage:.0%}")
+        sys.exit(1)
+    print("PASS coverage 检查")
+
+
 def main():
-    if len(sys.argv) != 3:
-        print(__doc__)
-        sys.exit(2)
-    actual = pptx_text(sys.argv[1])
-    with open(sys.argv[2], encoding="utf-8") as f:
+    ap = argparse.ArgumentParser(description="PPTX 文字与 expected_text.txt 比对")
+    ap.add_argument("pptx")
+    ap.add_argument("expected")
+    ap.add_argument("--mode", choices=["exact", "coverage"], default="exact")
+    ap.add_argument("--min-coverage", type=float, default=0.8)
+    args = ap.parse_args()
+
+    actual = pptx_text(args.pptx)
+    with open(args.expected, encoding="utf-8") as f:
         raw = f.read()
+    if args.mode == "coverage":
+        coverage_check(actual, raw, args.min_coverage)
+        return
     raw = re.sub(r"^===.*===\s*$", "", raw, flags=re.M)
     expected = re.sub(r"\s+", "", raw)
     if actual != expected:

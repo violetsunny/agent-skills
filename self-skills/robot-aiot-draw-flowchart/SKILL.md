@@ -23,12 +23,10 @@ metadata:
 | ui-ux-pro-max | XML→HTML 桥接稿的 UI 参考与非阻塞 UI 检查 |
 
 ```bash
-for s in diagram-design ui-ux-pro-max; do
-  [ -d "$HOME/.agents/skills/$s" ] && echo "[OK] $s" || echo "[MISS] $s"
-done
+bash "$HOME/.agents/skills/robot-aiot-draw-flowchart/scripts/precheck_deps.sh"
 ```
 
-协作规则见 `references/diagram-design-collaboration.md`。缺失时如实告知用户依赖不全，不得静默降级。
+执行第一个动作即跑此脚本：exit≠0（任一 [MISS]）立即中止并如实告知用户依赖不全，不得静默降级或假装可用。被上层 workflow 委派时输出存档批次 `_gen/precheck-robot-aiot-draw-flowchart.txt`。协作规则见 `references/diagram-design-collaboration.md`。
 
 ## 概述
 

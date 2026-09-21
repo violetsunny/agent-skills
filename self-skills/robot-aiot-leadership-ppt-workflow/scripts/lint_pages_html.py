@@ -2,7 +2,12 @@
 """书写侧 4 硬约束静态 lint（doc-ppt/pages/*.html 与 flow/*.html）。
 
 用法:
-  python3 lint_pages_html.py <文件或目录>...
+  python3 lint_pages_html.py [--flow] <文件或目录>...
+
+  --flow: 桥接产物模式（robot-aiot-xml-html-bridge 生成的 flow/*.html）。
+        约束2（文字必须原生文本框）降为 WARN——桥接 HTML 是屏幕展示中间产物，
+        最终经 draw-flowchart 管线转 SVG/PPTX，不直接进 PPT，div 结构可接受。
+        约束1/3/4 照常。
 
 检查（FAIL=阻塞，WARN=记录）:
   约束1 画布 1920x1080: 文件中应出现 1920 与 1080 尺寸声明（WARN 级弱检查）
@@ -55,19 +60,26 @@ SCREENSHOT_RE = re.compile(
 
 
 class Lint(HTMLParser):
-    def __init__(self, path):
+    def __init__(self, path, flow_mode=False):
         super().__init__(convert_charrefs=True)
         self.path = path
         self.stack = []
         self.fails = []
         self.warns = []
         self.raw = ""
+        self.flow_mode = flow_mode
 
     def fail(self, msg):
         self.fails.append(f"{self.path}:{self.getpos()[0]}: {msg}")
 
     def warn(self, msg):
         self.warns.append(f"{self.path}:{self.getpos()[0]}: {msg}")
+
+    def constraint2(self, msg):
+        if self.flow_mode:
+            self.warn(f"约束2(--flow 降级) {msg}")
+        else:
+            self.fail(f"约束2 {msg}")
 
     def handle_starttag(self, tag, attrs):
         a = dict(attrs)
@@ -86,7 +98,7 @@ class Lint(HTMLParser):
         if tag == "span":
             ancestors = set(self.stack[:-1])
             if not (ancestors & PARAGRAPH_TAGS):
-                self.fail("约束2 <span> 不在段落级元素(p/h1-h6/li)内")
+                self.constraint2("<span> 不在段落级元素(p/h1-h6/li)内")
 
     def handle_startendtag(self, tag, attrs):
         self.handle_starttag(tag, attrs)
@@ -103,7 +115,7 @@ class Lint(HTMLParser):
         if data.strip() and self.stack:
             tag = self.stack[-1]
             if tag == "div":
-                self.fail(f"约束2 <div> 内裸文字: {data.strip()[:30]!r}")
+                self.constraint2(f"<div> 内裸文字: {data.strip()[:30]!r}")
 
     def finish(self):
         for m in GRADIENT_RE.finditer(self.raw):
@@ -117,10 +129,10 @@ class Lint(HTMLParser):
             )
 
 
-def lint_file(path):
+def lint_file(path, flow_mode=False):
     with open(path, encoding="utf-8") as f:
         raw = f.read()
-    p = Lint(path)
+    p = Lint(path, flow_mode=flow_mode)
     p.raw = raw
     p.feed(raw)
     p.close()
@@ -128,11 +140,14 @@ def lint_file(path):
 
 
 def main():
-    if len(sys.argv) < 2:
+    argv = sys.argv[1:]
+    flow_mode = "--flow" in argv
+    argv = [a for a in argv if a != "--flow"]
+    if not argv:
         print(__doc__)
         sys.exit(2)
     targets = []
-    for arg in sys.argv[1:]:
+    for arg in argv:
         if os.path.isdir(arg):
             targets += sorted(
                 os.path.join(arg, f) for f in os.listdir(arg) if f.endswith(".html")
@@ -141,7 +156,7 @@ def main():
             targets.append(arg)
     total_fail = total_warn = 0
     for t in targets:
-        fails, warns = lint_file(t)
+        fails, warns = lint_file(t, flow_mode=flow_mode)
         total_fail += len(fails)
         total_warn += len(warns)
         for f in fails:

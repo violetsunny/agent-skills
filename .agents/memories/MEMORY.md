@@ -4,7 +4,7 @@
 
 - 吸收外部 skill 能力时，必须把规则内化到自身 references/ 文件中，禁止在 SKILL.md 或 references 中保留外部 skill 名称作为条件判断、可选依赖或导航索引。能力融合=写进自己的规则，不是做引用入口。
 - SKILL.md 禁止写"从X拆分而来/融合而成"等历史来历，只描述当前能力与边界；用户认为来历叙述对独立部署的 SKILL 是废话。
-- archify/diagram-design/ui-ux-pro-max 是用户运行时必部署的必需 skill；自写 skill 依赖表须标必需并检查齐备，禁止写"可选/缺失时降级用内置"。
+- archify/diagram-design/ui-ux-pro-max 必需且已硬门：precheck_deps.sh 为执行第一动作（exit≠0 中止），workflow 委派须落盘 _gen/precheck-<skill>.txt；禁"可选/降级"表述。
 - slide 类 skill 的受众是用户指定的（领导层/技术同行/外部客户/大众），不恒定为领导层；未指定时才默认领导层。受众→风格基调/表达策略映射能力已内化。
 - adhd 指令只做 i-have-adhd 的纯内化，禁止再并入 handoff/交接落盘能力；用户实测压缩时不会触发总结，判定无用已删除。
 - 验证产物（测试 deck/截图/测量报告）落盘交付项目的 test-run/<批次>/（如 doc-web/test-run/、doc-ppt/test-run/），不放 skill 仓库、不放 /tmp；人工确认前禁止清理。/tmp 只放过程性临时文件。
@@ -12,3 +12,10 @@
 ## 项目背景
 
 - 2026-09-19 用户裁决：生产 deck 存在技术评审/方案汇报场景，S23 代码版式/S24 Diff 对照登记保留；验证 deck 样本自指（deck 自身代码）可接受，因其定位是测试用例非交付物。
+- agent-skills 仓库 self-skills/robot-aiot-arch-diagram 是 ~/.agents/skills 安装副本的源，改安装副本后须镜像回仓库（_mideameta.json 仅安装侧有）。
+- 用户裁决 r4-anim-p01-p10 为 deck 风格真源且主题单色系（全 light 或全 dark，禁交替），已改母稿表/lint/phase2/style-lock/web-slide-strategies；验证批次只放 test-run/，写生产目录须用户明示。
+
+## 踩坑记录
+
+- 完整版 puppeteer 的 Chromium 下载本机超 5 分钟；svg2png.js 回退（puppeteer-core+系统 Chrome，CHROME_PATH 可覆盖）已同步 arch-diagram/draw-flowchart/fireworks 全部副本。
+- 本机 Intel macOS 26.6 无 poppler bottle、未装 Keynote（仅 WPS）；keynote_verify.sh 已改 slide images 直出 PNG 免 poppler，渲染终审只能 WPS 人工。

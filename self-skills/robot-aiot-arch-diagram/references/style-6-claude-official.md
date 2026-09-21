@@ -161,7 +161,9 @@ Position: bottom-right, 20px margin from edges.
 canonical 副本：`templates/style-6-claude.svg` — 复制使用，以 templates 为准
 ```xml
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 600"
-     width="960" height="600">
+     width="960" height="600" role="img" aria-labelledby="style-6-claude-title style-6-claude-desc">
+  <title id="style-6-claude-title">Claude official style diagram</title>
+  <desc id="style-6-claude-desc">Warm cream editorial style skeleton</desc>
   <style>
     text { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI',
                    'Helvetica Neue', Arial, 'PingFang SC', 'Microsoft YaHei', 'Microsoft JhengHei', 'SimHei', sans-serif;

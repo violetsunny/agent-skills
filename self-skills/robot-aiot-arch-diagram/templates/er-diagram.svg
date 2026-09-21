@@ -1,4 +1,6 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 700">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 700" role="img" aria-labelledby="er-diagram-title er-diagram-desc">
+  <title id="er-diagram-title">ER diagram</title>
+  <desc id="er-diagram-desc">Entities, fields, and relationships</desc>
   <defs>
     <marker id="arrowBlue" markerWidth="9.0" markerHeight="6.3" viewBox="0 0 10 7" refX="9" refY="3.5" orient="auto" markerUnits="userSpaceOnUse">
       <polygon points="0 0, 10 3.5, 0 7" fill="#2563eb"/>

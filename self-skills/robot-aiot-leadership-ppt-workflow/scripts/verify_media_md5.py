@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """字节级验证：PPTX 内嵌媒体 md5 与源图目录逐一比对（标准库 zipfile+hashlib）。
 
-契约来源: references/phase5-ppt-delivery.md:305-311（无 LibreOffice 环境的替代目检第 2 条）。
+契约来源: references/phase5-ppt-delivery.md「无 LibreOffice 环境的替代目检」第 2 条。
 
 用法:
   python3 verify_media_md5.py <deck.pptx> <源图目录> [--media-only]

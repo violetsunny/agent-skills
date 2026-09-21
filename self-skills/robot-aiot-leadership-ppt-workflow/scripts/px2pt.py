@@ -16,7 +16,7 @@ JSON 输入 schema（各键均可选）:
   {"length_px": [48], "font_px": [48], "line_height": [1.5],
    "adj": [{"radius_px": 16, "w_pt": 400, "h_pt": 200}]}
 
-继承甲方模板时本换算不适用（phase5:66,158），缩放比 = 模板宽 pt / HTML 画布宽 px。
+继承甲方模板时本换算不适用（phase5:66、「甲方模板继承」继承规则 4），缩放比 = 模板宽 pt / HTML 画布宽 px。
 adj 超出 0-0.5 合法范围（phase5:140）→ FAIL 退出码 1。
 """
 

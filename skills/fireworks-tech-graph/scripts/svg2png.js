@@ -2,7 +2,28 @@
 
 const fs = require("fs");
 const path = require("path");
-const puppeteer = require("puppeteer");
+
+function loadPuppeteer() {
+  try {
+    return { mod: require("puppeteer"), launchOptions: {} };
+  } catch (error) {
+    const core = require("puppeteer-core");
+    const candidates = [
+      process.env.CHROME_PATH,
+      "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
+      "/usr/bin/google-chrome",
+      "/usr/bin/chromium",
+      "/usr/bin/chromium-browser",
+    ];
+    const executablePath = candidates.find((candidate) => candidate && fs.existsSync(candidate));
+    if (!executablePath) {
+      throw new Error("puppeteer-core loaded but no system Chrome found; set CHROME_PATH");
+    }
+    return { mod: core, launchOptions: { executablePath } };
+  }
+}
+
+const { mod: puppeteer, launchOptions } = loadPuppeteer();
 
 async function main() {
   const directory = path.resolve(process.argv[2] || ".");
@@ -10,6 +31,7 @@ async function main() {
   const browser = await puppeteer.launch({
     headless: "new",
     args: ["--no-sandbox", "--disable-setuid-sandbox"],
+    ...launchOptions,
   });
 
   try {

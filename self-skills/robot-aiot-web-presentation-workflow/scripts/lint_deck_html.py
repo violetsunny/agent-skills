@@ -16,8 +16,19 @@
   4. prefers-reduced-motion 媒体查询存在 → FAIL
   5. 导航链接有效性: href="#id" 的 id 必须存在；#/N 深链 N 不得超过 .slide 页数；
      相对文件 href 必须存在 → FAIL
-  6. 素材路径存在性: img/source/video/audio src 与 CSS url() 相对路径必须存在；
-     data:/blob: 豁免 → FAIL
+   6. 素材路径存在性: img/source/video/audio src 与 CSS url() 相对路径必须存在；
+      data:/blob: 豁免 → FAIL
+   7. .notes 话术容器: 容器存在时必须有 display:none 规则 → FAIL；空容器 → WARN
+   8. SVG 线/箭头动画契约（style-lock §3）: anim-draw/anim-fade 线禁带 marker-end
+      （箭头须分离为独立 anim-head polygon）；带 stroke-dasharray 属性的虚线禁配
+      anim-draw/anim-fade（dasharray 被虚线图案占用，描线须走 mask reveal）→ FAIL；
+      anim-flow 豁免
+   9. 组件 CSS 齐备（style-lock §5）: 页内 class 使用 chip/chips/mini/minis/grid2/
+      stat/kv/key/vs/steps/bars 任一但无对应 .<name> 选择器定义 → FAIL
+      （组件使用无 CSS 定义会静默退化为裸文本）
+  10. 平铺散文（style-lock §5）: .notes 区豁免；无 note/mut/bad/good/key 类的 <p>
+      文本 >60 字且 ≥2 句（。；计）→ FAIL；<ul> 的 li ≥4 条且最长 li >40 字 → FAIL
+  11. 交互反馈（style-lock §6）: 缺 :focus-visible 或 :hover 声明 → FAIL
 
 假设（md 未明确，按契约精神决定）:
   - DOM 计数口径: 元素节点（starttag + startendtag），.slide 子树内计数，
@@ -55,6 +66,21 @@ CDN_RE = re.compile(
 )
 CSS_URL_RE = re.compile(r"url\(\s*['\"]?([^'\")]+)['\"]?\s*\)")
 IMPORT_RE = re.compile(r"@import\s+['\"]?([^'\";]+)")
+STROKE_EL_RE = re.compile(r"<(?:path|line|polyline)\b[^>]*>", re.S)
+COMPONENTS = (
+    "chip",
+    "chips",
+    "mini",
+    "minis",
+    "grid2",
+    "stat",
+    "kv",
+    "key",
+    "vs",
+    "steps",
+    "bars",
+)
+STRIP_TAG_RE = re.compile(r"<[^>]+>")
 
 
 class DeckLint(HTMLParser):
@@ -217,6 +243,79 @@ def lint(path):
         local = href.split("#")[0].split("?")[0]
         if local and not os.path.exists(os.path.join(p.base, local)):
             p.fails.append(f"{path}:{line}: 导航链接文件不存在: {href[:80]}")
+
+    # 7. .notes 话术容器防泄漏
+    if 'class="notes"' in raw or "class='notes'" in raw:
+        if not re.search(r"\.notes\s*\{[^}]*display\s*:\s*none", raw):
+            p.fails.append(
+                f"{path}:0: 存在 .notes 容器但缺 display:none CSS 规则，话术泄漏进观众视图"
+            )
+        for m in re.finditer(r'<div class=["\']notes["\'][^>]*>\s*</div>', raw):
+            line = raw[: m.start()].count("\n") + 1
+            p.warns.append(f"{path}:{line}: .notes 容器为空")
+
+    # 8. SVG 线/箭头动画契约（style-lock §3 硬检查）
+    for m in STROKE_EL_RE.finditer(raw):
+        tag = m.group(0)
+        cm = re.search(r'class="([^"]*)"', tag)
+        cls = cm.group(1).split() if cm else []
+        if "anim-flow" in cls:
+            continue
+        anim = {"anim-draw", "anim-fade"} & set(cls)
+        if not anim:
+            continue
+        line = raw[: m.start()].count("\n") + 1
+        if "marker-end=" in tag:
+            p.fails.append(
+                f"{path}:{line}: 箭头未分离: {'/'.join(sorted(anim))} 线带 marker-end，"
+                f"箭头会先于描线完成出现；须改用独立 anim-head polygon"
+            )
+        if "stroke-dasharray=" in tag:
+            p.fails.append(
+                f"{path}:{line}: 虚线描线违规: dasharray 被虚线图案占用，"
+                f"{'/'.join(sorted(anim))} 无法描线；须改用 mask reveal（mask 内 rect 生长）"
+            )
+
+    # 9. 组件 CSS 齐备（style-lock §5）
+    used = set()
+    for cm in re.finditer(r'class="([^"]*)"', raw):
+        used |= set(cm.group(1).split())
+    for name in COMPONENTS:
+        if name in used and not re.search(rf"\.{name}[\s,{{:>.\[]", raw):
+            p.fails.append(
+                f"{path}:0: 组件 CSS 缺失: 使用 class {name} 但页内无 .{name} 选择器定义，"
+                f"静默退化为裸文本"
+            )
+
+    # 10. 平铺散文（style-lock §5，.notes 话术区豁免）
+    body = re.sub(r'<div class="notes">.*?</div>', "", raw, flags=re.S)
+    for m in re.finditer(r"<p(?:\s[^>]*)?>(.*?)</p>", body, re.S):
+        open_tag = body[m.start() : m.start() + body[m.start() :].index(">") + 1]
+        if re.search(r'class="[^"]*(note|mut|bad|good|key)', open_tag):
+            continue
+        txt = STRIP_TAG_RE.sub("", m.group(1)).strip()
+        if len(txt) > 60 and txt.count("。") + txt.count("；") >= 2:
+            p.fails.append(
+                f"{path}:0: 平铺散文: <p> {len(txt)} 字 ≥2 句无组件承载，"
+                f"须改写为 stat/kv/key/vs/steps/mini 等组件（style-lock §5）"
+            )
+    for m in re.finditer(r"<ul(?:\s[^>]*)?>(.*?)</ul>", body, re.S):
+        lis = re.findall(r"<li(?:\s[^>]*)?>(.*?)</li>", m.group(1), re.S)
+        if len(lis) >= 4:
+            longest = max(len(STRIP_TAG_RE.sub("", x).strip()) for x in lis)
+            if longest > 40:
+                p.fails.append(
+                    f"{path}:0: 平铺散文: <ul> {len(lis)} 条 li 最长 {longest} 字，"
+                    f"长文本 bullet 平铺须改写为 mini/vs/steps 组件（style-lock §5）"
+                )
+
+    # 11. 交互反馈（style-lock §6）
+    if ":focus-visible" not in raw:
+        p.fails.append(
+            f"{path}:0: 缺键盘焦点样式 :focus-visible（style-lock §6 交互反馈）"
+        )
+    if ":hover" not in raw:
+        p.fails.append(f"{path}:0: 缺 hover 反馈样式（style-lock §6 交互反馈）")
 
     return p.fails, p.warns
 

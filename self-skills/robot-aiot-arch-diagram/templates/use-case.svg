@@ -1,4 +1,6 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 700">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 700" role="img" aria-labelledby="use-case-title use-case-desc">
+  <title id="use-case-title">Use case diagram</title>
+  <desc id="use-case-desc">Actors, system boundary, and use cases</desc>
   <defs>
     <marker id="arrowBlue" markerWidth="9.0" markerHeight="6.3" viewBox="0 0 10 7" refX="9" refY="3.5" orient="auto" markerUnits="userSpaceOnUse">
       <polygon points="0 0, 10 3.5, 0 7" fill="#2563eb"/>

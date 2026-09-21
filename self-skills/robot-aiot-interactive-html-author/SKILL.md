@@ -43,10 +43,10 @@ description: >
 | ui-ux-pro-max | 设计数据资产检索（search.py 查询风格/调色板库；字体库受硬约束 11 限制仅用系统字体栈） |
 
 ```bash
-[ -d "$HOME/.agents/skills/ui-ux-pro-max" ] && echo "[OK] ui-ux-pro-max" || echo "[MISS] ui-ux-pro-max"
+bash "$HOME/.agents/skills/robot-aiot-interactive-html-author/scripts/precheck_deps.sh"
 ```
 
-缺失时如实告知用户依赖不全，不得静默降级或假装可用。设计规则权威在本技能 `references/`；检索结果仅为数据建议，不得覆盖内化规则。
+执行第一个动作即跑此脚本：exit≠0（任一 [MISS]）立即中止并如实告知用户依赖不全，不得静默降级或假装可用。被上层 workflow 委派时输出存档批次 `_gen/precheck-robot-aiot-interactive-html-author.txt`。设计规则权威在本技能 `references/`；检索结果仅为数据建议，不得覆盖内化规则。
 
 ## 输入
 

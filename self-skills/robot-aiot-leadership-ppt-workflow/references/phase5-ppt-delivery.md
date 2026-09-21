@@ -158,38 +158,13 @@ prs.slide_height = Emu(6858000)   # 7.5in = 540pt
 4. 画布尺寸跟模板走，「画布换算」一节的 960×540pt 不适用；缩放比 = 模板幻灯片宽 pt ÷ HTML 画布宽 px，1920px 画布配 1920pt 模板时该比为 1.0（1 CSS px = 1 pt）
 5. 版式里可能藏一个铺满全屏的纯色矩形遮罩（与版式底色同色同尺寸），留着会挡住内容层元素，重建时删除，删除不改变版式外观
 
-基底重建脚本（落 `projects/<任务名>/`；首次运行先看打印出的版式名清单，再回头改 LAYOUT_INDEX）：
+基底重建用自带脚本 `scripts/init_from_template.py`（实现继承规则 1/2/5：删示例页、删全屏遮罩、删空占位符），产物落 `projects/<任务名>/`；首次运行不带 `--layout-index` 先看打印出的版式名清单，选定后带序号重跑：
 
-```python
-from pptx import Presentation
-
-TEMPLATE = "甲方模板.pptx"   # 换成用户提供的甲方模板路径
-LAYOUT_INDEX = 1             # 换成版式名清单里选定的内页版式序号
-
-prs = Presentation(TEMPLATE)
-
-sld_id_lst = prs.slides._sldIdLst
-for sld_id in list(sld_id_lst):
-    prs.part.drop_rel(sld_id.rId)
-    sld_id_lst.remove(sld_id)
-
-for i, layout in enumerate(prs.slide_layouts):
-    print(i, layout.name)
-
-layout = prs.slide_layouts[LAYOUT_INDEX]
-for sp in list(layout.shapes):
-    if (sp.width and sp.height
-            and sp.width >= prs.slide_width * 0.99
-            and sp.height >= prs.slide_height * 0.99):
-        print("删除全屏遮罩:", sp.shape_id, sp.name)
-        sp._element.getparent().remove(sp._element)
-
-slide = prs.slides.add_slide(layout)
-for ph in list(slide.placeholders):
-    ph._element.getparent().remove(ph._element)
-
-prs.save("base_from_template.pptx")
-print("画布 pt:", prs.slide_width / 12700, "x", prs.slide_height / 12700)
+```bash
+SKILL=<本skill根目录>/scripts
+python3 "$SKILL/init_from_template.py" 甲方模板.pptx                          # 仅打印版式名清单
+python3 "$SKILL/init_from_template.py" 甲方模板.pptx --layout-index 1 \
+    --output projects/<任务名>/base_from_template.pptx                        # 重建基底
 ```
 
 ## 生成过程产物目录（硬性）
@@ -244,7 +219,7 @@ print("画布 pt:", prs.slide_width / 12700, "x", prs.slide_height / 12700)
 
 | 工具 | 结论 | 适用场景 |
 |---|---|---|
-| Keynote + AppleScript 导 PDF | ✅ 可终审 | 本机唯一能全自动且可信的渲染验证，真演示引擎排版；导 PDF 后逐页出图，与页面 HTML 并排比对 |
+| Keynote + AppleScript 导逐页 PNG | ✅ 可终审 | 本机唯一能全自动且可信的渲染验证，真演示引擎排版；`export as slide images` 直出逐页 PNG，与页面 HTML 并排比对 |
 | WPS / PowerPoint 人工打开 | ✅ 可终审 | 甲方多半用这一类，交付前人工逐页确认 |
 | python-pptx 结构验证 | ✅ 可信（结构层） | 递归展开形状构成、文字逐字比对、尺寸断言；不经渲染器、骗不过计数，但发现不了“看起来重叠”类视觉问题 |
 | LibreOffice headless | ⚠️ 版面可信，中文可能全丢 | 取不到 macOS 系统中文字体，渲出豆腐块甚至空白；中文丢失时先做对照实验判定是否环境问题 |
@@ -259,25 +234,15 @@ print("画布 pt:", prs.slide_width / 12700, "x", prs.slide_height / 12700)
 
 ### Keynote 自动化终审（可运行脚本）
 
+用自带脚本 `scripts/keynote_verify.sh`（osascript `export as slide images` 直出逐页 PNG，无 poppler 依赖）：
+
 ```bash
-PPTX="$PWD/doc-ppt/项目.pptx"
-OUT="$PWD/doc-ppt/test-run/projects/verify"
-mkdir -p "$OUT"
-osascript <<EOF
-tell application "Keynote"
-  activate
-  set d to open POSIX file "$PPTX"
-  delay 4
-  export d to POSIX file "$OUT/out.pdf" as PDF
-  close d saving no
-  quit
-end tell
-EOF
-pdftoppm -png -r 54 "$OUT/out.pdf" "$OUT/page"
+SKILL=<本skill根目录>/scripts
+bash "$SKILL/keynote_verify.sh" doc-ppt/项目.pptx doc-ppt/test-run/projects/verify [delay秒]
 ```
 
-1. `pdftoppm` 来自 poppler，未安装先 `brew install poppler`；大文件 4 秒不够 Keynote 完成排版时增大 `delay`
-2. 产出的 `$OUT/page-*.png` 与 `doc-ppt/pages/*.html` 原图逐页并排比对，重点核对「HTML→PPTX 转换保真」节六排版陷阱的 6 个条目
+1. 大文件默认 4 秒不够 Keynote 完成排版时增大第三个参数 delay；导出目录已存在时脚本会先清空（Keynote 对已存在目录报错）
+2. 脚本输出目录下的 `slides/Slide*.png` 与 `doc-ppt/pages/*.html` 原图逐页并排比对，重点核对「HTML→PPTX 转换保真」节六排版陷阱的 6 个条目
 3. 禁止用 System Events 注入按键翻页截图——按键会打进用户当前正在输入的窗口；只用 Keynote `export` 这类文档级 API，或人工看
 4. 本机未装 Keynote 时，退回排序表第 2 行的 WPS / PowerPoint 人工终审，不得改用 qlmanage 顶替
 
@@ -291,13 +256,16 @@ python3 "$SKILL/extract_expected_text.py" doc-ppt/pages/ -o projects/<任务名>
 python3 "$SKILL/compare_text.py" doc-ppt/项目.pptx projects/<任务名>/expected_text.txt
 ```
 
-`extract_expected_text.py` 支持 pages 目录与单文件 deck（自动探测 `.slide` 页数按 `#/N` 深链逐页抽取）；产物 expected_text.txt 带 `=== page N ===` 标记行，比对时自动剔除。生成层自动追加的页码/页脚文字按同一口径补进该文件，不得放宽为子串匹配来通过。`compare_text.py` 双方去除全部空白后严格相等比对，不一致时输出首个差异位置上下文。
+`extract_expected_text.py` 支持 pages 目录与单文件 deck（自动探测 `.slide` 页数按 `#/N` 深链逐页抽取）；产物 expected_text.txt 带 `=== page N ===` 标记行，比对时自动剔除。生成层自动追加的页码/页脚文字按同一口径补进该文件，不得放宽为子串匹配来通过。`compare_text.py` 两种模式按路线选用：桥接逐字路线（HTML→PPTX 文字逐字保留）用默认 `--mode exact`，双方去除全部空白后严格相等比对，不一致时输出首个差异位置上下文；SVG 重绘路线（ppt-master 手写 SVG，页内重组允许改写屏上文字）用 `--mode coverage`，expected 按句拆分逐句检查是否出现在 PPTX 文字中，输出覆盖率与缺失句清单，低于 `--min-coverage`（默认 0.8）判 FAIL，缺失句须逐条人工确认为重组改写而非信息丢失。
+
+话术双源一致性（页内重组后必查）：`python3 "$SKILL/check_notes.py" --sync doc-ppt/pages/ projects/<任务名>/notes/`，pages/*.html `.notes` 与 notes/*.md 按文件名排序逐页配对，去空白后文本必须完全一致。
 
 2. 形状构成验证（「可编辑 PPTX 硬规则」第 4 条）与书写侧 lint 同样走自带脚本：
 
 ```bash
 python3 "$SKILL/verify_pptx_shapes.py" doc-ppt/项目.pptx        # 递归展开GROUP，TEXT_BOX>=8，无超尺寸PICTURE
-python3 "$SKILL/lint_pages_html.py" doc-ppt/pages/ doc-ppt/flow/ # 书写侧4硬约束静态检查
+python3 "$SKILL/lint_pages_html.py" doc-ppt/pages/              # 书写侧4硬约束静态检查
+python3 "$SKILL/lint_pages_html.py" --flow doc-ppt/flow/        # 桥接产物：约束2降WARN（flow HTML 经 SVG 管线转译，不直接进 PPT）
 ```
 
 3. 数量比对：图片数、形状数逐页对齐，由 `verify_pptx_shapes.py` 递归展开统计覆盖，不另列

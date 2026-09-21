@@ -131,7 +131,7 @@ Phase 4: 交互HTML    → 委派 robot-aiot-interactive-html-author 逐页编�
 5. 上屏内容必须从源文档持续提炼填满（概念与示例成对出现），不得只写标题级骨架
 6. 章节/阶段之间的过渡论证独立成页（为什么从上一章进入下一章），主体章节页数占比与其分量匹配
 
-产物：`doc-web/<project>_演示母稿.md`，结构化分页文档（含图表需求总表与素材图映射表）。
+产物：`doc-web/<project>_演示母稿.md`，以 `templates/deck-manuscript.md` 为骨架填充（含图表需求总表、素材图映射表、主题节奏表、能量段位表），填充后必须跑 `scripts/lint_manuscript.py` 且 `[MS-FAIL]` 清零。
 
 阻塞条件：母稿未完成不得进入 Phase 3。
 
@@ -149,6 +149,7 @@ Phase 4: 交互HTML    → 委派 robot-aiot-interactive-html-author 逐页编�
 5. 图表产出直接为 HTML，无需 XML→HTML 桥接
 6. 数据统计图表（饼图/箱线图/热力图/网络拓扑等）按 `robot-aiot-arch-diagram` 的数据图表规则路由；页面需要嵌入 Mermaid/PlantUML 源码图时，Phase 4 由 `robot-aiot-interactive-html-author` 构建期渲染嵌入
 7. 图表数量多（>6 张）时：先锁定全局风格 token（皮肤/主色/箭头语义/viewBox/网格/数据标注纪律），再分批派发并行 sub agent 生成，避免风格漂移
+8. 委派前置落盘：进入 Phase 3 前跑 `robot-aiot-arch-diagram` 与 `robot-aiot-interactive-html-author` 各自的 `scripts/precheck_deps.sh`，输出存产出目录 `_gen/precheck-<skill名>.txt`；exit≠0 中止；批次无记录视同未执行前置检查
 
 产物：`doc-web/flow/<chart-name>.svg`（供 Phase 4 内嵌）+ `doc-web/flow/<chart-name>.html`（独立预览），每个图表两个文件；图表类产物一律落 `flow/` 子目录，不与母稿、页面混放。
 
@@ -161,7 +162,7 @@ Phase 4: 交互HTML    → 委派 robot-aiot-interactive-html-author 逐页编�
 编写能力委派给 `robot-aiot-interactive-html-author`：加载该 skill 并按其编写契约与审查流程执行；本阶段只提供输入与验收。
 
 入口约束：
-1. 向编写 skill 传递页面四要素、图表 SVG/HTML、素材图映射与主色基调
+1. 向编写 skill 传递页面四要素、图表 SVG/HTML、素材图映射与主色基调；委派前核对 `_gen/precheck-robot-aiot-interactive-html-author.txt` 存在，缺失先补跑 Phase 3 入口约束 8
 2. 默认形态：编写 skill 产出单文件多页 deck `doc-web/<project>-presentation.html`；多页形态（Phase 1 确认）：产出 `INDEX.html` 总纲 + `pages/` 逐页 HTML，每页必须有"上一页/下一页"跳转控件，末页可返回 INDEX
 3. 验收自检（编排侧抽查）：
    - 翻页键位全可用（多页形态为导航链接全可用）、`prefers-reduced-motion` 降级即时切换
@@ -169,7 +170,7 @@ Phase 4: 交互HTML    → 委派 robot-aiot-interactive-html-author 逐页编�
    - 母稿四要素与图表数据语义无缺页、无篡改
    - 母稿素材图映射表中该页有素材时必须已上屏（压缩缩略图 + 网格平铺无滚动 + 点击放大 lightbox）
     - 用户无风格偏好时：三标题页预览已出并经用户定稿，全套锁定无混用
-     - 多页批次：静态硬约束检查（禁旧色 / DOM 上限 / fit 脚本 / 素材路径 / lightbox 点击放大）+ 逐页截图 + 逐图目检全过，验证产物落盘 `test-run/<批次>/` 不删除
+     - 多页批次：源页（旧源拷贝或新制）入批前必须先单页过 `scripts/lint_deck_html.py`；批次终验一次调用 `scripts/check_deck_batch.py`（静态硬约束 + lint 全量检查含 SVG 线/箭头契约 #8 + 导航链闭合：中间页 prev/next 顺序指向相邻页、首末页禁用）+ `scripts/check_notes_hidden.py`（话术容器隐藏断言）+ `scripts/shoot_anim.py`（t100/t6000 双时间点动画触发截图）+ 逐图目检全过；验证产物落盘 `test-run/<批次>/` 不删除
 
 阻塞条件：所有页面生成完毕且通过编写 skill 的交付前审查才算完成。
 
@@ -195,9 +196,11 @@ Phase 4: 交互HTML    → 委派 robot-aiot-interactive-html-author 逐页编�
 ## 何时读取引用文档
 
 ### 核心工作流
-1. 需要内容分析规则时，读 `references/phase1-content-analysis.md`
-2. 需要分页策略和母稿模板时，读 `references/phase2-pagination.md`
+1. 需要内容分析规则时，读 `references/phase1-content-analysis.md`；产物骨架用 `templates/content-analysis-report.md`
+2. 需要分页策略和母稿规则时，读 `references/phase2-pagination.md`；产物骨架用 `templates/deck-manuscript.md`，填充后跑 `scripts/lint_manuscript.py`
 3. 需要图表生成调用规则时，读 `references/phase3-chart-generation.md`
+4. Phase 4 编写页面 shell/动画或批次验收时，读 `references/phase4-style-lock.md`（deck 级风格基线，优先于编写契约的 deck 级取舍）
+5. 存量 `.pptx` 作内容源时，跑 `scripts/extract_pptx.py`；Phase 4 交付 HTML 验收跑 `scripts/lint_deck_html.py`
 
 ### 外部委派
 1. 需要绘制架构图/流程图（Phase 3）时，加载 `robot-aiot-arch-diagram`

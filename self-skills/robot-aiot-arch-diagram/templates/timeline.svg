@@ -1,4 +1,6 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 400">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 400" role="img" aria-labelledby="timeline-title timeline-desc">
+  <title id="timeline-title">Timeline</title>
+  <desc id="timeline-desc">Events positioned in time</desc>
   <defs>
     <marker id="arrowBlue" markerWidth="11.2" markerHeight="7.9" viewBox="0 0 10 7" refX="9" refY="3.5" orient="auto" markerUnits="userSpaceOnUse">
       <polygon points="0 0, 10 3.5, 0 7" fill="#2563eb"/>

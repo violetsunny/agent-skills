@@ -75,26 +75,14 @@ cp <skill-path>/assets/midea-logo.png doc-ppt/assets/midea-logo.png
 
 **Step 3 · 下载（落盘 `doc-ppt/assets/<brand>/`）**
 - 输入：候选 URL 清单
-- 动作：按命中率递减依次尝试，下载后逐个核对是真实图片文件（不是 HTML 空壳或几百字节占位）。官网多为单页应用，直连静态路径常返回空壳，数字产品/AI 工具优先走图标聚合源：
+- 动作：三渠道按命中率递减依次尝试（图标聚合源 → 官网 HTML 提取 inline SVG → 站点图标兜底），用自带脚本执行，脚本内置 unset 代理、落盘 `doc-ppt/assets/<brand>/` 与真实文件核对（HTML 空壳/几百字节占位报 WARN）：
 
 ```bash
-unset ALL_PROXY HTTP_PROXY HTTPS_PROXY all_proxy http_proxy https_proxy
-brand=midea   # 替换为目标品牌小写名
-hex=0072CE    # 替换为品牌主色 HEX（不带 #）
-mkdir -p "doc-ppt/assets/$brand"
-# 渠道1：图标聚合源（知名数字产品/AI 工具首选，直出干净 SVG）
-curl -s "https://api.svgl.app?search=$brand"
-curl -o "doc-ppt/assets/$brand/logo.svg" "https://cdn.simpleicons.org/$brand/$hex"
-# 渠道2：官网 HTML 全文提取 inline SVG（下载后 grep <svg> 节点）
-curl -A "Mozilla/5.0" -L "https://www.$brand.com" -o "doc-ppt/assets/$brand/homepage.html"
-# 渠道3：站点图标兜底（几乎不失败）
-curl -o "doc-ppt/assets/$brand/favicon.png" "https://www.google.com/s2/favicons?domain=$brand.com&sz=256"
-# 核对：确认真实 SVG/PNG
-file "doc-ppt/assets/$brand"/*
-head -c 90 "doc-ppt/assets/$brand/logo.svg"
+SKILL=<本skill根目录>/scripts
+bash "$SKILL/fetch_brand_assets.sh" midea 0072CE   # 参数：品牌小写名 主色HEX（不带#，可省） [资产根目录，默认 doc-ppt/assets]
 ```
 
-  官方 brand/press 页的独立 SVG/PNG 直连文件，用 `curl -A "Mozilla/5.0" -L -o <目标路径> <Step 2 找到的直连 URL>` 下载
+  官网多为单页应用，直连静态路径常返回空壳，数字产品/AI 工具优先走图标聚合源；官方 brand/press 页的独立 SVG/PNG 直连文件，用 `curl -A "Mozilla/5.0" -L -o <目标路径> <Step 2 找到的直连 URL>` 下载
 - 产出：`doc-ppt/assets/<brand>/` 下已核对的资产文件
 
 **Step 4 · 验证 + 提取**
@@ -139,41 +127,7 @@ Logo 例外：有就必须用，不适用 5-10-2-8；没有就停下问用户。
 
 ### brand-spec 固化
 
-获取到的资产统一写入 `doc-ppt/brand-spec.md`，作为全 PPT 页面品牌资产的唯一真源。字段清单：
-
-```markdown
-# <Brand> · Brand Spec
-> 采集日期：YYYY-MM-DD
-> 资产来源：<逐项列出下载来源>
-> 资产完整度：<完整 / 部分 / 推断>
-
-## Logo
-- 主版本：doc-ppt/assets/<brand>/logo.svg
-- 浅底反色版：doc-ppt/assets/<brand>/logo-white.svg
-- 使用场景：<封面 / 页脚 / 角落水印>
-- 禁用变形：<不能拉伸 / 改色 / 加描边>
-
-## 产品图 / UI 截图
-- 主视觉：doc-ppt/assets/<brand>/product-hero.png（宽×高）
-- UI 截图：doc-ppt/assets/<brand>/ui-home.png
-- 使用场景：<案例页 / 对比页>
-
-## 色板
-- Primary / Background / Ink / Accent：#XXXXXX（逐项标注来源）
-- 禁用色：<品牌明确不用的色系>
-
-## 字体
-- Display / Body / Mono（数据看板用）：<font stack>
-
-## 气质关键词
-- <3-5 个形容词>
-
-## 禁区
-- <明确不能做的>
-
-## 缺口清单
-- <占位资产：页面 / 位置 / 待补说明>
-```
+获取到的资产统一写入 `doc-ppt/brand-spec.md`，作为全 PPT 页面品牌资产的唯一真源。成品骨架见 `templates/brand-spec.md`，复制到 `doc-ppt/brand-spec.md` 后逐字段填充，不得凭记忆转抄或删减字段。
 
 执行纪律：
 

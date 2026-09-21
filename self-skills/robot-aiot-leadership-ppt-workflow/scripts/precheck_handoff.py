@@ -5,7 +5,7 @@
 
 用法:
   python3 precheck_handoff.py <工作目录>            # 工作目录即 doc-ppt/
-  python3 precheck_handoff.py doc-ppt --skip-logo   # 甲方模板继承路线跳过 logo 校验(phase5:157)
+  python3 precheck_handoff.py doc-ppt --skip-logo   # 甲方模板继承路线跳过 logo 校验(phase5「甲方模板继承」继承规则 3)
 
 机判项:
   1. 零宽字符扫描（.md/.html/.xml/.css/.js/.svg/.txt 中的不可见字符）  → 校验第 3 条
@@ -173,7 +173,7 @@ def check_inputs(workdir, skip_logo, findings):
     logo = os.path.join(workdir, "assets", "midea-logo.png")
     if skip_logo:
         findings.append(
-            ("OK", "甲方模板继承路线，跳过 midea-logo.png 校验（phase5:157）")
+            ("OK", "甲方模板继承路线，跳过 midea-logo.png 校验（phase5「甲方模板继承」继承规则 3）")
         )
     elif os.path.isfile(logo):
         findings.append(("OK", f"logo 就位: {logo}"))

@@ -165,7 +165,9 @@ Clean, minimal text layout:
 
 canonical 副本：`templates/style-7-openai.svg` — 复制使用，以 templates 为准
 ```xml
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 600" width="960" height="600">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 600" width="960" height="600" role="img" aria-labelledby="style-7-openai-title style-7-openai-desc">
+  <title id="style-7-openai-title">OpenAI official style diagram</title>
+  <desc id="style-7-openai-desc">Pure white minimal style skeleton</desc>
   <style>
     text { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica Neue, 'PingFang SC', 'Microsoft YaHei', 'Microsoft JhengHei', 'SimHei', sans-serif; }
   </style>

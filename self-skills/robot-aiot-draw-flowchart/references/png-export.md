@@ -31,10 +31,17 @@ rsvg-convert -w 1920 input.svg -o output.png
 
 ## Puppeteer
 
-Install Puppeteer outside the user's project and run the bundled converter:
+`scripts/svg2png.js` 优先 `require("puppeteer")`；缺失时自动回退 `puppeteer-core` + 系统 Chrome（macOS/Linux 常见路径，或 `CHROME_PATH` 环境变量指定），无需下载 Chromium：
 
 ```bash
 SKILL_ROOT="${CLAUDE_SKILL_DIR:-/absolute/path/from-codex-skill-metadata}"
+npm install --prefix /tmp/svg2png-core puppeteer-core@25.3.0
+NODE_PATH=/tmp/svg2png-core/node_modules node "$SKILL_ROOT/scripts/svg2png.js" ./output
+```
+
+完整 puppeteer 安装（自带 Chromium，弱网可能超时）仍受支持：
+
+```bash
 npm install --prefix /tmp/svg2png-puppeteer puppeteer
 NODE_PATH=/tmp/svg2png-puppeteer/node_modules node "$SKILL_ROOT/scripts/svg2png.js" ./output
 ```

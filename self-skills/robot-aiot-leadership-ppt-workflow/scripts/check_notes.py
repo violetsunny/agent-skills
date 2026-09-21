@@ -5,12 +5,15 @@
 
 用法:
   python3 check_notes.py <pages目录|notes目录(.md)|单文件deck.html|单个.md>
+  python3 check_notes.py --sync <pages目录> <notes目录(.md)>   # 双源一致性比对
 
 检查（每页）:
-  铁律2 (:124-128): .notes 话术 150-500 字，缺 .notes 或字数越界 → FAIL
+  铁律2 (:124-128): .notes 话术 150-300 字，缺 .notes 或字数越界 → FAIL
   铁律3 (:130-141): 书面语禁词表（md 原文词表）出现在话术中 → FAIL
         因此 / 该方案 / 然而 / 进行优化 / 我们将会 / 综上所述
   不上屏 (:143-145): 页面可见区域出现提示语/口播稿/"这一页讲……"类描述 → FAIL
+  --sync 双源一致性: pages/*.html 的 .notes 与 notes/*.md 按文件名排序逐页配对，
+        去空白后文本必须完全一致，不一致 → FAIL（页内重组删改逐字稿后须双源同步更新）
 
 假设（md 未明确，按契约精神决定）:
   - 字数口径: .notes 内全部文本去除空白字符后的字符总数（中文字、标点、字母数字各计 1）
@@ -27,7 +30,7 @@ import sys
 from html.parser import HTMLParser
 
 MIN_CHARS = 150
-MAX_CHARS = 500
+MAX_CHARS = 300
 BANNED_WORDS = [
     "因此",
     "该方案",
@@ -175,7 +178,7 @@ def check_target(target, fails):
         run_file(target, os.path.basename(target), fails, deck_mode=True)
 
 
-MD_MARK_RE = re.compile(r"^[#>\-\+\s]+|[*`~_|]", re.M)
+MD_MARK_RE = re.compile(r"^[#>\-\+\s]+|~~|[*`_|]", re.M)
 
 
 def run_md_file(path, label, fails):
@@ -210,19 +213,81 @@ def run_file(path, label, fails, deck_mode):
         check_page(f"{label} 第{i}页", page, fails)
 
 
+def extract_notes_html(path):
+    with open(path, encoding="utf-8") as f:
+        raw = f.read()
+    p = NotesParser(path)
+    p.feed(raw)
+    p.close()
+    text = "".join(t for pg in p.pages for t in pg["notes"])
+    return re.sub(r"\s+", "", text)
+
+
+def extract_notes_md(path):
+    with open(path, encoding="utf-8") as f:
+        text = f.read()
+    return re.sub(r"\s+", "", MD_MARK_RE.sub("", text))
+
+
+def sync_check(pages_dir, notes_dir, fails):
+    htmls = sorted(
+        os.path.join(pages_dir, f) for f in os.listdir(pages_dir) if f.endswith(".html")
+    )
+    mds = sorted(
+        os.path.join(notes_dir, f)
+        for f in os.listdir(notes_dir)
+        if f.endswith(".md") and not f.startswith("total")
+    )
+    if not htmls or not mds:
+        fails.append(f"--sync: {pages_dir} 无 .html 或 {notes_dir} 无页级 .md")
+        return
+    if len(htmls) != len(mds):
+        fails.append(f"--sync: 页数不一致 pages={len(htmls)} notes={len(mds)}")
+        return
+    for h, m in zip(htmls, mds):
+        th, tm = extract_notes_html(h), extract_notes_md(m)
+        hb, mb = os.path.basename(h), os.path.basename(m)
+        if th != tm:
+            fails.append(
+                f"--sync 双源不一致: {hb}({len(th)}字) vs {mb}({len(tm)}字)，"
+                "页内重组删改话术后须同步更新两处"
+            )
+        else:
+            print(f"[ OK ] 双源一致: {mb} {len(tm)} 字")
+
+
 def main():
     ap = argparse.ArgumentParser(
-        description="话术三铁律校验（.notes 字数/禁词/可见区提示语）"
+        description="话术三铁律校验（.notes 字数/禁词/可见区提示语）+ --sync 双源一致性"
     )
-    ap.add_argument("target", help="pages 目录 / notes .md 目录 / 单文件 deck.html 或 .md")
+    ap.add_argument(
+        "target",
+        nargs="?",
+        help="pages 目录 / notes .md 目录 / 单文件 deck.html 或 .md",
+    )
+    ap.add_argument(
+        "--sync",
+        nargs=2,
+        metavar=("PAGES_DIR", "NOTES_DIR"),
+        help="比对 pages/*.html .notes 与 notes/*.md 话术是否一致",
+    )
     args = ap.parse_args()
 
-    if not os.path.exists(args.target):
-        print(f"FAIL 目标不存在: {args.target}", file=sys.stderr)
-        return 2
-
     fails = []
-    check_target(args.target, fails)
+    if args.sync:
+        for d in args.sync:
+            if not os.path.isdir(d):
+                print(f"FAIL --sync 目录不存在: {d}", file=sys.stderr)
+                return 2
+        sync_check(args.sync[0], args.sync[1], fails)
+    if args.target:
+        if not os.path.exists(args.target):
+            print(f"FAIL 目标不存在: {args.target}", file=sys.stderr)
+            return 2
+        check_target(args.target, fails)
+    if not args.sync and not args.target:
+        ap.print_help()
+        return 2
     for f in fails:
         print("[FAIL]", f)
     print(f"--- check_notes 汇总: FAIL={len(fails)} ---")

@@ -23,12 +23,10 @@ metadata:
 | ui-ux-pro-max | 设计数据资产检索（search.py 查询风格/调色板/字体/图表类型库，仅提供数据建议；规则权威在本 SKILL 内化文件） |
 
 ```bash
-for s in archify diagram-design ui-ux-pro-max; do
-  [ -d "$HOME/.agents/skills/$s" ] && echo "[OK] $s" || echo "[MISS] $s"
-done
+bash "$HOME/.agents/skills/robot-aiot-arch-diagram/scripts/precheck_deps.sh"
 ```
 
-任一缺失时如实告知用户依赖不全，不得静默降级或假装可用。
+执行第一个动作即跑此脚本：exit≠0（任一 [MISS]）立即中止并如实告知用户依赖不全，不得静默降级或假装可用。被上层 workflow 委派时输出存档批次 `_gen/precheck-robot-aiot-arch-diagram.txt`。
 
 ## 概述
 
