@@ -492,9 +492,9 @@ deck 换肤素材库。每套预设 = 一组语义 token 覆盖集，直接覆�
 - **页型配方要点**:
   - cover: navy 面 + serif 大标题内嵌古金斜体 `<em>`（Signal moment；CJK 降级为仅颜色替代）+ 36px 金短线。
   - stat-grid: stat-card 古金 serif 数字 5.5vw 600 −0.02em + 发丝分隔。
-  - quote: chromeless 声明页（serif 声明居中裸面，无卡片）。
+  - quote: chromeless 声明页（serif 声明居中裸面，无卡片；裸面随 deck 底面，无反转）。
   - timeline: vt-spine 1px 竖发丝 + 9px 金点 + em-dash 金 mono 项目符。
-  - closing: pyramid band 3px 金左边 + color-mix 递减 + 双表面反转收底。
+  - closing: pyramid band 3px 金左边 + color-mix 递减 + 同表面收底（可用另一表面作页内 accent 强调块——组件级反转，非页级主题反转，全 deck 仍单主题）。
 
 ### 2.32 soft-editorial
 
