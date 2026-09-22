@@ -212,11 +212,11 @@ A/B 约 84 对同源 references 文件。合法差异白名单（diff 后逐 hun
 - codex-cli 禁令句保留；onboarding-map.json Codex 枚举豁免；arcSize=15（draw.io XML 百分比语义）豁免；studio :532「双表面反转」保留。
 - 验证产物落盘交付项目 test-run/<批次>/，人工确认前禁止清理；/tmp 只放过程性临时文件。
 
-### 待办计划（按序执行）
+### 待办计划（2026-09-22 更新：原 1/2 已完成）
 
-1. **市场端更新**：skillId SKILL_CS30SK20260814000011855853 仍绑旧名 leadership-ppt 且 description 为旧版（含 GIF 字样）。做法：`skill_marketplace(action='publish', name='robot-aiot-draw-flowchart')` 以新名重新发布覆盖；旧名注册项若无法覆盖则先下架。B/IHA/PPT/WEB 四个 skill 的 description 若有变更一并重发布。
-2. **docs/skills-overview.md 再生成**：跑 robot-aiot-self-skill-sync 的 module 5，消除旧名 leadership-ppt 残留；生成后 diff 核对五 skill 名称与 version（A=6.0.0）。
-3. **key-skills-git/ 未跟踪目录**：7-9 月旧 skill 仓库（用户自行放置），默认不动不入库；确认无引用价值后由用户删除或加 .gitignore。
+1. ~~市场端更新~~：已完成（用户确认已发布）。
+2. ~~docs/skills-overview.md 再生成~~：已完成——module 5 全流程（m5_extract → sub agent 翻译 41 条 → m5_render），872 技能（133/722/17），旧名 leadership-ppt 零命中，五 skill 条目为新版 description（draw-flowchart 无 GIF、PPT 六阶段、IHA 新能力清单）；快照 docs/.skills-overview-mtimes.json 已在 .gitignore。
+3. **key-skills-git/ 入库受阻（如实记录）**：目录 1.9GB、50005 文件、含多个嵌套 .git（matt-skills/i-have-adhd/ponytail 等外部 skill 克隆）——直接 git add 会被降级为假 submodule 且体积不适合入库。处置选项：加 .gitignore 保持仓库干净（推荐），或剥离嵌套 .git 后分批入库，或移出仓库目录。执行前需用户定夺一次，之后不再确认。
 
 ### 踩坑经验（环境类，工程类见开头 6 条根因教训）
 

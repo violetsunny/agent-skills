@@ -4,9 +4,9 @@
 
 ## 第一部分：`~/.agents/skills/`
 
-扫描目录：`/Users/kangll13/.agents/skills/`（运行时技能目录）
+扫描目录：`/Users/kangll13/.agents/skills/（运行时技能目录）`
 
-共 **127** 个 `SKILL.md`。
+共 **133** 个 `SKILL.md`。
 
 | 技能 | 路径 | 说明 |
 |------|------|------|
@@ -30,7 +30,7 @@
 | `design` | `design` | 综合设计能力：品牌识别、design tokens、UI 样式、logo 生成（55 种风格，支持 Gemini/Atlas Cloud/MuAPI AI）、CIP 企业形象方案（50 项交付物）、HTML 演示（Chart.js）、banner 设计（22 种风格）、图标设计（15 种风格 SVG）、社交配图（HTML→截图，多平台）。触发：设计 logo、生成 mockup、做 slide、banner、图标、社媒图片、品牌识别、设计系统；覆盖 Facebook/Twitter/LinkedIn/YouTube/Instagram/Pinterest/TikTok 等平台。 |
 | `design-patterns` | `design-patterns` | 常见设计模式的 Java 示例（Factory、Builder、Strategy、Observer、Decorator 等）。用户要求实现某模式或设计可扩展组件时使用。 |
 | `design-system` | `design-system` | 设计 token 架构、组件规格与幻灯片生成：三层 token（primitive→semantic→component）、CSS 变量、间距/字体比例、组件规格与策略性幻灯片创建。用于设计 token、系统化设计与品牌合规演示。 |
-| `dev-paradigm-matt` | `dev-paradigm-matt` | 分层工作流路由 skill：按任务阶段把需求澄清、规格设计、架构规划、实现、调试、审查、交接和长期维护路由到合适的 matt-skills，而非所有任务走同一条流水线。适用于「这个需求该怎么推进」「该先 grill 还是 to-spec」「Bug/重构/新功能分别怎么走」、接手陌生项目、setup、领域建模、票据拆分等场景的统一入口。 |
+| `dev-paradigm-matt` | `dev-paradigm-matt` | 面向日常工程开发的分层工作流路由 skill：按任务所处阶段把需求澄清、规格设计、架构规划、实现、调试、审查、交接和长期维护路由到合适的 matt-skills，不强迫所有任务走同一条固定流水线。适用于「这个需求该怎么推进」「该先 grill 还是 to-spec」「Bug/重构/新功能分别怎么走」「完整开发流程怎么编排」等场景；也是接手陌生项目做 setup、领域建模、票据拆分、实现收尾或维护规划的统一入口，以及极简实现约束、过度工程审查、全仓膨胀审计、捷径台账跟踪的编排入口。 |
 | `diagnosing-bugs` | `diagnosing-bugs` | 面向疑难 bug 与性能回退的诊断循环。用户说 "diagnose""debug this"，或报告某功能损坏/抛错/失败/变慢时使用。 |
 | `diagram-design` | `diagram-design` | 生成品牌化架构图、流程图、时序图、状态机、ER/数据模型、时间线、泳道、雷达图、甘特图、桑基图、鱼骨图、Wardley map、UML 类图、数据库 schema 等 40+ 类图表，输出独立 HTML/SVG/PNG；可重绘 .drawio、Mermaid .mmd、.excalidraw 源文件，从网站提取品牌 token，支持语义标注、无障碍动效与手绘风格。 |
 | `discernment-nudge` | `discernment-nudge` | 在给出用户可能据以行动的实质性回答或草稿（建议推荐、目标/计划/proposal/邮件草稿、估算预测、数据分析解读、可依赖的事实断言、多步论证）后、定稿前调用：追加 2-3 个针对所产内容具体点的追问，帮助用户核查关键事实、检验推理与假设、发现缺失上下文；每次对话最多一次。简单查询、纯教学解释、格式转换、用户自己运行的代码、创意写作、闲聊，或用户已要求复查引用时跳过。 |
@@ -79,6 +79,12 @@
 | `opsx-workflow-hooks` | `opsx-workflow-hooks` | opsx 工作流的后置命令钩子。触发 A：/opsx/propose 生成全部 artifacts 后进入迭代打磨循环，询问用户新想法并更新提案直到满意，非平凡分析用全新 sub agent。触发 B：/opsx/apply 达到实现完成交接后，在用户人工验证（SIT/UAT）前运行 review/test/verification、修复关键问题，全部任务真正完成才归档。普通实现中暂停不触发。 |
 | `pdf` | `pdf` | 处理 PDF 文件的一切任务：读取/提取文本表格、合并、拆分、旋转页面、加水印、创建 PDF、填表单、加密解密、提取图片、扫描件 OCR。用户提及 .pdf 文件或要求产出 PDF 时使用。 |
 | `performance-smell-detection` | `performance-smell-detection` | 检测 Java 代码级性能坏味道：streams、集合、装箱、正则、对象创建。仅提供风险提示而非定论，优化前务必实测；JPA/数据库性能问题改用 jpa-patterns。 |
+| `ponytail` | `ponytail` | 强制采用真正可行的最懒方案：最简、最短、最 minimal。模拟见多识广的资深开发者：质疑任务是否需要存在（YAGNI）、标准库优先于自定义代码、平台原生特性优先于依赖、一行优先于五十行。支持强度级别 lite/full（默认）/ultra。适用于任何编码任务：编写、新增、重构、修复、评审、设计代码及选择库或依赖。触发词：ponytail、be lazy、lazy mode、simplest solution、minimal solution、yagni、do less、shortest path，或抱怨过度工程、膨胀、样板代码、不必要依赖。非编码请求（常识、散文、翻译、摘要、菜谱）不适用。 |
+| `ponytail-audit` | `ponytail-audit` | 全仓过度工程审计。类似 ponytail-review 但扫描整个代码库而非 diff：按优先级列出可删除、可简化或可用 stdlib/原生等价物替换的项。触发：用户说 audit this codebase、audit for over-engineering、what can I delete from this repo、find bloat、ponytail-audit 或 /ponytail-audit。一次性报告，不实施修复。 |
+| `ponytail-debt` | `ponytail-debt` | 把代码库中所有 `ponytail:` 注释收割成债务台账，让 ponytail 刻意留下的捷径与延期项被跟踪，而不是烂尾成「以后=永不」。触发：用户说 ponytail debt、/ponytail-debt、what did ponytail defer、list the shortcuts、ponytail ledger、what did we mark to do later。一次性报告，不改动任何内容。 |
+| `ponytail-gain` | `ponytail-gain` | 以紧凑计分板展示 ponytail 的实测影响：基于基准中位数，代码更少、成本更低、速度更快。一次性展示，非持久模式，也非按仓库统计的数字。触发：/ponytail-gain、ponytail gain、what does ponytail save、show ponytail impact、ponytail scoreboard。 |
+| `ponytail-help` | `ponytail-help` | ponytail 全部模式、skill 与命令的速查卡。一次性展示，非持久模式。触发：/ponytail-help、ponytail help、what ponytail commands、how do I use ponytail。 |
+| `ponytail-review` | `ponytail-review` | 只关注过度工程的代码评审。找出可删除项：重复造轮子的标准库、不必要的依赖、投机性抽象、死掉的灵活性。每条发现一行：位置、砍什么、用什么替代。触发：用户说 review for over-engineering、what can we delete、is this over-engineered、simplify review 或调用 /ponytail-review。与正确性评审互补，本 skill 只猎杀复杂度。 |
 | `ppt-master` | `ppt-master` | AI 驱动的演示文稿工作流：生成可编辑 PPTX 幻灯片、重建页面视觉、创建可复用 Brand/Style/Layout/Deck 工作区、填充原生 PPTX 模板、美化成品文件。触发于创建/重建/美化/模板化/填充 PPT、PPTX、幻灯片或课件，含添加旁白动画或生成演示视频。 |
 | `pptx` | `pptx` | 任何涉及 .pptx 或 .potx 文件的任务都用它：创建 slide deck、pitch deck、演示文稿；读取、解析、提取文本（即使内容用于邮件或摘要等其他用途）；编辑修改现有演示；合并拆分 slide 文件；处理模板、layout、speaker notes、comments。用户提到 deck、slides、presentation 或相关文件名时触发。 |
 | `prototype` | `prototype` | 构建一次性原型来回答设计问题。用于验证状态模型或逻辑是否合理，或探索 UI 应该长什么样。 |
@@ -92,16 +98,16 @@
 | `retro` | `retro` | 复盘与回顾 skill：把一次开发、排障、交付或协作过程整理成可执行的复盘结论，输出做得好的地方、问题与根因、改进动作和后续跟踪项。用户要求「复盘」「回顾这次开发」「总结问题和经验」postmortem、retrospective 等场景，或任务完成后沉淀流程改进、防止同类问题复发时使用。 |
 | `robot-aiot-adr-confluence` | `robot-aiot-adr-confluence` | 技术方案文档端到端工作流：信息评估 → 需求收敛、追问澄清、方案比较 → 生成 ADR、技术提案或决策简报，需要时发布到 Confluence。适用于「写技术方案」「生成 ADR」「架构决策记录发 Confluence」「技术选型文档输出」等场景。只要文档可停在 Markdown 草稿，明确要求发布才进 Confluence 阶段。 |
 | `robot-aiot-adr-generator` | `robot-aiot-adr-generator` | 生成并校验 ADR 架构决策记录：先按业务/技术需求产出标准 ADR 文档，再按需对可外部验证的关键技术断言执行验证链核查。适用于"生成 ADR""写架构决策记录""输出技术选型归档""ADR 发布前审稿"等场景，输出服务技术决策归档而非通用技术文章。 |
-| `robot-aiot-arch-diagram` | `robot-aiot-arch-diagram` | 架构图/技术可视化绘制能力。两条输出路径：直绘 SVG/HTML（主路径，编辑级设计系统+工程制图管线，含几何校验与构图契约）、archify 运行时渲染（主题切换+导出）。覆盖流程图、分层架构、时序、状态机、ER、UML 类/用例、网络拓扑等 40+ 图表类型；内置 12 套 SVG 风格皮肤与品牌 token 定制、PNG/GIF 导出，支持 drawio/Mermaid/Excalidraw 导入重绘与 .excalidraw/SVG/PNG 三件套离线导出，含数据统计图表绘制规则、深色主题直绘与出版级迭代流程。非 PPT 场景专用。触发：绘制架构图/技术可视化。 |
+| `robot-aiot-arch-diagram` | `robot-aiot-arch-diagram` | 架构图/技术可视化绘制能力。两条输出路径：直绘 SVG/HTML（主路径，编辑级设计系统+工程制图管线，几何校验+构图契约，汇报级展示）、archify 运行时渲染（主题切换+导出）。覆盖流程图、分层架构、时序、状态机、ER、UML 类/用例、网络拓扑、时间线、Agent/记忆架构等 40+ 图表类型；内置 12 套 SVG 风格皮肤与品牌 token 定制、PNG/GIF 导出与 drawio/Mermaid/Excalidraw 导入重绘；支持 Mermaid 源码写作（23 类图表语法）与 .excalidraw/SVG/PNG 三件套离线导出、数据统计图表（饼图/箱线图/热力图等）绘制规则、深色主题直绘技法与出版级示意图迭代流程。专注技术图表绘制。 |
 | `robot-aiot-bash-code-review` | `robot-aiot-bash-code-review` | 审查 skill 文档（.md）中 bash 代码块的语法、功能正确性与模式匹配准确性。创建或更新含 bash 代码块的 skill、要求验证文档 bash 代码、编辑涉及 bash 块的 skill 文档后触发。触发词：review bash、verify code blocks、bash 验证、代码块审查。 |
 | `robot-aiot-commit` | `robot-aiot-commit` | 为本项目生成统一格式的中文提交说明，用户明确要求时执行 Git commit。适用于「生成 commit message」「按规范提交」「总结 diff」「按 FEAT/FIX/ENH/DOC/CHORE 分类提交」「根据分支提取 JIRA」等场景，遵循本项目提交规范而非通用 Conventional Commits 模板。 |
 | `robot-aiot-docs-sync` | `robot-aiot-docs-sync` | 扫描项目并创建或更新可溯源文档：AGENTS.md、README.md、CHANGELOG.md、docs/project-map.md、docs/architecture.md。适用于「更新项目文档」「同步文档」「生成 changelog」「生成项目地图」等场景，仅对这 5 个文件做结构化增强，不修改源代码、配置或测试。 |
-| `robot-aiot-draw-flowchart` | `robot-aiot-draw-flowchart` | 机器人/IoT 业务图表绘制与页面化能力：draw.io XML 图表生成（可编辑主路径）+ XML→HTML 稳定桥接转换 + 领导汇报静态页面 HTML（1920x1080 画布）。覆盖流程图、分层架构、时序、状态机、ER、UML 类/用例、网络拓扑等 39+ 图表类型；内置机器人视觉语言、配色与样式一致性体系、几何/构图校验，PNG/GIF 导出与 drawio/Mermaid 导入重绘，支持 Mermaid 源码写作与 .excalidraw/SVG/PNG 三件套离线导出、数据统计图表绘制、深色主题直绘与出版级迭代流程。 |
-| `robot-aiot-interactive-html-author` | `robot-aiot-interactive-html-author` | 交互式动画特效 HTML 编写能力。纯原生零依赖产出浏览器可直接运行的交互页面/多页 deck：翻页系统（键盘+点击+触摸滑动+View Transition+#/N 深链）、演讲者模式（S 键弹窗：像素级预览+提词+计时器，双窗口同步）、总览网格（O 键）、话术抽屉（N 键）、元素入场、数据动效（数字滚动/进度条填充/图表逐步绘制）、交互图表、关键帧动画与动效接缝、扩展特效目录（27 种 CSS 入场动画 + 20 种 canvas FX，仅明确要求时启用）、Mermaid/PlantUML 构建期渲染嵌入（headless Chrome→PNG/SVG，失败降级不静默丢图）、自包含单文件构建与交付前审查。用户要求写交互动画页、加翻页/动画/动效、演讲者模式/提词器/双屏演示，或 robot-aiot-web-presentation-workflow 委派 Phase 4 编写时触发。 |
+| `robot-aiot-draw-flowchart` | `robot-aiot-draw-flowchart` | 机器人/IoT 业务图表绘制与页面化能力。draw.io XML 图表生成（可编辑主路径）+ XML→HTML 稳定桥接转换 + 领导汇报静态页面 HTML 生成。覆盖流程图、分层架构、时序、状态机、ER、UML 类/用例、网络拓扑、时间线、Agent/记忆架构等 39+ 图表类型；内置机器人视觉语言、配色与样式一致性体系、几何/构图校验、PNG 导出与 drawio/Mermaid 导入重绘；支持 Mermaid 源码写作（23 类语法）与 .excalidraw/SVG/PNG 三件套导出、数据统计图表绘制规则、深色主题直绘与出版级迭代流程；XML→HTML 保留原始样式/布局/层级/配色；静态页面固定 1920x1080 画布，内化语义 token、高级感设计标准与交付审查流程。 |
+| `robot-aiot-interactive-html-author` | `robot-aiot-interactive-html-author` | 交互式动画特效 HTML 编写能力。纯原生零依赖产出浏览器直接可运行的交互页面/多页 deck：翻页系统（键盘/点击/触摸滑动/View Transition/#/N/M 深链）、演讲者模式（S 键：双窗口同步预览+提词+计时器）、总览网格（O 键）、话术抽屉（N 键）、内联编辑（E 键+Ctrl+S 导出）、分步揭示、数据动效、交互图表、关键帧动画、相机运镜与分镜、UI 演示与画廊编排、多版本设计选优、41 套风格预设、登记版式（瑞士风 S01-S25×杂志风 M01-M10）、扩展动画目录（49 种 CSS 入场+21 种 canvas FX）、Mermaid/PlantUML 构建期渲染嵌入、单文件/多页 INDEX 构建、衍生态（文档 PDF A4/落地页 1440px）、高级感设计与交付审查。触发：用户要求写交互动画页、给 HTML 加翻页/动画/动效、单文件交互演示页、演讲者模式/提词器/双屏演示、风格预设/deck 换肤、瑞士风/杂志风 deck、运镜/分镜、UI 演示编排、品牌主色套色、落地页/PDF 衍生态、浏览器内联编辑，或上层 workflow 委派页面编写。 |
 | `robot-aiot-knowledge-expert` | `robot-aiot-knowledge-expert` | 物联网全栈技术专家回答规范。用户问 IoT/AIOT 架构设计、协议选型、平台集成、边云协同、性能调优、故障排查时使用。触发词：物联网、IoT、MQTT、Modbus、BACnet、OPC UA、EMQX、物模型、边云协同、设备影子、OTA、JetLinks、ThingsBoard、感认行。 |
-| `robot-aiot-leadership-ppt-workflow` | `robot-aiot-leadership-ppt-workflow` | 把项目数据和技术分析转化为领导汇报 PPT，五阶段全链路：数据池建立 → 技术明细版加目标受众汇报版文档分层 → 调用 robot-aiot-draw-flowchart 生成分层架构图/流程图 XML 并完成 XML→HTML 桥接 → 调用 ppt-master 生成最终 PPTX。用户要求「写领导汇报PPT」「出PPT母稿」「做汇报材料」时触发。受众由用户指定，默认领导层。 |
-| `robot-aiot-self-skill-sync` | `robot-aiot-self-skill-sync` | 批量更新 self 目录下所有 git 项目并同步 skills 的五模块工作流：统一更新 npx 管理型外部 skill（失败按 self/skills/ 本地克隆 rsync 兜底）、OpenSpec profile 升级并将 opsx/ 命令与 openspec-* skills 同步到 ~/.agents、self-skills/ 与 ~/.agents/skills/ 及 commands/ 按内容+mtime 文件级双向同步（严禁旧覆盖新）、~/.agents/skills/ 全量同步到知识库 agent-skills/skills/（不加 --delete）、最后更新 docs/skills-overview.md。核心原则：只允许新增和修改，禁止删除与 git push；self-skills/ 是自写 skill 唯一真源，禁止从非运行时来源写入。触发词：更新self、同步skills、更新skills、拉取self 等。 |
-| `robot-aiot-web-presentation-workflow` | `robot-aiot-web-presentation-workflow` | 交互式 Web 演示页面制作工作流：根据知识文档生成分页汇报母稿，按需制作架构图/流程图，逐页交互 HTML（可翻页、带动画、数据动效，纯原生零依赖双击即用）委派 robot-aiot-interactive-html-author 编写。触发于“做交互演示”“生成Web演示”“做动态汇报”“可翻页演示”“带动画的汇报”“Web版汇报”，或将技术项目数据转化为可交互浏览器演示的场景。 |
+| `robot-aiot-ppt-presentation-workflow` | `robot-aiot-ppt-presentation-workflow` | 将用户指定的源文件转化为面向目标受众的结构化汇报 PPT（受众由用户指定：领导层/技术同行/外部客户/大众，未指定默认领导层）。六阶段全链路：源文件分析与反问澄清（页数/汇报对象/范围/演讲时长）→PPT 演示母稿（用户确认门）→调用 robot-aiot-draw-flowchart 生成 flow/ 图表 XML 并完成 XML→HTML 桥接（用户确认门）→图表回写母稿对应页并逐页 HTML 化→调用 ppt-master 生成最终 PPTX。触发：用户要求写 PPT、出 PPT 母稿、做汇报材料、汇报方案、生成汇报 PPT、领导汇报；也适用于需将技术项目数据转化为目标受众可读汇报格式的场景。 |
+| `robot-aiot-self-skill-sync` | `robot-aiot-self-skill-sync` | 批量更新 self 目录下所有 git 项目并同步 skills。模块 1 递归五层扫描更新嵌套 git 仓库；agent-skills/skills/ 为外部副本（禁改），self-skills/ 为自写真源。模块 2 升级 OpenSpec 并把 opsx/ 命令与 openspec-* skills 同步到 ~/.agents。模块 3 用 npx skills@latest update 更新 16 个 npx 管理型 skill，失败按本地克隆 rsync 兜底；自写 skill 与命令同 ~/.agents 文件级双向同步，只更新不新增。模块 4 将 ~/.agents/skills/ 同步到仓库 skills/（不加 --delete），模块 5 更新总览文档。原则：两侧只增改不删除；比对内容+mtime 判新旧，禁旧覆盖新（标 [NEWER-TARGET] 或回写真源）；gggggggood/ 下用户维护代码禁回滚/清理/覆盖，冲突提示用户跳过。触发：更新self、拉取self、同步skills、更新skills，或说更新代码/拉取最新代码且指向 self 目录。 |
+| `robot-aiot-web-presentation-workflow` | `robot-aiot-web-presentation-workflow` | 交互式 Web 演示页面制作工作流。用户指定源文件后分析并一次性反问（页数/汇报对象/汇报范围/场景/交付形态），产出 Web 演示母稿（用户确认门），按需调用 robot-aiot-arch-diagram 生成 flow/ 架构图/流程图（用户确认门），图表回写母稿对应页后，逐页交互动画特效 HTML（可翻页、带动画、数据动效，纯原生零依赖双击即用）委派 robot-aiot-interactive-html-author 编写。交付形态含单文件 deck（默认）、多页形态、竖版社交 deck、滚动叙事页。触发：用户要求做交互演示、生成 Web 演示、做动态汇报、可翻页演示、带动画的汇报、Web 版汇报、竖版社交演示、滚动叙事页；也适用于将技术项目数据转化为可交互浏览器演示的场景。 |
 | `scaffold-exercises` | `scaffold-exercises` | 创建通过 lint 的练习目录结构，含 sections、problems、solutions、explainers。用于搭建练习脚手架、创建练习 stub 或新建课程章节。 |
 | `security-audit` | `security-audit` | Java 安全检查清单，覆盖 OWASP Top 10、输入校验、注入防护与安全编码，适用于 Spring、Quarkus、Jakarta EE 及原生 Java。用于代码安全审查、发布前检查或用户询问漏洞时。 |
 | `setup-matt-pocock-skills` | `setup-matt-pocock-skills` | 为仓库配置工程技能：设置 issue tracker、triage 标签词表与领域文档布局。首次使用其他工程技能前运行一次。 |
@@ -140,9 +146,9 @@
 
 ## 第二部分：`agent-skills/skills/`
 
-扫描目录：`/Users/kangll13/aiot/java-code/self/gggggggood/agent-skills/skills/`（外部 skill 副本库）
+扫描目录：`/Users/kangll13/aiot/java-code/self/gggggggood/agent-skills/skills/（外部 skill 副本库）`
 
-共 **696** 个 `SKILL.md`。
+共 **722** 个 `SKILL.md`。
 
 | 技能 | 路径 | 说明 |
 |------|------|------|
@@ -157,6 +163,7 @@
 | `algorithmic-art` | `algorithmic-art` | 用 p5.js 结合种子随机与交互参数探索创作算法艺术。用户要求代码艺术、生成艺术、流场、粒子系统时使用。须创作原创作品，不得复制现有艺术家以防侵权。 |
 | `analytical-method-validation` | `analytical-method-validation` | 按 ICH Q2(R2)/Q14、USP <1220>/<1225>/<1226>、ICH M10、CLSI EP、ISO/IEC 17025 等框架规划、执行并记录分析方法的验证、确认与转移，适用于 HPLC、LC-MS/MS、GC、CE、ICP-MS、溶出、qNMR、qPCR、NIR 及配体结合/细胞 assay。触发：method validation、AMV、linearity、accuracy and precision、LOD/LOQ、specificity、robustness、method transfer、Bland-Altman、OOS investigation、ISR 等。 |
 | `anndata` | `anndata` | 单细胞分析中带注释矩阵的数据结构。处理 .h5ad 文件或对接 scverse 生态时使用。这是数据格式 skill——分析工作流用 scanpy，概率模型用 scvi-tools，群体规模查询用 cellxgene-census。 |
+| `api-and-interface-design` | `api-and-interface-design` | 指导稳定的 API 与接口设计。触发：设计 API、模块边界或任何公共接口时；创建 REST/GraphQL 端点、定义模块间类型契约、划定前后端边界时。 |
 | `api-contract-review` | `api-contract-review` | 审查 REST API 契约：HTTP 语义、版本管理、向后兼容与响应一致性。用户说 "review API""check endpoints""REST review"，或发布 API 变更前使用。 |
 | `api-design` | `api-design` | 生产级 REST API 设计模式：资源命名、状态码、分页、过滤、错误响应、版本控制与限流。设计或评审 REST endpoint、资源命名、状态码、分页或版本控制时使用。 |
 | `api-sculptor` | `api-sculptor` | 设计并实现 API：REST、GraphQL、gRPC 与 WebSocket，产出 OpenAPI 3.1 规范、GraphQL SDL schema、Protocol Buffer 定义及可运行的服务端实现。触发：API 设计、endpoint 结构、schema 定义、版本策略、分页、认证、限流，或 "design an API for"、"write an OpenAPI spec"、"create a GraphQL schema"、"set up gRPC" 及 "I need endpoints for my app" 等口语化请求。 |
@@ -214,6 +221,7 @@
 | `breakout-trade-planner` | `breakout-trade-planner` | 从 VCP 筛选器输出生成 Minervini 风格突破交易计划：最坏情况风险计算、组合热度管理、Alpaca 兼容订单模板（确认前用 stop-limit bracket 预挂，确认后用 limit bracket）。用户提供 VCP 筛选结果并需要入场/止损/目标位与仓位规模时使用。 |
 | `browse` | `gstack-browse` | 无头浏览器 QA 测试与网站自用测试工具：导航任意 URL、交互元素、验证页面状态、对比操作前后差异、带标注截图、检查响应式布局、测试表单与上传、处理对话框、断言元素状态，约 100ms/命令。用于测试功能、验证部署、dogfood 用户流程或带证据提交 bug；触发于“open in browser”“test the site”“take a screenshot”“dogfood this”。 |
 | `browser-qa` | `browser-qa` | 功能部署后用浏览器自动化执行视觉测试与 UI 交互验证。 |
+| `browser-testing-with-devtools` | `browser-testing-with-devtools` | 通过 Chrome DevTools MCP 在真实浏览器中测试。适用于构建或调试任何浏览器运行的内容：检查 DOM、捕获 console 错误、分析网络请求、性能剖析、用真实运行时数据验证视觉输出。需已配置 chrome-devtools MCP server。 |
 | `bulk-rnaseq` | `bulk-rnaseq` | 端到端 bulk RNA-seq 编排：原始 FASTQ 经 QC 与剪切（FastQC、fastp/Trim Galore）、比对与定量（STAR、Salmon、featureCounts）生成基因级 counts 矩阵，再接差异表达（pydeseq2）、通路/GSEA 富集与出版级图表。在 nf-core/rnaseq（Nextflow）与独立 STAR/Salmon 两条路径间路由，覆盖实验设计与 QC 门槛；单细胞 RNA-seq 改用 scanpy。 |
 | `bun-runtime` | `bun-runtime` | Bun 作为 runtime、包管理器、bundler 与 test runner。何时选 Bun 而非 Node、迁移要点与 Vercel 支持。 |
 | `canary` | `gstack-canary` | 部署后金丝雀监控。通过 browse daemon 监控线上应用的 console 报错、性能回退与页面故障，周期性截图并与部署前基线对比，发现异常即告警。触发语："monitor deploy""canary""post-deploy check""watch production""verify deploy"。 |
@@ -244,12 +252,13 @@
 | `chinese-documentation` | `chinese-documentation` | 中文文档排版参考：中英文空格、全半角标点、术语保留、链接格式等，遵循中文文案排版指北约定。仅在用户显式 /chinese-documentation 时调用，不要根据上下文自动触发。 |
 | `chinese-git-workflow` | `chinese-git-workflow` | 国内 Git 平台（Gitee、Coding.net、极狐 GitLab、CNB）的 SSH/HTTPS/凭据/CI 接入差异与镜像同步配置参考。仅在显式 /chinese-git-workflow 时调用，不自动触发。 |
 | `ci` | `ci` | 面向 Gemini CLI 的专用 skill，提供 GitHub Actions workflow 的高性能 fail-fast 监控与 CI 失败的自动化本地验证；自动处理 run 发现，只需提供分支名。 |
+| `ci-cd-and-automation` | `ci-cd-and-automation` | 自动化 CI/CD 流水线搭建。触发：设置或修改构建与部署流水线、自动化质量门禁、在 CI 中配置测试运行器、制定部署策略时。 |
 | `cirq` | `cirq` | Google 量子计算框架。面向 Google Quantum AI 硬件、噪声感知电路设计或量子表征实验时使用，擅长 Google 硬件、噪声建模与底层电路设计。IBM 硬件用 qiskit，量子机器学习用 pennylane，物理模拟用 qutip。 |
 | `citation-management` | `citation-management` | 学术研究引文管理：检索 OpenAlex、PubMed、Google Scholar，提取准确元数据、校验引文、生成规范 BibTeX。用于查论文、验证引文信息、DOI 转 BibTeX、保证科学写作参考文献准确。 |
 | `claude` | `gstack-claude` | 面向非 Claude 宿主的 Claude Code CLI 包装器，含三种模式：Review（用 claude -p 独立审查 diff）、Challenge（对抗式失败模式审查）、Consult（以只读文件工具向 Claude 询问仓库问题）。用户说 "claude review"、"claude challenge"、"ask claude"、"second opinion from claude" 或 "outside voice" 时触发。 |
 | `claude-api` | `claude-api` | Claude API / Anthropic SDK 参考——模型 ID、定价、参数、streaming、tool use、MCP、agents、缓存、token 计数与模型迁移。凡涉及 Claude/Anthropic 或 LLM 定价/选型/限额/缓存的问题须先读此参考、不得凭记忆作答；任务呈 LLM 形态但未指明提供商时也使用。查询明确指定其他提供商（OpenAI/GPT/Gemini 等）或项目 grep 命中其他 SDK 时跳过。 |
-| `claude-handoff` | `in-progress/claude-handoff` | 把当前对话移交给一个全新的后台 agent，立即接手继续工作。 |
 | `claude-handoff` | `claude-handoff` | 把当前对话移交给一个全新的后台 agent，立即接手继续工作。 |
+| `claude-handoff` | `in-progress/claude-handoff` | 把当前对话移交给一个全新的后台 agent，立即接手继续工作。 |
 | `clean-code` | `clean-code` | Clean Code 原则（DRY、KISS、YAGNI）、命名、函数设计与可读性。代码难读、方法过长、命名不清、重复或深嵌套时使用；类职责划分与依赖方向问题改用 solid-principles。 |
 | `cleanddd-coach` | `cleanddd-coach` | 交互式 CleanDDD 教练技能：循序讲解并与用户互动练习 CleanDDD 核心原则与方法，含微课、测验与检查清单，可承接到需求分析/建模/代码实现技能。 |
 | `cleanddd-dotnet-coding` | `cleanddd-dotnet-coding` | CleanDDD 项目中落地已建模需求的编码指南，覆盖聚合、命令、查询、API 端点（Endpoints）、事件、仓储、配置与测试。用于编写或修改业务功能、端点与数据访问。 |
@@ -262,15 +271,19 @@
 | `cobrapy` | `cobrapy` | 基于约束的代谢建模（COBRA）：FBA、FVA、基因敲除、通量采样、SBML 模型，用于系统生物学与代谢工程分析。 |
 | `code-review` | `code-review` | 从固定基点（commit、branch、tag 或 merge-base）起沿两条轴审查变更：Standards（代码是否符合仓库成文编码标准）与 Spec（是否符合原始 issue/规格要求）。以并行 subagent 运行两项审查并排汇报。审查分支、PR、进行中的改动，或用户要求 "review since X" 时使用。 |
 | `code-review` | `engineering/code-review` | 以固定基准点（commit、branch、tag 或 merge-base）为起点审查变更，沿两条轴进行：Standards（代码是否符合仓库文档化的编码规范）与 Spec（代码是否满足原始 issue/spec 要求）。通过并行 subagent 执行两项审查并排报告。当用户要求审查分支、PR、进行中的改动，或说"review since X"时使用。 |
+| `code-review-and-quality` | `code-review-and-quality` | 执行多维度代码评审。触发：合并任何变更之前；评审自己、其他 agent 或人写的代码时；需要在进入主分支前从多个维度评估代码质量时。 |
 | `code-reviewer` | `code-reviewer` | 代码评审技能，支持本地变更（staged 或工作区）与远程 PR（按 ID 或 URL），关注正确性、可维护性与项目规范遵循。 |
+| `code-simplification` | `code-simplification` | 为清晰性简化代码。触发：在不改变行为的前提下重构提升可读性；代码能跑但难读、难维护、难扩展；评审积累了不必要复杂度的代码时。 |
 | `codebase-design` | `codebase-design` | 深模块设计的共享词汇。用于设计或改进模块接口、寻找深化机会、决定接缝位置、提升代码可测试性与 AI 可导航性，或其他 skill 需要深模块词汇时。 |
 | `codebase-design` | `engineering/codebase-design` | 深模块设计的共享词汇。用于设计或改进模块接口、寻找深化机会、决定接缝位置、提升代码可测试性与 AI 可导航性，或其他 skill 需要深模块词汇时。 |
 | `codebase-onboarding` | `codebase-onboarding` | 分析陌生代码库并生成结构化上手指南：架构图、关键入口、约定与初始 CLAUDE.md。加入新项目或首次在 repo 设置 Claude Code 时使用。 |
 | `coding-standards` | `coding-standards` | 跨项目基线编码规范，覆盖命名、可读性、不可变性与代码质量评审。框架特定模式交给具体的前后端 skill。触发：评审代码质量或命名但没有适用的框架 skill 时。 |
 | `concurrency-review` | `concurrency-review` | 审查 Java 并发代码的线程安全、竞态条件、死锁和现代模式（Virtual Threads、CompletableFuture、@Async）。用户要求 check thread safety、concurrency review、async code review 或审查多线程代码时使用。 |
-| `confluence-cli` | `confluence-cli` | 提供 Confluence CLI 基础能力：环境检查、uv 安装、命令调用方式与参数说明、页面/附件/搜索等通用操作，以及 Markdown 发布的基础转换规则。需要查询、检索、读取、发布 Confluence 页面或确认 CLI 用法与环境是否正确时使用。 |
+| `confluence-cli` | `confluence-cli` | 提供 Confluence CLI 基础能力：环境检查、uv 安装、命令调用方式与参数说明、页面/附件/搜索等通用操作，以及 Markdown 发布的基础转换规则。需要查询、检索、读取、发布 Confluence 页面或确认 CLI 用法与环境是否正确时使用。 |
 | `consciousness-council` | `consciousness-council` | 就任意问题、决策或创意挑战运行多视角「心智议会」式讨论。需要多元观点、艰难决策、多角度探索、魔鬼代言人分析，或面对无明显答案的两难与权衡时使用。 |
+| `constraint-driven-development` | `constraint-driven-development` | 把项目质量标准写成书面契约，阻止 agent 暗中降低标准。访谈用户关心哪些维度，无具体数字时给出合理默认阈值，全部记录到 CONSTRAINTS.md，并监控 diff 中的降标行为：新增 @ts-ignore 或 eslint-disable、跳过/删除测试、剥离断言、未实现的桩、调低阈值。触发：质量标准未成文；用户说「设置约束」「定义我们的标准」；需要把无障碍、Web 性能、覆盖率等维度设为强制约束；agent 反复静默检查或跳过测试来变绿；需要覆盖率/性能阈值但不知取什么数。 |
 | `context-budget` | `context-budget` | 审计 Claude Code 上下文窗口在 agents、skills、MCP servers 与 rules 上的消耗，识别臃肿与冗余组件，产出按优先级排序的 token 节省建议。当上下文窗口消耗过快、需要定位是哪些 agents/skills/MCP servers/rules 占用时使用。 |
+| `context-engineering` | `context-engineering` | 优化 agent 上下文配置。触发：开始新会话、agent 输出质量下降、任务间切换、需要为项目配置规则文件与上下文时。 |
 | `context-restore` | `gstack-context-restore` | 恢复此前由 /context-save 保存的工作上下文：默认加载最近一次保存状态（跨所有分支），可跨 Conductor workspace 交接续接。用户说 "resume"、"restore context"、"where was I"、"pick up where I left off" 时使用。与 /context-save 配对。原 /checkpoint resume——因 Claude Code 将 /checkpoint 作为原生回退别名而改名。(gstack) |
 | `context-save` | `gstack-context-save` | 保存工作上下文：捕获 git 状态、已做决策与剩余工作，使未来会话可无缝接续。用户说 "save progress"、"save state"、"context save" 等时触发，配合 /context-restore 恢复。原名 /checkpoint，因与 Claude Code 原生回退别名冲突而改名。 |
 | `continuous-learning-v2` | `continuous-learning-v2` | 基于 instinct 的学习系统：通过 hooks 观察会话，生成带置信度评分的原子 instinct，并进化为 skills/commands/agents；v2.1 支持项目级 instinct 防止跨项目污染。用于沉淀会话经验、管理 instinct 或将其提升为技能/命令/agent。 |
@@ -289,6 +302,7 @@
 | `datamol` | `datamol` | RDKit 的 Pythonic 封装，接口简化、默认值合理，标准药物发现任务首选：SMILES 解析、标准化、描述符、指纹、聚类、3D 构象、并行处理。返回原生 rdkit.Chem.Mol 对象；需高级控制或自定义参数时直接用 rdkit。 |
 | `db-migrator` | `db-migrator` | 数据库迁移助手：Schema 对比、迁移脚本生成。 |
 | `db-whisperer` | `db-whisperer` | 诊断并改进应用层数据库：Postgres、MySQL、SQLite、MongoDB。覆盖 EXPLAIN ANALYZE、慢查询定位、索引策略、N+1 检测、带 up/down 脚本的 schema 迁移、连接池、复制搭建、vacuum/analyze。触发："this query is slow"、"add an index for"、"migration for a new column"、"N+1 on this ORM"、"explain this query plan"、"replication lag"、"optimize my database"、"query is timing out"、"connection pool exhausted"。 |
+| `debugging-and-error-recovery` | `debugging-and-error-recovery` | 指导系统化根因调试。触发：测试失败、构建损坏、昨天还正常的东西坏了、行为与预期不符或任何意外错误；需要弄清坏了什么和为什么——用系统方法定位并修复根因而非猜测。 |
 | `deep-research` | `deep-research` | 通用深度研究 agent 团队：13-agent 流水线，8 种模式（完整研究、快速简报、论文评审、文献综述、事实核查、三段式文献扫描、苏格拉底引导研究对话、系统综述+可选 meta 分析）。覆盖研究问题构建、方法论设计、系统检索、来源验证、跨源综合、偏倚风险评估、meta 分析、APA 7.0 报告、编辑评审、魔鬼代言人挑战、伦理审查与研后文献监测。触发：research、deep research、文献综述、PRISMA、meta-analysis、事实查核、深度研究等。 |
 | `deep-research-ecc` | `deep-research-ecc` | 用 firecrawl 与 exa MCP 做多来源深度研究：搜索网络、综合发现、交付带来源署名的引用报告。触发：用户希望对任意主题做有证据、有引用的彻底研究。 |
 | `deepchem` | `deepchem` | 分子机器学习库，提供多种 featurizer 与预置数据集。用传统 ML 或 GNN 做 ADMET、毒性等性质预测，适合配合 MoleculeNet 基准做快速实验与多样化分子表示。图优先的 PyTorch 工作流用 torchdrug，基准数据集用 pytdc。 |
@@ -299,6 +313,7 @@
 | `deploy-to-vercel` | `deploy-to-vercel` | 将应用和网站部署到 Vercel。触发于“deploy my app”“deploy and give me the link”“push this live”“create a preview deployment”等部署请求。 |
 | `deployment-patterns` | `deployment-patterns` | Web 应用部署工作流与 CI/CD 模式技能，涵盖 Docker 容器化、健康检查、回滚策略和生产就绪检查清单。设置 CI/CD、容器化应用或发布前检查生产就绪状态时使用。 |
 | `depmap` | `depmap` | 查询 Cancer Dependency Map（DepMap）获取癌细胞系基因依赖评分（CRISPR Chronos）、药物敏感性数据与基因效应谱。用于识别癌症特异性脆弱点、合成致死相互作用及验证肿瘤药物靶点。 |
+| `deprecation-and-migration` | `deprecation-and-migration` | 管理弃用与迁移。触发：移除旧系统、API 或功能；把用户从一种实现迁移到另一种；生产环境数据库 schema 迁移（如 expand/contract 方式无停机重命名/删除列）；决定现有代码是维护还是下线时。 |
 | `design` | `design` | 综合设计 skill：品牌识别、design tokens、UI 样式、logo 生成（55 种风格，Gemini AI）、CIP 企业识别（50 项交付物与 mockup）、HTML 演示（Chart.js）、banner 设计（22 种风格，社交/广告/网页/印刷）、图标设计（15 种风格，SVG，Gemini 3.1 Pro）、社交配图（HTML→截图，多平台）。动作含 design logo、create CIP、build slides、design banner、generate icon、create social photos。平台覆盖 Facebook、Twitter、LinkedIn、YouTube、Instagram、Pinterest、TikTok、Threads、Google Ads。 |
 | `design-consultation` | `gstack-design-consultation` | 设计咨询：理解产品、调研行业、提出完整设计系统（美学、字体、色彩、布局、间距、动效），生成字体+颜色预览页，产出 DESIGN.md 作为项目设计的事实来源。已有站点用 /plan-design-review 推断系统。被要求 "design system"、"brand guidelines" 或 "create DESIGN.md" 时使用；新项目 UI 尚无设计系统或 DESIGN.md 时主动建议。 |
 | `design-html` | `gstack-design-html` | 设计定稿：生成生产级 Pretext 原生 HTML/CSS。可基于 /design-shotgun mockup、/plan-ceo-review 计划、设计评审上下文或用户描述从零开始；文本真实重排、高度计算、动态布局，仅 30KB 开销零依赖，按设计类型智能路由 Pretext 模式。触发 "finalize this design"、"turn this into HTML"、"build me a page" 或用户批准设计/计划就绪后。 |
@@ -330,10 +345,12 @@
 | `docs-writer` | `docs-writer` | 凡涉及在 /docs 目录或仓库内任何 .md 文件的撰写、审阅或编辑任务，必须使用此技能。 |
 | `document-generate` | `gstack-document-generate` | 为功能、模块或整个项目从零生成缺失文档，基于 Diataxis 框架（tutorial/how-to/reference/explanation）产出完整结构化文档。可独立调用，也可被 /document-release 在发现覆盖缺口时调用。当用户要求"写文档""生成文档""为这个功能写文档""创建教程""解释这个模块"时使用。 |
 | `document-release` | `gstack-document-release` | 发布后的文档更新：读取全部项目文档并对照 diff，构建 Diataxis 覆盖图（reference/how-to/tutorial/explanation），更新 README/ARCHITECTURE/CONTRIBUTING/CLAUDE.md 与已发布内容一致，检测架构图漂移，用 sell-test 规则润色 CHANGELOG，清理 TODOS，可选升 VERSION，并在 PR 描述呈现文档欠债。触发「update the docs」「sync documentation」「post-ship docs」；PR 合并后主动建议。 |
+| `documentation-and-adrs` | `documentation-and-adrs` | 记录决策与文档。触发：需要记录架构决策（ADR）或设计选择背后的理由；变更公共 API、发布功能；需要为未来的工程师和 agent 留下理解代码库的上下文时。 |
 | `documentation-lookup` | `documentation-lookup` | 通过 Context7 MCP 获取最新库/框架文档，而非依赖训练数据。适用于安装配置问题、API 参考、代码示例，或用户点名框架（如 React、Next.js、Prisma）时触发。 |
 | `docx` | `docx` | 创建、读取、编辑、操作 Word 文档（.docx）与模板（.dotx）。触发于 Word 文档相关请求：目录、标题、页码、信头等专业格式，提取/重组内容，插入替换图片，查找替换，修订与批注，或要求以 Word 交付报告、备忘录、信函、模板。不适用于 PDF、表格或与文档生成无关的编码任务。 |
 | `domain-modeling` | `domain-modeling` | 构建和打磨项目领域模型。讨论代码库术语、编写或编辑 CONTEXT.md、记录或编辑 ADR 时使用。 |
 | `domain-modeling` | `engineering/domain-modeling` | 构建和打磨项目领域模型。讨论代码库术语、编写或编辑 CONTEXT.md、记录或编辑 ADR 时使用。 |
+| `doubt-driven-development` | `doubt-driven-development` | 让每个非平凡决策在成立前接受全新上下文的对抗性评审。触发：希望在推进前交叉质询每个假设；对计划做隐藏失败模式压力测试；正确性比速度重要；在陌生代码中工作；高风险场景（生产认证、安全敏感逻辑、高危迁移、不可逆操作）；或自信的输出现在验证比事后调试更便宜时。 |
 | `downtrend-duration-analyzer` | `downtrend-duration-analyzer` | 分析历史下跌趋势持续时间，生成交互式 HTML 直方图，展示按板块与市值划分的典型回调时长。 |
 | `drawdown-circuit-breaker` | `drawdown-circuit-breaker` | 基于 trader-memory-core 状态评估账户级回撤熔断规则，决定今日是否允许新增交易风险。使用已实现盈亏、连亏冷却与周/月回撤限额，不依赖任何外部 API。 |
 | `ds-mapper` | `ds-mapper` | 项目目录结构地图：生成带说明的可视化目录树，快速理解任意代码库。接手新项目或需要总览目录结构时使用。 |
@@ -377,7 +394,8 @@
 | `frontend-a11y` | `frontend-a11y` | React 与 Next.js 的无障碍模式——语义化 HTML、ARIA 属性、表单标注、键盘导航、焦点管理与读屏器支持。构建任何交互式 UI 组件或表单时使用。 |
 | `frontend-design` | `frontend-design` | 构建或改造 UI 时的视觉设计指导：确定美学方向与字体排印，做出有辨识度的设计选择，避免模板化默认观感。 |
 | `frontend-patterns` | `frontend-patterns` | React/Next.js 前端开发模式：组件、状态管理、性能优化与 UI 最佳实践。构建或审查 React/Next.js 组件、状态或渲染性能时使用。 |
-| `frontend-slides` | `frontend-slides` | 从零构建动画丰富的精美 HTML 演示，或把 PPT/PPTX 转为网页。用户要做演示、转换幻灯片、为演讲或 pitch 制作 slides 时使用；通过视觉探索帮助非设计师找到自己的审美。 |
+| `frontend-slides` | `frontend-slides` | 从零创建或由 PowerPoint 文件转换出动画丰富的 HTML 演示文稿。触发：用户想做演示、把 PPT/PPTX 转成 web、为演讲/路演做幻灯片；帮助非设计师通过视觉探索而非抽象选择找到自己的审美方向。 |
+| `frontend-ui-engineering` | `frontend-ui-engineering` | 构建生产级、可访问、响应式的用户界面。触发：构建或修改界面与页面、创建组件、实现布局、满足 WCAG 无障碍要求、管理状态；或输出需要达到生产质感而非一眼 AI 生成时。 |
 | `ftd-detector` | `ftd-detector` | 用 William O'Neil 方法检测 Follow-Through Day（FTD）信号确认市场底部：双指数跟踪（S&P 500 + NASDAQ），状态机管理 rally attempt、FTD 资格判定与 post-FTD 健康监测。询问底部信号、follow-through day、反弹尝试、回调后再入场时机或能否加大股票敞口时使用。与防守型 market-top-detector 互补，本技能偏进攻（底部确认）。 |
 | `full-output-enforcement` | `output-skill` | 覆盖默认 LLM 截断行为，强制完整代码生成，禁止占位符模式，并妥善处理 token 上限分段。适用于要求详尽、无删节输出的任务。 |
 | `futures-position-sizer` | `futures-position-sizer` | 根据方向、入场价和止损价计算期货合约手数，使用经验证的各品种合约规格（乘数、tick 大小、tick 价值），支持 ES、NQ、ZB、GC、CL、6E/E6、VX、BT 等。纯离线计算，无需 API key 和网络；也用于接收 contrarian-setup-gate 的 READY_FOR_PLAN 方向/invalidation_level 做仓位测算。 |
@@ -395,9 +413,10 @@
 | `ghost-scraper` | `ghost-scraper` | 从网站提取结构化数据：覆盖静态 HTML、JS 渲染 SPA、分页列表和 API 支撑页面，具备反爬检测意识、限速与 robots.txt 合规。用户想抓取网站、从 URL 提取数据、拉取商品列表、逆向站点 API 或处理动态渲染内容时使用，包括「从这个网站拿数据」「提取价格」等口语化请求。 |
 | `ginkgo-cloud-lab` | `ginkgo-cloud-lab` | 在 Ginkgo Bioworks Cloud Lab（cloud.ginkgo.bio）上提交和管理实验协议，该平台通过 RAC（Reconfigurable Automation Carts）实现自主实验室执行。适用于蛋白表达与纯化（cell-free、E. coli、Pichia）、HiBiT/A280/LabChip 定量、IVT mRNA/circRNA 合成、热位移/可开发性实验、Echo-MS 酶或分析物方法、SPR 靶点导入等场景，覆盖协议选择、输入准备、报价与下单流程。 |
 | `git-commit` | `git-commit` | 为 Java 项目生成 conventional commit 提交信息。用户说 "commit""create commit""commit changes" 或代码改动完成需要提交时使用。 |
-| `git-guardrails-claude-code` | `misc/git-guardrails-claude-code` | 配置 Claude Code hooks，在危险 git 命令（push、reset --hard、clean、branch -D 等）执行前拦截。用户想防止破坏性 git 操作、添加 git 安全钩子，或在 Claude Code 中封禁 git push/reset 时使用。 |
 | `git-guardrails-claude-code` | `git-guardrails-claude-code` | 配置 Claude Code hooks，在危险 git 命令（push、reset --hard、clean、branch -D 等）执行前拦截。用户想防止破坏性 git 操作、添加 git 安全钩子，或在 Claude Code 中封禁 git push/reset 时使用。 |
+| `git-guardrails-claude-code` | `misc/git-guardrails-claude-code` | 配置 Claude Code hooks，在危险 git 命令（push、reset --hard、clean、branch -D 等）执行前拦截。用户想防止破坏性 git 操作、添加 git 安全钩子，或在 Claude Code 中封禁 git push/reset 时使用。 |
 | `git-workflow` | `git-workflow` | 安全处理 Git 状态检查、提交信息、commit、分支、push、PR 与 rebase。用于检查改动、生成或创建提交、管理分支、推送、发 PR 或整理历史时；严格区分每个动作的授权，保护工作树中已有及无关修改。 |
+| `git-workflow-and-versioning` | `git-workflow-and-versioning` | 规范 git 工作流实践。触发：进行任何代码变更时；提交、建分支、解决冲突、把杂乱工作区中未提交的工作拆成干净的原子提交、开或评审 PR、推送远端、组织多条并行工作流；以及发布版本、选择语义化版本号、打 tag、写 changelog 时。 |
 | `git-workflow-ecc` | `git-workflow-ecc` | Git 工作流模式：分支策略、commit 规范、merge vs rebase、冲突解决与各规模团队的协作开发最佳实践。选分支策略、写 commit 规范、决定 merge 还是 rebase 或解决冲突时使用。 |
 | `github-actions-gen` | `github-actions-gen` | 分析真实项目并生成或修订安全、可验证的 GitHub Actions workflow；当用户要求创建 CI、测试矩阵、构建、Release、部署、缓存、Secrets、OIDC、PR 自动化或排查 workflow 配置时使用。 |
 | `github-issue-creator` | `github-issue-creator` | 创建 GitHub issue 时使用，按仓库模板处理 bug、feature 等不同类型并确保正确打标签。 |
@@ -407,14 +426,15 @@
 | `gpt-taste` | `gpt-tasteskill` | 精英 UX/UI 与高级 GSAP 动效工程师。强制 Python 驱动的真随机化布局变化、严格 AIDA 页面结构、宽幅编辑排版（禁止 6 行长行）、无缝 bento 网格、严格 GSAP ScrollTrigger（pinning/stacking/scrubbing）、行内微图与超大段落间距。 |
 | `grill-me` | `grill-me` | 通过毫不留情的追问打磨方案或设计。 |
 | `grill-me` | `productivity/grill-me` | 通过毫不留情的追问打磨方案或设计。 |
-| `grill-with-docs` | `grill-with-docs` | 通过持续追问打磨计划或设计，过程中同步产出 ADR 和术语表文档。 |
 | `grill-with-docs` | `engineering/grill-with-docs` | 通过持续追问打磨计划或设计，过程中同步产出 ADR 和术语表文档。 |
+| `grill-with-docs` | `grill-with-docs` | 通过持续追问打磨计划或设计，过程中同步产出 ADR 和术语表文档。 |
 | `grilling` | `grilling` | 就方案、决策或想法对用户穷追不舍地拷问。用于用户想压力测试自己的思考，或说出 grill 类触发语时。 |
 | `grilling` | `productivity/grilling` | 就方案、决策或想法对用户穷追不舍地拷问。用于用户想压力测试自己的思考，或说出 grill 类触发语时。 |
 | `gstack` | `gstack` | gstack 技能套件的路由器：把 gstack 请求分发到正确技能（规划、评审、QA、发布、调试、文档、安全、设计），浏览器/QA 与 dogfooding 指向 /browse。调用 gstack 未指定具体技能，或问「哪个 gstack 技能合适」时使用。 |
 | `gstack-upgrade` | `gstack-upgrade` | 升级 gstack 到最新版：识别全局或 vendored 安装方式、执行升级并展示新特性。触发："upgrade gstack"、"update gstack"、"get latest version"；语音别名 "upgrade the tools" 等。 |
 | `gtars` | `gtars` | 用 Gtars 做本地基因组区间建模与集合代数：overlaps 与计数、consensus 与 coverage、tokenization、fragment 处理及 refget/BEDbase 规划，覆盖 Python、Rust 与 CLI。 |
 | `guard` | `gstack-guard` | 完全安全模式：破坏性命令警告 + 限定目录编辑，结合 /careful（rm -rf、DROP TABLE、force-push 等操作前警告）与 /freeze（阻止指定目录外的编辑）。操作生产环境或调试在线系统需要最高安全时使用。触发 "guard mode"、"full safety"、"lock it down"。 |
+| `guizang-ppt-skill` | `guizang-ppt-skill` | 生成横向翻页网页 PPT（单 HTML 文件），含 WebGL 背景、演讲者视图、观众屏同步、讲稿备注、章节幕封、数据大字报、图片网格等模板。两种风格：电子杂志×电子墨水（衬线+流体背景+暖色）、瑞士国际主义（无衬线+网格点阵+IKB/柠檬黄/柠檬绿/安全橙高亮）。触发：制作分享/演讲/发布会风格的网页 PPT，或提到「杂志风 PPT」「瑞士风 PPT」「Swiss Style」「horizontal swipe deck」。 |
 | `handoff` | `handoff` | 把当前对话压缩成交接文档，供另一个 agent 接手继续。 |
 | `handoff` | `productivity/handoff` | 把当前对话压缩成交接文档，供另一个 agent 接手继续。 |
 | `harness` | `harness` | 构建 harness 的元 skill：定义专业 agent 并生成其所需 skill。触发场景：用户要求"하네스 구성"类构建请求、进行 harness 设计/工程、为新领域或项目搭建 harness 自动化体系、重构或扩展既有 harness 配置、以及 harness 点检/审计/现状梳理或 agent/skill 同步维护。 |
@@ -424,6 +444,7 @@
 | `high-end-visual-design` | `soft-skill` | 教 AI 以高端设计机构的标准做设计。定义让网站显得昂贵的精确字体、间距、阴影、卡片结构与动画，并封禁所有让 AI 设计显得廉价或平庸的常见默认做法。 |
 | `histolab` | `histolab` | 轻量级 WSI 切片提取与预处理：基础切片处理、组织检测、tile 提取和 H&E 染色归一化。适合简单流水线、数据集准备和快速 tile 分析；高级空间蛋白组学、多重成像或深度学习流水线请改用 pathml。 |
 | `html-ppt` | `html-ppt-skill` | HTML PPT Studio——模板驱动制作专业静态 HTML 演示文稿，支持多种风格、布局与动画。用户要 presentation、PPT、slides、keynote、deck、"幻灯片"、"演讲稿"、"做一份 PPT"、小红书图文等需键盘翻页的精美多页文档时使用。 |
+| `huashu-design` | `huashu-design` | 花叔Design：用 HTML 做高保真原型、幻灯片、动画、可视化与专家评审。任何新设计 100% 先出三个方向初稿供用户选择（指定风格/品牌也不豁免），选定后才执行。触发词：做原型、PPT、幻灯片、动画、设计风格、评审、做个 HTML 页面、UI mockup、导出 MP4/GIF、做个好看的。生产级 Web App 或需后端的系统不适用。 |
 | `hugging-science` | `hugging-science` | 科学领域 AI/ML 资源目录 Hugging Science。当工作涉及生物、化学、物理、天文、气候、基因组、材料、医药、药物发现、蛋白质设计、气象建模、定理证明、单细胞或 PDE 求解等科学场景时使用，通过 datasets、transformers、HF Inference API、gradio_client 及方法论引用，发现和使用科学数据集、模型、博客与交互式 Spaces。 |
 | `humanizer` | `humanizer` | 重写 AI 腔文本使其读起来自然，且不改变原意。用于消除夸大宣传、推销语言、模糊来源、重复结构、AI 套话、被动语态与填充词，依据 Wikipedia 的 Signs of AI writing。编辑或审校文稿时使用。 |
 | `humanizer-zh` | `humanizer-zh` | 去除文本中的 AI 生成痕迹，使其更自然、更像人类书写。基于维基百科"AI 写作特征"指南，检测并修复夸大象征意义、宣传性语言、模糊归因、破折号滥用、三段式法则、AI 词汇、否定式排比、过多连接词等模式。触发：编辑或审阅文本要求去 AI 腔。 |
@@ -437,24 +458,27 @@
 | `hyperframes-registry` | `hyperframes-registry` | 在手写任何具名视觉效果之前，先搜索、安装 HyperFrames registry 的 blocks 与组件并接入 composition。约 400 个托管条目已覆盖 CRT scanlines、glitch、chromatic aberration、film grain、图表、终端窗口等。触发：brief 或分镜点名某效果/转场，运行 hyperframes add 或 hyperframes catalog，按 tag 批量安装，向 index.html 接入已安装条目，处理 hyperframes.json，或贡献新 block（idea → scaffold → validate → PR）。 |
 | `hypogenic` | `hypogenic` | 规划和审计使用 ChicagoHAI HypoGeniC/HypoRefine 做基于标注文本数据集的 LLM 辅助假设生成。适用于 `hypogenic` 包、task configs、hypothesis banks、HypoBench 数据集；不用于人工假设构建或科学验证。 |
 | `hypothesis-generation` | `hypothesis-generation` | 构建有证据边界的科学问题、候选假设、竞争性解释、因果/关联声明、判别性预测、测量方案与预注册级分析计划。用于把观察或初步发现转化为透明可检验的研究计划，不把假设当事实。 |
-| `i-have-adhd` | `i-have-adhd` | 为 ADHD 读者塑造输出形态：先给下一步动作、多步任务编号、跨轮重述进度状态、抑制跑题、给具体时间估计、让成果可见。用 /i-have-adhd 调用，说 "stop adhd mode" 关闭。 |
+| `i-have-adhd` | `i-have-adhd` | 为 ADHD 读者调整输出格式：下一步行动放最前、多步任务编号、跨轮次重述状态、抑制跑题、给具体时间估计、让成果可见。用 /i-have-adhd 触发；持续生效直到用户说 stop adhd mode。 |
 | `i18n-helper` | `i18n-helper` | 国际化/本地化助手——扫描代码中的硬编码文本、生成 i18n 配置、批量翻译。 |
 | `ibd-distribution-day-monitor` | `ibd-distribution-day-monitor` | 检测 QQQ/SPY 的 IBD 式 Distribution Days（放量下跌至少 0.2%），跟踪 25 日过期与 5% 失效规则，统计 d5/d15/d25 聚类并分级市场风险（NORMAL/CAUTION/HIGH/SEVERE），给出 TQQQ/QQQ 敞口建议。收盘后或调整 TQQQ 仓位前使用；不执行交易。 |
+| `idea-refine` | `idea-refine` | 通过结构化的发散与收敛思维，把粗糙想法提炼成清晰可执行的概念。触发：想法还模糊；需要在定计划前压力测试假设；想先扩展选项再收敛到一个方案。触发词：ideate、refine this idea、stress-test my plan。 |
 | `image-to-code` | `image-to-code-skill` | 面向 Codex 的网站图生码技能：先自行生成设计图并深度分析，再尽量按图实现网站。要求生成大而可读的分节设计图而非压缩拼板、为分节/细节视图生成全新独立图、避免多层嵌套卡片 UI、保持 hero 干净留白且在小屏笔记本可读。 |
 | `imagegen-frontend-mobile` | `imagegen-frontend-mobile` | 高端移动应用界面图像生成：面向 iOS、Android 及跨平台产品，产出 app 原生级屏幕概念与流程图。强调清晰层级、舒适可读的文字、多屏一致性、克制配色、质感表面、图像主导构图与优质自定义图标，默认置于精致 iPhone 样机框内展示、主体仍是 app 内容。仅生成图像，不写代码。 |
 | `imagegen-frontend-web` | `imagegen-frontend-web` | 前端图像方向技能：生成高品质、注重转化率的网站设计参考图。核心规则是每个页面 section 单独生成一张横向图，8 个 section 出 8 张，绝不合并。强制构图多样性、背景图自由、CTA 多样、hero 尺度变化（巨型/中等/极简小图）、叙事概念主线与全局统一配色。适用于 landing page、营销站与可供开发者或编码模型精确复刻的产品设计图。 |
 | `imaging-data-commons` | `imaging-data-commons` | 查询和下载 NCI Imaging Data Commons 的公共癌症影像数据。凡涉及 IDC 集合、癌症影像数据集、DICOM 数据访问、放射（CT/MR/PET）或病理 AI 训练集、元数据查询、可视化或许可检查的问题均可调用，即使用户未明确提到 IDC；无需认证。 |
-| `implement` | `implement` | 根据 spec 或一组 tickets 实现具体工作。 |
 | `implement` | `engineering/implement` | 根据 spec 或一组 tickets 实现具体工作。 |
+| `implement` | `implement` | 根据 spec 或一组 tickets 实现具体工作。 |
 | `implement-spec` | `implement-spec` | 将规格说明（spec）实现为代码。 |
-| `improve-codebase-architecture` | `improve-codebase-architecture` | 扫描代码库寻找模块深化（deepening）机会，生成可视化 HTML 报告，并对选中的机会进行追问深挖。 |
 | `improve-codebase-architecture` | `engineering/improve-codebase-architecture` | 扫描代码库寻找模块深化（deepening）机会，生成可视化 HTML 报告，并对选中的机会进行追问深挖。 |
+| `improve-codebase-architecture` | `improve-codebase-architecture` | 扫描代码库寻找模块深化（deepening）机会，生成可视化 HTML 报告，并对选中的机会进行追问深挖。 |
+| `incremental-implementation` | `incremental-implementation` | 以薄且可验证的切片增量交付变更。触发：实现涉及多文件的功能或变更；从计划中领取下一个任务；用 feature flag 灰度发布变更；即将一次性写大量代码；或任务大到无法一步落地时。 |
 | `industrial-brutalist-ui` | `brutalist-skill` | 原生机械风界面，融合瑞士排版印刷与军用终端美学：刚性网格、极端字号对比、功利主义配色、模拟退化效果。适合需要"解密蓝图"感的数据密集 dashboard、作品集或编辑类网站。 |
 | `infographics` | `infographics` | 用 Nano Banana Pro AI 创建专业信息图并智能迭代精修，Gemini 3.6 Flash 做质量评审；集成 research-lookup 与网络搜索保证数据准确。支持 10 种信息图类型、8 种行业风格和色盲安全配色。 |
 | `infra-automation` | `infra-automation` | 管理基础设施操作：DNS 记录、SSL 证书、Cloudflare Workers、CDN 配置与域名开通。提到 Cloudflare、DNS、SSL、Workers、域名、CDN、TLS 加固，或要求 add an A record、check my SSL、deploy a Worker、audit domain config 时触发。 |
 | `infra-dependency-scan` | `infra-dependency-scan` | 扫描 Java/Spring Boot 项目，列出全部外部服务、中间件与第三方依赖。 |
 | `institutional-flow-tracker` | `institutional-flow-tracker` | 用 13F 持仓申报跟踪机构投资者的所有权变化与组合资金流向，分析对冲基金、共同基金等机构持仓，识别被聪明钱显著增持或减持的股票，帮助在股价大波动前发现机会。 |
 | `internal-comms` | `internal-comms` | 撰写各类公司内部沟通材料的资源集：状态报告、领导层更新、3P updates、公司 newsletter、FAQ、事故报告、项目进展等。被要求写内部沟通时使用。 |
+| `interview-me` | `interview-me` | 挖掘用户真正想要什么而非其自以为想要的：每次只问一个问题的访谈，直到对底层意图有约 95% 置信度。触发：需求不明确（只说 build me X 而没有 for whom / why now）；用户明确调用（interview me、grill me、are we sure?、stress-test my thinking）；或发现自己在计划/规格/代码出现前默默脑补模糊需求时。 |
 | `investigate` | `gstack-investigate` | 系统化调试与根因调查，四阶段：investigate、analyze、hypothesize、implement。铁律：未找到根因不得修复。用户报错、500、堆栈、异常行为、"昨天还好好的"或排查故障停摆时主动调用（不要直接调试）。触发："debug this"、"fix this bug"、"root cause analysis"。(gstack) |
 | `investigate-first` | `investigate-first` | 编辑前先诊断原因不明的故障。用于原因未知、间歇性行为、性能回归，或需要按证据排序假设的调查场景。 |
 | `investor-materials` | `investor-materials` | 创建与更新融资材料：pitch deck、一页纸、投资人备忘录、加速器申请、财务模型等。当需要投资人视角的文档、业绩预测、资金用途表、里程碑计划，或需要多份融资材料之间保持内部一致时使用。 |
@@ -491,8 +515,8 @@
 | `literature-review` | `literature-review` | 用多个学术数据库（PubMed、arXiv、bioRxiv、Semantic Scholar 等）开展系统性文献综述、meta 分析、研究综合或全面文献检索，覆盖生医/科学/技术领域，生成含已验证引用的规范 markdown 文档与 PDF，支持 APA、Nature、Vancouver 等引用格式。 |
 | `log-analyzer` | `log-analyzer` | 日志分析助手：智能解析日志文件，识别异常模式，定位问题根因。 |
 | `logging-patterns` | `logging-patterns` | Java 日志最佳实践：SLF4J、JSON 结构化日志、MDC 请求追踪，含面向 Claude Code 调试的 AI 友好日志格式。用于编写日志、调试应用流程或分析日志。 |
-| `loop-me` | `loop-me` | 在当前 workspace 内，就我想构建的工作流规格对我进行严格追问（grill）。 |
 | `loop-me` | `in-progress/loop-me` | 在当前 workspace 内，就我想构建的工作流规格对我进行严格追问（grill）。 |
+| `loop-me` | `loop-me` | 在当前 workspace 内，就我想构建的工作流规格对我进行严格追问（grill）。 |
 | `macro-regime-detector` | `macro-regime-detector` | 用跨资产比率分析检测 1-2 年维度的宏观结构性 regime 转换。分析 RSP/SPY 集中度、收益率曲线、信用条件、规模因子、股债关系与板块轮动，在 Concentration/Broadening/Contraction/Inflationary/Transitional 状态间识别切换。用户问宏观 regime、市场结构转变或长期仓位布局时使用。 |
 | `make-pdf` | `gstack-make-pdf` | 把任意 markdown 文件转成出版级 PDF：1 英寸页边距、智能分页、页码、封面、页眉、弯引号与破折号、可点击目录、斜向 DRAFT 水印，输出成品而非草稿。用户要求 "make a PDF"、"export to PDF"、"generate a document" 等时触发。 |
 | `markdown-mermaid-writing` | `markdown-mermaid-writing` | Markdown 与 Mermaid 图表写作综合技能：把文本图表设为默认文档标准，含完整风格指南（markdown + mermaid）、24 种图表类型参考、9 个文档模板。创建科学文档、报告、分析或可视化时使用。 |
@@ -511,8 +535,8 @@
 | `mcp-conductor` | `mcp-conductor` | 把复杂任务分解为子任务并协调多个工具或 agent 执行。处理任务依赖图、并行执行计划、结果合并与冲突解决。适用于跨多领域的多步任务，如"抓取 5 个站点、对比数据、生成报告"或"部署应用、跑安全检查、配监控"；触发 "orchestrate"、"coordinate agents"、"run these in parallel" 等。 |
 | `medchem` | `medchem` | 药物化学过滤器，用于化合物初筛：应用类药性规则（Lipinski、Veber、CNS）、结构警示目录（PAINS、NIBR、ChEMBL）、复杂度指标及 medchem 查询语言做化合物库过滤。 |
 | `media-use` | `media-use` | HyperFrames 项目媒体统一入口：用 `resolve` 将 BGM、SFX、图片、图标、品牌 logo、配音、调色、LUT 解析为冻结的本地文件或即贴代码块+台账记录；目录缺失时经 TTS/音乐/图像模型生成；一个共享音频引擎产出配音、转写、字幕、去背景；支持媒体剪切/重构图/变换与跨项目资产复用。也处理模糊反馈（实拍偏暗、扁平、需复古/隐私/媒体揭示）。 |
-| `migrate-to-shoehorn` | `misc/migrate-to-shoehorn` | 将测试文件中的 as 类型断言迁移到 @total-typescript/shoehorn。触发于提及 shoehorn、想替换测试中的 as、或需要部分测试数据时。 |
 | `migrate-to-shoehorn` | `migrate-to-shoehorn` | 将测试文件中的 as 类型断言迁移到 @total-typescript/shoehorn。触发于提及 shoehorn、想替换测试中的 as、或需要部分测试数据时。 |
+| `migrate-to-shoehorn` | `misc/migrate-to-shoehorn` | 将测试文件中的 as 类型断言迁移到 @total-typescript/shoehorn。触发于提及 shoehorn、想替换测试中的 as、或需要部分测试数据时。 |
 | `migration` | `migration` | 实现可回滚、兼容安全的迁移过渡：schema、数据、API、协议、配置或依赖迁移，要求具备回滚能力与数据保全证明。 |
 | `minimalist-ui` | `minimalist-skill` | 极简编辑风界面设计：暖色单色调、字体排印对比、扁平 bento 网格、柔和粉彩色，不用渐变与重阴影。适用于需要干净杂志感 UI 的设计场景。 |
 | `mle-workflow` | `mle-workflow` | 生产级机器学习工程工作流：数据契约、可复现训练、模型评估、部署、监控与回滚。触发：构建、评审或加固超越一次性 notebook 的 ML 系统时。 |
@@ -538,6 +562,7 @@
 | `nutrient-document-processing` | `nutrient-document-processing` | 通过 Nutrient DWS API 处理文档：转换、OCR、提取、涂黑（redact）、签名、填表，支持 PDF、DOCX、XLSX、PPTX、HTML 与图像。需要经该 API 做文档转换/OCR/提取/涂黑/签名/填表时使用。 |
 | `nuxt4-patterns` | `nuxt4-patterns` | Nuxt 4 应用模式：hydration 安全、性能、route rules、懒加载，及 useFetch/useAsyncData 的 SSR 安全数据获取。用于构建或评审 Nuxt 4 应用，或排查 hydration 不匹配与数据获取问题。 |
 | `obs-guardian` | `obs-guardian` | 为生产系统构建可观测性、监控、告警与事件可见性：OpenTelemetry 埋点（traces/metrics/logs）、JSON 结构化日志与关联 ID、Prometheus/Grafana 抓取配置与 recording rules、Jaeger/Tempo 分布式追踪、SLO/错误预算与 burn-rate 告警、PagerDuty/OpsGenie 告警规则及 on-call runbook 模板。触发："set up monitoring"、"add structured logging"、"no visibility into my app" 等。 |
+| `observability-and-instrumentation` | `observability-and-instrumentation` | 为代码埋点，使生产行为可见、可诊断。触发：添加日志、指标、追踪或告警；发布任何运行在生产环境的功能且需要其正常工作的证据；生产问题被报告但现有数据无法说明发生了什么时。 |
 | `office-hours` | `gstack-office-hours` | YC Office Hours，两种模式。创业模式：通过六个逼迫性问题检验需求真实性、现状、迫切具体性、最窄切入点、观察与未来适配性。Builder 模式：面向副业项目、黑客松、学习与开源的设计思维头脑风暴，并保存设计文档。当用户描述新产品想法、询问某想法是否值得做、想在写代码前探索概念或梳理设计决策时须主动调用（不要直接回答），也可在 /plan-ceo-review 或 /plan-eng-review 之前使用。触发语："brainstorm this""I have an idea""help me think through this""office hours"等。 |
 | `omero-integration` | `omero-integration` | 用 omero-py、BlitzGateway、OMERO CLI 等安全检查和自动化 OMERO.server 显微镜数据工作流，覆盖 tables、annotations、ROIs、rendering 及有文档的 OMERO.web API。适用于范围化 OMERO 清点、元数据导出、导入/导出规划或受审查的写操作。 |
 | `onekgpd` | `onekgpd` | 按参与者级别查询 1000 Genomes Project 数据集（3202 名全基因组测序个体，GRCh38）。触发：询问队列中的个体或变异——哪些个体携带符合基因/区域条件的变异、某位点纯合参考的个体、某变异是否存在或由指定个体携带、两个体间亲缘关系。返回 1000 Genomes AF、gnomAD v4.1 外显子/基因组 AF、AlphaMissense 评分与 HGVSp 注释。 |
@@ -579,6 +604,7 @@
 | `peer-review` | `peer-review` | 生成证据有界、建设性的同行评审草稿与结构化稿件评估。用于获授权评审科学论文、协议、预印本或研究提案；选择报告规范、核查论断与证据、评估方法/统计/可复现性/伦理/图表/引用质量，以及规划 revision-response 回复。 |
 | `pennylane` | `pennylane` | 硬件无关的量子机器学习框架，带自动微分。用于梯度训练量子线路、构建量子-经典混合模型，可跨 IBM/Google/Rigetti/IonQ 设备移植。擅长 VQE、QAOA、量子神经网络及 PyTorch/JAX 集成；硬件专属优化用 qiskit/cirq，开放量子系统用 qutip。 |
 | `perf-profiler` | `perf-profiler` | 基于可复现基线和 profiler 证据分析性能问题。用于定位慢接口、慢任务、慢查询、内存或网络瓶颈、制定优化方案或验证优化收益；区分实测结论与静态推断，不虚构耗时和提升比例，生产环境操作需明确授权。 |
+| `performance-optimization` | `performance-optimization` | 跨前端、后端、查询与数据库优化应用性能。触发：存在性能要求；怀疑性能回退；需要改善 Core Web Vitals 或加载时间；需要修复 N+1 查询模式；或剖析发现瓶颈时。 |
 | `performance-smell-detection` | `performance-smell-detection` | 检测 Java 代码级性能坏味道：streams、集合、装箱、正则、对象创建。仅提供风险提示而非定论，优化前务必实测；JPA/数据库性能问题改用 jpa-patterns。 |
 | `phylogenetics` | `phylogenetics` | 使用 MAFFT（多序列比对）、IQ-TREE 2（最大似然）与 FastTree（快速 NJ/ML）构建与分析系统发育树，用 ETE3 或 FigTree 可视化。适用于进化分析、微生物基因组学、病毒系统动力学、蛋白家族分析与分子钟研究。 |
 | `pi-agent` | `pi-agent` | 构建和使用 Pi（极简终端编码 harness）。涵盖安装 Pi、配置 provider/model/环境变量、创建 Pi 的 skills/extensions/packages/themes/prompt 模板、通过 SDK 嵌入、RPC 或 JSON 事件流集成、解析 session、用 llama.cpp router 跑本地模型、开发自定义 provider 与 TUI 组件，以及使用生态包 pi-subagents（委派/编排）、pi-mcp-adapter（MCP server）、pi-interview（交互表单）、pi-web-access（网页搜索/抓取/视频理解）。 |
@@ -591,6 +617,7 @@
 | `plan-eng-review` | `gstack-plan-eng-review` | 工程经理模式评审并锁定执行计划——架构、数据流、图表、边界情况、测试覆盖、性能，交互式逐项给出明确建议。触发："review the architecture"、"engineering review"、"lock in the plan"；用户手握计划/设计文档即将开工时主动建议，在实现前发现架构问题。语音别名："tech review" 等。(gstack) |
 | `plan-tune` | `gstack-plan-tune` | gstack 的自调节提问敏感度与开发者画像（v1 观察式）：回顾各 gstack skill 触发的 AskUserQuestion 提示，设置逐题偏好（never-ask / always-ask / ask-only-for-one-way），查看"声明 vs 行为"双轨画像并开关提问调优。纯对话式，无 CLI 语法。触发："tune questions"、"stop asking me that"、"show my profile" 等；用户反复遇到同一 gstack 提问或多次覆盖推荐时主动建议。 |
 | `plankton-code-quality` | `plankton-code-quality` | 基于 Plankton 的写入时代码质量强制：通过 hooks 在每次文件编辑时自动格式化、lint 并用 Claude 修复。为文件编辑设置写入时格式化/lint/自动修复 hooks 时使用。 |
+| `planning-and-task-breakdown` | `planning-and-task-breakdown` | 把工作拆解为有序任务。触发：已有规格或明确需求、需要拆成可实现的任务；任务大到无从下手；需要估算范围；或存在可并行的工作时。 |
 | `polars` | `polars` | 高性能 DataFrame 库，用于 Python ETL、数据分析与 pandas 迁移。表达式驱动的数据处理，支持惰性查询优化、并行执行、流式核外处理、Arrow 互操作与可选 GPU 执行。 |
 | `polars-bio` | `polars-bio` | 在 Polars DataFrame 上做高性能基因组区间运算与生信文件 I/O：对 BED/VCF/BAM/GFF 区间执行 overlap、nearest、merge、coverage、complement、subtract。支持流式与云原生，是更快的 bioframe 替代品。 |
 | `ponytail` | `ponytail` | 强制采用能工作的最懒方案——最简单、最短、最小化：先质疑任务是否该存在（YAGNI），标准库优先于自写代码、平台原生优先于依赖、一行优先于五十行。支持 lite/full/ultra 三档。用于任何编码任务（写、加、重构、修、评审、选型）；用户说 ponytail、be lazy、yagni 等，或抱怨过度设计、样板代码、多余依赖时触发；不用于非编码请求。 |
@@ -616,8 +643,8 @@
 | `project-flow-ops` | `project-flow-ops` | 跨 GitHub 与 Linear 运转执行流：分诊 issue 与 PR、关联进行中的工作，GitHub 保持对外公开、Linear 作为内部执行层。用户要做 backlog 控制、PR 分诊或 GitHub-to-Linear 协调时使用。 |
 | `prompt-forge` | `prompt-forge` | 为 LLM 编写与优化 prompt：系统提示词、few-shot 示例、思维链结构、agent 人设与评估框架。用于写/改 system prompt、设计 few-shot、创建 agent persona、优化 prompt 性能、搭建评估体系或模板系统。触发："write a system prompt"、"prompt engineering"、"this prompt isn't working well" 等。 |
 | `protocolsio-integration` | `protocolsio-integration` | 按当前官方 REST/MCP 契约读取、校验并安全导出 protocols.io 数据，或创建非执行型变更计划。内置客户端仅在显式 --execute 时对官方主机发起有界 GET 请求。仅用于明确针对 protocols.io 或精确协议版本的任务。 |
-| `prototype` | `prototype` | 构建一次性原型来回答设计问题。用于验证状态模型或逻辑是否合理，或探索 UI 应该长什么样。 |
 | `prototype` | `engineering/prototype` | 构建一次性原型来回答设计问题。用于验证状态模型或逻辑是否合理，或探索 UI 应该长什么样。 |
+| `prototype` | `prototype` | 构建一次性原型来回答设计问题。用于验证状态模型或逻辑是否合理，或探索 UI 应该长什么样。 |
 | `pufferlib` | `pufferlib` | 针对 PufferLib 强化学习的版本感知指导，覆盖环境适配、向量化、策略、PuffeRL 训练、评估与安全检查点审查。适用于将 Gymnasium/PettingZoo 环境迁移到已发布的 PufferLib 3.0.0，或使用重新设计的 4.0 原生源码线时。 |
 | `pydeseq2` | `pydeseq2` | 用 PyDESeq2 做 bulk RNA-seq 差异表达分析，涵盖公式化设计、Wald 检验、FDR 校正、LFC 收缩与结果可视化。 |
 | `pydicom` | `pydicom` | 用 pydicom 读取、检查、写入、转换本地 DICOM 数据集与像素数据并做安全预检。覆盖 DICOM 元数据、transfer syntax、压缩插件、frames、私有元素、JSON 及限定范围的脱敏审查。 |
@@ -655,13 +682,13 @@
 | `remotion-to-hyperframes` | `remotion-to-hyperframes` | 把现有 Remotion（React）composition 源码移植为 HyperFrames HTML。仅在明确要求 port/convert/migrate/translate Remotion 源码时使用，单向且仅限 Remotion；顺带提及 Remotion、仅参考代码或"做个类似我 Remotion 视频的东西"属于全新构建（/general-video）。不明确时转 /hyperframes。 |
 | `repo-scan` | `repo-scan` | 引导安装外部 repo-scan 技能的 bootstrap 指针，从固定、可审查的 commit 安装。需在运行跨技术栈源码资产审计前先安装 repo-scan 时使用；此 ECC 指针本身不执行审计。 |
 | `requesting-code-review` | `requesting-code-review` | 完成任务、实现重要功能或合并前使用，验证工作成果是否符合要求。 |
-| `research` | `research` | 调研类能力：针对高可信一手来源调查问题，把发现整理成 Markdown 文件存入仓库。用户想调研主题、收集文档或 API 事实、或把阅读工作交给后台 agent 时使用。 |
 | `research` | `engineering/research` | 调研类能力：针对高可信一手来源调查问题，把发现整理成 Markdown 文件存入仓库。用户想调研主题、收集文档或 API 事实、或把阅读工作交给后台 agent 时使用。 |
+| `research` | `research` | 调研类能力：针对高可信一手来源调查问题，把发现整理成 Markdown 文件存入仓库。用户想调研主题、收集文档或 API 事实、或把阅读工作交给后台 agent 时使用。 |
 | `research-grants` | `research-grants` | 撰写有竞争力的科研基金申请书，覆盖 NSF、NIH、DOE、DARPA 与台湾 NSTC：机构特定格式、评审标准、预算编制、broader impacts、意义陈述、创新叙事与提交合规。 |
 | `research-lookup` | `research-lookup` | 为科学手稿或研究简报汇编最新学术证据。用户明确要求收集文献、参考资料、背景证据、竞争性发现或研究资料包时使用；默认 Parallel Search，源验证用 Parallel Extract，明确要求深度工作时用 Parallel Research，Perplexity 仅在允许时作为兜底。 |
 | `residual-edge-analyzer` | `residual-edge-analyzer` | 将策略收益序列分解为基准暴露与残差 alpha：基于收益的 OLS 归因、HAC 推断、滚动稳定性、替代基准敏感性与分市场状态分析。用于评估回测/实盘收益是否含市场、等权、动量、行业等因子之外的独立 alpha，或解释回撤来自基准暴露还是策略本身。不适用于持仓级 Brinson 归因或无带日期收益序列的汇总指标分析。 |
-| `resolving-merge-conflicts` | `resolving-merge-conflicts` | 需要解决进行中的 git merge/rebase 冲突时使用。 |
 | `resolving-merge-conflicts` | `engineering/resolving-merge-conflicts` | 需要解决进行中的 git merge/rebase 冲突时使用。 |
+| `resolving-merge-conflicts` | `resolving-merge-conflicts` | 需要解决进行中的 git merge/rebase 冲突时使用。 |
 | `retro` | `gstack-retro` | 每周工程回顾：分析 commit 历史、工作模式与代码质量指标，带持久历史与趋势追踪。团队感知：按人拆分贡献，给出表扬与成长点。触发："weekly retro"、"what did we ship"、"engineering retrospective"；在周末或 sprint 结束时主动建议使用。(gstack) |
 | `retro` | `retro` | 复盘与回顾 skill：把一次开发、排障、交付或协作过程整理成可执行的复盘结论，输出做得好的地方、问题与根因、改进动作和后续跟踪项。用户要求「复盘」「回顾这次开发」「总结问题和经验」postmortem、retrospective 等场景，或任务完成后沉淀流程改进、防止同类问题复发时使用。 |
 | `review` | `gstack-review` | 合并前的 PR 评审：对照 base 分支分析 diff，检查 SQL 安全、LLM 信任边界违规、条件副作用等结构问题。被要求 review this PR、code review、pre-landing review、check my diff 时使用；即将合并代码时主动建议。 |
@@ -689,6 +716,7 @@
 | `seam-craft` | `seam-craft` | HyperFrames 发布视频中场景间接缝的渲染正确性规范——保证转场在 master timeline 上正确合成的先决条件。在组装 master timeline / index.html、切点或交叉淡入出现白闪（尤其暗色影片）、推理转场透明度下陷为何透出、或验证场景 wrapper 重叠混合的渲染机制时加载。涵盖不透明 stage-ground（#root 背景）白闪防护，以及 injector 的 wrapper 重叠、定格末帧、ping-pong 轨道与模板代码 stamping。不含逐个转场目录——单个转场条目见 transition registry。 |
 | `search-first` | `search-first` | 先研究后编码的工作流。在编写自定义代码前先搜索现有工具、库与成熟模式，通过调用 researcher agent 完成。 |
 | `sector-analyst` | `sector-analyst` | 分析板块轮动模式与市场周期定位。从 CSV 读取板块上升趋势数据（无需 API key），可选接收图表图片作补充分析。用于板块轮动分析、周期股 vs 防御股评估、超买超卖识别或市场周期阶段判断；分析与输出均为英文。 |
+| `security-and-hardening` | `security-and-hardening` | 加固代码抵御漏洞。触发：审计输入处理器的漏洞；处理用户输入、认证、数据存储或外部集成；检查登录流程是否防住 OWASP Top Ten；构建任何接受不可信数据、管理用户会话或与第三方服务交互的功能；审计依赖已知漏洞、分诊包管理器 audit 发现、评估新包的供应链风险；涉及个人数据或隐私合规（GDPR、CCPA）时。 |
 | `security-audit` | `security-audit` | Java 安全检查清单，覆盖 OWASP Top 10、输入校验、注入防护与安全编码，适用于 Spring、Quarkus、Jakarta EE 及原生 Java。用于代码安全审查、发布前检查或用户询问漏洞时。 |
 | `security-review` | `security-review` | 实现安全相关功能时使用：新增认证、处理用户输入、操作密钥、创建 API endpoint 或实现支付/敏感功能。提供全面的安全检查清单与安全模式。 |
 | `security-scan` | `security-scan` | 用 AgentShield 扫描 Claude Code 配置（.claude/ 目录）的安全漏洞、配置错误与注入风险，检查 CLAUDE.md、settings.json、MCP servers、hooks 及 agent 定义。审计 .claude/ 目录时触发。 |
@@ -696,14 +724,15 @@
 | `setup-browser-cookies` | `gstack-setup-browser-cookies` | 把真实 Chromium 浏览器的 cookie 导入无头浏览会话，弹出交互式选择界面由用户勾选要导入的 cookie 域名。QA 测试需登录页面前使用；用户要求 import cookies、登录站点或认证浏览器时触发。(gstack) |
 | `setup-deploy` | `gstack-setup-deploy` | 为 /land-and-deploy 配置部署设置：自动检测部署平台（Fly.io、Render、Vercel、Netlify、Heroku、GitHub Actions 或自定义）、生产 URL、健康检查端点与部署状态命令，并写入 CLAUDE.md 使后续部署自动化。触发："setup deploy"、"configure deployment" 等。 |
 | `setup-gbrain` | `gstack-setup-gbrain` | 为当前编码 agent 配置 gbrain：安装 CLI、初始化本地 PGLite 或 Supabase brain、注册 MCP、捕获按 remote 的信任策略，一条命令从零到"gbrain 运行中且本 agent 可调用"。触发语："setup gbrain""connect gbrain""start gbrain""install gbrain""configure gbrain for this machine"。 |
-| `setup-matt-pocock-skills` | `setup-matt-pocock-skills` | 为仓库配置工程技能：设置 issue tracker、triage 标签词表与领域文档布局。首次使用其他工程技能前运行一次。 |
 | `setup-matt-pocock-skills` | `engineering/setup-matt-pocock-skills` | 为仓库配置工程技能：设置 issue tracker、triage 标签词表与领域文档布局。首次使用其他工程技能前运行一次。 |
+| `setup-matt-pocock-skills` | `setup-matt-pocock-skills` | 为仓库配置工程技能：设置 issue tracker、triage 标签词表与领域文档布局。首次使用其他工程技能前运行一次。 |
 | `setup-pre-commit` | `misc/setup-pre-commit` | 在当前仓库配置 Husky pre-commit 钩子，含 lint-staged（Prettier）、类型检查与测试。用户想添加 pre-commit 钩子、配置 Husky/lint-staged 或提交时格式化/类型检查/测试时使用。 |
 | `setup-pre-commit` | `setup-pre-commit` | 在当前仓库配置 Husky pre-commit 钩子，含 lint-staged（Prettier）、类型检查与测试。用户想添加 pre-commit 钩子、配置 Husky/lint-staged 或提交时格式化/类型检查/测试时使用。 |
-| `setup-ts-deep-modules` | `setup-ts-deep-modules` | 把 dependency-cruiser 接入 TypeScript 仓库，使每个 package 成为深模块——实现隐藏在子文件夹中，只能通过入口文件访问。用户手动调用。 |
 | `setup-ts-deep-modules` | `in-progress/setup-ts-deep-modules` | 在 TypeScript 仓库接入 dependency-cruiser，使每个 package 成为深模块——实现藏在子文件夹、只能通过入口文件访问。用户手动调用。 |
+| `setup-ts-deep-modules` | `setup-ts-deep-modules` | 把 dependency-cruiser 接入 TypeScript 仓库，使每个 package 成为深模块——实现隐藏在子文件夹中，只能通过入口文件访问。用户手动调用。 |
 | `shap` | `shap` | 用 SHAP 解释和审计机器学习预测：选择 explainer 与 masker、计算并验证特征归因、处理多输出解释、生成局部或全局 SHAP 可视化。 |
 | `ship` | `gstack-ship` | 发布工作流：检测并合并基础分支、跑测试、审查 diff、bump VERSION、更新 CHANGELOG、commit、push、创建 PR。用户说 "ship"、"deploy"、"push to main"、"create a PR"、"merge and push" 等时触发；用户表示代码就绪、要部署或建 PR 时应主动调用此技能，而非直接 push/PR。 |
+| `shipping-and-launch` | `shipping-and-launch` | 准备生产上线。触发：准备部署到生产环境，或询问上线前需要就绪什么；需要发布前检查清单、设置监控、规划分阶段灰度发布、制定回滚策略时。 |
 | `short-term-stock-picker` | `short-term-stock-picker` | 基于 AKShare 的 A 股短线选股工具。筛选条件：流通市值≤150亿、近20交易日有涨停、非 ST、沪深主板/创业板/科创板、近3日主力净流入估算、换手率≤10%。用户说"帮我选短线股""找强势股""筛选股票"或需按条件筛 A 股短线机会时触发。 |
 | `signal-postmortem` | `signal-postmortem` | 记录并分析 edge pipeline 等技能所产生信号的事后交易结果：追踪假阳性、错失机会与 regime 错配，并将结论回馈到 edge-signal-aggregator 权重与技能改进 backlog。 |
 | `simpy` | `simpy` | 用 SimPy 构建与检验有界过程式离散事件仿真：事件、资源、中断、监控、复现实验、预热期与可复现的输出分析。 |
@@ -717,7 +746,9 @@
 | `slides` | `slides` | 用 Chart.js、design tokens、响应式布局、文案公式和场景化 slide 策略创建策略型 HTML 演示。 |
 | `slideshow` | `slideshow` | 用 HyperFrames 制作演示文稿/pitch deck/交互式 deck：离散分页、fragment 渐显、分支与热点导航、内置演讲者模式与讲者备注，也可把现有页面转为 deck；输出可导航 deck 而非 MP4。用户未明确要求 slideshow 时先确认。 |
 | `solid-principles` | `solid-principles` | SOLID 原则清单（附 Java 示例）。类职责过多、抽象泄漏、依赖方向错误，或用户问及单一职责、开闭、里氏替换、接口隔离、依赖倒置时使用；命名、重复与方法长度问题改用 clean-code。 |
+| `source-driven-development` | `source-driven-development` | 让每个实现决策都立足于官方文档。触发：想在实现前对照官方 docs 验证方案；想要权威、有出处引用、不含过时模式的代码；使用任何正确性重要的框架或库进行构建时。 |
 | `spec` | `gstack-spec` | 五阶段把模糊意图变成精确可执行的 spec，创建 GitHub issue，可选在全新 worktree 中拉起 Claude Code agent，合并时用 /ship 关闭源 issue。触发："spec this out"、"file an issue"、"write up a ticket"、"make this a GitHub issue"、"turn this into a backlog item"。(gstack) |
+| `spec-driven-development` | `spec-driven-development` | 先写规格再编码。触发：启动新项目、新功能或重大变更且尚无规格；起草含目标与范围的 PRD 或需求文档；需求不清晰、模糊或只是含糊想法；单个需求横跨多个可独立测试的能力、需要先分解成模块能力地图再写规格时。 |
 | `spring-boot-patterns` | `spring-boot-patterns` | Spring Boot 最佳实践与模式。创建 controller/service/repository，或用户问及 Spring Boot 分层、装配、配置、异常处理时使用；JPA 与 Hibernate 行为改用 jpa-patterns。 |
 | `springboot-patterns` | `springboot-patterns` | Spring Boot 架构模式：REST API 设计、分层服务、数据访问、缓存、异步处理与日志。构建或审查 Spring Boot 后端（REST 层、服务层、数据访问、缓存或异步任务）时使用。 |
 | `springboot-security` | `springboot-security` | Spring Security 最佳实践：认证授权、校验、CSRF、密钥管理、headers、限流与依赖安全。审查 Spring Boot 服务的 authn/authz、校验、CSRF、secrets、headers 或限流时使用。 |
@@ -746,11 +777,11 @@
 | `systematic-debugging` | `systematic-debugging` | 遇到任何 bug、测试失败或异常行为时使用，在提出修复方案之前先系统性定位根因。 |
 | `talking-head-recut` | `talking-head-recut` | 为已有口播/访谈/播客视频叠加与转录同步的计时图文卡片：动态标题、下三分之一条、数据标注、引言侧栏、画中画等，可选 16:9/9:16/4:5 画布，原片画面不动。触发 "graphic overlays"、"package / dress up my video"；非普通字幕（/embedded-captions），不确定时转 /hyperframes。 |
 | `tamarind` | `tamarind` | 通过 REST API 或 MCP server 使用 Tamarind Bio 平台的开源分子设计与结构生物学工具，无需本地 GPU：结构预测（AlphaFold、Boltz、Chai、ESMFold）、蛋白/binder/de novo 设计（RFdiffusion、ProteinMPNN、BoltzGen）、抗体与纳米抗体设计、分子对接（DiffDock、Autodock Vina）、亲和力预测、MSA 生成与分子动力学。提到 tamarind.bio 或需云端批量提交序列做结构/生物物理表征时使用。 |
-| `tdd` | `tdd` | 测试驱动开发。用于测试先行构建功能或修复 bug、提及 red-green-refactor、或需要集成测试时。 |
 | `tdd` | `engineering/tdd` | 测试驱动开发。用于测试先行构建功能或修复 bug、提及 red-green-refactor、或需要集成测试时。 |
+| `tdd` | `tdd` | 测试驱动开发。用于测试先行构建功能或修复 bug、提及 red-green-refactor、或需要集成测试时。 |
 | `tdd-workflow` | `tdd-workflow` | 写新功能、修 bug 或重构时使用，强制测试驱动开发，要求 80%+ 覆盖率，含单元、集成与 E2E 测试。 |
-| `teach` | `teach` | 在当前工作区内向用户教授新技能或概念。 |
 | `teach` | `productivity/teach` | 在当前工作区内向用户教授新技能或概念。 |
+| `teach` | `teach` | 在当前工作区内向用户教授新技能或概念。 |
 | `technical-analyst` | `technical-analyst` | 用于分析股票、股指、加密货币或外汇的周线图。当用户提供图表图像并要求纯基于图表数据的技术分析时使用，涵盖趋势识别、支撑/阻力位、情景推演与概率评估，不考虑新闻或基本面因素。 |
 | `terminal-opener` | `terminal-opener` | 在可见终端窗口中打开可执行文件及其参数数组，提供可复用、无 shell 的启动计划，支持 dry-run、JSON、能力检测、detached 回退与独立恢复模式。当需要在新终端打开交互式 CLI、SSH 会话、本地开发进程、沙箱等 argv 命令，或诊断目标终端是否可用、给出不支持时的可行方案时使用。 |
 | `terminal-ops` | `terminal-ops` | ECC 的证据优先仓库执行工作流：需要执行命令、检查仓库、调试 CI 失败或推送小修，并要求对实际执行与验证内容给出精确证据时使用。 |
@@ -761,12 +792,12 @@
 | `theme-factory` | `theme-factory` | 为产物（slide、docs、报告、HTML landing page 等）套用主题的样式工具包。内置 10 套预设配色/字体主题，可直接应用到已创建的产物，也可即时生成新主题。 |
 | `tiledbvcf` | `tiledbvcf` | 基于 TileDB 高效存储与检索基因组变异数据：可扩展的 VCF/BCF 写入、增量添加样本、压缩存储、并行查询与导出，面向群体基因组学场景。 |
 | `timesfm-forecasting` | `timesfm-forecasting` | 用 Google TimesFM 基础模型做零样本时间序列预测：任意单变量序列（销售、传感器、能源、生命体征、天气）无需训练自定义模型。支持 CSV/DataFrame/数组输入，输出点预测与预测区间；含首次使用前检查 RAM/GPU 的预检脚本。 |
-| `to-questionnaire` | `to-questionnaire` | 把你无法完全回答的决策转成问卷，交给他人填写。 |
 | `to-questionnaire` | `productivity/to-questionnaire` | 把你无法完全回答的决策转成问卷，交给他人填写。 |
-| `to-spec` | `to-spec` | 把当前对话综合成 spec 并发布到项目 issue tracker，无需访谈，直接提炼已讨论内容。 |
+| `to-questionnaire` | `to-questionnaire` | 把你无法完全回答的决策转成问卷，交给他人填写。 |
 | `to-spec` | `engineering/to-spec` | 将当前对话整理成 spec 并发布到项目 issue tracker——无需访谈，直接综合已讨论的内容。 |
-| `to-tickets` | `to-tickets` | 把计划、规格或当前对话拆解为一组 tracer-bullet 工单，每张声明自己的阻塞依赖，发布到配置的 tracker（本地为每工单一文件的文本记录，或在真实 tracker 上用原生 blocking 链接）。 |
+| `to-spec` | `to-spec` | 把当前对话综合成 spec 并发布到项目 issue tracker，无需访谈，直接提炼已讨论内容。 |
 | `to-tickets` | `engineering/to-tickets` | 将计划、spec 或当前对话拆解为一组 tracer-bullet 工单并发布到配置的 tracker，每张工单声明其阻塞依赖——本地以每工单一文件中的文本边表示，或用真实 tracker 的原生阻塞链接。 |
+| `to-tickets` | `to-tickets` | 把计划、规格或当前对话拆解为一组 tracer-bullet 工单，每张声明自己的阻塞依赖，发布到配置的 tracker（本地为每工单一文件的文本记录，或在真实 tracker 上用原生 blocking 链接）。 |
 | `torch-geometric` | `torch-geometric` | PyTorch Geometric（PyG）图神经网络技能：节点/边/图分类、消息传递（GCN、GAT、GraphSAGE、GIN）、异构图、邻居采样与自定义数据集。使用 torch_geometric 时触发，不适用于一般 NetworkX 分析或非图 PyTorch 模型。 |
 | `torchdrug` | `torchdrug` | 构建与排障 TorchDrug 0.2.1 工作流：分子图、性质预测、自监督预训练、分子生成、逆合成、蛋白质表示学习、知识图谱推理。代码 import torchdrug 或需要其 datasets、models、tasks、Engine 时使用。 |
 | `trade-hypothesis-ideator` | `trade-hypothesis-ideator` | 从市场数据、交易日志与笔记片段生成可证伪的交易策略假设，输出按优先级排序的假设卡片，附实验设计与 kill criteria，可导出兼容 edge-finder-candidate/v1 的 strategy.yaml。需有结构化输入。 |
@@ -775,8 +806,8 @@
 | `trading-skills-navigator` | `trading-skills-navigator` | 根据自然语言目标推荐合适的交易工作流、技能集、API 配置与上手路径。触发场景：用户表达交易/投资目标并询问从哪开始、该用哪个 skill、无付费 API key 时能做什么等（如 "where do I start"、"I want to swing trade only when the market is favorable"）。仅做路由与解释，不执行交易、不自动运行其他 skill；若尚无可用工作流会如实说明。 |
 | `transformers` | `transformers` | Hugging Face Transformers 使用技能：从 Hub 加载模型、pipeline 推理、文本生成及 Trainer 微调，覆盖 NLP、视觉、音频与多模态任务。涉及 AutoModel、pipelines、tokenizers 或 TrainingArguments 时使用，不适用于 Transformers 库之外的一般机器学习。 |
 | `treatment-plans` | `treatment-plans` | 在授权执业专业人员已给出并核实临床决策之后，对本地治疗计划文档做格式化与结构校验。用于来源可追溯、临床医师撰写的干预记录、目标与检查点、共同决策记录、交接与发布关卡——不用于临床决策本身。 |
-| `triage` | `triage` | 让 issue 和外部 PR 走分诊角色状态机：分类、验证、必要时追问，并写出 agent-ready 简报。 |
 | `triage` | `engineering/triage` | 以状态机方式推进 issue 与外部 PR 的分诊流程：分类、验证、必要时深度质询，并撰写 agent 可直接使用的简报。 |
+| `triage` | `triage` | 让 issue 和外部 PR 走分诊角色状态机：分类、验证、必要时追问，并写出 agent-ready 简报。 |
 | `tui-tester` | `tui-tester` | 用终端自动化测试 Gemini CLI 行为与视觉输出的专家指导。 |
 | `ui-styling` | `ui-styling` | 用 shadcn/ui 组件（基于 Radix UI + Tailwind）、Tailwind CSS 原子化样式与 canvas 视觉设计构建美观、可访问的界面。构建 UI、实现设计系统、响应式布局、无障碍组件（对话框、下拉、表单、表格）、主题配色定制、暗黑模式、生成视觉海报或建立跨应用统一样式规范时使用。 |
 | `ui-to-vue` | `ui-to-vue` | 用户有 UI 截图或设计稿导出、需批量转换为 Vue 3 组件时使用，尤其配合 Vant、Element Plus 或 Ant Design Vue。 |
@@ -789,6 +820,7 @@
 | `us-market-bubble-detector` | `us-market-bubble-detector` | 用修订版 Minsky/Kindleberger 框架 v2.1 做定量数据驱动的市场泡沫风险评估：优先客观指标（Put/Call、VIX、融资余额、市场广度、IPO 数据）而非主观印象，含严格定性调整标准与确认偏误防范，强制数据采集加机械评分，辅助实际投资决策。用户问泡沫风险、估值担忧或止盈时机时使用。 |
 | `us-stock-analysis` | `us-stock-analysis` | 美股综合分析：基本面（财务指标、业务质量、估值）、技术面（指标、图表形态、支撑/阻力）、个股对比与投资报告生成。触发：用户要求分析美股代码（如 "analyze AAPL"、"compare TSLA vs NVDA"、"give me a report on Microsoft"）、评估财务指标、技术图表分析或美股投资建议。 |
 | `usfiscaldata` | `usfiscaldata` | 查询 U.S. Treasury Fiscal Data REST API 获取联邦财政数据，无需 API key：国债（Debt to the Penny）、Daily/Monthly Treasury Statements、国债拍卖、利率、汇率、储蓄债券、政府收支统计。 |
+| `using-agent-skills` | `using-agent-skills` | 发现并调用 agent skills。触发：会话开始时，或需要判断当前工作适用哪个 skill 或 workflow 时。这是管理所有其他 skill 如何被发现和调用的元 skill。 |
 | `using-git-worktrees` | `using-git-worktrees` | 需要开始与当前工作区隔离的功能开发，或在执行实现计划之前使用——通过原生工具或 git worktree 回退机制确保隔离工作区存在。 |
 | `using-superpowers` | `using-superpowers` | 在任何对话开始时使用——确立如何查找和使用技能，要求在给出任何响应（包括澄清性提问）之前先调用 Skill 工具。 |
 | `vaex` | `vaex` | 处理与分析超出内存的十亿行级表格数据集：Vaex 擅长 out-of-core DataFrame 操作、惰性求值、快速聚合、大数据可视化与大规模数据集上的机器学习。用于处理大型 CSV/HDF5/Arrow/Parquet 文件、海量数据快速统计、大数据可视化或内存装不下的 ML 管线。 |
@@ -807,10 +839,10 @@
 | `verify-chain` | `verify-chain` | 验证链——角色对抗式技术文章交叉验证。写完 IT 文章后，Critic 提取关键断言并生成核查问题，多个 Verifier SubAgent 在独立上下文联网验证，Repairer 自动修复。用于规避 AI 幻觉、知识过时、信息遗漏。 |
 | `vite-patterns` | `vite-patterns` | Vite 构建工具模式：配置、插件、HMR、env 变量、proxy 设置、SSR、library mode、依赖预打包与构建优化。处理 vite.config.ts、Vite 插件或 Vite 项目时使用。 |
 | `vue-patterns` | `vue-patterns` | Vue.js 3 Composition API 模式、组件架构、响应式最佳实践、Pinia 状态管理、Vue Router 导航与 Nuxt SSR 模式。Vue/Nuxt/Vite/Pinia 项目中编写或评审 Vue 3、Nuxt、Pinia 代码时激活。 |
-| `wait-what` | `wait-what` | 当上一条消息未有效传达到位时，停下来重新组织表达再讲一遍。 |
 | `wait-what` | `productivity/wait-what` | 中断指令：上一条回复没有说到点子上，停下来重新组织表达再说一遍。触发短语 "wait what"。 |
-| `wayfinder` | `wayfinder` | 把超出单个 agent 会话容量的大型工作规划为 issue tracker 上的决策工单共享地图，逐个解决，直到通往目标的路径清晰。 |
+| `wait-what` | `wait-what` | 当上一条消息未有效传达到位时，停下来重新组织表达再讲一遍。 |
 | `wayfinder` | `engineering/wayfinder` | 将超出单个 agent 会话容量的超大工作量规划为 issue tracker 上的决策工单共享地图，逐个解决，直至通往目标的路径完全清晰。适用于大规模长期任务的拆解与推进。 |
+| `wayfinder` | `wayfinder` | 把超出单个 agent 会话容量的大型工作规划为 issue tracker 上的决策工单共享地图，逐个解决，直到通往目标的路径清晰。 |
 | `waypoint-bio` | `waypoint-bio` | 用于 Outpost Bio 的开放微生物组基础模型：Waypoint 检查点（Waypoint-6m、Waypoint-45m、Waypoint-170m）、Atlas 预训练语料、Compass 八任务基准及 waypoint-bio 包的 waypoint CLI。覆盖微生物组样本嵌入、分类丰度数据微调、在 Compass 上基准测试检查点、GPT-2 预训练，以及 MetaPhlAn/Kraken2/QIIME 2/MGnify 丰度表转 waypoint 格式。 |
 | `web-artifacts-builder` | `web-artifacts-builder` | 用现代前端技术（React、Tailwind CSS、shadcn/ui）构建复杂多组件 claude.ai HTML artifacts 的工具集。适用于需要状态管理、路由或 shadcn/ui 组件的复杂 artifact，不用于简单单文件 HTML/JSX。 |
 | `web-design-guidelines` | `web-design-guidelines` | 按 Web Interface Guidelines 审查 UI 代码。用户要求 "review my UI""check accessibility""audit design""review UX" 或按最佳实践检查站点时使用。 |
@@ -818,8 +850,8 @@
 | `webapp-testing` | `webapp-testing` | 基于 Playwright 的本地 Web 应用交互与测试工具集。用于验证前端功能、调试 UI 行为、截取浏览器截图、查看浏览器日志。 |
 | `weekly-performance-digest` | `weekly-performance-digest` | 从 trader-memory-core 已平仓论点生成绩效周报：胜率、期望值、profit factor、R-multiple、MAE/MFE，并按来源 skill、退出原因、论点类型、板块、机制做盈亏模式分析。无需 API，纯本地计算。 |
 | `what-if-oracle` | `what-if-oracle` | 结构化 What-If 情景分析，展开 4-6 个分支可能性（最好、最可能、最坏、wild card、逆向、二阶影响）。用户就不确定的未来提假设性问题、面对战略分叉、做应急预案或决策前压力测试时使用。 |
-| `wizard` | `wizard` | 生成交互式 bash 向导，引导人工完成只有人才能做的步骤。适用于基础设施开通、凭据或 CI secrets 配置、操作陌生的第三方控制台、一次性迁移或切换。agent 自己能完成的步骤不要用它。 |
 | `wizard` | `engineering/wizard` | 生成交互式 bash 向导，引导人工完成只有人才能做的步骤。适用于基础设施开通、凭据或 CI secrets 配置、操作陌生的第三方控制台、一次性迁移或切换。agent 自己能完成的步骤不要用它。 |
+| `wizard` | `wizard` | 生成交互式 bash 向导，引导人工完成只有人才能做的步骤。适用于基础设施开通、凭据或 CI secrets 配置、操作陌生的第三方控制台、一次性迁移或切换。agent 自己能完成的步骤不要用它。 |
 | `workflow-runner` | `workflow-runner` | 在 Claude Code / OpenClaw / Cursor 中直接运行 agency-orchestrator YAML 工作流——无需 API key，以当前会话的 LLM 作为执行引擎。用户提供 .yaml 工作流文件或要求多角色协作完成任务时触发。 |
 | `wps-excel` | `wps-excel` | WPS 表格智能助手，通过自然语言操控 Excel，解决公式编写、数据清洗、图表创建等痛点。 |
 | `wps-office` | `wps-office` | WPS Office 跨应用智能助手，统一管理 Excel、Word、PPT 三大应用，处理跨应用操作与通用功能。 |
@@ -827,8 +859,8 @@
 | `wps-word` | `wps-word` | WPS 文字智能助手，通过自然语言操控 Word 文档，解决排版、格式、内容编辑等痛点。 |
 | `writing-beats` | `in-progress/writing-beats` | 写作·组装阶段：把素材编排成 beats（节拍）旅程，每个术语在被节拍依赖前先落实定义。 |
 | `writing-beats` | `writing-beats` | 写作技法：将原始素材组织为由节拍（beats）推进的叙事旅程，确保每个术语在节拍依赖它之前先做铺垫解释。 |
-| `writing-for-agents` | `writing-for-agents` | 为 agent 撰写文档。创建或编辑 skill、修改 AGENTS.md 或 CLAUDE.md 时使用。 |
 | `writing-for-agents` | `productivity/writing-for-agents` | 为 agent 撰写文档。创建或编辑 skill、修改 AGENTS.md 或 CLAUDE.md 时使用。 |
+| `writing-for-agents` | `writing-for-agents` | 为 agent 撰写文档。创建或编辑 skill、修改 AGENTS.md 或 CLAUDE.md 时使用。 |
 | `writing-fragments` | `in-progress/writing-fragments` | 写作·探索阶段：挖掘原始素材片段，尚无结构。 |
 | `writing-fragments` | `writing-fragments` | 写作探索阶段：挖掘原始写作片段，暂不做结构化。 |
 | `writing-great-skills` | `writing-great-skills` | 编写与编辑 skill 的参考：让 skill 行为可预测所需的词汇与原则。 |
@@ -845,26 +877,27 @@
 
 ## 第三部分：`agent-skills/self-skills/`（用户自写）
 
-扫描目录：`/Users/kangll13/aiot/java-code/self/gggggggood/agent-skills/self-skills/`（用户自写 skill 真源）
+扫描目录：`/Users/kangll13/aiot/java-code/self/gggggggood/agent-skills/self-skills/（用户自写 skill 真源）`
 
 共 **17** 个 `SKILL.md`。
 
 | 技能 | 路径 | 说明 |
 |------|------|------|
-| `dev-paradigm-matt` | `dev-paradigm-matt` | 分层工作流路由 skill：按任务阶段把需求澄清、规格设计、架构规划、实现、调试、审查、交接和长期维护路由到合适的 matt-skills，而非所有任务走同一条流水线。适用于「这个需求该怎么推进」「该先 grill 还是 to-spec」「Bug/重构/新功能分别怎么走」、接手陌生项目、setup、领域建模、票据拆分等场景的统一入口。 |
+| `dev-paradigm-matt` | `dev-paradigm-matt` | 面向日常工程开发的分层工作流路由 skill：按任务所处阶段把需求澄清、规格设计、架构规划、实现、调试、审查、交接和长期维护路由到合适的 matt-skills，不强迫所有任务走同一条固定流水线。适用于「这个需求该怎么推进」「该先 grill 还是 to-spec」「Bug/重构/新功能分别怎么走」「完整开发流程怎么编排」等场景；也是接手陌生项目做 setup、领域建模、票据拆分、实现收尾或维护规划的统一入口，以及极简实现约束、过度工程审查、全仓膨胀审计、捷径台账跟踪的编排入口。 |
 | `easy-crawler` | `easy-crawler` | 可独立部署的网页抓取 skill，统一覆盖通用网页抓取、社媒平台专项优化及反爬/浏览器自动化。用户提到抓网页、列表页/详情页、社媒搜索/评论/创作者主页，或需浏览器自动化、代理、登录态复用、反爬边界说明时触发。输出统一任务契约、可观测结果与显式失败，不把未实现的平台逆向能力伪装成已支持。 |
 | `mac-safe-storage-cleaner` | `mac-safe-storage-cleaner` | 安全检查并清理本机 macOS 的缓存、日志、临时文件、下载目录安装包及受控的 Workspace 历史目录。用户提到清理系统缓存/日志、清理 Workspace 占用、磁盘空间不足、删除临时文件、清理 Downloads/IDEA 日志、分析磁盘占用时触发；支持复查清理规则、验证保护目录、确认是否会误删，按"先分析、再确认、最后决定是否删除"的交互流程执行。 |
 | `opsx-workflow-hooks` | `opsx-workflow-hooks` | opsx 工作流的后置命令钩子。触发 A：/opsx/propose 生成全部 artifacts 后进入迭代打磨循环，询问用户新想法并更新提案直到满意，非平凡分析用全新 sub agent。触发 B：/opsx/apply 达到实现完成交接后，在用户人工验证（SIT/UAT）前运行 review/test/verification、修复关键问题，全部任务真正完成才归档。普通实现中暂停不触发。 |
 | `robot-aiot-adr-confluence` | `robot-aiot-adr-confluence` | 技术方案文档端到端工作流：信息评估 → 需求收敛、追问澄清、方案比较 → 生成 ADR、技术提案或决策简报，需要时发布到 Confluence。适用于「写技术方案」「生成 ADR」「架构决策记录发 Confluence」「技术选型文档输出」等场景。只要文档可停在 Markdown 草稿，明确要求发布才进 Confluence 阶段。 |
 | `robot-aiot-adr-generator` | `robot-aiot-adr-generator` | 生成并校验 ADR 架构决策记录：先按业务/技术需求产出标准 ADR 文档，再按需对可外部验证的关键技术断言执行验证链核查。适用于"生成 ADR""写架构决策记录""输出技术选型归档""ADR 发布前审稿"等场景，输出服务技术决策归档而非通用技术文章。 |
-| `robot-aiot-arch-diagram` | `robot-aiot-arch-diagram` | 架构图/技术可视化绘制能力。两条输出路径：直绘 SVG/HTML（主路径，编辑级设计系统+工程制图管线，含几何校验与构图契约）、archify 运行时渲染（主题切换+导出）。覆盖流程图、分层架构、时序、状态机、ER、UML 类/用例、网络拓扑等 40+ 图表类型；内置 12 套 SVG 风格皮肤与品牌 token 定制、PNG/GIF 导出，支持 drawio/Mermaid/Excalidraw 导入重绘与 .excalidraw/SVG/PNG 三件套离线导出，含数据统计图表绘制规则、深色主题直绘与出版级迭代流程。非 PPT 场景专用。触发：绘制架构图/技术可视化。 |
+| `robot-aiot-arch-diagram` | `robot-aiot-arch-diagram` | 架构图/技术可视化绘制能力。两条输出路径：直绘 SVG/HTML（主路径，编辑级设计系统+工程制图管线，几何校验+构图契约，汇报级展示）、archify 运行时渲染（主题切换+导出）。覆盖流程图、分层架构、时序、状态机、ER、UML 类/用例、网络拓扑、时间线、Agent/记忆架构等 40+ 图表类型；内置 12 套 SVG 风格皮肤与品牌 token 定制、PNG/GIF 导出与 drawio/Mermaid/Excalidraw 导入重绘；支持 Mermaid 源码写作（23 类图表语法）与 .excalidraw/SVG/PNG 三件套离线导出、数据统计图表（饼图/箱线图/热力图等）绘制规则、深色主题直绘技法与出版级示意图迭代流程。专注技术图表绘制。 |
 | `robot-aiot-bash-code-review` | `robot-aiot-bash-code-review` | 审查 skill 文档（.md）中 bash 代码块的语法、功能正确性与模式匹配准确性。创建或更新含 bash 代码块的 skill、要求验证文档 bash 代码、编辑涉及 bash 块的 skill 文档后触发。触发词：review bash、verify code blocks、bash 验证、代码块审查。 |
 | `robot-aiot-commit` | `robot-aiot-commit` | 为本项目生成统一格式的中文提交说明，用户明确要求时执行 Git commit。适用于「生成 commit message」「按规范提交」「总结 diff」「按 FEAT/FIX/ENH/DOC/CHORE 分类提交」「根据分支提取 JIRA」等场景，遵循本项目提交规范而非通用 Conventional Commits 模板。 |
 | `robot-aiot-docs-sync` | `robot-aiot-docs-sync` | 扫描项目并创建或更新可溯源文档：AGENTS.md、README.md、CHANGELOG.md、docs/project-map.md、docs/architecture.md。适用于「更新项目文档」「同步文档」「生成 changelog」「生成项目地图」等场景，仅对这 5 个文件做结构化增强，不修改源代码、配置或测试。 |
-| `robot-aiot-draw-flowchart` | `robot-aiot-draw-flowchart` | 机器人/IoT 业务图表绘制与页面化能力：draw.io XML 图表生成（可编辑主路径）+ XML→HTML 稳定桥接转换 + 领导汇报静态页面 HTML（1920x1080 画布）。覆盖流程图、分层架构、时序、状态机、ER、UML 类/用例、网络拓扑等 39+ 图表类型；内置机器人视觉语言、配色与样式一致性体系、几何/构图校验，PNG/GIF 导出与 drawio/Mermaid 导入重绘，支持 Mermaid 源码写作与 .excalidraw/SVG/PNG 三件套离线导出、数据统计图表绘制、深色主题直绘与出版级迭代流程。 |
-| `robot-aiot-interactive-html-author` | `robot-aiot-interactive-html-author` | 交互式动画特效 HTML 编写能力。纯原生零依赖产出浏览器可直接运行的交互页面/多页 deck：翻页系统（键盘+点击+触摸滑动+View Transition+#/N 深链）、演讲者模式（S 键弹窗：像素级预览+提词+计时器，双窗口同步）、总览网格（O 键）、话术抽屉（N 键）、元素入场、数据动效（数字滚动/进度条填充/图表逐步绘制）、交互图表、关键帧动画与动效接缝、扩展特效目录（27 种 CSS 入场动画 + 20 种 canvas FX，仅明确要求时启用）、Mermaid/PlantUML 构建期渲染嵌入（headless Chrome→PNG/SVG，失败降级不静默丢图）、自包含单文件构建与交付前审查。用户要求写交互动画页、加翻页/动画/动效、演讲者模式/提词器/双屏演示，或 robot-aiot-web-presentation-workflow 委派 Phase 4 编写时触发。 |
+| `robot-aiot-draw-flowchart` | `robot-aiot-draw-flowchart` | 机器人/IoT 业务图表绘制与页面化能力。draw.io XML 图表生成（可编辑主路径）+ XML→HTML 稳定桥接转换 + 领导汇报静态页面 HTML 生成。覆盖流程图、分层架构、时序、状态机、ER、UML 类/用例、网络拓扑、时间线、Agent/记忆架构等 39+ 图表类型；内置机器人视觉语言、配色与样式一致性体系、几何/构图校验、PNG 导出与 drawio/Mermaid 导入重绘；支持 Mermaid 源码写作（23 类语法）与 .excalidraw/SVG/PNG 三件套导出、数据统计图表绘制规则、深色主题直绘与出版级迭代流程；XML→HTML 保留原始样式/布局/层级/配色；静态页面固定 1920x1080 画布，内化语义 token、高级感设计标准与交付审查流程。 |
+| `robot-aiot-interactive-html-author` | `robot-aiot-interactive-html-author` | 交互式动画特效 HTML 编写能力。纯原生零依赖产出浏览器直接可运行的交互页面/多页 deck：翻页系统（键盘/点击/触摸滑动/View Transition/#/N/M 深链）、演讲者模式（S 键：双窗口同步预览+提词+计时器）、总览网格（O 键）、话术抽屉（N 键）、内联编辑（E 键+Ctrl+S 导出）、分步揭示、数据动效、交互图表、关键帧动画、相机运镜与分镜、UI 演示与画廊编排、多版本设计选优、41 套风格预设、登记版式（瑞士风 S01-S25×杂志风 M01-M10）、扩展动画目录（49 种 CSS 入场+21 种 canvas FX）、Mermaid/PlantUML 构建期渲染嵌入、单文件/多页 INDEX 构建、衍生态（文档 PDF A4/落地页 1440px）、高级感设计与交付审查。触发：用户要求写交互动画页、给 HTML 加翻页/动画/动效、单文件交互演示页、演讲者模式/提词器/双屏演示、风格预设/deck 换肤、瑞士风/杂志风 deck、运镜/分镜、UI 演示编排、品牌主色套色、落地页/PDF 衍生态、浏览器内联编辑，或上层 workflow 委派页面编写。 |
 | `robot-aiot-knowledge-expert` | `robot-aiot-knowledge-expert` | 物联网全栈技术专家回答规范。用户问 IoT/AIOT 架构设计、协议选型、平台集成、边云协同、性能调优、故障排查时使用。触发词：物联网、IoT、MQTT、Modbus、BACnet、OPC UA、EMQX、物模型、边云协同、设备影子、OTA、JetLinks、ThingsBoard、感认行。 |
-| `robot-aiot-leadership-ppt-workflow` | `robot-aiot-leadership-ppt-workflow` | 把项目数据和技术分析转化为领导汇报 PPT，五阶段全链路：数据池建立 → 技术明细版加目标受众汇报版文档分层 → 调用 robot-aiot-draw-flowchart 生成分层架构图/流程图 XML 并完成 XML→HTML 桥接 → 调用 ppt-master 生成最终 PPTX。用户要求「写领导汇报PPT」「出PPT母稿」「做汇报材料」时触发。受众由用户指定，默认领导层。 |
-| `robot-aiot-self-skill-sync` | `robot-aiot-self-skill-sync` | 批量更新 self 目录下所有 git 项目并同步 skills 的五模块工作流：统一更新 npx 管理型外部 skill（失败按 self/skills/ 本地克隆 rsync 兜底）、OpenSpec profile 升级并将 opsx/ 命令与 openspec-* skills 同步到 ~/.agents、self-skills/ 与 ~/.agents/skills/ 及 commands/ 按内容+mtime 文件级双向同步（严禁旧覆盖新）、~/.agents/skills/ 全量同步到知识库 agent-skills/skills/（不加 --delete）、最后更新 docs/skills-overview.md。核心原则：只允许新增和修改，禁止删除与 git push；self-skills/ 是自写 skill 唯一真源，禁止从非运行时来源写入。触发词：更新self、同步skills、更新skills、拉取self 等。 |
-| `robot-aiot-web-presentation-workflow` | `robot-aiot-web-presentation-workflow` | 交互式 Web 演示页面制作工作流：根据知识文档生成分页汇报母稿，按需制作架构图/流程图，逐页交互 HTML（可翻页、带动画、数据动效，纯原生零依赖双击即用）委派 robot-aiot-interactive-html-author 编写。触发于“做交互演示”“生成Web演示”“做动态汇报”“可翻页演示”“带动画的汇报”“Web版汇报”，或将技术项目数据转化为可交互浏览器演示的场景。 |
+| `robot-aiot-ppt-presentation-workflow` | `robot-aiot-ppt-presentation-workflow` | 将用户指定的源文件转化为面向目标受众的结构化汇报 PPT（受众由用户指定：领导层/技术同行/外部客户/大众，未指定默认领导层）。六阶段全链路：源文件分析与反问澄清（页数/汇报对象/范围/演讲时长）→PPT 演示母稿（用户确认门）→调用 robot-aiot-draw-flowchart 生成 flow/ 图表 XML 并完成 XML→HTML 桥接（用户确认门）→图表回写母稿对应页并逐页 HTML 化→调用 ppt-master 生成最终 PPTX。触发：用户要求写 PPT、出 PPT 母稿、做汇报材料、汇报方案、生成汇报 PPT、领导汇报；也适用于需将技术项目数据转化为目标受众可读汇报格式的场景。 |
+| `robot-aiot-self-skill-sync` | `robot-aiot-self-skill-sync` | 批量更新 self 目录下所有 git 项目并同步 skills。模块 1 递归五层扫描更新嵌套 git 仓库；agent-skills/skills/ 为外部副本（禁改），self-skills/ 为自写真源。模块 2 升级 OpenSpec 并把 opsx/ 命令与 openspec-* skills 同步到 ~/.agents。模块 3 用 npx skills@latest update 更新 16 个 npx 管理型 skill，失败按本地克隆 rsync 兜底；自写 skill 与命令同 ~/.agents 文件级双向同步，只更新不新增。模块 4 将 ~/.agents/skills/ 同步到仓库 skills/（不加 --delete），模块 5 更新总览文档。原则：两侧只增改不删除；比对内容+mtime 判新旧，禁旧覆盖新（标 [NEWER-TARGET] 或回写真源）；gggggggood/ 下用户维护代码禁回滚/清理/覆盖，冲突提示用户跳过。触发：更新self、拉取self、同步skills、更新skills，或说更新代码/拉取最新代码且指向 self 目录。 |
+| `robot-aiot-web-presentation-workflow` | `robot-aiot-web-presentation-workflow` | 交互式 Web 演示页面制作工作流。用户指定源文件后分析并一次性反问（页数/汇报对象/汇报范围/场景/交付形态），产出 Web 演示母稿（用户确认门），按需调用 robot-aiot-arch-diagram 生成 flow/ 架构图/流程图（用户确认门），图表回写母稿对应页后，逐页交互动画特效 HTML（可翻页、带动画、数据动效，纯原生零依赖双击即用）委派 robot-aiot-interactive-html-author 编写。交付形态含单文件 deck（默认）、多页形态、竖版社交 deck、滚动叙事页。触发：用户要求做交互演示、生成 Web 演示、做动态汇报、可翻页演示、带动画的汇报、Web 版汇报、竖版社交演示、滚动叙事页；也适用于将技术项目数据转化为可交互浏览器演示的场景。 |
 | `stock-replay-workbench` | `stock-replay-workbench` | A 股盘后复盘工作台。当用户要求收盘简报、主线题材梳理、强势股/观察池、个股走强原因、题材与资金联动、龙虎榜/公告/研报/财务交叉分析，或简单行情查询需扩展为带任务路由、来源优先级、时间戳、警告与分层结论的结构化流程时触发。覆盖打板情绪（涨停/炸板/跌停/昨涨停四池+连板分析+涨停揭秘）、ETF 期权（T型报价+希腊字母+IV）、舆情互动（热榜/人气榜/互动易）；多股对比经 sub-agent 并行编排，深度报告强制经 cross-check-reviewer 二次校对。 |
+
