@@ -597,7 +597,7 @@ function loadRenderer() {
 
 function chromeExecutable(renderer) {
   const candidates = [
-    process.env.FIREWORKS_CHROME_PATH,
+    process.env.CHROME_PATH || process.env.FIREWORKS_CHROME_PATH, // FIREWORKS_CHROME_PATH 仅作旧名兼容 fallback
     "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
     "/Applications/Chromium.app/Contents/MacOS/Chromium",
     "/usr/bin/google-chrome",

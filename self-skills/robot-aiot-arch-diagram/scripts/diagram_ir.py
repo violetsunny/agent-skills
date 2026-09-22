@@ -69,7 +69,9 @@ class DiagramIR:
         return copy.deepcopy(dict(self.raw))
 
 
-def _validate_numeric_fields(item: Mapping[str, Any], fields: Sequence[str], path: str) -> None:
+def _validate_numeric_fields(
+    item: Mapping[str, Any], fields: Sequence[str], path: str
+) -> None:
     for field in fields:
         if field in item and item[field] is not None:
             _finite(item[field], f"{path}.{field}")
@@ -84,9 +86,13 @@ def normalize_diagram(data: Mapping[str, Any], expected_mode: str) -> DiagramIR:
     if isinstance(schema_version, bool) or schema_version != 1:
         raise DiagramValidationError(f"unsupported schema_version: {schema_version}")
 
-    mode = str(normalized.get("mode") or normalized.get("template_type") or expected_mode)
+    mode = str(
+        normalized.get("mode") or normalized.get("template_type") or expected_mode
+    )
     if normalized.get("mode") and mode != expected_mode:
-        raise DiagramValidationError(f"mode {mode!r} conflicts with template type {expected_mode!r}")
+        raise DiagramValidationError(
+            f"mode {mode!r} conflicts with template type {expected_mode!r}"
+        )
     normalized["schema_version"] = 1
     normalized["mode"] = mode
 
@@ -106,12 +112,21 @@ def normalize_diagram(data: Mapping[str, Any], expected_mode: str) -> DiagramIR:
         container = copy.deepcopy(dict(raw_container))
         container_id = str(container.get("id") or "").strip()
         if not container_id:
-            raise DiagramValidationError(f"containers[{index}].id must be a non-empty string")
+            raise DiagramValidationError(
+                f"containers[{index}].id must be a non-empty string"
+            )
         if container_id in container_ids:
             raise DiagramValidationError(f"duplicate container id: {container_id}")
         container_ids.add(container_id)
         container["id"] = container_id
-        _validate_numeric_fields(container, ("x", "y", "width", "height"), f"containers[{index}]")
+        for field in ("x", "y"):
+            if container.get(field) is None:
+                raise DiagramValidationError(
+                    f"containers[{index}] (id={container_id}) missing required field: {field}"
+                )
+        _validate_numeric_fields(
+            container, ("x", "y", "width", "height"), f"containers[{index}]"
+        )
         containers.append(container)
     normalized["containers"] = containers
 
@@ -131,7 +146,14 @@ def normalize_diagram(data: Mapping[str, Any], expected_mode: str) -> DiagramIR:
             raise DiagramValidationError(f"duplicate diagram id: {node_id}")
         node_ids.add(node_id)
         node["id"] = node_id
-        _validate_numeric_fields(node, ("x", "y", "width", "height", "r", "offset_y"), f"nodes[{index}]")
+        for field in ("x", "y"):
+            if node.get(field) is None:
+                raise DiagramValidationError(
+                    f"nodes[{index}] (id={node_id}) missing required field: {field}"
+                )
+        _validate_numeric_fields(
+            node, ("x", "y", "width", "height", "r", "offset_y"), f"nodes[{index}]"
+        )
         nodes.append(NodeIR(node_id, node))
     normalized["nodes"] = [copy.deepcopy(dict(node.raw)) for node in nodes]
 
@@ -157,15 +179,28 @@ def normalize_diagram(data: Mapping[str, Any], expected_mode: str) -> DiagramIR:
         target = str(edge["target"]) if edge.get("target") is not None else None
         for endpoint_name, endpoint in (("source", source), ("target", target)):
             if endpoint is not None and endpoint not in node_ids:
-                raise DiagramValidationError(f"arrows[{index}].{endpoint_name} references unknown node: {endpoint}")
+                raise DiagramValidationError(
+                    f"arrows[{index}].{endpoint_name} references unknown node: {endpoint}"
+                )
         _validate_numeric_fields(
             edge,
-            ("x1", "y1", "x2", "y2", "label_dx", "label_dy", "routing_padding", "port_clearance"),
+            (
+                "x1",
+                "y1",
+                "x2",
+                "y2",
+                "label_dx",
+                "label_dy",
+                "routing_padding",
+                "port_clearance",
+            ),
             f"arrows[{index}]",
         )
         raw_waypoints = edge.get("route_points", [])
         if not isinstance(raw_waypoints, list):
-            raise DiagramValidationError(f"arrows[{index}].route_points must be an array")
+            raise DiagramValidationError(
+                f"arrows[{index}].route_points must be an array"
+            )
         waypoints: list[tuple[float, float]] = []
         for waypoint_index, raw_waypoint in enumerate(raw_waypoints):
             if not isinstance(raw_waypoint, (list, tuple)) or len(raw_waypoint) != 2:
@@ -173,8 +208,14 @@ def normalize_diagram(data: Mapping[str, Any], expected_mode: str) -> DiagramIR:
                     f"arrows[{index}].route_points[{waypoint_index}] must be [x, y]"
                 )
             waypoint = (
-                _finite(raw_waypoint[0], f"arrows[{index}].route_points[{waypoint_index}][0]"),
-                _finite(raw_waypoint[1], f"arrows[{index}].route_points[{waypoint_index}][1]"),
+                _finite(
+                    raw_waypoint[0],
+                    f"arrows[{index}].route_points[{waypoint_index}][0]",
+                ),
+                _finite(
+                    raw_waypoint[1],
+                    f"arrows[{index}].route_points[{waypoint_index}][1]",
+                ),
             )
             waypoints.append(waypoint)
         edge["route_points"] = [[x, y] for x, y in waypoints]

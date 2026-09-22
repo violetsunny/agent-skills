@@ -1,8 +1,8 @@
-# Style 3: Blueprint
+# Style 3: Blueprint（蓝图）
 
-Engineering blueprint aesthetic with grid background and technical annotation style.
+工程蓝图美学：网格背景 + 技术标注风格。本文件字号（16/13/10px）为风格锁定值，豁免 4px 网格（例外清单登记在 design-system.md §7）。
 
-## Colors
+## 颜色
 
 ```
 Background:     #0a1628
@@ -23,7 +23,7 @@ Accent colors:
   Green:   #06d6a0 (success/active)
 ```
 
-## Background with Grid
+## 带网格的背景
 
 ```xml
 <defs>
@@ -36,7 +36,7 @@ Accent colors:
 <rect width="960" height="600" fill="url(#grid)" opacity="0.6"/>
 ```
 
-## Typography
+## 排版
 
 ```
 font-family: 'Courier New', 'Lucida Console', 'Microsoft YaHei', 'SimHei', monospace
@@ -46,7 +46,7 @@ text-transform: uppercase for section headers
 letter-spacing: 0.05em
 ```
 
-## Box Styles
+## 盒样式
 
 ```xml
 <!-- Technical node box -->
@@ -60,7 +60,7 @@ letter-spacing: 0.05em
       stroke-dasharray="6,3"/>
 ```
 
-## Arrows & Annotations
+## 箭头与标注
 
 ```xml
 <defs>
@@ -78,7 +78,7 @@ letter-spacing: 0.05em
 <text fill="#48cae4" font-size="10" text-anchor="middle">HTTP/REST</text>
 ```
 
-## Title Block (bottom-right)
+## 标题块（右下角）
 
 ```xml
 <!-- Blueprint title block -->

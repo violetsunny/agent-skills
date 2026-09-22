@@ -5,13 +5,13 @@
   用途：headless Chrome（CDP Page.setDocumentContent 或 file:// 导航）渲染
         Mermaid 图为 PNG/SVG 的包装页；轮询 window.__mermaidReady /
         __mermaidError 判定渲染完成后测量 #host 包围盒截图
-  接线：替换三处占位——
+  接线：替换四处占位——
         1) background: <white | transparent | #hex>（默认 white；深色页面融合
            用 transparent 并输出 PNG 透明通道，或直接内联 SVG 由 CSS 控制）
         2) <已转义的Mermaid源码>（注入前必须转义 & < >，防止破坏页面结构）
         3) theme: "<default|forest|dark|neutral|base>"
-        /* mermaid.min.js 全文内联 */ 处替换为 mermaid.min.js 源码全文
-        （自包含要求，禁 CDN）
+        4) /* mermaid.min.js 全文内联 */ 处替换为 mermaid.min.js 源码全文
+           （自包含要求，禁 CDN）
   要点：startOnLoad:false + 显式 mermaid.run()，Promise 回调置就绪/错误标志；
         中文字体栈必须写进包装页，否则截图中文显示为豆腐块；#host 含 16px
         padding 即截图区域；渲染缓存键与目录约定见 md §1.4

@@ -215,3 +215,5 @@ CairoSVG 是默认 PNG 导出渲染器（png-export.md）。macOS 下 fontconfig
 - 语义改用文字表达：`→` 写"演进到/导向"，`×` 写"与/对应"，`≈` 写"约"，圈号写"问题1/第1项"。
 - HTML 页面文本不受限（浏览器逐字形回退）；本规则只约束 SVG 文本与经 CairoSVG 导出的 PNG。
 - 导出后目检 PNG 一次确认无豆腐；必需符号无法回避时改用 Puppeteer 渲染器（png-export.md）。
+
+自动化校验：`python3 $SKILL_ROOT/scripts/check_glyph_safety.py <file.svg>` 扫描 SVG `<text>` 内容，检出会在 CairoSVG 导出中渲染为豆腐块的不安全字形（箭头/数学运算符/带圈字符等）。exit 0 = 无 error（允许 warning），1 = 有 error。仅约束 SVG 文本，HTML 页面文本豁免。

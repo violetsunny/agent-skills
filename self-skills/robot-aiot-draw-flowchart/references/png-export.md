@@ -13,7 +13,7 @@ Load this reference only when the bundled `generate-diagram.sh` fallback is insu
 Prefer the bundled validation/export entry point:
 
 ```bash
-SKILL_ROOT="${CLAUDE_SKILL_DIR:-/absolute/path/from-codex-skill-metadata}"
+SKILL_ROOT="$HOME/.agents/skills/robot-aiot-draw-flowchart"  # 本 skill 安装根目录
 "$SKILL_ROOT/scripts/generate-diagram.sh" -t architecture -s 1 -o ./diagram.svg -w 1920
 ```
 
@@ -34,7 +34,7 @@ rsvg-convert -w 1920 input.svg -o output.png
 `scripts/svg2png.js` 优先 `require("puppeteer")`；缺失时自动回退 `puppeteer-core` + 系统 Chrome（macOS/Linux 常见路径，或 `CHROME_PATH` 环境变量指定），无需下载 Chromium：
 
 ```bash
-SKILL_ROOT="${CLAUDE_SKILL_DIR:-/absolute/path/from-codex-skill-metadata}"
+SKILL_ROOT="$HOME/.agents/skills/robot-aiot-draw-flowchart"  # 本 skill 安装根目录
 npm install --prefix /tmp/svg2png-core puppeteer-core@25.3.0
 NODE_PATH=/tmp/svg2png-core/node_modules node "$SKILL_ROOT/scripts/svg2png.js" ./output
 ```

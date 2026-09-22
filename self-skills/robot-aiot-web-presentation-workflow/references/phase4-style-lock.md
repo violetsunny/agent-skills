@@ -1,6 +1,6 @@
 # Phase 4 风格锁定（deck 级默认基线）
 
-多页/单页 deck 的页面 shell 与动画契约以此文件为准；`robot-aiot-interactive-html-author` 编写契约管编写期细则，两者冲突时本文件的 deck 级 token 与骨架优先。参照实现：`doc-web/test-run/r4-anim-p01-p10/pages/`（用户验收认定的风格真源）。
+多页/单页 deck 的页面 shell 与动画契约以此文件为准；`robot-aiot-interactive-html-author` 编写契约管编写期细则，两者冲突时本文件的 deck 级 token 与骨架优先。风格真源为 r4-anim-p01-p10 验证批次（位于该批次交付项目 `doc-web/test-run/` 下，存在时可作参照；不存在时以本文件规则为准）。
 
 ## 1. Token（逐字使用，禁改色值）
 
@@ -27,7 +27,7 @@ body(#171c22) > .viewport(fixed 居中) > .stage#stage(1920x1080, padding:36px 6
 footer.bar      64px 固定底：左 .tag（页码+章名+场景），右 prev/next
 ```
 
-- 导航按钮：`a.btn` 白底描边；next 加 `.pri`（--pri 底白字）；首页 prev / 末页 next 用 `<span class="btn">`（无 href，CSS `span.btn{opacity:.45}` 即禁用态），键盘翻页脚本须判 `tagName==='A'` 再跳
+- 导航按钮：`a.btn` 白底描边；next 加 `.pri`（--pri 底白字）；首页 prev / 末页 next 用 `<span class="btn">`（无 href，且保留 `id="nav-prev"` / `id="nav-next"`，CSS `span.btn{opacity:.45}` 即禁用态），键盘翻页脚本须判 `tagName==='A'` 再跳
 - `.stack` 右栏 `overflow-y:auto` + 细滚动条（`::-webkit-scrollbar` 6px）
 - 每页独立自包含：自带 token、fit 壳、`.notes`、lightbox，双击可单开
 
@@ -72,7 +72,7 @@ footer.bar      64px 固定底：左 .tag（页码+章名+场景），右 prev/n
 - fit 壳：`scale(min(innerWidth/1920, innerHeight/1080))`，resize 监听
 - 键盘：←/→ 翻 prev/next（判 A 标签）
 - lightbox：`figure img` 点击放大（`.lb` 遮罩 + img），Esc/遮罩点击关闭，`body.lb-open` 锁滚动
-- 素材图：`../../../assets/aiot/<名>.png`（pages/ 三层深）+ `onerror` 缺图降级占位
+- 素材图：按页面相对输出目录的实际层级回退到 `<输出目录>/assets/`（多页形态 pages/ 下为 `../assets/`，test-run 参照目录按实际深度）+ `onerror` 缺图降级占位
 - 明细数据用 `<details>` 折叠，summary 蓝字 ▶ 前缀；折叠取舍口径：删掉该卡本页结论仍成立则折叠（补充细则、笔记章节展开、素材图参照），不成立则常驻（定义、职责表、代码示例）；全 deck 统一执行，不逐页临场改口径
 - 交互反馈（每页必带）：`a.btn`/`summary` 带 `transition:background .15s`；hover 态 `a.btn:not(.pri):hover,summary:hover{background:var(--band)}`、`a.btn.pri:hover{background:var(--pri-d)}`；键盘焦点 `a.btn:focus-visible,summary:focus-visible{outline:2px solid var(--pri);outline-offset:2px}`
 - 编写期依赖检查：委派 `robot-aiot-interactive-html-author` 写页前必须跑其执行前依赖检查（ui-ux-pro-max 齐备），并用其 search.py 检索设计数据资产核对风格/交互缺口；检索结果仅为数据建议，不得覆盖本文件 token 与硬约束

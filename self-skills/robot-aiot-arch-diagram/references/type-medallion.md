@@ -354,4 +354,4 @@ Before emitting SVG, verify **every** item:
 
 ## 10. Worked YAML
 
-The YAML in §1 is the **complete** inputs definition for the shipped `example-medallion.html`. Every coordinate in that file's SVG is derivable from §2 applied to those inputs. The same YAML is embedded as a top-of-file HTML comment inside `example-medallion.html` so source view shows the parametric inputs immediately above the SVG.
+The YAML in §1 is the **complete** inputs definition of the canonical example（输入契约示例，示例文件不随本 skill 分发）. Every coordinate of the target SVG is derivable from §2 applied to those inputs. When shipping an HTML variant, embed the same YAML as a top-of-file HTML comment so source view shows the parametric inputs immediately above the SVG.

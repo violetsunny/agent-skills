@@ -401,9 +401,9 @@ Before emitting SVG, verify **every** item:
 
 ---
 
-## 10. Worked YAML — full inputs for `example-it-state.html`
+## 10. Worked YAML — 输入契约示例（示例文件不随本 skill 分发）
 
-The complete inputs that map to the shipped canonical example. Every coordinate in that SVG is derivable from §2 applied to these inputs.
+The complete inputs of the canonical worked example. Every coordinate in the generated SVG is derivable from §2 applied to these inputs.
 
 canonical 副本：`templates/type-it-state.yaml` — 参数化文档契约，复制后手工填参绘图；不是 generate-from-template.py 的输入（该脚本只接受 containers/nodes/arrows JSON），以 templates 为准
 ```yaml

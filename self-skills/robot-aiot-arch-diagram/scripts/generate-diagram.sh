@@ -129,7 +129,7 @@ fi
 # Note: Actual SVG generation is done by the invoking AI coding agent
 # This script provides validation and export only
 
-echo -e "${YELLOW}Note: SVG content generation is handled by Codex or Claude Code${NC}"
+echo -e "${YELLOW}Note: SVG content generation is handled by the invoking AI agent${NC}"
 echo -e "${YELLOW}This script provides validation and export only${NC}"
 
 # Validate if SVG exists
@@ -180,7 +180,7 @@ if [ -f "$SVG_FILE" ]; then
         exit 1
     fi
 else
-    echo -e "${YELLOW}SVG file not found. Generate it first with Codex or Claude Code.${NC}"
+    echo -e "${YELLOW}SVG file not found. Generate it first with the invoking AI agent.${NC}"
     exit 1
 fi
 

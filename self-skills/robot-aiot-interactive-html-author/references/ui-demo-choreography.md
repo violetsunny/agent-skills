@@ -285,7 +285,7 @@ deck 能量曲线：`封面峰 → 下行陈述 → 铺垫谷（背景/问题/�
 3. 演示峰前 1-2 页是呼吸页：低密度慢节奏，不放高能量特效——hold/静止预算先划走再排动效（对齐 `keyframe-animation.md` build/breathe/resolve）
 4. 演示峰后一页必须放结论/价值页承接：演示是证据，主张放下一页
 5. 画廊墙页（§6-§8）是"体量陈述"，放演示峰之后、收尾页之前，能量中高但以静态陈列为主，不与演示峰抢
-6. 叙事策略对齐 `web-slide-strategies.md`（Product Demo：痛点→Demo→价值→下一步）；明暗节奏上演示峰页可用 hero dark 制造暗拍
+6. 叙事策略对齐 `web-slide-strategies.md`（Product Demo：痛点→Demo→价值→下一步）；演示峰页可用 deck 色系内的 hero 档制造强调拍（dark 系用 hero dark、light 系用 hero light），全 deck 单色系，不跨色系翻面
 
 ## 5. 节奏铁律
 

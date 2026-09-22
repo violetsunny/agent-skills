@@ -1,5 +1,7 @@
 # Layered Architecture Diagram Pattern
 
+> **⚠️ 路径豁免声明：** 本文 draw.io mxGraphModel XML 仅作布局结构参考，最终产物走 SVG 直绘路径（路径 B，SKILL.md 硬约束 1：本 skill 不含 draw.io XML 路径能力）。绘制时按路径 B 流程把同一布局结构渲染为 SVG，样式数值以 `design-system.md` 为唯一权威。
+
 ## 适用场景
 
 - 系统架构展示（技术版 / 领导版）
@@ -100,7 +102,7 @@
 **圆角矩形（服务/模块）：**
 ```xml
 <mxCell id="node" value="🔧&lt;br&gt;&lt;b&gt;服务名称&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:11px;color:#333;&quot;&gt;功能描述&lt;/font&gt;" 
-  style="rounded=1;whiteSpace=wrap;html=1;fillColor={节点色};strokeColor={边框色};strokeWidth=2;arcSize=15;fontSize=12;" 
+  style="rounded=1;whiteSpace=wrap;html=1;fillColor={节点色};strokeColor={边框色};strokeWidth=2;arcSize=6;fontSize=12;" 
   vertex="1" parent="1">
   <mxGeometry x={X} y={Y} width={W} height={H} as="geometry"/>
 </mxCell>
@@ -118,7 +120,7 @@
 **圆柱体（数据库/消息队列）：**
 ```xml
 <mxCell id="db" value="️&lt;br&gt;&lt;b&gt;数据库名&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:11px;&quot;&gt;存储内容&lt;/font&gt;" 
-  style="shape=cylinder3;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor={边框色};strokeWidth=2;arcSize=15;boundedLbl=1;size=10;fontSize=12;" 
+  style="shape=cylinder3;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor={边框色};strokeWidth=2;arcSize=6;boundedLbl=1;size=10;fontSize=12;" 
   vertex="1" parent="1">
   <mxGeometry x={X} y={Y} width={W} height={H} as="geometry"/>
 </mxCell>
@@ -127,7 +129,7 @@
 **能力标签（小圆角矩形）：**
 ```xml
 <mxCell id="tag" value="✅ 能力名称" 
-  style="rounded=1;whiteSpace=wrap;html=1;fillColor={标签背景色};strokeColor={标签边框色};strokeWidth=1;arcSize=20;fontSize=11;fontStyle=1;" 
+  style="rounded=1;whiteSpace=wrap;html=1;fillColor={标签背景色};strokeColor={标签边框色};strokeWidth=1;arcSize=4;fontSize=11;fontStyle=1;" 
   vertex="1" parent="1">
   <mxGeometry x={X} y={Y} width={W} height={H} as="geometry"/>
 </mxCell>
@@ -147,7 +149,7 @@
 
 <!-- 数据卡片 -->
 <mxCell id="card" value="📊 &lt;b&gt;指标名&lt;/b&gt;&lt;br&gt;&lt;b style=&quot;font-size:20px;color={主题色};&quot;&gt;{数值}&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:10px;color:#666;&quot;&gt;{说明}&lt;/font&gt;" 
-  style="rounded=1;whiteSpace=wrap;html=1;fillColor={卡片背景色};strokeColor={卡片边框色};strokeWidth=2;arcSize=10;fontSize=12;" 
+  style="rounded=1;whiteSpace=wrap;html=1;fillColor={卡片背景色};strokeColor={卡片边框色};strokeWidth=2;arcSize=6;fontSize=12;" 
   vertex="1" parent="1">
   <mxGeometry x={X} y={Y} width="220" height="90" as="geometry"/>
 </mxCell>
@@ -159,14 +161,14 @@
 
 ```xml
 <mxCell id="legend-box" value="" 
-  style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#CCCCCC;strokeWidth=2;arcSize=10;" 
+  style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#CCCCCC;strokeWidth=2;arcSize=8;" 
   vertex="1" parent="1">
   <mxGeometry x="1500" y="110" width="220" height="220" as="geometry"/>
 </mxCell>
 
 <!-- 图例项 -->
 <mxCell id="legend-item" value="L1 层名称" 
-  style="rounded=1;whiteSpace=wrap;html=1;fillColor={层背景色};strokeColor={层边框色};strokeWidth=1;arcSize=10;fontSize=11;" 
+  style="rounded=1;whiteSpace=wrap;html=1;fillColor={层背景色};strokeColor={层边框色};strokeWidth=1;arcSize=4;fontSize=11;" 
   vertex="1" parent="1">
   <mxGeometry x="1515" y={Y} width="110" height="28" as="geometry"/>
 </mxCell>
@@ -202,7 +204,7 @@
 
 ```xml
 <mxCell id="value-tag" value="✅ 价值描述" 
-  style="rounded=1;whiteSpace=wrap;html=1;fillColor={标签背景色};strokeColor={标签边框色};strokeWidth=2;arcSize=20;fontStyle=1;fontSize=12;" 
+  style="rounded=1;whiteSpace=wrap;html=1;fillColor={标签背景色};strokeColor={标签边框色};strokeWidth=2;arcSize=4;fontStyle=1;fontSize=12;" 
   vertex="1" parent="1">
   <mxGeometry x="1300" y={Y} width="130" height="38" as="geometry"/>
 </mxCell>

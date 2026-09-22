@@ -597,6 +597,7 @@ function loadRenderer() {
 
 function chromeExecutable(renderer) {
   const candidates = [
+    process.env.CHROME_PATH,
     process.env.FIREWORKS_CHROME_PATH,
     "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
     "/Applications/Chromium.app/Contents/MacOS/Chromium",

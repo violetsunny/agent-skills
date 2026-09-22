@@ -85,5 +85,6 @@ metric cards. When deployment evidence is absent, fall back to a generic Style
 
 ## Fixture
 
-`fixtures/cloud-fabric-style10.json` demonstrates active-active checkout
-deployment with two regions, explicit VPC ownership, and neutral glyphs.
+`fixtures/cloud-fabric-style10.json`（内部测试集，不随 skill 分发）demonstrates
+active-active checkout deployment with two regions, explicit VPC ownership,
+and neutral glyphs.

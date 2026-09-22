@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""经纬度 → 面板百分比坐标投影（content-imagery-and-infographic.md 地图页·经纬度→百分比坐标换算）。
+"""经纬度 → 面板百分比坐标投影（content-imagery-and-infographic.md 原生 SVG 静态地图/经纬度 → 百分比坐标换算）。
 
 用法:
   python3 map_project.py --points '[[117.1946,39.1052],[117.1988,39.1080],[117.2028,39.1090]]'

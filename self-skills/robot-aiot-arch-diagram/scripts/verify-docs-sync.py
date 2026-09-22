@@ -17,7 +17,8 @@ Checked references:
    resolved against the skill root. Prose examples under `assets/` or
    `references/` are deliberately not swept up: markdown-link checking already
    covers real doc references, while backticked asset paths are frequently
-   hypothetical examples (e.g. `assets/index.html` in export-registry.md).
+    hypothetical examples（如 export-registry.md 中的多图 gallery HTML 源示例，
+    属用户源文件，不随 skill 分发）.
 
 Assumption: "sync" is link integrity only. Reverse coverage (every file
 mentioned from every doc) is not part of the contract and is not checked.

@@ -85,5 +85,6 @@ metric chips. If those facts dominate the request, route to Style 10, 11, or
 
 ## Fixture
 
-`fixtures/c4-review-canvas-style9.json` demonstrates a checkout container
-review with a deterministic seed and a 100-point showcase composition score.
+`fixtures/c4-review-canvas-style9.json`（内部测试集，不随 skill 分发）demonstrates
+a checkout container review with a deterministic seed and a 100-point
+showcase composition score.

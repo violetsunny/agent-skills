@@ -38,20 +38,24 @@ Point = tuple[float, float]
 Bounds = tuple[float, float, float, float]
 
 TEMPLATE_DIR = os.path.join(SCRIPT_DIR, "..", "templates")
+# Fallback only: when templates/<type>.svg exists, parse_template_viewbox()
+# reads the template's actual viewBox and this table is not consulted.
+# Values below mirror the shipped templates; entries without a template file
+# (mind-map, memory, class, network-topology) are generator-internal defaults.
 DEFAULT_VIEWBOX = {
-    "architecture": (960, 600),
-    "data-flow": (960, 600),
-    "flowchart": (960, 640),
-    "sequence": (960, 700),
-    "comparison": (960, 620),
-    "timeline": (960, 520),
+    "architecture": (960, 700),
+    "data-flow": (960, 700),
+    "flowchart": (960, 700),
+    "sequence": (960, 800),
+    "comparison": (960, 700),
+    "timeline": (1200, 400),
     "mind-map": (960, 620),
     "agent": (960, 700),
     "memory": (960, 720),
-    "use-case": (960, 600),
+    "use-case": (960, 700),
     "class": (960, 700),
-    "state-machine": (960, 620),
-    "er-diagram": (960, 680),
+    "state-machine": (960, 700),
+    "er-diagram": (960, 700),
     "network-topology": (960, 620),
 }
 

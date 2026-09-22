@@ -4,102 +4,106 @@
 
 ---
 
-## §1 Philosophy
+## §1 Philosophy（哲学）
 
-**The highest-quality move is usually deletion.**
+**最高质量的动作通常是删除。**
 
-Applied to schematics:
+应用到技术示意图：
 
-- Every node represents a distinct idea. Two nodes that always travel together are one node.
-- Every connection carries information. If the relationship is obvious from layout, remove the line.
-- Accent is **editorial, not a flag.** 1–2 focal nodes per diagram. Using it on 5 nodes erases the signal.
-- The schematic isn't done when everything is added. It's done when nothing can be removed.
+- 每个节点代表一个独立想法。永远一起出现的两个节点是一个节点。
+- 每条连接都携带信息。布局已能表达的关系，删线。
+- 强调色是**编辑手段，不是信号旗。** 每张图 1–2 个焦点节点。用在 5 个节点上就抹掉了信号。
+- 示意图不是在所有东西都加上时完成，而是在无可再删时完成。
 
-**Target density: 4/10.** Enough to be technically complete. Not so dense it needs a guide. Above 9 nodes, it's probably two diagrams.
-
----
-
-## §2 When to Use
-
-Use for any supported visual type when a reader will learn more from a visual than from prose, a table, or a bulleted list.
-
-**Don't use for:**
-
-- Quick unicode diagrams → use wiretext.
-- Lists of things → table or bullets.
-- Simple before/after → table.
-- One-shape "diagrams" → just write the sentence.
-
-Before drawing, ask: *Would the reader learn more from this than from a well-written paragraph?* If no, don't draw.
+**目标密度：4/10。** 足够技术上完整，又不至于密到需要导读。超过 9 个节点，通常是两张图。
 
 ---
 
-## §4 Universal Anti-patterns
+## §2 When to Use（何时使用）
 
-These mark "AI slop" schematics of any type:
+当读者从一张视觉图中学到的比从散文、表格或列表更多时，对任何受支持的视觉类型使用。
 
-| Anti-pattern | Why it fails |
+**不要用于：**
+
+- 快速 unicode 字符图 → 用 wiretext。
+- 事物罗列 → 表格或列表。
+- 简单前后对比 → 表格。
+- 只有一个形状的"图" → 直接写那句话。
+
+画图前自问：*读者从这张图学到的会比从一个写得好的段落多吗？* 若否，不画。
+
+> **编号说明：** §3 为预留跳号，本文件无 §3 内容；`design-system.md §N` 引用以实际存在的章节为准。
+
+---
+
+## §4 Universal Anti-patterns（通用反模式）
+
+这些是任何类型都属于"AI 糊图"的标记：
+
+| 反模式 | 失败原因 |
 |---|---|
-| Dark mode + cyan/purple glow | Looks "technical" without design decisions |
-| JetBrains Mono as blanket "dev" font | Mono is for *technical* content — ports, commands, URLs. Names go in Geist sans. |
-| Identical boxes for every node | Erases hierarchy |
-| Legend floating inside the diagram area | Collides with nodes |
-| Arrow labels with no masking rect | Bleeds through the line |
-| Vertical `writing-mode` text on arrows | Unreadable |
-| 3 equal-width summary cards as default | Generic grid — vary widths |
-| Shadow on any element | Shadows are out. Borders are in. |
-| `rounded-2xl` on boxes | Max radius 6–10px or none |
-| Accent on every "important" node | Accent is 1–2 editorial accents, not a signaling system |
-| Reproducing Mermaid's renderer layout | Imports automatic spacing and routing instead of making an editorial layout |
-| Any breach of the six §6 connector rules | Diagonal slants, labels touching their stroke, masks clipped by a later node, overlapping paths, shared attach points, transit behind a non-endpoint box — each is an automatic fail; §6 states them in full |
+| 暗色 + 青/紫辉光 | 看似"技术感"，实则没有设计决策 |
+| 把 JetBrains Mono 当整体"开发感"字体 | Mono 只用于*技术*内容——端口、命令、URL；名称用 Geist sans |
+| 所有节点画成一样的盒子 | 抹掉层级 |
+| 图例漂浮在图区内部 | 与节点碰撞 |
+| 箭头标签没有遮罩矩形 | 透线 |
+| 箭头上用竖排 `writing-mode` 文本 | 不可读 |
+| 默认三张等宽摘要卡片 | 通用网格——宽度应有变化 |
+| 任何元素上加阴影 | 阴影出局，边框进场 |
+| 盒子上用 `rounded-2xl` | 最大圆角 6–10px 或无圆角 |
+| 每个"重要"节点都加强调色 | accent 是 1–2 个编辑焦点，不是信号系统 |
+| 复刻 Mermaid 渲染器布局 | 引入自动间距与布线，而不是做编辑级布局 |
+| 违反 §6 连接线六规则中任何一条 | 对角斜线、标签贴线、遮罩被后绘节点裁切、路径重叠、共享锚点、穿越非端点盒——每一条都是自动失败；§6 有完整陈述 |
 
-Type-specific anti-patterns live in each type reference.
+类型专属反模式在各 type reference 内。
+
+> **阴影例外登记（唯一）：** `style-6-claude-official.md`（Style 6 官方风格）允许使用其定义的 `feDropShadow` 软阴影（`dy=2`、`stdDeviation=6`、`flood-color=#00000008`），作为本表"任何元素上加阴影"禁令的唯一官方例外，仅限 Style 6 产物；其余风格与元素一律禁止。
 
 ---
 
-## §5 Design System
+## §5 Design System（设计系统）
 
-**The design system is skinnable.** All colors, typography, and tokens live in a single source of truth — [`style-guide.md`](style-guide.md). That file describes semantic roles (`paper`, `ink`, `muted`, `accent`, `link`, …). The default skin is a cool editorial palette (white-smoke paper, jet-black ink, atomic-tangerine accent, blue-slate muted, silver hairlines); to apply your own brand, either edit `style-guide.md` directly or run the URL-based flow described in [`onboarding.md`](onboarding.md). 机器人/IoT 场景优先把 `color-schemes.md` 主题色注入为品牌 token。
+**设计系统可换肤。** 所有颜色、排版与 token 存放在单一真源——[`style-guide.md`](style-guide.md)。该文件描述语义角色（`paper`、`ink`、`muted`、`accent`、`link` 等）。默认皮肤是冷调编辑调色板（white-smoke 纸面、jet-black 墨色、atomic-tangerine 强调色、blue-slate 弱化色、银色发丝线）；要应用自己的品牌，可直接编辑 `style-guide.md`，或运行 [`onboarding.md`](onboarding.md) 描述的 URL 流程。机器人/IoT 场景优先把 `color-schemes.md` 主题色注入为品牌 token。
 
-> When specs below or in type references mention "ink", "accent", "muted", etc., look up the current hex value in `style-guide.md`.
+> 下文或类型 reference 中提到 "ink"、"accent"、"muted" 等时，到 `style-guide.md` 查当前 hex 值。
 
-### Semantic roles (at a glance)
+### 语义角色（一览）
 
-| Role | Purpose |
+| 角色 | 用途 |
 |---|---|
-| `paper`, `paper-2` | Page bg and container bg |
-| `ink` | Primary text / stroke |
-| `muted`, `soft` | Secondary text, default arrows, sublabels |
-| `rule`, `rule-solid` | Hairline borders |
-| `accent`, `accent-tint` | 1–2 focal elements per diagram |
-| `link` | HTTP/API calls, external arrows |
+| `paper`、`paper-2` | 页面背景与容器背景 |
+| `ink` | 主文本 / 描边 |
+| `muted`、`soft` | 次级文本、默认箭头、子标签 |
+| `rule`、`rule-solid` | 发丝线边框 |
+| `accent`、`accent-tint` | 每张图 1–2 个焦点元素 |
+| `link` | HTTP/API 调用、外部箭头 |
 
-**Focal rule:** `accent` goes on 1–2 elements max. Everything else is `ink` / `muted` / `soft`. If you're tempted to accent 4 things, you haven't decided what's focal yet.
+**焦点规则：** `accent` 最多用在 1–2 个元素上。其余一切用 `ink` / `muted` / `soft`。如果你想给 4 个东西加强调，说明你还没决定什么是焦点。
 
-### Node type → treatment
+### 节点类型 → 处理
 
-| Type | Fill | Stroke |
+| 类型 | 填充 | 描边 |
 |---|---|---|
-| **Focal** (1–2 max) | `accent-tint` | `accent` |
+| **Focal**（最多 1–2 个） | `accent-tint` | `accent` |
 | **Backend / API / Step** | white | `ink` |
 | **Store / State** | `ink @ 0.05` | `muted` |
 | **External / Cloud** | `ink @ 0.03` | `ink @ 0.30` |
 | **Input / User** | `muted @ 0.10` | `soft` |
-| **Optional / Async** | `ink @ 0.02` | `ink @ 0.20` dashed `4,3` |
-| **Security / Boundary** | `accent @ 0.05` | `accent @ 0.50` dashed `4,4` |
+| **Optional / Async** | `ink @ 0.02` | `ink @ 0.20` 虚线 `4,3` |
+| **Security / Boundary** | `accent @ 0.05` | `accent @ 0.50` 虚线 `4,4` |
 
-### Typography (summary — full spec in style-guide.md)
+### 排版（摘要——完整规格在 style-guide.md）
 
-- **Title** — Instrument Serif, 1.75rem, 400 — H1 only
-- **Node name** — Geist (sans), 12px, 600 — human-readable labels
-- **Sublabel** — Geist Mono, 9px — ports, URLs, field types
-- **Eyebrow / tag** — Geist Mono, 7–8px, uppercase, tracked — type tags, axis labels
-- **Arrow label** — Geist Mono, 8px — annotation on arrows
-- **Editorial aside** — Instrument Serif *italic*, 14px — callouts only
+- **Title** — Instrument Serif，1.75rem，400 — 仅 H1
+- **Node name** — Geist (sans)，12px，600 — 人类可读标签
+- **Sublabel** — Geist Mono，9px — 端口、URL、字段类型
+- **Eyebrow / tag** — Geist Mono，7–8px，大写、加字距 — 类型标签、轴标签
+- **Arrow label** — Geist Mono，8px — 箭头上的注记
+- **Editorial aside** — Instrument Serif *斜体*，14px — 仅用于 callout
 
-**Korean labels** — Geist and Instrument Serif carry no Hangul. Extend the family on that `<text>`, budget 1em per Unicode wide or full-width character and the Latin advance for every other, and never set Hangul below 12px. Full rules in [`style-guide.md`](style-guide.md#korean-labels).
+**韩文标签** — Geist 与 Instrument Serif 不含谚文字形。在该 `<text>` 上扩展字体族，按每个 Unicode 宽字符/全角字符 1em、其余按拉丁步进宽度预算，且谚文永不低于 12px。完整规则见 [`style-guide.md`](style-guide.md#korean-labels)。
 
-**Mono is for technical content only** — never as a blanket "dev" font, and never JetBrains Mono.
+**Mono 只用于技术内容** — 永不做整体"开发感"字体，永不用 JetBrains Mono。
 
 ```html
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500;600&family=Noto+Sans+KR:wght@400;500;600&family=Noto+Serif+KR:wght@400&display=swap" rel="stylesheet">
@@ -109,25 +113,25 @@ Type-specific anti-patterns live in each type reference.
 
 ---
 
-## §6 Core SVG Primitives
+## §6 Core SVG Primitives（核心 SVG 基元）
 
-Universal building blocks. Type-specialized primitives (lifeline, activation bar, region) live in the relevant type reference. Optional primitives:
+通用构件。类型专属基元（lifeline、activation bar、region）在对应 type reference 内。可选基元：
 
-- Editorial callouts → [primitive-annotation.md](primitive-annotation.md)
-- Hand-drawn variant → [primitive-sketchy.md](primitive-sketchy.md)
-- Icon set (laptop, server, DB, K8s, Docker, AWS, …) → [primitive-icons.md](primitive-icons.md). Browse the gallery at `assets/icons.html`.
-- Terminal / CLI-window variant → [primitive-terminal.md](primitive-terminal.md)
-- Optional explanatory motion → [animation.md](animation.md)
+- 编辑级 callout → [primitive-annotation.md](primitive-annotation.md)
+- 手绘变体 → [primitive-sketchy.md](primitive-sketchy.md)
+- 图标集（laptop、server、DB、K8s、Docker、AWS 等）→ [primitive-icons.md](primitive-icons.md)。画廊浏览 `assets/icons.html`。
+- 终端 / CLI 窗口变体 → [primitive-terminal.md](primitive-terminal.md)
+- 可选解释性动效 → [animation.md](animation.md)
 
-### Background
+### 背景
 
-**Default: clean paper, no dot pattern.** Single `<rect>` filled with `paper`. Don't wrap the diagram in a secondary container background — the diagram sits directly on the page.
+**默认：干净纸面，无点阵图案。** 单个 `<rect>` 填充 `paper`。不要把图包在二级容器背景里——图直接坐在页面上。
 
 ```svg
 <rect width="100%" height="100%" fill="#f5f5f5"/>
 ```
 
-**Optional: dotted paper variant.** When a long-form editorial diagram benefits from textured ground (essays, hero diagrams on a dedicated page), opt in by adding the `dots` pattern and a second rect:
+**可选：点阵纸面变体。** 当长篇编辑级图表受益于纹理底（随笔文章、独立页上的主视觉图）时，显式启用：加入 `dots` pattern 与第二个 rect：
 
 ```svg
 <defs>
@@ -139,14 +143,14 @@ Universal building blocks. Type-specialized primitives (lifeline, activation bar
 <rect width="100%" height="100%" fill="url(#dots)" opacity="0.6"/>
 ```
 
-Don't use the dot pattern when the diagram sits inside a product page, slide, or card — the texture compounds with surrounding chrome and reads as noise.
+图表位于产品页、幻灯片或卡片内时不要用点阵图案——纹理与周边 chrome 叠加会读作噪点。
 
-### Arrow markers (define all three, always)
+### 箭头 marker（三个全部定义，永远）
 
-**Arrow size standard (mandatory):** `markerWidth` = canvas viewBox width × 0.9375%, `markerHeight` = markerWidth × 0.7, with `markerUnits="userSpaceOnUse"` so arrows never scale with stroke-width. One size for all arrows — no large/small tiers. Keep the polygon geometry in its own coordinate system and scale it via the marker's `viewBox` (refX/refY stay in that system). Examples: 960-wide canvas → 9.0×6.3; 1000 → 9.4×6.6; 1200 → 11.2×7.9; 1600 → 15×10.5.
+**箭头尺寸标准（强制）：** `markerWidth` = 画布 viewBox 宽 × 0.9375%，`markerHeight` = markerWidth × 0.7，且 `markerUnits="userSpaceOnUse"`，箭头永不随 stroke-width 缩放。所有箭头一个尺寸——不分大小档。polygon 几何保持在自己的坐标系内，通过 marker 的 `viewBox` 缩放（refX/refY 留在该坐标系）。示例：960 宽画布 → 9.0×6.3；1000 → 9.4×6.6；1200 → 11.2×7.9；1600 → 15×10.5。
 
 ```svg
-<!-- example for a 1000-wide canvas -->
+<!-- 1000 宽画布示例 -->
 <marker id="arrow" markerWidth="9.4" markerHeight="6.6" viewBox="0 0 8 6" refX="7" refY="3" orient="auto" markerUnits="userSpaceOnUse">
   <polygon points="0 0, 8 3, 0 6" fill="#4f5d75"/>
 </marker>
@@ -158,173 +162,186 @@ Don't use the dot pattern when the diagram sits inside a product page, slide, or
 </marker>
 ```
 
-| Arrow | Stroke | When |
+| 箭头 | 描边 | 何时用 |
 |---|---|---|
-| Default | muted `#4f5d75` | Internal, generic |
-| Accent | coral `#eb6c36` | Primary / highlighted / headline |
-| Link-blue | `#2e5aa8` | HTTP/API calls, external systems |
-| Dashed | `stroke-dasharray="5,4"` + any color | Optional, passive, return, async |
+| Default | muted `#4f5d75` | 内部、通用 |
+| Accent | coral `#eb6c36` | 主要 / 高亮 / 头条 |
+| Link-blue | `#2e5aa8` | HTTP/API 调用、外部系统 |
+| Dashed | `stroke-dasharray="5,4"` + 任意色 | 可选、被动、返回、异步 |
 
-**Draw arrows before boxes** so z-order puts lines behind nodes.
+**箭头先于盒子绘制**，让 z-order 把线压在节点之下。
 
-### Mandatory connector rules
+### 连接线强制规则
 
-These six rules are **non-negotiable**. Run the pre-output checklist (§9) to verify before producing any diagram.
+这六条规则**不可妥协**。产出任何图表前运行输出前清单（§9）逐项核验。
 
-1. **Rounded right-angle (orthogonal) connectors are mandatory.** Never use diagonal `<line>` or straight slanted paths between nodes that don't share an x or y axis. Every bend must be a quarter-arc with `r=8` (or `r=6` minimum for tight layouts). See `type-architecture.md` for the elbow-path formula. Reserve plain straight `<line>` only for connections whose endpoints share the same x or y coordinate. Diagonal connectors are an automatic fail.
+1. **强制圆角直角（正交）连接线。** 不共享 x 或 y 轴的节点之间永不使用对角 `<line>` 或直线斜路径。每个拐弯必须是 `r=8` 的四分之一圆弧（紧凑布局最小 `r=6`）。elbow 路径公式见 `type-architecture.md`。普通直线 `<line>` 只保留给端点共享同一 x 或 y 坐标的连接。对角连接线是自动失败。
 
-2. **Label-to-connector margin: 6–10px gap, always.** A label must never sit *on* its arrow — the connector must remain visible. Place the label centered above (or beside, for vertical segments) the line with a **minimum 6px gap** between the bottom of the label's mask rect and the connector stroke. The opaque mask rect prevents the arrow from bleeding through, but the *visible* gap between mask edge and line preserves the reader's ability to trace the connection. If the label is large enough that 6px feels cramped, push it to 8–10px. Never let the mask rect touch or overlap the stroke.
+2. **标签与连线间距：永远 6–10px。** 标签永不坐在*自己的*箭头上——连线必须保持可见。标签居中放在线上方（垂直段则放侧方），标签遮罩矩形底边与连线描边之间**最小 6px 间隙**。不透明遮罩矩形防止箭头透底，但遮罩边缘与线之间的*可见*间隙保留读者追踪连接的能力。标签大到 6px 显得局促时，推到 8–10px。永不让遮罩矩形接触或重叠描边。
 
-3. **No overlapping connectors.** Two connectors must never share the same stroke path, run parallel on top of each other, or be drawn on top of each other for any segment. When two orthogonal arrows must cross at a single point, apply the **bridge / hop** primitive (see `type-architecture.md` § Crossing arrows). When two arrows naturally want to overlap, offset their routing by ≥12px so each line is independently traceable. If you find yourself stacking connectors, redesign the layout — it means two nodes are too close, or the diagram is over budget (split into overview + detail).
+3. **连线不得重叠。** 两条连线永不共享同一描边路径、平行叠走、或在任何一段互相叠画。两条正交箭头必须在单点交叉时，应用 **bridge / hop** 基元（见 `type-architecture.md` § Crossing arrows）。两条箭头自然想重叠时，把布线和路由错开 ≥12px，让每条线可独立追踪。如果发现自己在叠连线，重新设计布局——那说明两个节点太近，或图超预算（拆成总览 + 详情）。
 
-4. **Shared edge → fan the attach points.** When two or more connectors enter or exit the *same edge* of a box, each must have its own distinct attach point along that edge — **no two connectors may share a single point on a box**. Spread the attach points evenly along the edge with **≥12px** between adjacent points (8px minimum for very small boxes). Routing rules:
-   - For N connectors on an edge of length L, attach point `k` (1..N) sits at offset `L * k / (N + 1)` from the edge's leading corner.
-   - When the connectors fan out to destinations on different sides, route each one orthogonally from its own attach point — no merging strokes near the box.
-   - When two parallel connectors run in the same direction, keep them ≥12px apart along their entire length, not just at the attach point. Each arrow must remain independently traceable end-to-end.
+4. **共边 → 扇形展开锚点。** 两条或更多连线进入或离开盒子的*同一条边*时，每条必须在该边上有自己独立的锚点——**盒子上任何单点不得被两条连线共享**。锚点沿边均匀展开，相邻锚点间 **≥12px**（极小盒子最小 8px）。布线规则：
+   - 长度为 L 的边上有 N 条连线时，锚点 `k`（1..N）位于距边起始角 `L * k / (N + 1)` 处。
+   - 连线扇出到不同侧的目的地时，每条从自己的锚点正交布线——盒子附近不得合并描边。
+   - 两条平行连线同向行进时，全程保持 ≥12px 间距，而不只在锚点处。每条箭头必须端到端可独立追踪。
 
-   No connector may hide another. If you can't tell two arrows apart at a glance, the layout has failed.
+   任何连线不得遮蔽另一条。一眼分不出两条箭头，布局即失败。
 
-5. **A connector must not pass behind a box that isn't its source or destination — except when the box is geometrically unavoidable on a direct orthogonal path.** Reroute around intervening boxes by default. The only legitimate exception is when a cross-cutting node (e.g., a footer service, a horizontal layer bar) physically sits between the connector's source and destination on the only straight path between them. In that exception:
-   - The stroke must be **dashed** (e.g., `stroke-dasharray="4,3"`) to signal "transit, not interaction" — it tells the reader the intervening box is not an endpoint.
-   - The label sits at the **visible end** of the connector (typically near the source) so it doesn't fall behind the intervening box.
-   - No marker (arrowhead) may land on the intervening box's edge — the marker resolves at the true destination only.
+5. **连线不得穿过非其源或目的地的盒子——除非该盒子在直接正交路径上几何不可避免。** 默认绕开中间盒子重新布线。唯一合法例外：横切节点（如底部服务、水平层条）物理上位于连线源与目的地之间的唯一直路径上。该例外下：
+   - 描边必须为**虚线**（如 `stroke-dasharray="4,3"`），示意"过境，非交互"——告诉读者中间盒子不是端点。
+   - 标签放在连线的**可见端**（通常靠近源），避免落到中间盒子后面。
+   - marker（箭头）不得落在中间盒子边缘——marker 只在真目的地收尾。
 
-   When in doubt, reroute. The exception exists for the narrow case where rerouting is geometrically impossible, not as a shortcut to avoid layout work.
+   拿不准就重新布线。该例外只针对重新布线几何不可能的窄场景，不是逃避布局工作的捷径。
 
-6. **A label mask must not overlap a node drawn after it.** Rule 2 keeps the label off its own connector; this one keeps it off the boxes. Because nodes are painted after labels, a mask that lands partly inside a node is covered by the node fill and the text renders as a fragment sitting on the node border. Place the label on a segment of the connector that runs through open canvas — for a connector leaving a node's right edge, that means clearing the node's `x + width` before the mask starts. A mask fully *inside* a node is a badge chip and is fine; a mask overlapping a zone container is fine too, since zones are painted first. Verify with `python3 scripts/validate_svg.py <file>` (geometry checks: collisions, bounds, edge routing).
+6. **标签遮罩不得与其后绘制的节点重叠。** 规则 2 让标签离开自己的连线；本规则让标签离开盒子。因为节点在标签之后绘制，部分落入节点内的遮罩会被节点填充盖住，文本渲染成坐在节点边框上的残片。把标签放在穿过开阔画布的连线段上——对离开节点右边缘的连线，意味着遮罩起点前须清空节点的 `x + width`。完全*位于*节点内部的遮罩是 badge chip，可以；遮罩与 zone 容器重叠也可以，因为 zone 先绘制。用 `python3 scripts/validate_svg.py <file>` 验证（几何检查：碰撞、边界、边布线）。
 
-### Node box — full pattern
+### 节点盒 — 完整模式
 
 ```svg
-<!-- 1. Opaque paper mask — prevents arrows bleeding through transparent fills -->
+<!-- 1. 不透明纸面遮罩——防止箭头透过透明填充 -->
 <rect x="X" y="Y" width="W" height="H" rx="6" fill="#f5f5f5"/>
-<!-- 2. Styled box -->
+<!-- 2. 样式化盒子 -->
 <rect x="X" y="Y" width="W" height="H" rx="6" fill="FILL" stroke="STROKE" stroke-width="1"/>
-<!-- 3. Rectangular type tag (rx=2, NOT a pill) -->
+<!-- 3. 矩形类型标签（rx=2，不是药丸） -->
 <rect x="X+8" y="Y+6" width="28" height="12" rx="2" fill="transparent" stroke="STROKE@0.40" stroke-width="0.8"/>
 <text x="X+22" y="Y+15" fill="STROKE@0.8" font-size="7" font-family="'Geist Mono', monospace"
       text-anchor="middle" letter-spacing="0.08em">API</text>
-<!-- 4. Node name (Geist sans — human-readable) -->
+<!-- 4. 节点名（Geist sans — 人类可读） -->
 <text x="CX" y="CY+2" fill="#2d3142" font-size="12" font-weight="600"
       font-family="'Geist', sans-serif" text-anchor="middle">Node Name</text>
-<!-- 5. Technical sublabel (Geist Mono) -->
+<!-- 5. 技术子标签（Geist Mono） -->
 <text x="CX" y="CY+18" fill="#4f5d75" font-size="9"
       font-family="'Geist Mono', monospace" text-anchor="middle">tech:port</text>
 ```
 
-### Arrow labels — always mask, always with margin
+### 箭头标签 — 永远遮罩、永远留间距
 
-Every arrow label needs an opaque rect behind it. Without one it bleeds through the line. **And the label must sit with a visible gap above the connector — never on top of it.**
+每个箭头标签背后需要不透明矩形，否则透线。**且标签必须与连线保持可见间隙——永不压线。**
 
 ```svg
-<!-- Mask sits 14px above the arrow (8px text height + 6px gap). Stroke is at ARROW_Y. -->
+<!-- 遮罩位于箭头上方 14px（8px 文本高 + 6px 间隙）。描边在 ARROW_Y。 -->
 <rect x="MID_X-18" y="ARROW_Y-20" width="36" height="12" rx="2" fill="#f5f5f5"/>
 <text x="MID_X" y="ARROW_Y-11" fill="#7a8399" font-size="8"
       font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.06em">WRITE</text>
 ```
 
-Rules:
+规则：
 
-- ≤14 characters, all-caps, centered on segment midpoint.
-- **Mandatory 6–10px gap** between the bottom of the mask rect and the arrow stroke. The connector must remain visible — a label that hides its own arrow is a hard fail.
-- Never `writing-mode` vertical.
-- For vertical segments, place the label to the side (not on the line) with the same 6–10px horizontal gap.
+- ≤14 字符，全大写，居中于线段中点。
+- 遮罩矩形底边与箭头描边之间**强制 6–10px 间隙**。连线必须保持可见——遮住自己箭头的标签是硬失败。
+- 永不 `writing-mode` 竖排。
+- 垂直段的标签放侧方（不在线上），保持同样的 6–10px 水平间隙。
 
-### Legend — horizontal strip at the bottom
+### 图例 — 底部水平条
 
-**Never put the legend inside the diagram area.** Place as a horizontal strip after all nodes, with a hairline separator:
+**永不把图例放进图区。** 作为水平条放在所有节点之后，带发丝分隔线：
 
 ```svg
 <line x1="30" y1="LEGEND_Y-8" x2="VIEWBOX_W-30" y2="LEGEND_Y-8"
       stroke="rgba(45,49,66,0.10)" stroke-width="0.8"/>
 <text x="30" y="LEGEND_Y+8" fill="#4f5d75" font-size="8" font-family="'Geist Mono', monospace"
       letter-spacing="0.14em">LEGEND</text>
-<!-- Items — horizontal row, ~160px apart -->
+<!-- 条目 — 水平一行，间距 ~160px -->
 ```
 
-Expand SVG `viewBox` height by ~60px.
+SVG `viewBox` 高度扩 ~60px。
 
 ---
 
-## §7 Layout & Spacing
+## §7 Layout & Spacing（布局与间距）
 
-### 4px grid
+### 4px 网格
 
-**All values — font sizes, padding, node dimensions, gaps, x/y coords — divisible by 4.** Non-negotiable.
+**所有数值——字号、padding、节点尺寸、间隙、x/y 坐标——被 4 整除。** 不可妥协。
 
-| Category | Allowed values |
+| 类别 | 允许值 |
 |---|---|
-| Font sizes | 8, 12, 16, 20, 24, 28, 32, 40 |
-| Node width / height | 80, 96, 112, 120, 128, 140, 144, 160, 180, 200, 240, 320 |
-| x / y coordinates | multiples of 4 |
-| Gap between nodes | 20, 24, 32, 40, 48 |
-| Padding inside boxes | 8, 12, 16 |
-| Border radius | 4, 6, 8 |
+| 字号 | 8, 12, 16, 20, 24, 28, 32, 40 |
+| 节点宽 / 高 | 80, 96, 112, 120, 128, 140, 144, 160, 180, 200, 240, 320 |
+| x / y 坐标 | 4 的倍数 |
+| 节点间隙 | 20, 24, 32, 40, 48 |
+| 盒内 padding | 8, 12, 16 |
+| 圆角半径 | 4, 6, 8 |
 
-Exempt: stroke widths (0.8, 1, 1.2), opacity values, and the 22×22 dot-pattern.
+豁免：stroke 宽度（0.8, 1, 1.2）、opacity 值、22×22 点阵图案。
 
-Quick check: if a coordinate ends in 1, 2, 3, 5, 6, 7, 9 — fix it.
+**全局字号例外清单（风格锁定值，豁免 4px 网格与字号集）：**
+- 风格皮肤 1–8 的锁定字号（如 Style 6 的 16/14/13px），见各 `style-N-*.md` 头部"风格锁定值豁免"声明
+- 参数化图表类型的 11 / 10 / 9 / 6.5px 刻度与注记字号
+- `dark-svg-techniques.md` 的 7–16px 深色字号阶梯
+- `grouped-container-style.md` §3 的 15 / 11px 卡片字号
+- `primitive-annotation.md` 的 14px 斜体 callout
 
-### Complexity budget (per diagram)
+清单之外的数值仍必须遵守 4px 网格与字号集。
 
-| Limit | Rule |
+快速检查：坐标以 1、2、3、5、6、7、9 结尾——修掉。
+
+### 复杂度预算（每张图）
+
+| 限制 | 规则 |
 |---|---|
-| Max nodes | 9 |
-| Max arrows / transitions | 12 |
-| Max accent elements | 2 |
-| Max lifelines (sequence) | 5 |
-| Max combined fragments (sequence) | 1 (default); 2 only if each is single-region `opt`/`loop` |
-| Max `alt` regions (sequence) | 2 |
-| Max fragment nesting (sequence) | 1 |
-| Max lanes (swimlane) | 5 |
-| Max items (quadrant) | 12 |
-| Max entities (ER) | 8 |
-| Max nesting levels (nested) | 6 |
-| Max tree depth | 4 |
-| Max org chart depth | 4 |
-| Max org chart nodes | 12 |
-| Max layers (layer stack) | 6 |
-| Max circles (venn) | 3 |
-| Max layers (pyramid) | 6 |
-| Max radar axes | 5 |
-| Max radar series | 5 |
-| Max focal radar series | 1 |
-| Max polar categories | 8 |
-| Max polar series | 1 |
-| Max focal polar categories | 1 |
-| Max bars (bar chart) | 8 |
-| Max bars (waterfall) | 8 incl. totals, 1 subtotal |
-| Max cells (treemap) | 8 |
-| Max series (line chart) | 5 |
-| Max tasks (Gantt) | 12 |
-| Max points (scatter plot) | 30 |
-| Max stages / nodes / flows (sankey) | 3 / 8 / 12 |
-| Max categories (fishbone) | 6 bones, 3 sub-causes each |
-| Max components / links (wardley) | 9 / 12, 2 movement arrows |
-| Max columns / cards (kanban) | 5 / 12 total, 4 per column |
-| Max stages / rows (user journey) | 6 / 3, 2 pain markers |
-| Max zones / nodes / paths (deployment) | 3 / 6 / 8, 9 artifacts |
-| Max nodes / edges (dependency) | 9 / 14, 4 ranks, 1 cycle |
-| Max classes / relationships (UML class) | 7 / 8, 5 members per compartment |
-| Max activities / slices / cards (story map) | 5 / 3 / 12 |
-| Max tables / columns / FKs (db schema) | 5 / 8 shown / 6 |
-| Max annotation callouts | 2 |
-| Max motion (optional) | 8 steps, 12 marked items, 2 simultaneous items — see [animation.md](animation.md) |
+| 最大节点数 | 9 |
+| 最大箭头 / 迁移数 | 12 |
+| 最大 accent 元素数 | 2 |
+| 最大生命线数（sequence） | 5 |
+| 最大组合片段数（sequence） | 1（默认）；仅当每个都是单区域 `opt`/`loop` 时允许 2 |
+| 最大 `alt` 区域数（sequence） | 2 |
+| 最大片段嵌套（sequence） | 1 |
+| 最大泳道数（swimlane） | 5 |
+| 最大条目数（quadrant） | 12 |
+| 最大实体数（ER） | 8 |
+| 最大嵌套层数（nested） | 6 |
+| 最大树深度 | 4 |
+| 最大组织图深度 | 4 |
+| 最大组织图节点数 | 12 |
+| 最大层数（layer stack） | 6 |
+| 最大圆数（venn） | 3 |
+| 最大层数（pyramid） | 6 |
+| 最大雷达轴数 | 5 |
+| 最大雷达系列数 | 5 |
+| 最大焦点雷达系列数 | 1 |
+| 最大极坐标类目数 | 8 |
+| 最大极坐标系列数 | 1 |
+| 最大焦点极坐标类目数 | 1 |
+| 最大条数（bar chart） | 8 |
+| 最大条数（waterfall） | 8 含总量，1 小计 |
+| 最大单元格数（treemap） | 8 |
+| 最大系列数（line chart） | 5 |
+| 最大任务数（Gantt） | 12 |
+| 最大点数（scatter plot） | 30 |
+| 最大 stage / 节点 / 流数（sankey） | 3 / 8 / 12 |
+| 最大类目数（fishbone） | 6 骨，每骨 3 子因 |
+| 最大组件 / 连线数（wardley） | 9 / 12，2 条移动箭头 |
+| 最大列 / 卡片数（kanban） | 5 / 12 总数，每列 4 |
+| 最大 stage / 行数（user journey） | 6 / 3，2 个痛点标记 |
+| 最大 zone / 节点 / 路径数（deployment） | 3 / 6 / 8，9 个 artifact |
+| 最大节点 / 边数（dependency） | 9 / 14，4 rank，1 环 |
+| 最大类 / 关系数（UML class） | 7 / 8，每 compartment 5 成员 |
+| 最大活动 / 切片 / 卡片数（story map） | 5 / 3 / 12 |
+| 最大表 / 列 / 外键数（db schema） | 5 / 8 展示 / 6 |
+| 最大注释 callout 数 | 2 |
+| 最大动效（可选） | 8 步、12 个标记项、2 个同时项 — 见 [animation.md](animation.md) |
 
-If you exceed, split into two diagrams (overview + detail).
+超出预算时拆成两张图（总览 + 详情）。
 
-### Page layout
+> **类型索引导航：** 40 类视觉类型完整清单（含 IT current-state `type-it-state.md`、Loop `type-loop.md`、Fishbone `type-fishbone.md`、Venn `type-venn.md`、Pyramid `type-pyramid.md`、Scatter `type-scatter.md`、Story map `type-story-map.md`、Wardley map `type-wardley.md` 等）见 SKILL.md「图表类型选择」；各类型布局规则与类型专属预算在对应 `references/type-*.md`。注意区分：Loop 图表类型（飞轮/增强循环）与动画模式 `loop`（`animation.md`，循环播放）是两回事。
 
-1. **Header** — eyebrow (Geist Mono), title (Instrument Serif), optional subtitle (Geist muted).
-2. **Diagram container** — default: **clean, borderless**, no background — the SVG sits directly on the page paper. Optional *framed* variant (for card-heavy layouts or hero placements): `paper-2` bg + 1px `rule` border + 8px radius + `1.5rem` padding + `overflow-x: auto`.
-3. **Summary cards** — 2–3 col grid with *varied* widths (e.g., `1.1fr 1fr 0.9fr`).
-4. **Footer** — colophon in Geist Mono, muted, hairline top border.
+**几何自检脚本：** `python3 scripts/check_design_geometry.py <file.svg>` — 按本文件契约校验 §6 箭头尺寸标准/锚点扇形与本节 4px 网格/通用复杂度预算（节点 ≤9、箭头 ≤12、accent ≤2）；仅标准库；退出码 0=无 error（允许 warning/note），1=有 error。节点计数与锚点扇形检查依赖 `data-graph-role="node"` 标注，缺标注时报 SKIP 而不猜测；类型专属预算（泳道、实体等）不在其范围。
+
+### 页面布局
+
+1. **Header** — eyebrow（Geist Mono）、标题（Instrument Serif）、可选副标题（Geist muted）。
+2. **图表容器** — 默认：**干净、无边框**、无背景——SVG 直接坐在页面纸面上。可选*带框*变体（卡片密集布局或主视觉位）：`paper-2` 背景 + 1px `rule` 边框 + 8px 圆角 + `1.5rem` padding + `overflow-x: auto`。
+3. **摘要卡片** — 2–3 列网格，宽度*有变化*（如 `1.1fr 1fr 0.9fr`）。
+4. **Footer** — colophon 用 Geist Mono、muted 色、顶部发丝线。
 
 ---
 
-## §8 Summary Card Pattern
+## §8 Summary Card Pattern（摘要卡片模式）
 
-Don't use 3 identical generic cards. Vary the treatment:
+不要用 3 张相同的通用卡片。处理要有变化：
 
 ```html
 <div class="card">
@@ -337,102 +354,104 @@ Don't use 3 identical generic cards. Vary the treatment:
 </div>
 ```
 
-Rules:
+规则：
 
-- `background: #ffffff` (not paper — slight lift without shadow)
+- `background: #ffffff`（不用 paper——无阴影的轻微抬升）
 - `border: 1px solid rgba(45,49,66,0.12)`
-- `border-radius: 6px`, `padding: 1.25rem`
-- **No `box-shadow`**
-- Card dots: 7px, `border-radius: 50%` — ink / muted / coral / link / soft variants
+- `border-radius: 6px`、`padding: 1.25rem`
+- **无 `box-shadow`**
+- 卡片圆点：7px、`border-radius: 50%` — ink / muted / coral / link / soft 变体
 
 ---
 
-## §9 Pre-Output Checklist (Taste Gate)
+## §9 Pre-Output Checklist（Taste Gate，输出前清单）
 
-Run before producing any diagram.
+产出任何图表前运行。
 
-**Type fit:**
+**类型匹配：**
 
-- [ ] If behavior matters, did I choose one semantic pattern before the visual type and load `semantic-patterns.md`?
-- [ ] Right visual type for the layout? (SKILL.md「图表类型选择」)
-- [ ] Stated type, pattern, size preset, and planned cuts before drawing — confirmed, or assumptions noted?
-- [ ] Would a table / paragraph do the same job? (If yes — don't draw.)
-- [ ] Loaded the matching type reference?
-- [ ] If this is an import — format, size, detail level, and audience set? `viewBox` and type ramp match the size preset? (`output-spec.md` §6)
-- [ ] If this is an import — fidelity ledger ready to report?
+- [ ] 行为语义重要时，是否在视觉类型之前先选定了一个语义模式并加载 `semantic-patterns.md`？
+- [ ] 布局选对了视觉类型？（SKILL.md「图表类型选择」）
+- [ ] 画图前说明了类型、模式、尺寸预设与计划裁剪——已确认，或已注明假设？
+- [ ] 表格 / 段落能否胜任同样的工作？（能——就不画。）
+- [ ] 加载了对应的 type reference？
+- [ ] 如果是导入——格式、尺寸、详略、受众已定？`viewBox` 与类型字号阶梯匹配尺寸预设？（`output-spec.md` §6）
+- [ ] 如果是导入——保真度账单准备好报告了？
 
-**Remove test:**
+**删除测试：**
 
-- [ ] Can I remove any node? (Would a reader still understand?)
-- [ ] Can I merge any two nodes? (Do they always travel together?)
-- [ ] Can I remove any arrow? (Is the relationship obvious from layout?)
-- [ ] Can I remove any label? (Does color or shape already signal it?)
+- [ ] 能删掉任何节点吗？（读者还能理解吗？）
+- [ ] 能合并任何两个节点吗？（它们总是同时出现吗？）
+- [ ] 能删掉任何箭头吗？（关系从布局已经显然了吗？）
+- [ ] 能删掉任何标签吗？（颜色或形状已经表达了吗？）
 
-**Signal:**
+**信号：**
 
-- [ ] Accent used on ≤2 elements? If more, which actually deserve focal status?
-- [ ] Legend covers every type used — and nothing extra?
-- [ ] Within the type's complexity budget (§7)?
+- [ ] Accent 用在 ≤2 个元素上？更多时，哪些才真正配得上焦点？
+- [ ] 图例覆盖用到的每种类型——且无多余？
+- [ ] 在该类型的复杂度预算内（§7）？
 
-**Technical:**
+**技术：**
 
-- [ ] Diagram `<svg>` has `role="img"` and `aria-labelledby` resolving to its `<title>` and `<desc>`?
-- [ ] `<title>` is the first child of `<svg>` (before `<defs>`) and both `<title>` and `<desc>` are filled in?
-- [ ] `<title>` / `<desc>` IDs are prefixed for this diagram and variant — never bare `title` / `desc`?
-- [ ] Arrows drawn before boxes?
-- [ ] **Every connector between off-axis nodes uses a rounded right-angle elbow (`r=8`)? No diagonal `<line>` slants?**
-- [ ] **Every arrow label has a visible 6–10px gap above its connector? (Mask rect not touching the stroke.)**
-- [ ] **No two connectors overlap, share a stroke path, or run on top of each other? Crossings use the bridge/hop primitive?**
-- [ ] **When several connectors enter or exit the same edge of a box, each has its own attach point (≥12px apart)? No connector hides another?**
-- [ ] **No connector passes behind a non-endpoint box, except the unavoidable-intervening-box case (§6 rule 5) — and in that case, the stroke is dashed and the label sits at the visible end?**
-- [ ] **No label mask overlaps a node drawn after it? (Node fill would clip the text — §6 rule 6. Run `python3 scripts/validate_svg.py <file>`.)**
-- [ ] Every arrow label has an opaque `fill="#f5f5f5"` rect behind it?
-- [ ] Legend is a horizontal bottom strip, not floating?
-- [ ] No vertical `writing-mode` text?
-- [ ] `viewBox` expanded for the legend strip (~60px)?
-- [ ] Every font size, coord, width, height, gap divisible by 4?
-- [ ] From the installed skill directory, did `python3 scripts/self_check.py <file>` pass? (Accessible-SVG contract, single-file safety, motion basics; ships with the skill.)
-- [ ] If animated, does the complete static/no-JS frame work, does reduced motion hide/disable playback, and is the controller copied verbatim from `assets/template-motion.html`? Run `python3 scripts/self_check.py path/to/generated.html`, and manually check print and static-query states on top of it.
+- [ ] 图表 `<svg>` 有 `role="img"` 且 `aria-labelledby` 解析到其 `<title>` 与 `<desc>`？
+- [ ] `<title>` 是 `<svg>` 的首个子元素（在 `<defs>` 之前），且 `<title>` 与 `<desc>` 都已填写？
+- [ ] `<title>` / `<desc>` ID 带本图与变体前缀——绝不用裸 `title` / `desc`？
+- [ ] 箭头先于盒子绘制？
+- [ ] **不共轴节点间的每条连线都用圆角直角 elbow（`r=8`）？没有对角 `<line>` 斜线？**
+- [ ] **每个箭头标签与其连线之间有可见的 6–10px 间隙？（遮罩矩形不接触描边。）**
+- [ ] **没有两条连线重叠、共享描边路径或叠走？交叉用 bridge/hop 基元？**
+- [ ] **多条连线进出盒子同一边时，各有独立锚点（相距 ≥12px）？没有连线遮蔽另一条？**
+- [ ] **没有连线穿过非端点盒子，除不可避免的中间盒情形（§6 规则 5）——且该情形下描边为虚线、标签在可见端？**
+- [ ] **没有标签遮罩与其后绘制的节点重叠？（节点填充会裁切文本——§6 规则 6。跑 `python3 scripts/validate_svg.py <file>`。）**
+- [ ] 每个箭头标签背后有不透明 `fill="#f5f5f5"` 矩形？
+- [ ] 图例是底部水平条，不是漂浮的？
+- [ ] 没有竖排 `writing-mode` 文本？
+- [ ] `viewBox` 为图例条扩展（~60px）？
+- [ ] 每个字号、坐标、宽、高、间隙被 4 整除？
+- [ ] 从已安装 skill 目录跑过 `python3 scripts/self_check.py <file>` 且通过？（无障碍 SVG 契约、单文件安全、动效基础；随 skill 分发。）
+- [ ] 有动画时，完整的静态/无 JS 帧可用吗？reduced motion 会隐藏/禁用播放吗？控制器逐字复制自 `assets/template-motion.html` 吗？跑 `python3 scripts/self_check.py path/to/generated.html`，并在其上人工检查打印与静态查询状态。
 
-**Typography:**
+> **交付门豁免：** `scripts/interactive_html.py` 与 `scripts/fireworks.py export-html` 产出的 canonical viewer 产物为工具正则输出，豁免 `self_check.py` / `lint-skin.py` 交付门；手写 SVG/HTML 不豁免。
 
-- [ ] Brand match uses exact public families/weights, verified via `getComputedStyle`; fallbacks disclosed?
-- [ ] Human-readable names in Geist sans, not Geist Mono?
-- [ ] Technical sublabels (ports, commands, URLs) in Geist Mono?
-- [ ] Page title in Instrument Serif?
-- [ ] Annotation callouts (if any) in *italic* Instrument Serif? (see [primitive-annotation.md](primitive-annotation.md))
-- [ ] No JetBrains Mono anywhere?
+**排版：**
 
-### Accessible SVG contract
+- [ ] 品牌匹配使用精确的公开字体族/字重，经 `getComputedStyle` 验证；回退已披露？
+- [ ] 人类可读名称用 Geist sans，不是 Geist Mono？
+- [ ] 技术子标签（端口、命令、URL）用 Geist Mono？
+- [ ] 页面标题用 Instrument Serif？
+- [ ] 注释 callout（如有）用 *斜体* Instrument Serif？（见 [primitive-annotation.md](primitive-annotation.md)）
+- [ ] 任何地方都没有 JetBrains Mono？
 
-The Technical checklist above verifies the mechanics; these editorial rules are what the mechanics serve:
+### 无障碍 SVG 契约
 
-- `<title>` is the short name of the subject — roughly the page `<h1>`, and about 60 characters or fewer.
-- `<desc>` is one sentence stating what the diagram shows in terms a reader needs without the image. Describe the content, not the geometry: “Org chart showing a command center routing work to specialist agents and escalation owners,” not “A box at the top with five boxes below it.” A shape-by-shape narration is worse than no useful description.
-- Decorative-only SVG, such as the specimen glyphs in `assets/icons.html`, carries `aria-hidden="true"` instead of `<title>` / `<desc>`.
+上面的技术清单验证机制；这些编辑规则是机制服务的目标：
+
+- `<title>` 是主题的短名称——大致相当于页面 `<h1>`，约 60 字符以内。
+- `<desc>` 是一句话，用读者在没有图像时需要的术语陈述图表内容。描述内容而不是几何："Org chart showing a command center routing work to specialist agents and escalation owners"，而不是"A box at the top with five boxes below it"。逐形状复述比没有有用的描述更糟。
+- 纯装饰 SVG（如 `assets/icons.html` 中的样例字形）带 `aria-hidden="true"` 而不是 `<title>` / `<desc>`。
 
 ---
 
-## §10 Templates & Variants
+## §10 Templates & Variants（模板与变体）
 
-Every diagram ships in three variants (see `assets/`):
+每张图交付三种变体（见 `assets/`）：
 
-| Variant | File pattern | When to use |
+| 变体 | 文件模式 | 何时用 |
 |---|---|---|
-| **Minimal light** (default) | `assets/template.html` | Screenshot-ready. Diagram only — title lives inside the SVG (`<title>`/图内文字), no HTML-layer h1. Warm paper, system font stack, zero external requests. |
-| **Minimal dark** | `assets/template-dark.html` | Dark mode sites, slides, high-contrast posts. Same title-single-source and zero-external rules. |
-| **Full editorial** | `assets/template-full.html` | Long-form posts where the diagram is the hero. Page-level header (eyebrow/h1/subtitle) is part of this variant's design — the SVG carries no visible title text, so no double title. |
+| **Minimal light**（默认） | `assets/template.html` | 可截图交付。仅图表——标题住在 SVG 内（`<title>`/图内文字），无 HTML 层 h1。暖纸面、系统字体栈、零外部请求。 |
+| **Minimal dark** | `assets/template-dark.html` | 暗色站点、幻灯片、高对比帖子。同样的标题单源与零外链规则。 |
+| **Full editorial** | `assets/template-full.html` | 图表为主视觉的长文。页面级 header（eyebrow/h1/subtitle）是本变体设计的一部分——SVG 不带可见标题文字，因此没有双标题。 |
 
-**Sketchy variant** (optional, applied to any of the above) — see [primitive-sketchy.md](primitive-sketchy.md). SVG turbulence filter wobbles strokes for a hand-drawn feel. Good for essays, not for technical docs.
+**Sketchy 变体**（可选，可叠加于以上任一）— 见 [primitive-sketchy.md](primitive-sketchy.md)。SVG turbulence 滤镜让描边抖动出徒手感。适合随笔，不适合技术文档。
 
-**Terminal variant** (optional, replaces any of the above) — see [primitive-terminal.md](primitive-terminal.md). Start from `assets/template-terminal.html`. Charcoal CLI-window chrome, monospace, one red-orange accent. Good for dev-tool posts; not brand-tokenized, so skip it for onboarded output.
+**Terminal 变体**（可选，替换以上任一）— 见 [primitive-terminal.md](primitive-terminal.md)。从 `assets/template-terminal.html` 起步。炭色 CLI 窗口 chrome、等宽字体、一个红橙 accent。适合开发工具帖；未做品牌 token 化，onboarded 输出跳过它。
 
-**Animation** (optional presentation layer) — see [animation.md](animation.md). Modes are `none` (default), `reveal`, `step`, and `loop`; motion never changes the static meaning or raises the complexity budget.
+**Animation**（可选呈现层）— 见 [animation.md](animation.md)。模式为 `none`（默认）、`reveal`、`step`、`loop`；动效永不改变静态语义，也不提高复杂度预算。（动画模式 `loop` 指循环播放，与 Loop 图表类型无关，见 §7 类型索引导航。）
 
-### To create a new diagram
+### 创建新图表
 
-1. Copy the variant closest to what you want (`assets/template.html` for minimal, `assets/template-full.html` for cards, `assets/template-motion.html` only when motion is requested).
-2. If behavior is load-bearing, choose a semantic pattern; then load the matching type reference.
-3. Replace the SVG body (minimal variants have no HTML-layer header; `template-full`/`template-motion`/`template-terminal` carry a page header — replace its eyebrow/h1/subtitle there). Replace `[diagram-slug]` with the file slug and fill `<title>` / `<desc>`.
-4. If motion is requested, load `animation.md`; otherwise keep mode `none` and no script.
-5. Run the §9 taste gate.
+1. 复制最接近目标的变体（minimal 用 `assets/template.html`，卡片用 `assets/template-full.html`，仅在被要求动效时用 `assets/template-motion.html`）。
+2. 行为语义承重时，选定语义模式；然后加载匹配的 type reference。
+3. 替换 SVG 主体（minimal 变体无 HTML 层 header；`template-full`/`template-motion`/`template-terminal` 带页面 header——在那里替换其 eyebrow/h1/subtitle）。把 `[diagram-slug]` 替换为文件 slug 并填写 `<title>` / `<desc>`。
+4. 被要求动效时加载 `animation.md`；否则保持模式 `none` 且无脚本。
+5. 运行 §9 Taste Gate。

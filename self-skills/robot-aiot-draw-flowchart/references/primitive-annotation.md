@@ -1,8 +1,8 @@
-# Annotation Callout (italic-serif aside)
+# Annotation Callout（斜体衬线旁注）
 
-Use for editorial asides — the "italic pointer" that marks a detail without competing with the primary diagram grammar. Think marginalia: *"structure IS the index"*, *"no imports, no configuration"*.
+用于编辑风旁注——不与主图语法争抢注意力的"斜体指针"，标记一个细节。类比页边批注：*"structure IS the index"*、*"no imports, no configuration"*。
 
-## Grammar
+## 语法
 
 ```svg
 <!-- 1. Italic Instrument Serif text -->
@@ -15,13 +15,13 @@ Use for editorial asides — the "italic pointer" that marks a detail without co
 <circle cx="520" cy="216" r="2" fill="#2d3142"/>
 ```
 
-## Rules
-- Italic + serif together signal "editorial voice" against the diagram's sans/mono body. Don't substitute italic sans or italic mono — the combination is load-bearing.
-- Dashed path (`stroke-dasharray="4,3"`) distinguishes the callout leader from primary arrows (which are solid).
-- Place callouts in margins (top-right, bottom-left). Never inside the active diagram area.
-- Max 2 callouts per diagram. More becomes commentary, not signal.
+## 规则
+- 斜体 + 衬线共同构成"编辑声音"信号，与图内 sans/mono 主体形成对比。不要换成斜体 sans 或斜体 mono——这个组合是承重的。
+- 虚线路径（`stroke-dasharray="4,3"`）把旁注引线与主箭头（实线）区分开。
+- 旁注放在页边空白处（右上、左下）。永不放进图形活动区内部。
+- 每张图最多 2 个旁注。再多就成了评论，不是信号。
 
-## Colors
+## 颜色
 
 | Intent | Text | Leader |
 |---|---|---|
@@ -29,8 +29,8 @@ Use for editorial asides — the "italic pointer" that marks a detail without co
 | Focal / accent | coral `#eb6c36` | `rgba(235,108,54,0.50)` |
 | Tertiary (muted) | muted `#4f5d75` | `rgba(45,49,66,0.30)` |
 
-## Anti-patterns
-- Solid arrow leader (reads as a flow arrow).
-- Italic sans or italic mono — the serif is load-bearing.
-- Callouts crossing primary arrows / lifelines — offset to a clear margin.
-- Using a callout to label something the diagram should label directly — put the label on the element.
+## 反模式
+- 实线箭头引线（会被读成流程箭头）。
+- 斜体 sans 或斜体 mono——衬线是承重的。
+- 旁注穿越主箭头/生命线——偏移到干净的页边。
+- 用旁注去标注图本身应直接标注的东西——标签应放在元素上。

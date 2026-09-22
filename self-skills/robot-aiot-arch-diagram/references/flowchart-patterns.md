@@ -165,8 +165,6 @@
 - 并行任务垂直排列，间距 20px
 - 所有并行任务完成后才能继续
 
-> ⚠️ `mxgraph.flowchart.merge_or_storage` 等 `mxgraph.flowchart.*` 命名空间形状在 XML→HTML 映射中无对应 CSS。本路径（SVG/HTML 直绘）不涉及该问题，此警告仅适用于 draw.io XML 路径。
-
 ---
 
 ## 5. 子流程图 (Subprocess)

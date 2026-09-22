@@ -275,16 +275,16 @@
 - 注意：页眉不写页码，封面自成一体
 
 ### M02 · 章节幕封
-- 主题：hero dark 与 hero light 在多幕之间必须交替（制造呼吸节奏）
+- 主题：hero 档；全 deck 单色系——dark 系 deck 用 hero dark、light 系 deck 用 hero light，禁多幕间明暗翻面；呼吸节奏靠 hero 档与非 hero 档轮换及版式变化制造
 - 骨架：极简三件——kicker（Act N）→ 巨字标题（163px 档，可按长短微调）→ 一行 lead（max-width 1056px）
 
 ### M03 · 数据大字报
-- 主题：light（数字需纸白底；多幕连发可偶插 dark）
+- 主题：light（数字需纸白底；dark 系 deck 用本版式时按 token 映射保持全 deck 单色系，禁插入异主题页，节奏靠版式变化制造）
 - 骨架：kicker → 大标题 → lead → 3×2 六格统计卡（每卡：英文小标签 → 大字数字 → 注释）；数字 2-3 位字符，过长用 K/M 简写
 - 注意：间距实测上限——主体 padding-top 32px + lead margin-bottom 22px + grid margin-top 22px，六格在 16:9 不压脚注；内容更多时先删卡片，不压缩脚注空间
 
 ### M04 · 左文右图
-- 主题：light / dark 交替（正文节奏主力）
+- 主题：随 deck 单色系取 light 或 dark（全篇统一，禁逐页明暗交替）；正文节奏主力，节奏靠版式与密度变化制造
 - 骨架：7:5 grid；左列 flex column + `justify-content:space-between`——上部 kicker + 大标题（138px 档，单行可 nowrap）+ lead，底部 callout 引用 + 出处；右列 16:10 或 4:3 图片 + 框内图注
 - 注意：右列图片禁 `align-self:end`；图片用标准比例，不用原图奇葩比例
 
@@ -299,12 +299,12 @@
 - 动效：分步手动推进——步骤默认 `opacity:.15`，按 →/空格/滚轮下滑一次点亮一步，全部点亮完才翻页（fragment 机制）；制造演讲互动感
 
 ### M07 · 悬念问题页
-- 主题：hero dark（强视觉冲击）
+- 主题：hero 档，随 deck 单色系取 hero dark/light（强视觉冲击；禁在 light 系 deck 单独用 hero dark 翻面）
 - 骨架：留白最大化，只放一个问题——kicker → 巨字三行（134px 档，手工 `<br>` 断在语义处）→ 一行 lead 点破
 - 用途：幕收束、留悬念
 
 ### M08 · 大引用页
-- 主题：dark 优先，偶用 light（金句仪式感靠暗底）
+- 主题：hero 档，随 deck 单色系取 hero dark/light（dark 系金句仪式感靠暗底；light 系靠整页留白与字号档位制造同等仪式感，禁为金句页单独翻面）
 - 骨架：整页留白——kicker → blockquote 系统衬线栈金句（111px 档 / weight 700 / line-height 1.2，每行 `<span>` 块级）→ 外文原文或译文 lead（opacity .65 制造层级）→ meta 行出处·日期
 - 动效：quote recipe——一句一句揭示（550ms stagger 慢节奏）
 - 注意：blockquote 单独放大字号，不复用页面主标题档；中文金句按 §15（「」引号、禁伪斜体）
@@ -315,7 +315,7 @@
 - 动效：directional——左进 → 分割 → 右进
 
 ### M10 · 图文混排
-- 主题：light / dark 交替
+- 主题：随 deck 单色系取 light 或 dark（全篇统一，禁逐页明暗交替）
 - 骨架：8:4 grid（正文主导，图片辅助）；左列多层级：kicker → 大标题 → lead → 正文段落（22px 档 / line-height 1.75）→ callout 引用；右列竖版 3:4 或方形 1:1 辅助图（避免与左列文字抢注意力）
 - 适用：页面信息量偏大的场景（不像 M04 只承载一句金句）
 

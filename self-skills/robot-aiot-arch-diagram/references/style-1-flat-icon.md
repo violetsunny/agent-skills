@@ -1,8 +1,8 @@
-# Style 1: Flat Icon (Default)
+# Style 1: Flat Icon（默认）
 
-Inspired by draw.io defaults and Apple documentation style.
+灵感来自 draw.io 默认样式与 Apple 文档风格。
 
-## Colors
+## 颜色
 
 ```
 Background:     #ffffff
@@ -27,7 +27,7 @@ Icon accent backgrounds:
   Teal tint:   #f0fdfa / #ccfbf1
 ```
 
-## Typography
+## 字体排印
 
 ```
 font-family: 'Helvetica Neue', Helvetica, Arial, 'PingFang SC',
@@ -36,7 +36,7 @@ font-size:   14px labels, 12px sub-labels, 16px titles
 font-weight: 400 normal, 600 semi-bold for titles
 ```
 
-## Box Shapes
+## 盒形状
 
 ```xml
 <!-- Standard node box -->
@@ -50,7 +50,7 @@ font-weight: 400 normal, 600 semi-bold for titles
 <!-- User/actor: circle or rounded rect with icon -->
 ```
 
-## Arrows
+## 箭头
 
 ```xml
 <defs>
@@ -70,9 +70,9 @@ font-weight: 400 normal, 600 semi-bold for titles
 <path stroke="#2563eb" stroke-width="1.5" fill="none" marker-end="url(#arrow-blue)"/>
 ```
 
-## Legend
+## 图例
 
-Always include a legend in the bottom-left if multiple arrow colors are used:
+使用多种箭头颜色时，始终在左下角放图例：
 
 ```xml
 <g transform="translate(20, 560)">
@@ -85,7 +85,7 @@ Always include a legend in the bottom-left if multiple arrow colors are used:
 </g>
 ```
 
-## SVG Template
+## SVG 模板
 
 ```xml
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 600"

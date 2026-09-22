@@ -98,7 +98,7 @@ A R R 0 0 1 q_end.x q_end.y
 
 The large-arc flag is `0` because adjacent-station gaps are less than 180 degrees; the sweep flag is always `1` for clockwise motion in SVG coordinates. The arrowhead overhang completes the final 1.2px to `q_entry(j)`, landing on the box edge without crossing its stroke. The closing connector from station `N-1` to station 0 uses the identical formula.
 
-Loop's circular ring arcs are a documented type-specific exception to design-system.md §6 rule 1, following the same precedent as Medallion's promotion arcs. A Loop never mixes cubic, straight, or rounded-orthogonal segments into its ring: the six visible gaps must read as pieces of one continuous circle.
+Loop's circular ring arcs are a documented type-specific exception to design-system.md §6 rule 1, following the same precedent as Medallion's promotion arcs. A Loop never mixes cubic, straight, or rounded-orthogonal segments into its ring: the visible gaps between stations (gap 数=站数，站数按预算 5–8) must read as pieces of one continuous circle.
 
 ### 2.3 Dashed write-back spoke endpoints
 

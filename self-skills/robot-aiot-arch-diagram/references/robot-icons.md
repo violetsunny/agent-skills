@@ -1,10 +1,14 @@
-# Robot Vacuum Icons Reference
+# 扫地机器人图标参考（Robot Vacuum Icons）
 
-## Base Robot Icons
+> **⚠️ 路径豁免声明：** 本文 draw.io mxGraphModel XML 仅作布局结构参考，最终产物走 SVG 直绘路径（路径 B，SKILL.md 硬约束 1：本 skill 不含 draw.io XML 路径能力）。机器人图标属插画资产而非流程图节点：机身子形状可用符合形态的 arcSize/填充（如 arcSize=40/50 的圆润机身），流程图节点样式以 `design-system.md` 为唯一权威；阴影禁令（§4）对本文件所有元素同样生效。
+>
+> **调色板谱系声明：** 本文件中的 `#0078D4` 蓝色系为辅助谱系，仅用于机器人/设备本体语义（按键、激光雷达、联网状态等）；通用图表节点的默认主谱系以 `style-guide.md` / `design-system.md` 为准。
 
-### 1. Simple Top View (简约俯视)
+## 基础机器人图标
+
+### 1. 简约俯视
 ```xml
-<mxCell id="robot_simple" value="" style="ellipse;fillColor=#333333;strokeColor=#1A1A1A;strokeWidth=2;shadow=1;" vertex="1" parent="1">
+<mxCell id="robot_simple" value="" style="ellipse;fillColor=#333333;strokeColor=#1A1A1A;strokeWidth=2;" vertex="1" parent="1">
   <mxGeometry width="80" height="80" as="geometry" />
 </mxCell>
 <mxCell id="robot_lidar" value="" style="ellipse;fillColor=#555555;strokeColor=#444444;strokeWidth=1;" vertex="1" parent="1">
@@ -15,9 +19,9 @@
 </mxCell>
 ```
 
-### 2. Top View with Side Brushes (带边刷俯视)
+### 2. 带边刷俯视
 ```xml
-<mxCell id="robot_body" value="" style="ellipse;fillColor=#444444;strokeColor=#222222;strokeWidth=2;shadow=1;" vertex="1" parent="1">
+<mxCell id="robot_body" value="" style="ellipse;fillColor=#444444;strokeColor=#222222;strokeWidth=2;" vertex="1" parent="1">
   <mxGeometry x="15" y="10" width="80" height="80" as="geometry" />
 </mxCell>
 <mxCell id="robot_lidar" value="" style="ellipse;fillColor=#666666;strokeColor=#555555;" vertex="1" parent="1">
@@ -34,9 +38,9 @@
 </mxCell>
 ```
 
-### 3. Side View (侧视图)
+### 3. 侧视图
 ```xml
-<mxCell id="robot_side_body" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#444444;strokeColor=#222222;strokeWidth=2;arcSize=40;shadow=1;" vertex="1" parent="1">
+<mxCell id="robot_side_body" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#444444;strokeColor=#222222;strokeWidth=2;arcSize=40;" vertex="1" parent="1">
   <mxGeometry x="10" y="25" width="100" height="40" as="geometry" />
 </mxCell>
 <mxCell id="robot_lidar_top" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#666666;strokeColor=#555555;arcSize=30;" vertex="1" parent="1">
@@ -53,11 +57,11 @@
 </mxCell>
 ```
 
-## State-Specific Icons
+## 状态专用图标
 
-### 4. Connected/OTA State (联网/OTA状态)
+### 4. 联网/OTA 状态
 ```xml
-<mxCell id="robot_connected" value="" style="ellipse;fillColor=#0078D4;strokeColor=#005A9E;strokeWidth=2;shadow=1;" vertex="1" parent="1">
+<mxCell id="robot_connected" value="" style="ellipse;fillColor=#0078D4;strokeColor=#005A9E;strokeWidth=2;" vertex="1" parent="1">
   <mxGeometry x="20" y="30" width="70" height="70" as="geometry" />
 </mxCell>
 <mxCell id="robot_lidar_blue" value="" style="ellipse;fillColor=#4DA8DA;strokeColor=#0078D4;" vertex="1" parent="1">
@@ -74,9 +78,9 @@
 </mxCell>
 ```
 
-### 5. Charging State (充电中)
+### 5. 充电中
 ```xml
-<mxCell id="robot_charging" value="" style="ellipse;fillColor=#555555;strokeColor=#333333;strokeWidth=2;shadow=1;" vertex="1" parent="1">
+<mxCell id="robot_charging" value="" style="ellipse;fillColor=#555555;strokeColor=#333333;strokeWidth=2;" vertex="1" parent="1">
   <mxGeometry x="20" y="25" width="70" height="70" as="geometry" />
 </mxCell>
 <mxCell id="battery_icon" value="⚡" style="text;html=1;fontSize=24;align=center;fillColor=none;strokeColor=none;" vertex="1" parent="1">
@@ -87,7 +91,7 @@
 </mxCell>
 ```
 
-### 6. Cleaning Active (清扫中)
+### 6. 清扫中
 ```xml
 <mxCell id="cleaning_trail" value="" style="endArrow=classic;strokeColor=#82B366;strokeWidth=2;dashed=1;curved=1;" edge="1" parent="1">
   <mxGeometry relative="1" as="geometry">
@@ -99,7 +103,7 @@
     </Array>
   </mxGeometry>
 </mxCell>
-<mxCell id="robot_cleaning" value="" style="ellipse;fillColor=#333333;strokeColor=#1A1A1A;strokeWidth=2;shadow=1;" vertex="1" parent="1">
+<mxCell id="robot_cleaning" value="" style="ellipse;fillColor=#333333;strokeColor=#1A1A1A;strokeWidth=2;" vertex="1" parent="1">
   <mxGeometry x="40" y="30" width="60" height="60" as="geometry" />
 </mxCell>
 <mxCell id="clean_btn" value="" style="ellipse;fillColor=#00C853;strokeColor=#009624;" vertex="1" parent="1">
@@ -110,9 +114,9 @@
 </mxCell>
 ```
 
-### 7. Error/Alert State (告警/故障)
+### 7. 告警/故障
 ```xml
-<mxCell id="robot_error" value="" style="ellipse;fillColor=#B85450;strokeColor=#8C2E2E;strokeWidth=2;shadow=1;" vertex="1" parent="1">
+<mxCell id="robot_error" value="" style="ellipse;fillColor=#B85450;strokeColor=#8C2E2E;strokeWidth=2;" vertex="1" parent="1">
   <mxGeometry x="15" y="25" width="70" height="70" as="geometry" />
 </mxCell>
 <mxCell id="warning_icon" value="⚠️" style="text;html=1;fontSize=22;align=center;fillColor=none;strokeColor=none;" vertex="1" parent="1">
@@ -120,9 +124,9 @@
 </mxCell>
 ```
 
-### 8. OTA Upgrade In Progress (OTA升级中)
+### 8. OTA 升级中
 ```xml
-<mxCell id="robot_upgrading" value="" style="ellipse;fillColor=#9673A6;strokeColor=#6A4C7D;strokeWidth=2;shadow=1;" vertex="1" parent="1">
+<mxCell id="robot_upgrading" value="" style="ellipse;fillColor=#9673A6;strokeColor=#6A4C7D;strokeWidth=2;" vertex="1" parent="1">
   <mxGeometry x="20" y="25" width="70" height="70" as="geometry" />
 </mxCell>
 <mxCell id="upgrade_arrow" value="⬆️" style="text;html=1;fontSize=20;align=center;fillColor=none;strokeColor=none;" vertex="1" parent="1">
@@ -136,9 +140,9 @@
 </mxCell>
 ```
 
-## Product Illustration Style
+## 产品插画风格
 
-### 10. Smart Home Product Style (产品插画风格·详细俯视)
+### 9. 智能家居产品风格（详细俯视）
 
 复刻 draw.io「Smart Home / IoT Devices」形状库的产品插画风格：浅银机身、白色内盘、绿色电源键、蓝色 LDS 塔与回充键、黑色三叉边刷、灰尘粒子。纯矢量 mxCell 组合，包围盒约 200x200。
 
@@ -227,24 +231,23 @@
 ```
 
 **使用方式：**
-1. 复制整段 XML 到 draw.io（Edit → Insert 或粘贴进 .drawio 文件）
-2. 全选所有 `pv_` 元素后 Group（Ctrl+G），整体移动/缩放
-3. 缩放时按住 Shift 保持圆形比例
+1. 将整段 XML 作为布局结构参考，按路径 B（SVG 直绘）渲染：全部 `pv_` 元素合并进同一个 `<g>` 分组，便于整体移动/缩放
+2. 缩放时使用同一 scale 系数等比变换，保持圆形比例
 
-## Usage Tips
+## 使用技巧
 
-1. **Group related elements** — After creating a robot icon with multiple parts, select all elements and Group them (Ctrl+G) for easy movement
-2. **Maintain proportions** — Hold Shift while resizing to keep the circular shape
-3. **Color consistency** — Always use the color codes from color-schemes.md
-4. **Layer order** — Place the robot body first, then overlay LiDAR, buttons, and icons
-5. **Signal waves** — Use multiple dashed ellipses with decreasing opacity for realistic effect
-6. **Side brushes** — Use the spiral shape with orange stroke (#FF6B35) for authenticity
-7. **Product illustration variant is a scoped exception** — Icon #10 is an illustration asset, not a flow node: §5 node style values (fillColor=#FFFFFF, arcSize=15) apply to diagram nodes, while illustration sub-shapes may use shape-appropriate fill/arcSize (e.g. silver body, arcSize=30/50 buttons); shadow=0 and all colors still come from the color-schemes.md palette
-8. **Palette check before delivery** — Verify every fillColor/strokeColor in a copied icon block exists in color-schemes.md
+1. **组合相关元素** — 多部件机器人图标完成后，把所有元素合并进同一分组（SVG `<g>`），便于整体移动
+2. **保持比例** — 等比缩放（同一 scale 系数），保持圆形机身比例
+3. **颜色一致性** — 色值一律取自 color-schemes.md 登记的调色板
+4. **图层顺序** — 先画机器人本体，再叠加激光雷达、按键与状态图标
+5. **信号波纹** — 用多个虚线椭圆按递减不透明度叠加，表现信号扩散
+6. **边刷** — 用 spiral 形状配橙色描边（#FF6B35）增强真实感
+7. **产品插画风格属限定例外** — 图标 #9 是插画资产而非流程图节点：design-system.md §5 的节点样式（白色填充、arcSize 6–8，圆角上限见 §4）只约束流程图节点；插画子形状可用符合形态的填充/arcSize（如银色机身、arcSize=30/50 按键）；shadow=0（阴影禁令见 §4），颜色仍全部来自 color-schemes.md 调色板
+8. **交付前调色板校验** — 核对引用图标块中的每个 fillColor/strokeColor 均已在 color-schemes.md 登记
 
-## PNG Image Asset
+## PNG 图像资产
 
-### 9. Robot Vacuum Icon (PNG)
+### 10. 扫地机器人图标（PNG）
 
 **文件路径：** `assets/robot-vacuum-icon.png`
 

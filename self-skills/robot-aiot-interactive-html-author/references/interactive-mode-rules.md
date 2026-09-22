@@ -200,9 +200,9 @@ function animateNumber(el, target, duration = 1200) {
 
 ### 进度条填充
 
-- 宽度从 0% 过渡到目标值
-- 时长 `800ms - 1200ms`
-- 使用 CSS `transition: width` 而非 JS 逐帧
+- 填充层固定 `width:100%`，用 `transform: scaleX(0→PCT)` + `transform-origin:left` 表达进度，禁止 transition `width`（触发 layout，违反性能红线）
+- 时长 `800ms - 1200ms`，cubic-out 缓动
+- 使用 CSS `transition: transform` 而非 JS 逐帧
 
 ### 图表逐步绘制
 
@@ -319,7 +319,7 @@ toggle.addEventListener('mouseleave', scheduleHide);
 ## 性能约束
 
 1. 单页 DOM 节点数 ≤ 500
-2. 动画属性仅限 `transform`、`opacity`、`filter`；禁止动画 `width`、`height`、`top`、`left`（进度条除外）
+2. 动画属性仅限 `transform`、`opacity`、`filter`；禁止动画 `width`、`height`、`top`、`left`（进度条填充用 `transform: scaleX`，无 width 例外）
 3. 图片使用 `loading="lazy"`
 4. 首屏渲染时间 ≤ 500ms（无网络请求）
 5. 内存占用：销毁非活跃页面的定时器和事件监听

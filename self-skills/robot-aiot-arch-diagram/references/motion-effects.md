@@ -1,19 +1,16 @@
-# Focused SVG-to-GIF Motion
+# 聚焦 SVG→GIF 动效（Focused SVG-to-GIF Motion）
 
-Motion has one public contract:
+动效只有一个公开契约：
 
 ```text
 generated semantic SVG -> validated animated GIF
 ```
 
-PNG and JPEG are not accepted as animation inputs. Animated WebP, MP4, WebM,
-poster generation, and the old offline motion-review player are not part of this
-surface. Static SVG/PNG rendering and the single-file interactive HTML exporter
-remain unchanged.
+PNG 与 JPEG 不作为动画输入。动画 WebP、MP4、WebM、海报生成、旧版离线 motion-review 播放器均不属于本表面。静态 SVG/PNG 渲染与单文件交互式 HTML 导出器保持不变。
 
-## Simplest prompts
+## 极简提示词
 
-Use the most recently generated SVG when the user says:
+用户说以下内容时，使用最近一次生成的 SVG：
 
 - `让这张图动起来`
 - `生成 GIF`
@@ -23,263 +20,135 @@ Use the most recently generated SVG when the user says:
 - `Animate this diagram`
 - `Animate this SVG as a GIF`
 
-No format, preset, duration, or frame-rate wording is needed. The default is a
-960px-wide, 5.75-second, 20fps, 115-frame, infinitely looping GIF. `auto` reads the
-style id and explicit `data-motion-*` edge metadata from the generated SVG.
+无需提及格式、preset、时长或帧率。默认为 960px 宽、5.75 秒、20fps、115 帧、无限循环的 GIF。`auto` 从生成的 SVG 读取 style id 与显式 `data-motion-*` 边元数据。
 
-The input must satisfy one of the twelve approved motion-scene contracts. Exact
-source bytes are not pinned, so validated title and content variants of a
-supported topology are accepted. The role/stage/order schedule, route direction,
-required source colors, and geometry remain fail-closed; `auto` does not infer
-missing metadata or apply reviewed motion to an arbitrary same-style topology.
-The only motion media artifact is GIF. Unless `--report` supplies another path,
-the CLI also writes `<output>.motion.json` with the validation evidence.
+输入必须满足十二个已批准 motion-scene 契约之一。源文件精确字节不锁定，因此受支持拓扑的、通过校验的标题与内容变体均可接受。role/stage/order 调度、路由方向、必需源色与几何保持 fail-closed；`auto` 不推断缺失元数据，也不把已评审的动效套用到任意同风格拓扑上。唯一的动效媒体产物是 GIF。除非 `--report` 指定其他路径，CLI 同时写出 `<output>.motion.json` 承载校验证据。
 
-## ByteByteGo-derived rules
+## ByteByteGo 衍生规则
 
-Six measured ByteByteGo newsletter GIFs use short 2.10–2.75 second loops at a
-uniform 20 or 33.33fps. Only 1.20–3.56% of their canvases change over a loop and
-every measured frame is unique. The default loop extends to 5.75 seconds so the
-accepted 1.8-second construction leaves frames 38–109 for a clearly readable,
-continuously moving operating state. This project applies those lessons as a reusable technical-diagram contract:
+六个实测 ByteByteGo newsletter GIF 使用 2.10–2.75 秒短循环，帧率统一为 20 或 33.33fps。一个循环内画布仅 1.20–3.56% 发生变化，且每个实测帧都唯一。默认循环延长到 5.75 秒，使已批准的 1.8 秒构建之后留出第 38–109 帧，作为清晰可读、持续运动的工作状态。本项目把这些经验固化为可复用的技术图表契约：
 
-1. Frame 0 keeps nodes and regions readable while every connector is absent.
-2. Existing routes draw on in semantic order, then settle with their direction markers.
-3. Nodes, labels, containers, marker geometry, and the camera remain fixed.
-4. Connector overlap is scene-pinned: Styles 4 and 12 use one active build, plans that call for two enforce two, and Style 7's exact parallel governance schedule reaches three. The completed topology gets a noticeable operating hold.
-5. Samples use a uniform GIF-native cadence; no 6/7-centisecond alternation.
-6. The final slot is a real animation sample, never a copied opening frame.
-7. Every settled route carries marker-free operating motion toward the target. Styles 1–4 retain their approved packet-head, terminal-evidence, Blueprint-bead, and Notion-card identities. Styles 5–12 use a separate rail/signature family per scene and remain legible at 50% review size.
+1. 第 0 帧保持节点与区域可读，所有连接线缺席。
+2. 既有路由按语义顺序 draw-on，随后带方向标记落定。
+3. 节点、标签、容器、marker 几何与镜头保持固定。
+4. 连接线重叠度按场景钉死：Style 4 与 12 使用单条活跃构建，要求两条的方案强制两条，Style 7 的精确并行治理调度达到三条。完成的拓扑获得明显的工作状态停留。
+5. 样例使用统一的 GIF 原生节奏；禁止 6/7 厘秒交替。
+6. 最后一个槽位是真实动画采样，绝不是首帧复制。
+7. 每条落定路由都携带无 marker 的工作态运动指向目标。Style 1–4 保留各自已批准的 packet-head、terminal-evidence、Blueprint-bead、Notion-card 身份。Style 5–12 每场景使用独立的 rail/signature 家族，并在 50% 审查尺寸下保持可辨。
 
-## Approved default gate
+## 已批准默认门
 
-Styles 1–12 are enabled and their signature, speed, path, geometry, and
-construction contracts are user-approved. The shared `+2s-settled-flow`
-timing revision was approved on 2026-07-17, so new default 5.75-second packages
-record `review_status: user-approved`. The explicit 3.75-second and 2.75-second
-compatibility timelines remain available when requested.
+Style 1–12 已启用，其 signature、速度、路径、几何与构建契约均经用户批准。共享的 `+2s-settled-flow` 时序修订于 2026-07-17 批准，因此新的默认 5.75 秒包记录 `review_status: user-approved`。显式的 3.75 秒与 2.75 秒兼容时间线仍可按需提供。
 
-### Style 1 — Memory Weave
+### Style 1 — Memory Weave（记忆编织）
 
-Style 1 follows eight explicit route roles:
+Style 1 遵循八个显式路由角色：
 
-| Frames | Role | Edge meaning |
+| 帧 | 角色 | 边含义 |
 |---:|---|---|
-| `1–8` | `ingress` | user request |
-| `5–12` | `reason` | application to model |
-| `9–16` | `extract` | fact extraction |
-| `13–20` | `transform` | extracted facts |
-| `17–24` | `resolve` | conflict resolution |
-| `21–28` | `memory-write` | durable write |
-| `25–32` | `memory-read` | memory relation/read |
-| `29–36` | `response-context` | context to response |
+| `1–8` | `ingress` | 用户请求 |
+| `5–12` | `reason` | 应用到模型 |
+| `9–16` | `extract` | 事实抽取 |
+| `13–20` | `transform` | 抽取的事实 |
+| `17–24` | `resolve` | 冲突消解 |
+| `21–28` | `memory-write` | 持久化写入 |
+| `25–32` | `memory-read` | 记忆关联/读取 |
+| `29–36` | `response-context` | 上下文到响应 |
 
-The `connector-draw-on-with-persistent-data-flow` primitive transiently hides all immutable
-source edges and their route-owned label groups. Each route gets one marker-free
-linear draw clone and one settled clone that restores the original marker at
-arrival. Its label plate and text appear only with that settled route; label
-geometry never moves. The topology is complete by frame 36. From frames `36–114`,
-every settled route gets an adjacent marker-free, filter-free pair that preserves
-the source path direction. The `persistent-data-flow-stream` body uses memory-cyan
-`#06b6d4`, rounded caps and joins, opacity `.90`, width
-`min(4.0px, max(3.0px, source stroke × 1.60))`, and dash pattern `16 25`. Style 1's
-current 2.4px source routes therefore resolve to exactly 3.84px. Its immediately
-following `persistent-data-flow-head` clone stays inside that body with color
-`#e0f2fe`, width `2.20px`, opacity `.98`, rounded caps and joins, and pattern
-`6 35`. Both patterns have a 41-unit period; the head dash offset is always the
-body offset minus 10 units, placing the bright six-unit segment over the leading
-six units of the cyan body. Neither clone carries a marker, filter, glow, or blur.
+`connector-draw-on-with-persistent-data-flow` 原语临时隐藏全部不可变源边及其路由所属的标签组。每条路由获得一个无 marker 的线性 draw 克隆，以及一个在到达时恢复原 marker 的落定克隆。其标签底板与文本只随该落定路由出现；标签几何从不移动。拓扑在第 36 帧完成。第 `36–114` 帧，每条落定路由获得一对相邻的、无 marker、无滤镜、保持源路径方向的克隆。`persistent-data-flow-stream` 主体使用 memory-cyan `#06b6d4`、圆角端点与连接、不透明度 `.90`、宽度 `min(4.0px, max(3.0px, source stroke × 1.60))`、虚线模式 `16 25`。Style 1 当前 2.4px 源路由因此精确解析为 3.84px。紧随其后的 `persistent-data-flow-head` 克隆停留在主体内部，颜色 `#e0f2fe`、宽 `2.20px`、不透明度 `.98`、圆角端点与连接、模式 `6 35`。两个模式周期均为 41 单位；head 的 dash offset 恒为 body offset 减 10 单位，把明亮的 6 单位段置于青色主体前导 6 单位之上。两个克隆都不携带 marker、滤镜、辉光或模糊。
 
-Both layers advance together by `-6.0` SVG user units per rendered frame toward
-the target: 6px/frame or 120px/s at 960px, and 3px/frame or 60px/s at 50% review
-scale. Their shared phase is `(motionStage × 7 + motionOrder × 3) mod 41`; the
-request/reason/extract/facts/resolved/write/relate/context phase order is
-`[7, 14, 21, 28, 31, 35, 1, 8]`. Period 41 and step 6 are coprime, so the 39
-stream samples do not repeat a phase. Frames 36, 37, and 38 use pair-layer factors
-`.30`, `.65`, and `1.00`; frames `38–109` hold full body/head opacities `.90`/`.98`.
-Frames `110–114` keep both layers advancing while multiplying settled topology,
-labels, body, and head opacity by `1.00`, `.7575`, `.515`, `.2725`, and `.03`.
-Sampling uses `time × fps − 0.5`, so frames `0–35` match the accepted raw Chromium
-baseline exactly.
-This keeps the reset in motion and leaves frame 74 distinct from the connector-free
-frame 0. Runtime geometry sentinels also fail closed unless `ingress` travels right,
-`resolve` travels left, and `memory-write` follows down → left → down while the
-dash offset remains negative; declaring source/target metadata alone is not enough.
+两层每渲染帧向目标共同推进 `-6.0` SVG 用户单位：960px 下 6px/帧即 120px/s，50% 审查比例下 3px/帧即 60px/s。共享相位为 `(motionStage × 7 + motionOrder × 3) mod 41`；request/reason/extract/facts/resolved/write/relate/context 的相位顺序为 `[7, 14, 21, 28, 31, 35, 1, 8]`。周期 41 与步长 6 互质，39 个流采样不会重复相位。第 36、37、38 帧使用成对层系数 `.30`、`.65`、`1.00`；第 `38–109` 帧保持 body/head 满不透明度 `.90`/`.98`。第 `110–114` 帧两层继续推进，同时把落定拓扑、标签、body、head 的不透明度依次乘以 `1.00`、`.7575`、`.515`、`.2725`、`.03`。采样使用 `time × fps − 0.5`，因此第 `0–35` 帧与已接受的原始 Chromium 基线完全一致。这使重置保持运动，并让第 74 帧区别于无连接线的第 0 帧。运行时几何哨兵同样 fail-closed：除非 `ingress` 向右行进、`resolve` 向左行进、`memory-write` 沿 down → left → down 行进且 dash offset 保持为负，否则失败；仅声明 source/target 元数据不够。
 
-### Style 2 — Dark Terminal evidence trace
+### Style 2 — Dark Terminal 证据追踪（evidence trace）
 
-Style 2 selects the `tool-grounding` scene by SVG style metadata. Its schedule is
-keyed by the exact `(data-motion-role, data-motion-order)` pair, so two grounding
-routes remain independently addressable and every expected key must appear exactly
-once. The source edge stage and route color are validated before rendering.
+Style 2 通过 SVG style 元数据选择 `tool-grounding` 场景。其调度以精确的 `(data-motion-role, data-motion-order)` 对为键，因此两条 grounding 路由保持独立可寻址，且每个期望键必须恰好出现一次。源边 stage 与路由颜色在渲染前校验。
 
-| Frames | Stage | Role / order | Evidence transition | Body color |
+| 帧 | Stage | Role / order | 证据转移 | 主体色 |
 |---:|---:|---|---|---|
-| `1–8` | `1` | `ingress / 0` | query enters the application | `#a855f7` |
-| `5–12` | `2` | `delegate / 0` | application delegates to the model | `#a855f7` |
-| `9–16` | `3` | `tool-call / 0` | model issues the terminal command | `#38bdf8` |
-| `13–20` | `4` | `inspect / 0` | terminal output is inspected | `#38bdf8` |
-| `17–24` | `5` | `index / 0` | inspected evidence enters the index | `#22c55e` |
-| `21–28` | `6` | `grounding / 0` | indexed evidence returns to grounding | `#fb7185` |
-| `25–32` | `6` | `grounding / 1` | grounding reaches the answer context | `#fb7185` |
-| `29–36` | `7` | `answer / 0` | grounded answer returns to the user | `#f97316` |
+| `1–8` | `1` | `ingress / 0` | 查询进入应用 | `#a855f7` |
+| `5–12` | `2` | `delegate / 0` | 应用委托给模型 | `#a855f7` |
+| `9–16` | `3` | `tool-call / 0` | 模型发出终端命令 | `#38bdf8` |
+| `13–20` | `4` | `inspect / 0` | 终端输出被检查 | `#38bdf8` |
+| `17–24` | `5` | `index / 0` | 被检查的证据进入索引 | `#22c55e` |
+| `21–28` | `6` | `grounding / 0` | 已索引证据返回 grounding | `#fb7185` |
+| `25–32` | `6` | `grounding / 1` | grounding 到达答案上下文 | `#fb7185` |
+| `29–36` | `7` | `answer / 0` | 有依据的答案返回用户 | `#f97316` |
 
-After each route settles, it receives one adjacent, marker-free, filter-free pair.
-The `terminal-evidence-stream` body inherits that source route's stroke, uses width
-`min(3.8px, max(3.0px, source stroke × 1.50))`, opacity `.94`, and dash pattern
-`15 26`. Style 2's 2.3px routes resolve to exactly 3.45px. The immediately following
-`terminal-command-head` is white `#f8fafc`, 2.0px wide, opacity `1.00`, and uses
-pattern `5 36`; its offset is the body offset minus 10 units. Both advance by
-`-6.0` SVG user units per rendered frame, equal to 6px/frame at 960px and 3px/frame
-at 50% review size. The phase formula is
-`(motionStage × 6 + motionOrder × 3) mod 41`, producing
-`[6, 12, 18, 24, 30, 36, 39, 1]` in schedule order. Period 41 and step 6 are
-coprime, so all 39 stream samples remain phase-unique.
+每条路由落定后，获得一对相邻的、无 marker、无滤镜的克隆。`terminal-evidence-stream` 主体继承该源路由的描边，宽度 `min(3.8px, max(3.0px, source stroke × 1.50))`、不透明度 `.94`、虚线模式 `15 26`。Style 2 的 2.3px 路由精确解析为 3.45px。紧随其后的 `terminal-command-head` 为白色 `#f8fafc`、宽 2.0px、不透明度 `1.00`、模式 `5 36`；其 offset 为 body offset 减 10 单位。两者每渲染帧推进 `-6.0` SVG 用户单位，960px 下 6px/帧，50% 审查尺寸下 3px/帧。相位公式为 `(motionStage × 6 + motionOrder × 3) mod 41`，按调度顺序产生 `[6, 12, 18, 24, 30, 36, 39, 1]`。周期 41 与步长 6 互质，全部 39 个流采样相位唯一。
 
-All eight directions are runtime sentinels: `ingress / 0` right;
-`delegate / 0` down → left → down; `tool-call / 0` right; `inspect / 0` down;
-`index / 0` right → up; `grounding / 0` up → left → up; `grounding / 1` right;
-and `answer / 0` right. The body/head pair fades in on frames `36–38`, holds full
-opacity on frames `38–109`, then keeps moving while sharing the five-frame reset.
+全部八个方向都是运行时哨兵：`ingress / 0` 向右；`delegate / 0` down → left → down；`tool-call / 0` 向右；`inspect / 0` 向下；`index / 0` right → up；`grounding / 0` up → left → up；`grounding / 1` 向右；`answer / 0` 向右。body/head 对在第 `36–38` 帧淡入，第 `38–109` 帧保持满不透明度，随后继续运动并共享五帧重置。
 
-One scene signature appears over the terminal prompt: `terminal-prompt-cursor`.
-The renderer requires exactly one `data-node-id="terminal"` node and exactly one
-unchanged `_` source text within it. A 2.2px-high `#a7f3d0` rectangle is derived
-from that underscore's runtime `getBBox()` and placed in a separate signature
-layer. It changes opacity only: from frames `16–69`, each 16-frame period has eight
-bright frames at `.95` followed by eight absent frames. Its cadence runs through
-`reset_start - 1`; frames `110–114` multiply a
-bright cursor by the shared reset opacity. The source underscore remains visible
-and unmutated. Terminal text typing, scan lines, glows, camera motion, and animated
-backgrounds are outside this scene contract.
+终端提示符上出现一个场景签名：`terminal-prompt-cursor`。渲染器要求恰好一个 `data-node-id="terminal"` 节点，且其中恰好一个未被修改的 `_` 源文本。一个 2.2px 高的 `#a7f3d0` 矩形由该下划线的运行时 `getBBox()` 导出，置于独立签名层。它只改变不透明度：第 `16–69` 帧内，每个 16 帧周期有八个 `.95` 亮帧，随后八个缺席帧。其节奏持续到 `reset_start - 1`；第 `110–114` 帧把亮光标乘以共享重置不透明度。源下划线保持可见且未被修改。终端文字打字机、扫描线、辉光、镜头运动、动画背景均在本场景契约之外。
 
-### Style 3 — Blueprint distribution wave
+### Style 3 — Blueprint 分发波（distribution wave）
 
-Style 3 selects the `service-blueprint` scene. SHA-256
-`b8f55d9ea0c6111176d8ff50d2e844b2001ee5087a3940621e635e1b875d470d`
-remains the reviewed reference source, not an exact-byte input lock. Its schedule
-is keyed by the exact `(data-motion-role, data-motion-order)` pair.
-Every key resolves to one immutable source edge, and every source stage and route
-color is validated before rendering.
+Style 3 选择 `service-blueprint` 场景。SHA-256 `b8f55d9ea0c6111176d8ff50d2e844b2001ee5087a3940621e635e1b875d470d` 仍是已评审的参考源，而非精确字节输入锁。其调度以精确的 `(data-motion-role, data-motion-order)` 对为键。每个键解析到一条不可变源边，且每个源 stage 与路由颜色在渲染前校验。
 
-| Frames | Stage | Role / order | Blueprint transition | Body color |
+| 帧 | Stage | Role / order | Blueprint 转移 | 主体色 |
 |---:|---:|---|---|---|
-| `1–6` | `1` | `ingress / 0` | client request enters the gateway | `#38bdf8` |
-| `4–9` | `2` | `policy / 0` | gateway checks identity and policy | `#67e8f9` |
-| `8–13` | `3` | `fanout / 0` | gateway opens the Order branch | `#38bdf8` |
-| `11–16` | `3` | `fanout / 1` | gateway opens the Catalog branch | `#38bdf8` |
-| `14–19` | `3` | `fanout / 2` | gateway opens the Billing branch | `#38bdf8` |
-| `18–23` | `4` | `data-write / 0` | Order writes Postgres | `#fde047` |
-| `21–26` | `4` | `data-write / 1` | Catalog writes Redis | `#fde047` |
-| `24–29` | `4` | `data-write / 2` | Billing writes Warehouse | `#fde047` |
-| `28–33` | `5` | `event / 0` | Billing publishes an event | `#fb7185` |
-| `31–36` | `6` | `telemetry / 0` | Event Router emits metrics | `#fb7185` |
+| `1–6` | `1` | `ingress / 0` | 客户端请求进入网关 | `#38bdf8` |
+| `4–9` | `2` | `policy / 0` | 网关校验身份与策略 | `#67e8f9` |
+| `8–13` | `3` | `fanout / 0` | 网关打开 Order 分支 | `#38bdf8` |
+| `11–16` | `3` | `fanout / 1` | 网关打开 Catalog 分支 | `#38bdf8` |
+| `14–19` | `3` | `fanout / 2` | 网关打开 Billing 分支 | `#38bdf8` |
+| `18–23` | `4` | `data-write / 0` | Order 写入 Postgres | `#fde047` |
+| `21–26` | `4` | `data-write / 1` | Catalog 写入 Redis | `#fde047` |
+| `24–29` | `4` | `data-write / 2` | Billing 写入 Warehouse | `#fde047` |
+| `28–33` | `5` | `event / 0` | Billing 发布事件 | `#fb7185` |
+| `31–36` | `6` | `telemetry / 0` | Event Router 发出指标 | `#fb7185` |
 
-From frame 36, each settled route receives one marker-free, filter-free
-`blueprint-distribution-wave` body. It inherits the source stroke, uses width
-`min(3.4px, max(2.8px, source stroke × 1.40))`, opacity `.92`, rounded caps and
-joins, and dash pattern `12 31`. The reviewed 2.1px routes resolve to exactly
-2.94px, or 1.47px at 50% review scale. Dash offset advances by `-6.0` SVG units
-per rendered frame.
+自第 36 帧起，每条落定路由获得一个无 marker、无滤镜的 `blueprint-distribution-wave` 主体。它继承源描边，宽度 `min(3.4px, max(2.8px, source stroke × 1.40))`、不透明度 `.92`、圆角端点与连接、虚线模式 `12 31`。已评审的 2.1px 路由精确解析为 2.94px，50% 审查比例下为 1.47px。dash offset 每渲染帧推进 `-6.0` SVG 单位。
 
-Each body is paired with one `blueprint-registration-bead`: a circle with radius
-3.0px, fill `#e0f2fe`, source-colored 1.2px stroke, and opacity `.98`. Its initial
-path distance is the route phase. Every rendered frame advances `cx` and `cy` by
-`+6.0` user units through `getPointAtLength`; the bead wraps from the target end
-to the source start and never reverses. Only `cx`, `cy`, and `opacity` change.
+每个主体配一个 `blueprint-registration-bead`：半径 3.0px 的圆，填充 `#e0f2fe`、源色 1.2px 描边、不透明度 `.98`。其初始路径距离为路由相位。每渲染帧通过 `getPointAtLength` 把 `cx`、`cy` 推进 `+6.0` 用户单位；bead 从目标端回绕到源起点，从不反向。只有 `cx`、`cy`、`opacity` 变化。
 
-The stage-only phase formula is
-`(motionStage × 7 + motionOrder × 0) mod 43`, producing
-`[7, 14, 21, 21, 21, 28, 28, 28, 35, 42]`. All three fan-out routes therefore
-share phase 21, and all three equal-length data-write routes share phase 28 and
-the same bead Y coordinate throughout the live interval. Period 43 and step 6
-are coprime, so the 39 live samples do not repeat a body phase.
+仅按 stage 的相位公式为 `(motionStage × 7 + motionOrder × 0) mod 43`，产生 `[7, 14, 21, 21, 21, 28, 28, 28, 35, 42]`。因此三条 fan-out 路由共享相位 21，三条等长 data-write 路由共享相位 28，并在整个活跃区间内保持相同的 bead Y 坐标。周期 43 与步长 6 互质，39 个活跃采样不会重复 body 相位。
 
-The ten runtime direction sentinels require: ingress right; policy right;
-fan-out/0 down → left → down; fan-out/1 down; fan-out/2 down → right → down;
-all three data writes down; event right; and telemetry down. Body dash offset
-must stay negative while bead travel stays positive. Bodies and beads are absent
-through frame 35, fade in with `.30`, `.65`, and `1.00` factors on frames
-`36–38`, hold full opacity on frames `38–109`, then keep advancing through the
-five-frame reset. Glow, blur, shadow, scan lines, node/text/camera/background
-motion, halo, ripple, and terminal cursors remain outside the Style 3 contract.
+十个运行时方向哨兵要求：ingress 向右；policy 向右；fan-out/0 down → left → down；fan-out/1 向下；fan-out/2 down → right → down；三条 data write 全部向下；event 向右；telemetry 向下。body dash offset 必须保持为负，bead 行进保持为正。body 与 bead 在第 35 帧前缺席，第 `36–38` 帧以 `.30`、`.65`、`1.00` 系数淡入，第 `38–109` 帧保持满不透明度，随后在五帧重置中继续推进。辉光、模糊、阴影、扫描线、节点/文本/镜头/背景运动、光晕、涟漪、终端光标均在 Style 3 契约之外。
 
-### Style 4 — Notion memory-card handoff
+### Style 4 — Notion 记忆卡片交接（memory-card handoff）
 
-Style 4 selects the `memory-lifecycle` scene. SHA-256
-`04cf833659e82c3e1743db4042cacf839a6d784a99c32d076e36fd4776e70c1b`
-remains the reviewed reference source, not an exact-byte input lock. Its exact
-`(data-motion-role, data-motion-order)` schedule allows only one active
-connector build:
+Style 4 选择 `memory-lifecycle` 场景。SHA-256 `04cf833659e82c3e1743db4042cacf839a6d784a99c32d076e36fd4776e70c1b` 仍是已评审的参考源，而非精确字节输入锁。其精确的 `(data-motion-role, data-motion-order)` 调度只允许一条活跃连接线构建：
 
-| Frames | Stage | Role / order | Memory transition | Rail/card color |
+| 帧 | Stage | Role / order | 记忆转移 | rail/卡片色 |
 |---:|---:|---|---|---|
-| `1–4` | `1` | `sample / 0` | sensory input enters working memory | `#3b82f6` |
-| `5–8` | `2` | `attend / 0` | active context reaches the agent | `#3b82f6` |
-| `9–12` | `3` | `invoke / 0` | the agent invokes procedural memory | `#7c3aed` |
-| `13–22` | `4` | `remember / 0` | working context enters episodic memory | `#059669` |
-| `23–26` | `5` | `consolidate / 0` | episodes become semantic knowledge | `#ea580c` |
-| `27–36` | `6` | `recall / 0` | semantic knowledge returns to the agent | `#ea580c` |
+| `1–4` | `1` | `sample / 0` | 感官输入进入工作记忆 | `#3b82f6` |
+| `5–8` | `2` | `attend / 0` | 活跃上下文到达 agent | `#3b82f6` |
+| `9–12` | `3` | `invoke / 0` | agent 调用程序性记忆 | `#7c3aed` |
+| `13–22` | `4` | `remember / 0` | 工作上下文进入情景记忆 | `#059669` |
+| `23–26` | `5` | `consolidate / 0` | 情景固化为语义知识 | `#ea580c` |
+| `27–36` | `6` | `recall / 0` | 语义知识返回 agent | `#ea580c` |
 
-From frame 36, all six settled paths receive a marker-free, filter-free
-`notion-memory-rail`. Each rail uses destination-memory color, width
-`min(3.0px, max(2.4px, source stroke × 1.50))`, opacity `.88`, round caps and
-joins, and dash pattern `12 35`. The reviewed 1.8px paths resolve to exactly
-2.70px, or 1.35px at 50% review size. The phase formula
-`(motionStage × 7 + motionOrder × 0) mod 47` produces
-`[7, 14, 21, 28, 35, 42]`; dash offset advances by `-6.0` user units per frame.
-Period 47 and step 6 are coprime, so none of the 39 live rail samples repeats.
+自第 36 帧起，全部六条落定路径获得无 marker、无滤镜的 `notion-memory-rail`。每条 rail 使用目标记忆色、宽度 `min(3.0px, max(2.4px, source stroke × 1.50))`、不透明度 `.88`、圆角端点与连接、虚线模式 `12 35`。已评审的 1.8px 路径精确解析为 2.70px，50% 审查尺寸下为 1.35px。相位公式 `(motionStage × 7 + motionOrder × 0) mod 47` 产生 `[7, 14, 21, 28, 35, 42]`；dash offset 每帧推进 `-6.0` 用户单位。周期 47 与步长 6 互质，39 个活跃 rail 采样无一重复。
 
-Each rail is paired with one `notion-memory-card` group. Its white outer rect is
-`x=-7`, `y=-5`, `14×10`, `rx=2`, with a 1.4px semantic-color stroke. Two 2px
-butt-cap ink lines use `shape-rendering="crispEdges"` and run from `(-4.5,-2)`
-to `(4,-2)` and from `(-4.5,2)` to `(0.5,2)`. The exact normalized starting-progress vector is
-`[0.08, 0.22, 0.36, 0.50, 0.64, 0.78]`; distance is
-`8 + progress × (pathLength − 16)`. Cards keep 8px clearance from both endpoints,
-advance `+6.0` path units per rendered frame, wrap from target clearance to
-source clearance, and animate only group `transform` and `opacity`.
+每条 rail 配一个 `notion-memory-card` 组。其白色外框矩形为 `x=-7`、`y=-5`、`14×10`、`rx=2`，带 1.4px 语义色描边。两条 2px 平头墨线使用 `shape-rendering="crispEdges"`，分别从 `(-4.5,-2)` 到 `(4,-2)`、从 `(-4.5,2)` 到 `(0.5,2)`。精确的归一化起始进度向量为 `[0.08, 0.22, 0.36, 0.50, 0.64, 0.78]`；距离为 `8 + progress × (pathLength − 16)`。卡片与两端点保持 8px 净空，每渲染帧推进 `+6.0` 路径单位，从目标端净空回绕到源端净空，且只动画组 `transform` 与 `opacity`。
 
-Direction sentinels require sample, attend, and invoke to point right at `0°`;
-remember to point down at `90°`; consolidate to point right at `0°`; and recall
-to point up at `-90°`. Rails and cards are absent through frame 35, fade in with
-`.30`, `.65`, and `1.00` factors on frames `36–38`, hold full opacity on frames
-`38–109`, and keep advancing during the shared five-frame reset. Cards and rails
-remain below route labels and nodes. Generic packet heads, circular beads,
-terminal cursors, glow, blur, shadow, scan lines, node/text/camera/background
-motion, halo, and ripple remain outside the Style 4 contract.
+方向哨兵要求 sample、attend、invoke 指向右（`0°`）；remember 指向下（`90°`）；consolidate 指向右（`0°`）；recall 指向上（`-90°`）。rail 与卡片在第 35 帧前缺席，第 `36–38` 帧以 `.30`、`.65`、`1.00` 系数淡入，第 `38–109` 帧保持满不透明度，并在共享五帧重置期间继续推进。卡片与 rail 保持在路由标签与节点之下。通用 packet head、圆形 bead、终端光标、辉光、模糊、阴影、扫描线、节点/文本/镜头/背景运动、光晕、涟漪均在 Style 4 契约之外。
 
-### Styles 5–12 — approved signatures and shared timing
+### Style 5–12 — 已批准签名与共享时序
 
-All eight approved style contracts preserve immutable source paths, labels, nodes, containers,
-text, and markers. They reuse the connector-free opening, exact semantic draw-on,
-frames `36–38` live fade, frames `38–109` operating hold, and moving `110–114`
-reset. Live rails never exceed their source stroke width or their scene ceiling.
+全部八个已批准风格契约保持不可变的源路径、标签、节点、容器、文本与 marker。它们复用无连接线开场、精确语义 draw-on、第 `36–38` 帧活跃淡入、第 `38–109` 帧工作状态停留、运动中的 `110–114` 帧重置。活跃 rail 从不超过其源描边宽度或场景上限。
 
-| Style | Preset | Rail | Signature / auxiliary | Travel | Style / timing status |
+| Style | Preset | Rail | 签名/辅助元素 | 行进速度 | 风格/时序状态 |
 |---:|---|---|---|---:|---|
-| 5 | `agent-orchestration` | `glass-handoff-rail` | 14×9 `glass-task-capsule`; coordinator halo | 6px/frame | approved / `+2s` approved |
-| 6 | `governed-runtime` | `governance-thread` | 12×12 `policy-seal` | 6px/frame | approved / `+2s` approved |
-| 7 | `token-stream` | `api-token-rail` | three-cell `token-train` | 6px/frame | approved / `+2s` approved |
-| 8 | `golden-circuit` | `luxury-circuit-rail` | `gem-tracer`; only its gem halo is filtered | 6px/frame | approved / `+2s` approved |
-| 9 | `review-trace` | `review-trace-rail` | `review-cursor` | 5px/frame | approved / `+2s` approved |
-| 10 | `cloud-flow` | `cloud-flow-rail` | region chevrons, replication capsule, availability pulses | 6px/frame | approved / `+2s` approved |
-| 11 | `event-transit` | `event-transit-rail` | event train, exception/projection cars, dwell rings | 5px/frame | approved / `+2s` approved |
-| 12 | `ops-pulse` | incident / telemetry rails | ECG/export heads, trace reveals, `waterfall-scanner` | 5px/frame | approved / `+2s` approved |
+| 5 | `agent-orchestration` | `glass-handoff-rail` | 14×9 `glass-task-capsule`；协调器光晕 | 6px/帧 | 已批准 / `+2s` 已批准 |
+| 6 | `governed-runtime` | `governance-thread` | 12×12 `policy-seal` | 6px/帧 | 已批准 / `+2s` 已批准 |
+| 7 | `token-stream` | `api-token-rail` | 三节 `token-train` | 6px/帧 | 已批准 / `+2s` 已批准 |
+| 8 | `golden-circuit` | `luxury-circuit-rail` | `gem-tracer`；仅其宝石光晕允许使用滤镜 | 6px/帧 | 已批准 / `+2s` 已批准 |
+| 9 | `review-trace` | `review-trace-rail` | `review-cursor` | 5px/帧 | 已批准 / `+2s` 已批准 |
+| 10 | `cloud-flow` | `cloud-flow-rail` | 区域 chevron、复制胶囊、可用性脉冲 | 6px/帧 | 已批准 / `+2s` 已批准 |
+| 11 | `event-transit` | `event-transit-rail` | 事件列车、异常/投影车厢、停留环 | 5px/帧 | 已批准 / `+2s` 已批准 |
+| 12 | `ops-pulse` | incident / telemetry rails | ECG/导出头、trace 揭示、`waterfall-scanner` | 5px/帧 | 已批准 / `+2s` 已批准 |
 
-Styles 8, 11, and 12 use `(data-motion-role, data-motion-stage,
-data-motion-order)` because repeated roles must stay independently addressable.
-Styles 10–12 add only explicit motion metadata to their static source diagrams; stripping
-`data-motion-role`, `data-motion-stage`, and `data-motion-order` reproduces the
-pre-animation static SVG geometry exactly.
+Style 8、11、12 使用 `(data-motion-role, data-motion-stage, data-motion-order)`，因为重复角色必须保持独立可寻址。Style 10–12 只向静态源图添加显式 motion 元数据；剥离 `data-motion-role`、`data-motion-stage`、`data-motion-order` 后精确还原动画前的静态 SVG 几何。
 
 ## CLI
 
 ```bash
-SKILL_ROOT="${CLAUDE_SKILL_DIR:-/absolute/path/from-codex-skill-metadata}"
+SKILL_ROOT="$HOME/.agents/skills/robot-aiot-arch-diagram"  # 本 skill 安装目录（SKILL.md 所在处），按实际安装路径调整
 python3 "$SKILL_ROOT/scripts/fireworks.py" animate diagram.svg diagram.gif
 ```
 
-Optional controls remain deliberately small:
+可选控制项刻意保持精简：
 
 ```bash
 python3 "$SKILL_ROOT/scripts/fireworks.py" animate diagram.svg diagram.gif \
@@ -287,15 +156,11 @@ python3 "$SKILL_ROOT/scripts/fireworks.py" animate diagram.svg diagram.gif \
   --report diagram.motion.json
 ```
 
-Use `--dry-run` to validate identity, semantics, geometry, timeline, output path,
-and render budget without launching Chrome or writing artifacts. `duration × fps`
-must be a whole number of at least 55 frames. Width × height × frame count may
-not exceed 600 million rendered pixels.
+`--dry-run` 用于在不启动 Chrome、不写产物的情况下校验身份、语义、几何、时间线、输出路径与渲染预算。`duration × fps` 必须是至少 55 帧的整数。宽 × 高 × 帧数不得超过 6 亿渲染像素。
 
-## Runtime
+## 运行时
 
-SVG-to-GIF export needs Node.js 18+, FFmpeg/FFprobe, Chrome/Chromium, and either
-`puppeteer` or `puppeteer-core`:
+SVG→GIF 导出需要 Node.js 18+、FFmpeg/FFprobe、Chrome/Chromium，以及 `puppeteer` 或 `puppeteer-core` 之一：
 
 ```bash
 brew install ffmpeg
@@ -304,64 +169,26 @@ npm install --prefix "$SKILL_ROOT" --ignore-scripts --no-save --package-lock=fal
 python3 "$SKILL_ROOT/scripts/fireworks.py" doctor
 ```
 
-Set `FIREWORKS_CHROME_PATH` for a nonstandard Chrome install. Set
-`FIREWORKS_PUPPETEER_PATH` to an explicit trusted module directory when keeping
-the Node runtime elsewhere. Renderer resolution never searches the caller's
-working directory, so installing `puppeteer-core` in the diagram project does
-not make it available to a copied Skill. A `skills --copy` install creates two
-independent roots, so each existing root needs its own runtime installation.
-Chrome sandboxing is enabled by default; the no-sandbox override is reserved for
-isolated CI runners.
+Chrome 安装在非标准位置时设置 `CHROME_PATH`（兼容旧变量 `FIREWORKS_CHROME_PATH`，仅在 `CHROME_PATH` 未设置时生效）。Node 运行时放在别处时，用 `FIREWORKS_PUPPETEER_PATH` 指定显式的可信模块目录。渲染器解析从不搜索调用方工作目录，因此在图表项目里安装 `puppeteer-core` 不会让复制安装的 Skill 可用。`skills --copy` 安装会产生两个独立根目录，每个既有根都需要各自的运行时安装。Chrome 沙箱默认启用；no-sandbox 覆盖仅保留给隔离的 CI runner。
 
-## Quality contract
+## 质量契约
 
-- Require a source SVG with `viewBox`, valid semantic metadata, and
-  explicit motion role, stage, and order on every reviewed edge.
-- Sanitize SVG and block scripts, event handlers, external references, active CSS,
-  and browser network requests.
-- Pass XML, marker, geometry, and composition checks before rendering.
-- Preserve the source SHA-256 and assert the static DOM before every frame capture.
-- Hide source edges and route labels with a transient stylesheet; insert draw,
-  settled-marker, per-style stream-body, packet-head, registration-bead, or
-  memory-card decorations below nodes. Keep each Style 1/2 head immediately
-  after its body, keep Style 3 beads and Style 4 cards below route labels and
-  nodes, and keep the arrival-label layer above every motion path. Keep Style 2's
-  opacity-only cursor above the terminal node without mutating its source underscore.
-- Render uniform frame-center samples on a manual timeline.
-- Compare Style 1 raw Chromium frames `0–35` from 55-frame and 75-frame timelines;
-  their hashes must match before GIF palette quantization. Keep a separate 75-frame
-  raw baseline for the approved Style 1 worker and require every post-change frame
-  to remain byte-identical.
-- Raster-test Style 2's body/head layering, 6px/frame full-scale travel,
-  3px/frame half-scale travel, semantic route colors, all eight direction
-  sentinels, cursor cadence, and five-frame reset before GIF encoding.
-- Raster-test Style 3's connector-free opening, ten bodies and ten registration
-  beads, 6px/frame full-scale and 3px/frame half-scale bead travel, stage-locked
-  fan-out/data-write synchrony, all ten directions, and source-DOM integrity.
-- Preserve separate 75-frame raw Chromium baselines for approved Styles 1–3 and
-  require every post-change frame to remain byte-identical.
-- Render every style at 75 and 115 frames and accept all 852 raw comparisons for
-  frames `0–70` through a three-tier compatibility gate: binary SHA-256 exact,
-  decoded RGBA exact, then guarded compositor-antialias equivalence. The guarded
-  tier requires AE ≤ 128, normalized RMSE ≤ 0.001, every connected difference
-  component to be at most 2px wide or high, and every component to remain on an
-  edge or node border. Report each tier separately. DOM and per-style signature
-  geometry remain strict-exact before GIF palette quantization.
-- Raster-test Style 4's connector-free opening, sequential six-route arrivals,
-  six semantic rails and six outlined cards, 8px endpoint clearance, 6px/frame
-  full-scale and 3px/frame half-scale travel, exact progress/phase/rotation
-  vectors, all six directions, and source-DOM integrity. After real Chromium
-  capture and 50% point downsampling, horizontal, downward, and upward cards
-  must each retain two non-touching unequal-length ink strokes with a complete
-  background row or column between them.
-- Require exact codec, dimensions, duration, and frame count from FFprobe.
-- Require exact raw and encoded frame counts and zero adjacent duplicates. Keep
-  every frame unique through 75 frames. For longer timelines, require at least 75
-  unique rasters and allow repeated hashes inside full-opacity frames `38–109`.
-  Frame `110` is the sole permitted boundary repeat because its unchanged reset
-  opacity is exactly `1.00`; classify it as `intentional_reset_boundary_repeat`.
-  Frames `111–114` remain globally distinct. Record all repeated frame indices
-  and embed infinite GIF looping.
-- Install the GIF and optional JSON report atomically.
-- Treat 500KB as the focused artifact target and report deterministic size advice.
-- Deliver one live GIF plus a phase contact sheet for each style review.
+- 要求源 SVG 带 `viewBox`、有效语义元数据，且每条被评审的边带显式 motion role、stage、order。
+- 消毒 SVG，阻断脚本、事件处理器、外部引用、活动 CSS 与浏览器网络请求。
+- 渲染前通过 XML、marker、几何与构图检查。
+- 保留源 SHA-256，并在每次帧捕获前断言静态 DOM。
+- 用临时样式表隐藏源边与路由标签；在节点之下插入 draw、settled-marker、按风格的 stream-body、packet-head、registration-bead 或 memory-card 装饰。Style 1/2 的 head 保持紧随其 body，Style 3 的 bead 与 Style 4 的卡片保持在路由标签与节点之下，到达标签层保持在所有运动路径之上。Style 2 的仅不透明度光标保持在终端节点之上，且不修改其源下划线。
+- 在手动时间线上渲染统一的帧中心采样。
+- 对比 Style 1 在 55 帧与 75 帧时间线上的原始 Chromium 帧 `0–35`；GIF 调色板量化前其哈希必须一致。为已批准的 Style 1 worker 保留独立的 75 帧原始基线，并要求改动后的每一帧保持字节一致。
+- GIF 编码前对 Style 2 做光栅测试：body/head 分层、6px/帧全尺寸行进、3px/帧半尺寸行进、语义路由色、全部八个方向哨兵、光标节奏、五帧重置。
+- 对 Style 3 做光栅测试：无连接线开场、十个 body 与十个 registration bead、6px/帧全尺寸与 3px/帧半尺寸 bead 行进、stage 锁定的 fan-out/data-write 同步、全部十个方向、源 DOM 完整性。
+- 为已批准的 Style 1–3 保留各自独立的 75 帧原始 Chromium 基线，并要求改动后的每一帧保持字节一致。
+- 每个风格分别以 75 与 115 帧渲染，帧 `0–70` 的全部 852 组原始对比通过三级兼容门接受：二进制 SHA-256 精确、解码 RGBA 精确、再是受保护的合成器抗锯齿等价。受保护级要求 AE ≤ 128、归一化 RMSE ≤ 0.001、每个连通差异分量至多 2px 宽或高、且每个分量保持在边或节点边框上。分级分别报告。DOM 与按风格签名几何在 GIF 调色板量化前保持严格精确。
+- 对 Style 4 做光栅测试：无连接线开场、六路由顺序到达、六条语义 rail 与六张描边卡片、8px 端点净空、6px/帧全尺寸与 3px/帧半尺寸行进、精确 progress/phase/rotation 向量、全部六个方向、源 DOM 完整性。真实 Chromium 捕获并 50% 点采样降采样后，横向、向下、向上的卡片必须各自保留两条不接触、不等长的墨线，且其间有完整的背景行或列。
+- 要求 FFprobe 给出精确的编解码器、尺寸、时长与帧数。
+- 要求精确的原始与编码帧数，且相邻帧零重复。75 帧内每帧唯一。更长时间线要求至少 75 个唯一光栅，并允许满不透明度帧 `38–109` 内部出现重复哈希。第 `110` 帧是唯一允许的边界重复，因其未变化的重置不透明度恰为 `1.00`；归类为 `intentional_reset_boundary_repeat`。第 `111–114` 帧保持全局唯一。记录全部重复帧索引，并内嵌 GIF 无限循环。
+- GIF 与可选 JSON 报告原子化安装。
+- 以 500KB 为聚焦产物目标，并报告确定性的体积建议。
+- 每个风格评审交付一个实时 GIF 加一张相位缩略图联排（contact sheet）。
+
+**验证脚本：** `python3 "$SKILL_ROOT/scripts/test-verify-motion.py"` — 对 verify-motion.py 的对抗测试（正极：`assets/template-motion.html` 必须零 finding 通过；负极：每个变异必须产生含预期子串的 finding），仅用 Python 标准库；退出码 0=全部通过，1=任一失败。

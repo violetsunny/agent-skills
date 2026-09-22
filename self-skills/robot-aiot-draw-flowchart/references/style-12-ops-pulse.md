@@ -72,5 +72,6 @@ status, time window, and trace evidence, use a generic architecture style.
 
 ## Fixture
 
-`fixtures/ops-pulse-style12.json` demonstrates a degraded checkout path with
-four service cards, an OTel collector, and a correlated four-span trace.
+`fixtures/ops-pulse-style12.json`（内部测试集，不随 skill 分发）demonstrates a
+degraded checkout path with four service cards, an OTel collector, and a
+correlated four-span trace.

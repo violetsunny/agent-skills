@@ -4,7 +4,7 @@
 用法:
   python3 lint_pages_html.py [--flow] <文件或目录>...
 
-  --flow: 桥接产物模式（robot-aiot-xml-html-bridge 生成的 flow/*.html）。
+  --flow: 桥接产物模式（robot-aiot-draw-flowchart 的 XML→HTML 桥接能力生成的 flow/*.html）。
         约束2（文字必须原生文本框）降为 WARN——桥接 HTML 是屏幕展示中间产物，
         最终经 draw-flowchart 管线转 SVG/PPTX，不直接进 PPT，div 结构可接受。
         约束1/3/4 照常。

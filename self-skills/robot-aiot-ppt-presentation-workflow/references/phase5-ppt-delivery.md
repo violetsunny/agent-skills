@@ -65,6 +65,17 @@ Phase 5 负责将母稿、图表 XML/HTML、逐页 HTML 一并移交给 `ppt-mas
 5. 不要把 HTML 画布尺寸当分辨率：PPTX 是矢量文档，画布决定物理尺寸而非清晰度；超大画布不会让文字更清晰，只会让字号相对画布变小，投影反而更差。
 6. 继承甲方模板时本节换算不适用，缩放比 = 模板幻灯片宽 pt ÷ HTML 画布宽 px（见「甲方模板继承」）。
 
+上述换算用自带脚本 `scripts/px2pt.py` 确定性执行（长度 px÷2、字号 0.5pt 取整、行距倍数化、圆角 adj 公式、画布 EMU 常量，支持 `--json` 批量），不手工心算：
+
+```bash
+SKILL=<本skill根目录>/scripts
+python3 "$SKILL/px2pt.py" 48 28 16            # 长度: pt = px/2, EMU = pt*12700
+python3 "$SKILL/px2pt.py" --font 48 28        # 字号: 结果按 0.5pt 取整
+python3 "$SKILL/px2pt.py" --line-height 1.5   # 行距: CSS line-height → PPTX 百分比倍数
+python3 "$SKILL/px2pt.py" --adj 16 400 200    # 圆角: adj = radius_pt / (min(w_pt,h_pt)/2)
+python3 "$SKILL/px2pt.py" --canvas            # 打印画布 EMU 常量
+```
+
 python-pptx 重建路线新建画布时按如下设定：
 
 ```python
@@ -264,7 +275,7 @@ python3 "$SKILL/compare_text.py" doc-ppt/项目.pptx projects/<任务名>/expect
 
 ```bash
 python3 "$SKILL/verify_pptx_shapes.py" doc-ppt/项目.pptx        # 递归展开GROUP，TEXT_BOX>=8，无超尺寸PICTURE
-python3 "$SKILL/lint_pages_html.py" doc-ppt/pages/              # 书写侧4硬约束静态检查
+python3 "$SKILL/lint_pages_html.py" doc-ppt/pages/              # 书写侧约束静态检查（约束1/4 为 WARN 级启发式，硬兜底由 verify_pptx_shapes.py FAIL 承担）
 python3 "$SKILL/lint_pages_html.py" --flow doc-ppt/flow/        # 桥接产物：约束2降WARN（flow HTML 经 SVG 管线转译，不直接进 PPT）
 ```
 
@@ -275,5 +286,5 @@ python3 "$SKILL/lint_pages_html.py" --flow doc-ppt/flow/        # 桥接产物�
 渲染目检依赖 LibreOffice 不可用时，按以下替代方案验证，不得直接跳过验证：
 
 1. macOS QuickLook：`qlmanage -t -s 1200 -o <输出目录> <文件.pptx>` 生成缩略图目检封面与版式；qlmanage 只渲染封面且走简化渲染路径，不得作为内页与可编辑性的验收依据，边界见「验证工具可信度」节 qlmanage 局限注记
-2. 字节级验证：解压 pptx（`unzip <文件.pptx> -d <目录>`），比对 `ppt/media/` 内嵌媒体的 md5 与源截图/图表 PNG 的 md5（`md5 -q`），确认图片未丢失、未被替换降质
+2. 字节级验证：首选自带脚本 `python3 <本skill根目录>/scripts/verify_media_md5.py <文件.pptx> <源图目录>`——双向比对 `ppt/media/` 内嵌媒体与源图目录的 md5（内嵌媒体未替换降质 + 源图未丢失；源目录含非交付图时加 `--media-only` 跳过第二方向）。无脚本环境退回手工法：解压 pptx（`unzip <文件.pptx> -d <目录>`）后逐一 `md5 -q` 比对
 3. 替代目检通过后仍须在交付说明中注明"未经渲染目检，采用替代验证"

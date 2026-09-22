@@ -1,10 +1,10 @@
-# Terminal Window (CLI-chrome variant)
+# Terminal Window（CLI 外壳变体）
 
-Optional full-page skin that wraps any diagram in a fake terminal window — titlebar with three dots, a `$` prompt line, monospace type throughout. Use for dev-tool announcements, CLI-product posts, and technical social cards where a screenshot needs to read as "terminal," not "editorial doc."
+可选的整页皮肤，把任意图表包进一个仿终端窗口——带三个圆点的标题栏、一行 `$` 提示符、全篇等宽字体。用于开发工具发布、CLI 产品帖子，以及截图需要读起来像"终端"而不是"编辑级文档"的技术社交卡片。
 
-This is a **second, fixed skin** — see [style-guide.md § Terminal skin](style-guide.md#terminal-skin-opt-in-alternate) for the token table. It does not inherit from `onboarding.md` brand tokens and isn't part of the light/dark inversion rule; every terminal example uses the same nine tokens regardless of the host site's brand.
+这是**第二套固定皮肤**——token 表见 [style-guide.md § Terminal skin](style-guide.md#terminal-skin-opt-in-alternate)。它不继承 `onboarding.md` 的品牌 token，也不参与 light/dark 反转规则；无论宿主站点品牌如何，所有 terminal 示例都用同样的九个 token。
 
-## Grammar
+## 语法
 
 ```html
 <div class="terminal">
@@ -45,32 +45,32 @@ body {
 }
 ```
 
-Inside the SVG, swap the default light/dark tokens 1:1 for their `terminal-*` equivalents: `paper` → `terminal-paper`, `ink` → `terminal-ink`, `muted`/`soft` → `terminal-muted`/`terminal-soft`, `accent`/`accent-tint` → `terminal-accent`/`terminal-accent-tint`. The hub/focal-node pattern (inverted fill for the one highlighted element) still applies.
+SVG 内部把默认 light/dark token 按 1:1 换成对应的 `terminal-*`：`paper` → `terminal-paper`、`ink` → `terminal-ink`、`muted`/`soft` → `terminal-muted`/`terminal-soft`、`accent`/`accent-tint` → `terminal-accent`/`terminal-accent-tint`。枢纽/焦点节点模式（唯一高亮元素用反色填充）依然适用。
 
-## Typography
+## 字体排印
 
-**Everything is monospace** — this is the one variant where that's correct. Drop Instrument Serif and Geist sans entirely; set the page title in mono, bold, prefixed with `# ` (reads as a comment line). The eyebrow becomes a shell prompt: `$ ` in `terminal-accent`, the command in `terminal-muted`.
+**全部等宽**——这是唯一这样做才正确的变体。完全弃用 Instrument Serif 与 Geist sans；页面标题用 mono 粗体，前缀 `# `（读作注释行）。眉标变为 shell 提示符：`$ ` 用 `terminal-accent`，命令用 `terminal-muted`。
 
-Run every text role about **1–2px above** the default type scale in `style-guide.md` (e.g. `node-name` 12px → 14px, `sublabel`/`arrow-label` 8–9px → 9–10px, hub label 16px → 18px). Monospace at the default sizes reads small next to the sans/serif mix it's replacing, and these cards are usually viewed at social-feed scale, not full-bleed.
+每个文本角色比 `style-guide.md` 默认字号梯度**大 1–2px**（如 `node-name` 12px → 14px、`sublabel`/`arrow-label` 8–9px → 9–10px、枢纽标签 16px → 18px）。默认字号的等宽字体与被替换的 sans/serif 混排相比显得小，且这类卡片通常以社交信息流尺寸观看，不是全幅展示。
 
-## Titlebar dots
+## 标题栏圆点
 
-Three 10px circles, macOS-style. The **1-accent rule caps the color use here too**: one dot is `terminal-accent`, the other two are `terminal-soft`. Do not use a red/yellow/green traffic-light triad — that's a second and third hue, which the palette forbids.
+三个 10px 圆，macOS 风格。**1 强调色规则在这里同样限制用色**：一个圆点用 `terminal-accent`，另外两个用 `terminal-soft`。不要用红/黄/绿交通灯三色——那是第二、第三种色相，调色板禁止。
 
-## Critical rules
+## 关键规则
 
-- No pure black (`#000000`) — use `terminal-page` (`#0a0a0a`) / `terminal-paper` (`#141414`). Same rule as the default skin, same reason: true black clips on OLED and in print.
-- One accent only. If a diagram needs a second focal element, use `terminal-ink` (white) for emphasis via weight/size, not a second color.
-- Background dot-grid pattern (if used) stays `rgba(255,255,255,0.06–0.08)` — barely visible texture, not a visual competitor to the titlebar chrome.
+- 不用纯黑（`#000000`）——用 `terminal-page`（`#0a0a0a`）/ `terminal-paper`（`#141414`）。与默认皮肤同一规则、同一理由：真黑在 OLED 与打印中会死黑成块。
+- 只有一个强调色。图表需要第二个焦点元素时，用 `terminal-ink`（白）通过字重/字号强调，不用第二种颜色。
+- 背景点阵纹理（如使用）保持 `rgba(255,255,255,0.06–0.08)`——若有似无的质感，不与标题栏外壳抢视觉。
 
-## When to use
+## 何时使用
 
-- Dev-tool / CLI-product launch posts (npm package, CLI flag, terminal-based workflow).
-- Technical social cards where "this is a tool for engineers" is part of the message.
-- Screenshots meant to pop in a dark-mode-heavy feed (X, Discord, dev blogs).
+- 开发工具 / CLI 产品发布帖（npm 包、CLI flag、基于终端的工作流）。
+- "这是给工程师的工具"本身就是信息一部分的技术社交卡片。
+- 需要在深色模式为主的信息流（X、Discord、开发博客）中跳出来的截图。
 
-## When not to use
+## 何时不用
 
-- Editorial / long-form posts — pair with the default light or full-editorial variant instead.
-- Brand-matched output from `onboarding.md` — terminal is a fixed skin, not brand-tokenized. Don't try to reconcile the two.
-- Any diagram where the audience isn't developer-coded to read `$`/`#`/titlebar-dots as chrome rather than content.
+- 编辑级 / 长文帖子——改用默认 light 或 full-editorial 变体。
+- `onboarding.md` 的品牌匹配输出——terminal 是固定皮肤，不做品牌 token 化。不要试图调和两者。
+- 受众不是开发者、无法把 `$`/`#`/标题栏圆点读作外壳而非内容的任何图表。

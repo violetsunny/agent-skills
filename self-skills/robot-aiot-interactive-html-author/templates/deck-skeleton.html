@@ -13,7 +13,7 @@
   用途：新 deck 的起点底盘——fit-viewport 缩放壳、翻页/键盘/点击热区、入场
         编排、noscript 顺序流降级、reduced-motion 降级、打印一页一张。
         双击即可在浏览器打开（含 2 页示例，替换为真实内容）。
-  接线：token 值按 Phase 3 派生结果替换（当前为中性默认值）；标题占位字体栈
+  接线：token 值按调用方母稿派生结果替换（当前为中性默认值）；标题占位字体栈
         按 typography.md 选型替换。扩展模板在本底盘之上叠加：
         - templates/deck-nav.js      → fragment/分支/导航栈/#/N/M 深链（接管翻页）
         - templates/presenter-window.js → S 演讲者窗口/N 抽屉/O 总览/T 主题/预览模式
@@ -34,7 +34,7 @@
   <script>document.documentElement.classList.add('js');</script>
   <style>/* 全局样式 + token */
 
-/* ===== Token 体系（interactive-html-authoring.md「Token 体系」；值按 Phase 3 派生替换） ===== */
+/* ===== Token 体系（interactive-html-authoring.md「Token 体系」；值按调用方母稿派生替换） ===== */
 :root {
   --primary-color: #2563eb;
   --secondary-color: #0f766e;

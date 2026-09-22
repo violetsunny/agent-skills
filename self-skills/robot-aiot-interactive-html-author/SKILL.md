@@ -116,6 +116,6 @@ bash "$HOME/.agents/skills/robot-aiot-interactive-html-author/scripts/precheck_d
 15. 视觉风格预设（41 套设计系统预设、mood 路由表、先预览再定稿选型流程、五维旋钮、72 组配色库、预设标注四字段、单一主色推导三步法）：`references/visual-style-presets.md`
 16. 登记版式系统（瑞士风 S01-S25 × 杂志风 M01-M10 版式锁定、结构骨架 px 锚定、选择索引、内容-数据类型匹配、禁止清单）：`references/swiss-layout-system.md`
 17. 演示 deck 排版阶梯（字号双约束与画布推荐值、字重阶梯、中文大标题分档、最小字号三层下限、中文排印细则与字体配对）：`references/typography.md`
-18. 多版本并行设计与选优（三方向硬门、7 Phase 工作流、6 视角 5 维评审、选择无效铁律、4 Pass 收敛、调参面板）：`references/multi-version-selection.md`
+18. 多版本并行设计与选优（三方向硬门、7 阶段工作流、6 视角 5 维评审、选择无效铁律、4 Pass 收敛、调参面板）：`references/multi-version-selection.md`
 19. 页面级运镜与分镜规划（运镜预算制、动机表、对数时长公式、相机层结构、镜间三分律、能量骨架、分镜卡、thumbnail pass）：`references/camera-storyboard.md`
 20. UI 演示与画廊展示编排（演示即叙事公理、八式帧级参数、画廊墙 render(t)、Gallery Ripple、Dashboard Overlay、?seek/?autoplay/?speed、iframe 三坑）：`references/ui-demo-choreography.md`

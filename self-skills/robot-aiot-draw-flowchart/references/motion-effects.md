@@ -275,7 +275,7 @@ pre-animation static SVG geometry exactly.
 ## CLI
 
 ```bash
-SKILL_ROOT="${CLAUDE_SKILL_DIR:-/absolute/path/from-codex-skill-metadata}"
+SKILL_ROOT="$HOME/.agents/skills/robot-aiot-draw-flowchart"  # 本 skill 安装根目录
 python3 "$SKILL_ROOT/scripts/fireworks.py" animate diagram.svg diagram.gif
 ```
 
@@ -304,7 +304,7 @@ npm install --prefix "$SKILL_ROOT" --ignore-scripts --no-save --package-lock=fal
 python3 "$SKILL_ROOT/scripts/fireworks.py" doctor
 ```
 
-Set `FIREWORKS_CHROME_PATH` for a nonstandard Chrome install. Set
+非标准 Chrome 安装位置用 `CHROME_PATH` 指定（兼容旧名 `FIREWORKS_CHROME_PATH`，仅作 fallback）。Set
 `FIREWORKS_PUPPETEER_PATH` to an explicit trusted module directory when keeping
 the Node runtime elsewhere. Renderer resolution never searches the caller's
 working directory, so installing `puppeteer-core` in the diagram project does

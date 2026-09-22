@@ -1,6 +1,6 @@
 ---
 name: robot-aiot-arch-diagram
-description: 架构图/技术可视化绘制能力。两条输出路径：直绘 SVG/HTML（主路径，编辑级设计系统 + 工程制图管线，几何校验+构图契约，汇报级展示）、archify 运行时渲染（主题切换+导出）。覆盖流程图、分层架构、时序、状态机、ER、UML 类/用例、网络拓扑、时间线、Agent/记忆架构等 40+ 图表类型；内置 12 套 SVG 风格皮肤与品牌 token 定制、PNG/GIF 导出与 drawio/Mermaid/Excalidraw 导入重绘；支持 Mermaid 源码写作（23 类图表语法）与 .excalidraw/SVG/PNG 三件套离线导出、数据统计图表（饼图/箱线图/热力图/网络拓扑等）绘制规则、深色主题直绘技法与出版级示意图迭代流程。非 PPT 场景专用。
+description: 架构图/技术可视化绘制能力。两条输出路径：直绘 SVG/HTML（主路径，编辑级设计系统 + 工程制图管线，几何校验+构图契约，汇报级展示）、archify 运行时渲染（主题切换+导出）。覆盖流程图、分层架构、时序、状态机、ER、UML 类/用例、网络拓扑、时间线、Agent/记忆架构等 40+ 图表类型；内置 12 套 SVG 风格皮肤与品牌 token 定制、PNG/GIF 导出与 drawio/Mermaid/Excalidraw 导入重绘；支持 Mermaid 源码写作（23 类图表语法）与 .excalidraw/SVG/PNG 三件套离线导出、数据统计图表（饼图/箱线图/热力图/网络拓扑等）绘制规则、深色主题直绘技法与出版级示意图迭代流程。专注技术图表绘制。
 version: 2.4.0
 author: kangll13
 license: MIT

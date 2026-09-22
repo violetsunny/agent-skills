@@ -38,9 +38,22 @@
 | `__mermaidToExcalidraw` | `(mermaidSrc) → Promise<sceneJson>` | Mermaid 源码 → .excalidraw 场景 JSON |
 | `__excalidrawToSvg` | `(sceneJson) → Promise<svgString>` | 编辑后的场景 → SVG（往返导出用） |
 
+渲染页 bundle **不随本 skill 分发**，由调用方环境提供。按以下固定候选路径依次探测（`$SKILL_ROOT` 为本 skill 自身目录，见 `SKILL.md` 路径约定）：
+
+1. `$SKILL_ROOT/assets/diagram-render.html`
+2. `$HOME/.agents/skills/robot-aiot-arch-diagram/assets/diagram-render.html`
+3. 当前工作目录下的 `./diagram-render.html`
+
+全部未命中即输出 `BUNDLE_MISSING`，附构建命令后停止（见硬约束 1）：
+
+```bash
+npm install mermaid @excalidraw/mermaid-to-excalidraw
+# 再按上表四个入口函数的签名将依赖打包为单文件渲染页 diagram-render.html
+```
+
 准备规则：
 
-1. 按固定候选路径探测渲染页文件；找不到即输出 `BUNDLE_MISSING` 与构建命令，停止（见硬约束 1）。
+1. 按上述候选路径探测渲染页文件；找不到即输出 `BUNDLE_MISSING` 与构建命令，停止（见硬约束 1）。
 2. 将渲染页复制为**内容寻址**的暂存副本（如 `/tmp/diagram-render-<sha256前16位>.html`）：哈希一致直接复用，不一致先写临时文件再原子 `mv`。并发会话与不同版本互不覆盖。
 3. 用无头浏览器（或等价的本地浏览器自动化）打开暂存副本，等待页面就绪标记（如 `#done` 元素）后记录 tab 句柄。
 4. 后续所有页面内 JS 调用、等待、关闭操作都必须显式带上该 tab 句柄，避免误中共享浏览器实例里的其他标签页。

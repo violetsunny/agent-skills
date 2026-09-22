@@ -76,6 +76,7 @@ done
 doc-ppt/
 ├── assets/                     — 品牌静态资源（Logo、素材图压缩副本等）
 │   └── midea-logo.png          — 美的品牌 Logo（从 skill assets/ 复制）
+├── brand-spec.md               — 品牌资产唯一真源（规则见 references/brand-assets.md）
 ├── <project>_数据池.md          — 数据池（Phase 1）
 ├── <project>_PPT母稿.md        — PPT 演示母稿（Phase 2，G1 确认对象；Phase 4 回写图表）
 ├── flow/                       — 图表类产物统一目录
@@ -85,6 +86,9 @@ doc-ppt/
 │   ├── 01-cover.html
 │   ├── 02-overview.html
 │   └── ...
+├── projects/                   — 任务工程目录（Phase 5 过程产物：工作区/脚本/中间渲染图/验证报告）
+│   └── <任务名>/
+│       └── notes/              — 话术 notes/*.md（check_notes.py --sync 与 pages/*.html .notes 双源比对）
 └── <project>.pptx              — 最终 PPTX（Phase 5，ppt-master 产出）
 ```
 
@@ -201,7 +205,7 @@ Phase 5: PPT生成      → 调用 ppt-master，读取逐页 HTML/MD 生成最�
 ### 阻塞性要求
 
 1. 逐页 HTML 生成必须调用 `robot-aiot-draw-flowchart` 的静态页面 HTML 能力
-2. **仅使用静态版**：禁止生成交互版（翻页/动画/特效），ppt-master 只消费静态 HTML；scale-to-fit 视口自适应壳不属于交互版特性，必须保留（1920x1080 视口下 scale=1，不影响 ppt-master 消费）
+2. **仅使用静态版**：禁止动画与交互（翻页/动画/特效），ppt-master 只消费静态 HTML；scale-to-fit 视口自适应壳不属于交互动效，必须保留（1920x1080 视口下 scale=1，不影响 ppt-master 消费）
 3. 每页必须满足"标题 / 结论 / 上屏内容 / 话术"四要素；话术写入页面 `display:none` 的 `.notes` 容器，出现在可见区域按阻塞项处理
 4. 每页对应一个独立 HTML 文件，且图表只引用已回写母稿的图表 HTML（`flow/` 目录，相对路径 `../flow/<图表名>.html`）
 5. 母稿含素材图映射的页面必须把素材图以原图高清落盘、网格平铺上屏（只压格位占位空间不压图片分辨率，区内无滚动条、不拉伸变形），素材图规则由 `robot-aiot-draw-flowchart` 的 `references/slide-image-framing.md` 承载；母稿未指定但资源目录存在可用素材时，Phase 4 开始前盘点并向用户确认选配，不得静默忽略

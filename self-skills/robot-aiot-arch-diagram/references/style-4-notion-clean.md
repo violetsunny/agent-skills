@@ -1,8 +1,8 @@
 # Style 4: Notion Clean
 
-Minimal, documentation-friendly. Designed to embed in Notion, Confluence, or GitHub wikis.
+极简、文档友好。为嵌入 Notion、Confluence 或 GitHub wiki 设计。
 
-## Colors
+## 颜色
 
 ```
 Background:     #ffffff
@@ -20,15 +20,15 @@ Accent (subtle, used sparingly):
   Gray:   #d1d5db (dividers)
 ```
 
-## Design Principles
+## 设计原则
 
-- **No decorative icons** — use geometric shapes only (rect, circle, diamond)
-- **Generous whitespace** — 24px+ padding between elements
-- **Single arrow color** — blue (#3b82f6) for all connections
-- **Labels in ALL CAPS** — section headers and node type labels
-- **No drop shadows** — flat only
+- **无装饰图标** — 只用几何形状（rect、circle、diamond）
+- **充足留白** — 元素间 24px+ 内边距
+- **单一箭头颜色** — 所有连接用蓝色（#3b82f6）
+- **标签全大写** — 节标题与节点类型标签
+- **无投影** — 只有扁平
 
-## Typography
+## 字体排印
 
 ```
 font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI',
@@ -38,7 +38,7 @@ font-size:   14px labels, 11px uppercase type labels, 18px title
 font-weight: 400 normal, 500 medium for node labels
 ```
 
-## Box Styles
+## 盒样式
 
 ```xml
 <!-- Standard node -->
@@ -54,7 +54,7 @@ font-weight: 400 normal, 500 medium for node labels
       stroke-dasharray="4,3"/>
 ```
 
-## Arrows
+## 箭头
 
 ```xml
 <defs>
@@ -70,7 +70,7 @@ font-weight: 400 normal, 500 medium for node labels
       stroke-dasharray="4,3" marker-end="url(#arrow-gray)"/>
 ```
 
-## SVG Template
+## SVG 模板
 
 ```xml
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 560"
@@ -88,8 +88,8 @@ font-weight: 400 normal, 500 medium for node labels
 </svg>
 ```
 
-## Sizing Guide
+## 尺寸指南
 
-- Node box: min 120×40px, prefer 160×48px for readability
-- Title: top-left, 18px, gray-900, margin 32px from edges
-- Spacing: 80px minimum between nodes horizontally, 60px vertically
+- 节点盒：最小 120×40px，可读性优先 160×48px
+- 标题：左上角，18px，gray-900，距边缘 32px
+- 间距：节点间水平至少 80px，垂直至少 60px

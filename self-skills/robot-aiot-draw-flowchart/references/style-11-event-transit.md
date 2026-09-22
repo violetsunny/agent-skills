@@ -76,5 +76,6 @@ no topic, consumer-group, or stream evidence should use a generic flow style.
 
 ## Fixture
 
-`fixtures/event-transit-style11.json` shows a checkout event line with schema
-validation, fraud enrichment, a declared junction, DLQ, and materialized state.
+`fixtures/event-transit-style11.json`（内部测试集，不随 skill 分发）shows a checkout
+event line with schema validation, fraud enrichment, a declared junction,
+DLQ, and materialized state.

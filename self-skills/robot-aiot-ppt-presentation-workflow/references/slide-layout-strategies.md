@@ -56,16 +56,23 @@ What Is ↔ What Could Be 交替推进，在 1/3 和 2/3 位置打破模式制�
 2. 叙事骨架基线：封面 → 目录 → 章节过渡 → 每章 2-4 页正文 → 收束结论 → 致谢/行动号召。页数 ≥ 10 时目录页与章节过渡页必配，< 10 时可省目录
 3. 演讲时长按页数换算：30 分钟 = 8-12 页，45 分钟 = 12-16 页，1 小时 = 16-22 页；用户给了时长没给页数时按此推荐并确认
 
+上述规则 1-3 用本 skill 自带脚本确定性校验（FAIL 即阻塞，母稿排页后与 Phase 4 铺开前各跑一次）：
+
+```bash
+python3 <本skill根目录>/scripts/check_deck_rules.py "Title,Problem,Solution,..." [--minutes 30]
+python3 <本skill根目录>/scripts/check_deck_rules.py layouts.txt --minutes 45   # 文件每行一个布局名
+```
+
 ## PPT 风格精选（8 种）
 
 风格是整套 deck 的视觉语法（底色节奏、字体配对、信息密度、装饰克制），布局模式（17 种）是单页骨架。执行顺序：先按本节锁定风格，再逐页选布局；文案组织与话术写作不受风格影响，仍按"8个核心文案公式"与"话术（逐字稿）写作三铁律"执行。
 
-与 `slide-premium-design.md` 的层级关系：三档风格基调（A 克制商务 / B 深底科技 / C 暖调编辑）是受众映射的基线，本节 8 种风格是基调框架下的具体语法选型；选定后仍须整组落成 token 覆盖集，且不得与受众→基调映射冲突（领导层默认 A，禁用 B 除非品牌主色即深色系）。
+与 `~/.agents/skills/robot-aiot-draw-flowchart/references/slide-premium-design.md` 的层级关系：三档风格基调（A 克制商务 / B 深底科技 / C 暖调编辑）是受众映射的基线，本节 8 种风格是基调框架下的具体语法选型；选定后仍须整组落成 token 覆盖集，且不得与受众→基调映射冲突（领导层默认 A，禁用 B 除非品牌主色即深色系）。
 
 两条不随风格改变的纪律：
 
 1. 主色语义以首页架构图/品牌资产为准（`--color-primary`），风格只规定版式、字体配对、密度与装饰元素的语法，不改主色
-2. 静态交付约束：任何风格不得引入动画与交互（ppt-master 只消费静态 HTML），本文件"动画类"一节仅在交互版产物中使用
+2. 静态交付约束：任何风格不得引入动画与交互（ppt-master 只消费静态 HTML）
 
 ### 8 种风格
 
@@ -74,7 +81,7 @@ What Is ↔ What Could Be 交替推进，在 1/3 和 2/3 位置打破模式制�
 | 咨询双字体版 | 衬线展示标题 × 无衬线正文的高对比配对；深蓝×白二元色 + 单一品牌色高亮；左上角结论式整句标题；细线 pattern 装饰；暖灰底留白 | 高管业务汇报、行业研究、权威机构提案——领导层默认场景中最正式的一档 | 结论式标题与四要素契约"标题即结论"天然一致；Problem/Solution/Comparison/Pros-Cons 主场；大数字卡接 Big Number、Metrics Dashboard |
 | 断言-证据版 | 整句结论标题（非名词短语）；标题下独占一张证据图；零 bullet；白/极浅灰底 + 单一克制强调色；高数据墨水比 | 技术评审、工程汇报、数据严谨型决策页 | 与四要素"标题/结论/上屏内容"一一对应；证据图槽位直接引用 `flow/` 图表 HTML；Big Number、Split、Metrics Dashboard 主场；零 bullet 纪律倒逼上屏内容精简 |
 | 机构极简版 | 纯白底黑灰字 + 单一品牌强调色；顶部标题带 + 下方多栏对仗；2×2 矩阵；一页一信息、留白充分 | 立项/投资决策路演、标准商业提案、问题-解法叙事 | 17 布局中兼容面最广：Comparison（2×2 竞品矩阵）、Feature Grid、Roadmap、Pricing 均零冲突；首页架构图主色即唯一强调色时色彩冲突最小 |
-| 便当格模块版 | 浅灰/奶白底；不等高圆角卡片网格 + 微描边或微阴影；超大展示标题与常规正文强字重对比；KPI 数字表格体；每卡一个洞见 | 产品能力汇总、QBR 指标页、成果汇报页 | Feature Grid、Metrics Dashboard 主场；须遵守布局纪律"bento 格子数=内容条目数"与"禁三个等大卡片横排"（KPI 等大指标卡豁免）；卡内 sparkline 用内联 SVG，静态版不引 Chart.js（见本文件 Chart.js 边界声明） |
+| 便当格模块版 | 浅灰/奶白底；不等高圆角卡片网格 + 微描边或微阴影；超大展示标题与常规正文强字重对比；KPI 数字表格体；每卡一个洞见 | 产品能力汇总、QBR 指标页、成果汇报页 | Feature Grid、Metrics Dashboard 主场；须遵守布局纪律"bento 格子数=内容条目数"与"禁三个等大卡片横排"（KPI 等大指标卡豁免）；卡内 sparkline 用内联 SVG，不引 Chart.js（见本文件"约束"第 4 条） |
 | 大字报数字版 | 白底或近黑底 + 单一高饱和强调色；巨型数字占半屏（tabular-nums 收紧字距）；章节页大色块单词；严格基线网格 | 年度复盘、QBR 业务回顾、里程碑成果页——需要用一个数字制造记忆点的场景 | Big Number 的放大形态；章节过渡页用大色块（对应 Deck 级硬规则 2 的叙事骨架）；数字必须来自 Phase 1 数据池，估算值显式加 `~` |
 | 图谱箭头企业版 | 企业色块 + 产品线分色；箭头流程、分层架构盒、图标化能力网格；流程即叙事；清晰无衬线 | 平台架构讲解、客户旅程、方法论流程、生态地图——机器人/AIoT 架构类汇报的主场 | 直接消费 Phase 3.5 图表 HTML（`flow/` 目录），页面风格只做外框与结论层，不得重绘图表真源；Solution、Timeline、Roadmap、Feature Grid 适配 |
 | 暗色舞台版 | 近黑底（非纯黑）灰白字（非纯白）；一屏一词或一个巨型数字；单一品牌强调色高亮；大量负空间 | 产品发布、全员大会、愿景页——现场大屏演讲场景 | Title、Quote、Big Number、CTA 主场；高信息密度页（Metrics Dashboard、Comparison）不适合此语法；领导层受众默认禁 B 基调——仅品牌主色即深色系或用户点名时，用作章节过渡/愿景页的局部节奏页，不作整套风格 |
@@ -98,9 +105,9 @@ What Is ↔ What Could Be 交替推进，在 1/3 和 2/3 位置打破模式制�
 
 ### 风格硬规则
 
-1. 整套锁定一种风格，禁止混用或中途更换（与 `slide-premium-design.md` §3 基调锁定规则同源）；风格与基调必须一致，选定后一并落成 token 覆盖集
+1. 整套锁定一种风格，禁止混用或中途更换（与 `~/.agents/skills/robot-aiot-draw-flowchart/references/slide-premium-design.md` §3 基调锁定规则同源）；风格与基调必须一致，选定后一并落成 token 覆盖集
 2. 风格选型结果写入设计解读行与母稿头部，随两页 showcase 门一并确认（见 `phase4-page-authoring.md`）
-3. 字体落地遵守 `slide-premium-design.md` §4 排版纪律：中文字体栈 + 全套最多两个字体族；不得为风格引入无法确认渲染环境的字体，离线渲染掉字时退回默认字体栈
+3. 字体落地遵守 `~/.agents/skills/robot-aiot-draw-flowchart/references/slide-premium-design.md` §4 排版纪律：中文字体栈 + 全套最多两个字体族；不得为风格引入无法确认渲染环境的字体，离线渲染掉字时退回默认字体栈
 4. 风格不豁免 Deck 级硬规则：相邻两页布局不同、同一版式家族重复限制等仍逐页检查
 
 ### 眉标边界
@@ -109,7 +116,7 @@ What Is ↔ What Could Be 交替推进，在 1/3 和 2/3 位置打破模式制�
 
 1. **汇报 PPT 维持眉标克制**：沿用高级感设计标准 §4 条 7"全大写小标签（eyebrow）整套汇报最多每 3 页出现 1 次；多数页面标题本身足够，不需要眉标"（PPT 静态路径真源为 `robot-aiot-draw-flowchart` 的 `slide-premium-design.md`）。本节 8 种风格中除杂志编辑版外，全部执行此上限，不放宽。
 2. **杂志编辑版（出版物风）可放宽，须注记场景**：出版物 grammar 的刊头 + 眉标是页面骨架而非装饰，允许每页固定眉标（章节标签）。必须同时满足两个条件：① 设计解读行与母稿头部注记本套场景为"出版物/册子传阅阅读"，非讲台演示；② 眉标只承载章节语义（如"第二章 · 平台能力"），不得出现编号眉标（"01 / 概览"一类，AI 痕迹清单第 1 条，恒禁）、版本号页脚与装饰性分隔（破折号/中点串禁令照旧）。
-3. **审查衔接**：眉标超量按 `slide-premium-review.md` 检查清单作阻塞项处理；杂志编辑版放宽生效时，审查同步核对场景注记与章节语义两个条件，缺一即按超量判定。
+3. **审查衔接**：眉标超量按 `~/.agents/skills/robot-aiot-draw-flowchart/references/slide-premium-review.md` 检查清单作阻塞项处理；杂志编辑版放宽生效时，审查同步核对场景注记与章节语义两个条件，缺一即按超量判定。
 
 ## 话术（逐字稿）写作三铁律
 
@@ -163,17 +170,6 @@ What Is ↔ What Could Be 交替推进，在 1/3 和 2/3 位置打破模式制�
 | STAR | 案例页 | Situation → Task → Action → Result |
 | SPIN | 需求页 | Situation → Problem → Implication → Need-payoff |
 
-## Chart.js 集成规则
-
-> 边界声明：本节 Chart.js 仅适用于用户明确要求交互式图表产物的场景；PPT 静态交付链路一律用 SVG/HTML 静态图表，禁动画/交互/hover。
-
-当页面需要交互式数据图表时：
-
-- `responsive: true` + `maintainAspectRatio: false`
-- 暗色主题：grid `rgba(255,255,255,0.1)`，ticks `#9ca3af`
-- 亮色主题：grid `rgba(0,0,0,0.08)`，ticks `#6b7280`
-- 动画时长 ≤ 1s，避免干扰阅读
-
 ## CSS变量体系
 
 ```css
@@ -185,19 +181,9 @@ What Is ↔ What Could Be 交替推进，在 1/3 和 2/3 位置打破模式制�
 --typography-font-body: /* 正文字体 */
 ```
 
-## 动画类
-
-| 类名 | 效果 | 适用 |
-|------|-----|------|
-| animate-fade-up | 向上淡入 | 通用入场 |
-| animate-stagger | 依次延迟入场 | 列表/网格 |
-| animate-scale | 缩放进入 | 数字/图标 |
-| animate-count | 数字滚动 | 关键指标 |
-| animate-pulse | 脉冲呼吸 | 状态指示 |
-
 ## 约束
 
 1. 布局选择服务于内容结论，不为炫技选复杂布局
 2. 文案公式是思维框架不是填空模板，必须填入真实数据
-3. 动画仅在 ppt-master 支持时使用，静态 HTML 阶段不加动效
-4. Chart.js 仅在交互版使用，PPT 静态版用 SVG/HTML 图表
+3. 全链路禁止动画（ppt-master 只消费静态 HTML）
+4. PPT 链路一律 SVG/HTML 静态图表（禁动画/交互/hover），禁用 Chart.js

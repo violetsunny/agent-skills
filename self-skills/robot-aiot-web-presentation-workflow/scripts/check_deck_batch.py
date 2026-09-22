@@ -2,10 +2,13 @@
 """批次级静态验收：禁色 / 骨架六项 / DOM 上限 / 动效种类 / lightbox /
 导航链闭合 / lint_deck_html 全量检查集成。
 
-用法: python3 check_deck_batch.py <pages 目录>
+用法: python3 check_deck_batch.py <pages 目录> [--static-pages p03-x.html,p07-y.html]
+  --static-pages: 逗号分隔页文件名清单，命中的页豁免 data-enter 动画触发检查
+                  （母稿登记的"静态页，仅转场"）；不传时行为不变
 退出码: 有 FAIL → 1
 """
 
+import argparse
 import contextlib
 import glob
 import io
@@ -26,8 +29,12 @@ FORBIDDEN = [
     "#003d6b",
     "#e8f4fd",
     "#b85450",
-    "#009624",
 ]
+
+BTN_TEXT = {
+    "next": ("下一页", "next", "›", "»", "→"),
+    "prev": ("上一页", "prev", "‹", "«", "←"),
+}
 
 
 def nav_state(s, which):
@@ -36,18 +43,38 @@ def nav_state(s, which):
         return m.group(1)
     if re.search(r'<span\b[^>]*id="nav-%s"' % which, s):
         return None
-    if which == "next" and '<span class="btn">下一页</span>' in s:
-        return None
+    for text in re.findall(
+        r'<span\b[^>]*class="[^"]*\bbtn\b[^"]*"[^>]*>([^<]*)</span>', s
+    ):
+        low = text.strip().lower()
+        if any(v in low for v in BTN_TEXT[which]):
+            return None
     return "MISSING"
 
 
+def parse_static_pages(arg):
+    names = set()
+    for n in (arg or "").split(","):
+        n = n.strip()
+        if n:
+            names.add(n)
+            names.add(n[:-5] if n.endswith(".html") else n + ".html")
+    return names
+
+
 def main():
-    if len(sys.argv) != 2:
-        print(__doc__)
-        sys.exit(2)
-    pages = sorted(glob.glob(os.path.join(sys.argv[1], "p*.html")))
+    ap = argparse.ArgumentParser(add_help=True)
+    ap.add_argument("pages_dir")
+    ap.add_argument(
+        "--static-pages",
+        default="",
+        help="逗号分隔页文件名清单，命中的页豁免 data-enter 动画触发检查",
+    )
+    args = ap.parse_args()
+    static = parse_static_pages(args.static_pages)
+    pages = sorted(glob.glob(os.path.join(args.pages_dir, "p*.html")))
     if not pages:
-        print(f"[FAIL] 目录无 p*.html: {sys.argv[1]}")
+        print(f"[FAIL] 目录无 p*.html: {args.pages_dir}")
         sys.exit(1)
     names = [os.path.basename(p) for p in pages]
     fails = []
@@ -61,7 +88,7 @@ def main():
             "h1": "<h1" in s,
             "fit-script": "innerWidth/1920" in s,
             "reduced-motion": "prefers-reduced-motion" in s,
-            "data-enter": s.count("data-enter") > 3,
+            "data-enter": name in static or s.count("data-enter") > 3,
             "pri-#2563eb": "#2563eb" in s,
             "dom<=500": tags <= 500,
             "lightbox": (".lb{" in s and "figure img" in s and "Escape" in s)

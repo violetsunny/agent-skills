@@ -388,7 +388,7 @@ Above 6 lanes or 12 steps: split into two diagrams (overview + detail).
 
 ---
 
-## 12. Worked example — full YAML for `example-process-extended.html`
+## 12. Worked example — 输入契约示例（示例文件不随本 skill 分发）
 
 The extended example diagram is fully described by the following inputs. Every coordinate in the rendered SVG is derivable from this block via §2 + §3 + §4. This is the canonical proof that the parametric contract works end-to-end.
 

@@ -122,6 +122,8 @@ python3 scripts/lint-skin.py path/to/animated-diagram.html
 
 The verifier checks mode/state declarations, contiguous steps, motion budgets, complete SVG naming, no-JS source visibility, decorative accessibility, the full control set, live status, reduced-motion/print CSS, keyboard handling, page-hide pause, bounded static/test overrides, immediate final-step stop, and exact canonical-controller identity. Its adversarial tests mutate the canonical template to prove each failure is rejected.
 
+`python3 scripts/test-verify-motion.py` 是 verify-motion.py 的对抗性自测（无需参数）：正极断言 `assets/template-motion.html` 零 finding 通过，负极对每个具名检查项注入变异并断言被拒。exit 0 = 全部用例通过，1 = 任一用例失败。改动 verify-motion.py 或 canonical 控制器后必须跑一遍。
+
 Then verify in a browser:
 
 1. Disable JavaScript: the complete diagram remains visible and meaningful.

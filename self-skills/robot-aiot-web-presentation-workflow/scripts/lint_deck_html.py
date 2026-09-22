@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """交互 deck HTML 交付契约静态 lint（标准库 html.parser + re）。
 
-契约来源: robot-aiot-web-presentation-workflow/SKILL.md:166-172（验收自检）、
-          :187-193（硬约束交付契约 1-3）。
+契约来源: robot-aiot-web-presentation-workflow/SKILL.md（Phase 4 验收自检、
+          硬约束交付契约 1-3）。
 
 用法:
   python3 lint_deck_html.py <deck.html>

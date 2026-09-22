@@ -1,7 +1,7 @@
 /* ============================================================================
  * inline-editor.js — 内联文本编辑模式：浏览器内直接点上屏文字修改，不回源码
  *
- * 来源：references/interactive-mode-rules.md「内联文本编辑模式」（271-311）
+ * 来源：references/interactive-mode-rules.md「内联文本编辑模式」
  *       （乙类：md 只有行为规格 + 一段 hover 链示例，按规格实现完整可运行代码）
  * 用途：草稿生成后默认内置的轻量微调能力。三路入口并存：E 键切换 / 左上角
  *       80×80px 固定热区（hover 显现编辑按钮、点击热区直接切换）/ 编辑按钮点击。
@@ -18,7 +18,7 @@
  *       可见性只由 .show/.active class 控制；编辑激活期间 mouseleave 不隐藏。
  * 可调参数：热区 80×80px；hover 宽限 400ms；可编辑选择器 EDITABLE_SELECTOR；
  *       localStorage key = 'deck-edits::' + deck 文件名。
- * 交付说明（§307）：hover 左上角或按 E 进编辑、点文字改、Ctrl+S 导出。
+ * 交付说明（「编辑与持久化」条 5）：hover 左上角或按 E 进编辑、点文字改、Ctrl+S 导出。
  * 验证：scripts/headless_assert.py——E 键切换后抽一个文字元素断言
  *       isContentEditable===true、输入后 localStorage 有记录；Ctrl+S 的 Blob
  *       下载在 headless 不可达，记入真浏览器抽查清单（与跨窗口同步同批）。
@@ -42,7 +42,7 @@ window.InlineEdit = (function () {
     if (str == null) return fallback;
     try { var v = JSON.parse(str); return (v && typeof v === 'object') ? v : fallback; } catch (_) { return fallback; }
   }
-  // 消毒：剥离 script/style/iframe 等危险标签、on* 事件属性、javascript: 链接（§304 不注入未校验内容）
+  // 消毒：剥离 script/style/iframe 等危险标签、on* 事件属性、javascript: 链接（「编辑与持久化」条 2：不注入未校验内容）
   function sanitizeHTML(html) {
     var tmp = document.createElement('div');
     tmp.innerHTML = String(html == null ? '' : html);
@@ -77,7 +77,7 @@ window.InlineEdit = (function () {
     });
   }
   function slideOf(el) { return el.closest ? el.closest('.slide') : null; }
-  // 稳定选择器：data-slide-id（无则全局页序）+ 页内可编辑序号（§306）
+  // 稳定选择器：data-slide-id（无则全局页序）+ 页内可编辑序号（「编辑与持久化」条 4）
   function stableKey(el) {
     var slide = slideOf(el);
     if (slide) {
@@ -146,7 +146,7 @@ window.InlineEdit = (function () {
     setTimeout(function () { h.remove(); }, 3200);
   }
 
-  /* ---------- 导出完整 HTML（§305） ---------- */
+  /* ---------- 导出完整 HTML（「编辑与持久化」条 3） ---------- */
   function exportHTML() {
     var wasActive = isActive;
     if (wasActive) deactivate();                       // 先移除编辑态 outline 与 contenteditable
@@ -167,7 +167,7 @@ window.InlineEdit = (function () {
     if (wasActive) activate();
   }
 
-  /* ---------- 热区 + 按钮（JS 接管 hover 链，§283） ---------- */
+  /* ---------- 热区 + 按钮（JS 接管 hover 链，「热区 hover 链硬规则」节） ---------- */
   function buildHotzone() {
     hotzone = document.createElement('div');
     hotzone.className = 'ie-hotzone';
@@ -217,7 +217,7 @@ window.InlineEdit = (function () {
     document.head.appendChild(styleEl);
   }
 
-  /* ---------- 全局键：E 切换 / Ctrl+S 导出（输入态守卫，§277） ---------- */
+  /* ---------- 全局键：E 切换 / Ctrl+S 导出（「交互入口」条 1 输入态守卫） ---------- */
   function onKeydown(e) {
     var t = e.target;
     var inField = t && t.closest && t.closest('input,textarea,select,[contenteditable]');
@@ -230,7 +230,7 @@ window.InlineEdit = (function () {
     if (e.key === 'e' || e.key === 'E') { e.preventDefault(); toggleMode(); }
   }
 
-  /* ---------- 输入即自动存（委托，§304） ---------- */
+  /* ---------- 输入即自动存（委托，「编辑与持久化」条 2） ---------- */
   function onInput(e) {
     var el = e.target;
     if (!el || !el.getAttribute || el.getAttribute('contenteditable') !== 'true') return;
@@ -243,7 +243,7 @@ window.InlineEdit = (function () {
     if (document.getElementById('ie-style-installed')) return;
     injectStyle();
     buildHotzone();
-    restore();                                   // 刷新恢复（§306）
+    restore();                                   // 刷新恢复（「编辑与持久化」条 4）
     document.addEventListener('keydown', onKeydown);
     document.addEventListener('input', onInput);
     var marker = document.createElement('meta');
@@ -261,7 +261,7 @@ window.InlineEdit = (function () {
     deactivate: deactivate,
     exportHTML: exportHTML,
     isActive: function () { return isActive; },
-    // 供 hover 链规格引用（§290 editor.isActive）
+    // 供 hover 链规格引用（「热区 hover 链硬规则」节 editor.isActive）
     editor: { get isActive() { return isActive; } }
   };
 })();

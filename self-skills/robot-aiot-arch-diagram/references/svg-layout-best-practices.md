@@ -1,31 +1,33 @@
-# SVG Technical Diagram Layout Best Practices
+# SVG 技术图表布局最佳实践
 
-## Universal Layout Rules (Apply to All Styles)
+间距、字号、marker、阴影等基础参数的唯一权威是 `design-system.md`（§6/§7）；本文件只承载布局操作的增量技巧，与权威冲突处一律以 `design-system.md` 为准。
 
-### 1. Component Spacing
-- **Minimum clearance between components**: 80px (edge to edge)
-- **Minimum clearance for arrow paths**: 60px from component edges
-- **Layer vertical spacing**: 120px between horizontal layers
-- **Same-layer horizontal spacing**: 100-120px between components
+## 通用布局规则（对所有风格生效）
 
-### 2. Arrow Routing & Connection Points
+### 1. 组件间距
+- **组件间净距**：取 `design-system.md` §7 允许集 {20, 24, 32, 40, 48}px，坐标落 4px 网格
+- **箭头路径净空**：箭头路径与无关节点边缘保持可见净空，布线值同样落 4px 网格
+- **层间垂直间距 / 同层水平间距**：在允许间距带上取值；布局需要更大节奏时可放大，但必须是 4 的倍数且不制造对角线布线需求
 
-#### Connection Point Rules
-- **Never connect arrows to component corners** - use midpoints of edges
-- **Entry/exit points**:
-  - Top edge: `cx ± offset` where offset = 0 for single arrow, ±30px for multiple
-  - Bottom edge: same rule
-  - Left/right edges: `cy ± offset`
-- **Clearance from corners**: minimum 20px
+### 2. 箭头布线与连接点
 
-#### Arrow Path Routing
-- **Avoid diagonal lines crossing components** - use orthogonal routing (L-shaped paths)
-- **For curved arrows**:
-  - Control point should be at least 40px away from any component edge
-  - Use intermediate waypoints for complex routing: `M x1,y1 L x2,y2 Q cx,cy x3,y3`
-- **Multiple arrows between same layers**: stagger Y-coordinates by 15-20px to avoid overlap
+#### 连接点规则
+- **箭头永不接在组件角落** —— 用边的中点
+- **入/出点**：
+  - 上边：`cx ± offset`，单箭头 offset = 0，多箭头 ±30px
+  - 下边：同规则
+  - 左/右边：`cy ± offset`
+- **距角净空**：最小 20px
+- 同边多连接点按 `design-system.md` §6 规则 4 扇形均布（`L*k/(N+1)`，相邻 ≥12px）
 
-#### Arrow Overlap Prevention
+#### 箭头路径布线
+- **避免对角线穿越组件** —— 用正交布线（L 形路径），拐弯四分之一圆弧 r=8（紧凑布局最小 r=6，见 `design-system.md` §6 规则 1）
+- **曲线箭头**：
+  - 控制点距任何组件边缘 ≥40px
+  - 复杂布线用中间折点：`M x1,y1 L x2,y2 Q cx,cy x3,y3`
+- **同层间多条箭头**：Y 坐标错开 16-20px 防重叠（平行线错开 ≥12px 是 `design-system.md` §6 规则 3 的下限）
+
+#### 箭头防重叠
 ```svg
 <!-- Bad: diagonal arrow crosses component -->
 <path d="M 200,100 L 600,400"/>
@@ -38,24 +40,21 @@
 <!-- Control point (400,200) is 50px+ away from any component -->
 ```
 
-### 3. Arrow Label Placement
-- **Position**: midpoint of arrow path, offset by 5-10px perpendicular to arrow direction
-- **Offset first**: move the label 5-10px perpendicular to the arrow so it does not sit on the stroke
-- **Background rect fallback**: include only when offsetting cannot avoid another visual element, with:
-  - Padding: 4px horizontal, 2px vertical
-  - Fill: match background color
-  - Opacity: 0.9-0.95
-- **Safety distance**: 15px minimum from any component edge
-- **Multiple converging arrows**: stagger label positions vertically by 20px
-- **Length cap**: ≤3 words (CJK ≤6 chars); shorten to verb-object phrases, never full sentences
+### 3. 箭头标签摆放
+- **遮罩常驻**：每个箭头标签都必须有不透明遮罩矩形（`design-system.md` §6"Arrow labels — always mask, always with margin"），不是碰撞后才加的兜底
+- **可见间距**：遮罩矩形底边与连线 stroke 之间强制 6–10px 可见间隙，标签永不压线
+- **遮罩填充**：与背景色一致（默认 `#f5f5f5`），内边距水平 4px、垂直 2px 起步，按文本实际尺寸放大
+- **安全距离**：距任何组件边缘 ≥15px；遮罩不得压住后绘节点（§6 规则 6）
+- **多条汇聚箭头**：标签位置垂直错开 20px
+- **长度上限**：≤14 字符（§6 规则），全大写、居中于线段中点；缩短为动宾短语，永不整句
 
-### 4. Component Overlap Detection
-Before finalizing SVG, check:
-- No component bounding boxes overlap (8px safety margin)
-- No arrow paths pass through component interiors (except intentional tunneling with dashed style)
-- No text labels overlap with components or other labels
+### 4. 组件重叠检测
+定稿 SVG 前检查：
+- 组件包围盒互不重叠（8px 安全边距）
+- 箭头路径不穿过组件内部（唯一例外：几何不可避免时按 §6 规则 5 改虚线过境）
+- 文本标签不与组件或其他标签重叠
 
-### 5. Z-Index Layering (SVG render order)
+### 5. Z 序分层（SVG 渲染顺序）
 ```svg
 <!-- Render order (top to bottom = back to front): -->
 1. Background rect
@@ -68,98 +67,98 @@ Before finalizing SVG, check:
 8. Legend
 ```
 
-## Style-Specific Enhancements
+## 风格专属增强
 
 ### Style-1: Flat Icon Clean
-- **Perfect alignment**: snap all coordinates to 8px grid
-- **Sharp corners**: rx="8" ry="8" for rounded rects (consistent)
-- **Arrows**: thin (1.5-2px), filled polygon markers
-- **No shadows**: flat design principle
+- **严格对齐**：坐标吸附 8px 网格（4px 网格的更严子集）
+- **利落圆角**：圆角矩形统一 rx="8" ry="8"
+- **箭头**：细线（1.5-2px），实心 polygon marker
+- **无阴影**：扁平设计原则
 
 ### Style-6: Claude Official Warm
-- **Soft shadows**: `<feDropShadow dx="0" dy="2" stdDeviation="6" flood-color="#00000008"/>`
-- **Rounded corners**: rx="12" ry="12" (more rounded than Style-1)
-- **Arrows**: medium weight (2px), subtle markers
+- **柔和阴影**：`<feDropShadow dx="0" dy="2" stdDeviation="6" flood-color="#00000008"/>`（style-6 官方风格例外，已在 `design-system.md` §4 阴影禁令处登记）
+- **更圆圆角**：rx="12" ry="12"（同属 style-6 官方风格例外）
+- **箭头**：中等线宽（2px），弱化 marker
 
-## Validation Checklist
+## 校验清单
 
-Before exporting PNG, verify:
-- [ ] No arrow-component overlaps (visual inspection)
-- [ ] Arrow labels are offset from lines; fallback background rects are used only where needed
-- [ ] Minimum 60px clearance for all arrow paths
-- [ ] Component spacing ≥ 80px
-- [ ] Arrow connection points avoid corners (≥20px from corner)
-- [ ] Multiple arrows between layers are staggered
-- [ ] Legend is readable and doesn't overlap content
-- [ ] SVG renders cleanly via `cairosvg` (or `rsvg-convert` as fallback)
+导出 PNG 前核对：
+- [ ] 无箭头-组件重叠（目检）
+- [ ] 箭头标签带遮罩且与连线保持 6–10px 可见间距
+- [ ] 箭头路径对无关节点保持可见净空
+- [ ] 组件间距取 `design-system.md` §7 允许集 {20, 24, 32, 40, 48}px
+- [ ] 箭头连接点避开角落（距角 ≥20px）
+- [ ] 层间多条箭头已错开
+- [ ] 图例可读且不遮内容
+- [ ] SVG 经 `cairosvg`（或 `rsvg-convert` 兜底）渲染干净
 
-## Common Anti-Patterns to Avoid
+## 常见反模式与修法
 
-| Anti-Pattern | Fix |
+| 反模式 | 修法 |
 |--------------|-----|
-| Arrow crosses component | Use orthogonal routing, increase control point distance |
-| Label overlaps component | Increase offset; add a matching-background rect if the collision remains |
-| Components too close | Increase spacing to 80px minimum |
-| Arrow connects to corner | Move connection point to edge midpoint offset |
-| No z-index planning | Follow render order: arrows -> components -> text |
-| Repeated cross-layer arrows | Collapse them into a single "delegates down" rail outside the content area |
-| Elements packed too tightly | Increase viewBox height/width rather than packing elements tighter |
+| 箭头穿越组件 | 正交布线，加大控制点距离 |
+| 标签压组件 | 加大偏移；补常驻遮罩矩形并保持 6–10px 线距 |
+| 组件过近 | 间距回到 §7 允许集（20–48px）内取值，或扩大画布 |
+| 箭头接角落 | 连接点移到边中点偏移位 |
+| 无 Z 序规划 | 按渲染顺序：arrows -> components -> text |
+| 跨层箭头反复出现 | 收拢为内容区外单条 "delegates down" 汇流轨 |
+| 元素挤太密 | 加大 viewBox 高/宽，而不是继续挤 |
 
-## Line Overlap Prevention (jump-over)
+## 连线防重叠（jump-over）
 
-When two arrows must cross, ALWAYS use jump-over arcs to prevent visual overlap:
+两条箭头必须交叉时，一律用跳线弧防视觉重叠：
 
-- Crossing horizontal arrows: add a small semicircle arc (radius 5px, stroke same color as arrow, fill none) that "jumps over" the other line.
-- SVG pattern for jump-over: use a white/matching-background arc on the lower layer, then draw the upper arc on top.
-- Multiple crossings: stagger arc radii (5px, 7px, 9px) so arcs don't overlap each other.
-- Never let two arrows' straight-line segments cross without a jump-over arc.
+- 水平箭头交叉：加小半圆弧（半径 5px，stroke 同箭头色，fill none）"跳过"另一条线
+- jump-over 的 SVG 画法：下层先画白/同底色弧，再在其上画上层的弧
+- 多处交叉：弧半径错开（5px、7px、9px），弧与弧不重叠
+- 绝不允许两条箭头的直线段无跳线弧直接交叉
 
-## SVG Technical Rules
+## SVG 技术规则
 
-- ViewBox: `0 0 960 600` default; `0 0 960 800` tall; `0 0 1200 600` wide.
-- Fonts: embed via `<style>font-family: ...</style>` — no external `@import` (cairosvg / rsvg-convert cannot fetch external URLs).
-- `<defs>`: arrow markers, gradients, filters, clip paths.
-- Text: minimum 12px, prefer 13-14px labels, 11px sub-labels, 16-18px titles.
-- All arrows: `<marker>` with `markerEnd`, sized `markerWidth="10" markerHeight="7"`.
-- Drop shadows: `<feDropShadow>` in `<filter>`, apply sparingly (key nodes only).
-- Curved paths: use `M x1,y1 C cx1,cy1 cx2,cy2 x2,y2` cubic bezier for loops/feedback arrows.
-- Clip content: use `<clipPath>` if text might overflow a node box.
-- Filter boundary safety: for every element with `filter="url(...)"`, keep it at least `max(20% of element size, shadow blur radius × 3)` away from viewBox edges, or the edge-side stroke gets clipped (one side of the border vanishes).
+- ViewBox：默认 `0 0 960 600`；竖版 `0 0 960 800`；宽版 `0 0 1200 600`
+- 字体：经 `<style>font-family: ...</style>` 内嵌 —— 不用外部 `@import`（cairosvg / rsvg-convert 无法拉取外部 URL）
+- `<defs>`：arrow marker、渐变、filter、clip path
+- 文本：字号取 `design-system.md` §7 允许集 {8, 12, 16, 20, 24, 28, 32, 40}；角色分工按 §5 Typography（节点名 12px sans 600、技术子标签 9px mono、箭头标签 8px mono、页面标题按 style-guide）
+- 所有箭头：`<marker>` 配 `markerEnd`，尺寸按 `design-system.md` §6 动态标准 —— `markerWidth` = 画布 viewBox 宽 × 0.9375%，`markerHeight` = markerWidth × 0.7，`markerUnits="userSpaceOnUse"`（960 宽 → 9.0×6.3；1000 → 9.4×6.6；1200 → 11.2×7.9），全图一个尺寸
+- 阴影：禁止（`design-system.md` §4"Shadows are out. Borders are in."）；唯一例外是已登记的 style-6 官方风格
+- 曲线路径：循环/反馈箭头用 `M x1,y1 C cx1,cy1 cx2,cy2 x2,y2` 三次贝塞尔
+- 内容裁切：文本可能溢出节点框时用 `<clipPath>`
+- Filter 边界安全：每个带 `filter="url(...)"` 的元素距 viewBox 边缘至少 `max(元素尺寸 20%, 阴影模糊半径 × 3)`，否则靠边一侧 stroke 被裁掉（边框单边消失）
 
-## Post-Generation Arrow Optimization
+## 生成后箭头优化
 
-When a user asks to "优化箭头" / "fix arrow routing" / "optimize the diagram" on an already-generated diagram, preserve all nodes, containers, styles, and layout — only modify the `arrows` entries in the JSON data, then re-render with `scripts/generate-from-template.py`.
+用户对已生成的图要求"优化箭头" / "fix arrow routing" / "optimize the diagram"时，保留全部节点、容器、样式与布局——只改 JSON 数据中的 `arrows` 条目，然后用 `scripts/generate-from-template.py` 重渲染。
 
-Available arrow override fields (in recommended order of use):
+可用的箭头覆盖字段（按推荐使用顺序）：
 
 | Field | Type | When to Use |
 |-------|------|-------------|
-| `source_port` / `target_port` | `"left"` / `"right"` / `"top"` / `"bottom"` | Arrow exits/enters from the wrong edge |
-| `corridor_x` | `[x, ...]` | Hint vertical segments toward this x lane (soft preference) |
-| `corridor_y` | `[y, ...]` | Hint horizontal segments toward this y lane (soft preference) |
-| `route_points` | `[[x1,y1], [x2,y2], ...]` | Exact ordered waypoints; each leg is routed orthogonally and unsafe points are rejected |
-| `routing_padding` | number (default: 24) | *(Advanced)* Adjust obstacle clearance for this arrow |
-| `port_clearance` | number | *(Advanced)* Adjust first-segment offset from node edge |
-| `label_style` | `"badge"` / `"offset"` | Choose `"offset"` when badge backgrounds create visual clutter; keep `"badge"` (default) for legacy/high-contrast labels |
-| `stroke_width` | number (default: style `arrow_width`, e.g. 2.4) | Line thickness; arrowhead markers scale with stroke (`markerUnits="strokeWidth"`), so head width ≈ 10 × stroke_width. Set 1.6–1.8 on arrows when heads look chunky |
+| `source_port` / `target_port` | `"left"` / `"right"` / `"top"` / `"bottom"` | 箭头出/入边不对 |
+| `corridor_x` | `[x, ...]` | 提示垂直段走该 x 通道（软偏好） |
+| `corridor_y` | `[y, ...]` | 提示水平段走该 y 通道（软偏好） |
+| `route_points` | `[[x1,y1], [x2,y2], ...]` | 精确有序折点；每段正交布线，不安全点会被拒绝 |
+| `routing_padding` | number (default: 24) | *（进阶）*调整该箭头的障碍净空 |
+| `port_clearance` | number | *（进阶）*调整首段距节点边缘的偏移 |
+| `label_style` | `"badge"` / `"offset"` | badge 底色造成视觉杂乱时选 `"offset"`；传统/高对比标签保持默认 `"badge"` |
+| `stroke_width` | number (default: style `arrow_width`, e.g. 2.4) | 线宽；模板渲染路径的箭头 marker 为 `markerUnits="userSpaceOnUse"` 动态尺寸（viewBox 宽 × 0.9375%），不随 stroke 缩放，`stroke_width` 只改线身粗细。箭头显粗时设 1.6–1.8 |
 
-For JSON/template rendering, the default remains `"badge"` for backward compatibility. Set `"label_style": "offset"` on individual arrows for offset-first labels without background rects.
+JSON/模板渲染默认保持 `"badge"` 以向后兼容。单条箭头设 `"label_style": "offset"` 可得无底色矩形的偏移标签。
 
-Optimization steps:
+优化步骤：
 
-1. Read the existing SVG — identify which arrows overlap, cross nodes, or look misaligned.
-2. Find those arrows in the JSON data by `source` / `target` pair.
-3. Add `source_port` / `target_port` if the exit/entry direction is wrong; add `corridor_x` / `corridor_y` to space parallel arrows apart; use `route_points` only when hints alone cannot resolve the path.
-4. Re-run `generate-from-template.py` with the updated JSON and validate with `validate-svg.sh`.
+1. 读现有 SVG —— 找出哪些箭头重叠、穿节点或明显错位
+2. 在 JSON 数据中按 `source` / `target` 对定位这些箭头
+3. 出/入方向不对加 `source_port` / `target_port`；平行箭头要分开加 `corridor_x` / `corridor_y`；提示解决不了才用 `route_points`
+4. 用更新后的 JSON 重跑 `generate-from-template.py`，并以 `validate-svg.sh` 校验
 
-Example — spacing two overlapping arrows into separate corridors:
+示例 —— 把两条重叠箭头分进不同通道：
 
 ```json
 { "source": "nodeA", "target": "nodeB", "corridor_y": [280] }
 { "source": "nodeC", "target": "nodeD", "corridor_y": [320] }
 ```
 
-Example — shrinking chunky heads and rerouting a long cross-layer control arrow along the outer margin:
+示例 —— 收细粗箭头头，并把长跨层控制箭头改走外边距：
 
 ```json
 { "source": "d1", "target": "g1", "flow": "data", "stroke_width": 1.8 }
@@ -168,15 +167,15 @@ Example — shrinking chunky heads and rerouting a long cross-layer control arro
   "route_points": [[915, 160], [915, 425]], "stroke_width": 1.8 }
 ```
 
-Arrow-refinement rules:
+箭头精修规则：
 
-- Never let two arrows share one node's port region (e.g. both at top-center); give one a different edge via `source_port` / `target_port`.
-- For long cross-layer arrows, hug the outer margin: same-side ports (right→right or left→left) plus `route_points` in a lane between the container edge and the canvas edge (e.g. x=915 on a 960-wide canvas) yields a clean C-shape instead of a diagonal cut across node columns.
-- `route_points` legs must stay orthogonal to the declared ports and must not cross node rects, else generation raises a route error — move the lane rather than forcing the path.
+- 绝不让两条箭头共用一个节点的端口区（如都在 top-center）；用 `source_port` / `target_port` 给其中一条换边
+- 长跨层箭头贴外边距走：同侧端口（right→right 或 left→left）+ `route_points` 走在容器边缘与画布边缘之间的通道（如 960 宽画布上的 x=915），得到干净 C 形而不是斜穿节点列的对角线
+- `route_points` 各段必须与声明端口正交、不得穿越节点矩形，否则生成时报 route error —— 移通道，不要硬凑路径
 
-## SVG Generation & Error Prevention
+## SVG 生成与防错
 
-**MANDATORY: Python List Method** (ALWAYS use this for hand-written SVG):
+**强制：Python list 逐行生成法**（手写 SVG 一律用这个）：
 
 ```python
 python3 << 'EOF'
@@ -192,24 +191,24 @@ print("SVG generated successfully")
 EOF
 ```
 
-Why mandatory: prevents character truncation, typos, and syntax errors. Each line is independent and easy to verify.
+为什么强制：防字符截断、防手误、防语法错误。每行独立、逐行可校验。
 
-**Pre-Tool-Call Checklist** (use EVERY time):
+**Pre-Tool-Call 三问**（每次调用前都过）：
 
-1. Can I write out the COMPLETE command/content right now?
-2. Do I have ALL required parameters ready?
-3. Have I checked for syntax errors in my prepared content?
+1. 现在能一次写出完整命令/内容吗？
+2. 所有必需参数都备齐了吗？
+3. 检查过待写内容的语法错误了吗？
 
-If ANY answer is NO: STOP. Do NOT call the tool. Prepare the content first.
+任一为否：停止调用，先备好内容。
 
-**Error Recovery Protocol**:
+**错误恢复协议**：
 
-- First error: analyze root cause, apply targeted fix.
-- Second error: switch method entirely (Python list → chunked generation).
-- Third error: STOP and report to user — do NOT loop endlessly.
-- Never: retry the same failing command or call tools with empty parameters.
+- 第一次错误：分析根因，针对性修复
+- 第二次错误：整体换方法（Python list → 分块生成）
+- 第三次错误：停止并报告用户 —— 不无限循环
+- 永不：重试同一条失败命令、用空参数调用工具
 
-**Common Syntax Errors to Avoid**:
+**常见语法错误**：
 
 - ❌ `yt-anchor` → ✅ `y="60" text-anchor="middle"`
 - ❌ `x="390` (missing y) → ✅ `x="390" y="250"`
@@ -218,7 +217,7 @@ If ANY answer is NO: STOP. Do NOT call the tool. Prepare the content first.
 - ❌ `L 29450` → ✅ `L 290,220`
 - ❌ Missing `</svg>` at end
 
-**Validation** (run after generation):
+**校验**（生成后运行）：
 
 ```bash
 python3 -c "import xml.etree.ElementTree as ET; ET.parse('file.svg')" && echo "✓ Valid XML"
@@ -234,3 +233,4 @@ CairoSVG 是默认 PNG 导出渲染器（png-export.md）。macOS 下 fontconfig
 - 语义改用文字表达：`→` 写"演进到/导向"，`×` 写"与/对应"，`≈` 写"约"，圈号写"问题1/第1项"。
 - HTML 页面文本不受限（浏览器逐字形回退）；本规则只约束 SVG 文本与经 CairoSVG 导出的 PNG。
 - 导出后目检 PNG 一次确认无豆腐；必需符号无法回避时改用 Puppeteer 渲染器（png-export.md）。
+- 自动检查：`python3 $SKILL_ROOT/scripts/check_glyph_safety.py <file.svg>` —— 按本节安全字形集扫描 SVG `<text>` 内容（箭头/数学运算符/圈号等 Unicode 区块报违规），exit 0 = 无错误（允许 warning），exit 1 = 有错误。

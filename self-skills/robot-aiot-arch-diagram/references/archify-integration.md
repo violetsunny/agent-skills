@@ -55,10 +55,11 @@ archify 产物为自包含 HTML（内联 SVG），带暗/亮主题切换（local
 4. **保留交互块** — `.toolbar`、`<script>`、`:root` / `[data-theme]` CSS 不得改动（即主题切换与导出菜单本体）
 5. 交付前按自审清单核对：viewBox 余量 ≥20px、图例在所有 boundary 之下
 
-## 环境自检与降级
+## 环境自检与路径改选
 
+- 三硬门依赖（archify、diagram-design、ui-ux-pro-max）由 `precheck_deps.sh` 把关：precheck 失败即中止，本节不提供任何硬门降级。
 - 自检：`node $ARCHIFY doctor`；示例一览：`node $ARCHIFY examples`；本地演示：`node $ARCHIFY demo <目录>`
-- node 不可用或 doctor 失败时：降级为直绘 SVG/HTML（B），并如实告知用户降级原因；需要可编辑 XML 时如实告知本 SKILL 不具备该能力
+- precheck 通过后，若运行时 node 不可用或 doctor 失败，仅影响路径 C 的渲染引擎选型：按 SKILL.md「输出路径选型」改选直绘 SVG/HTML（路径 B），并如实告知用户改选原因；需要可编辑 XML 时如实告知本 SKILL 不具备该能力。
 
 ## 如实交付报告
 

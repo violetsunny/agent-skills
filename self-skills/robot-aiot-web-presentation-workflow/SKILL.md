@@ -112,7 +112,7 @@ Phase 4: 交互HTML     → 委派 robot-aiot-interactive-html-author 逐页编�
 
 入口约束：
 1. 源文件必须由用户指定；完整读取，提取关键信息，禁止抽样阅读
-2. 一次性列齐反问清单向用户批量确认：**页面总数、汇报对象（领导层/技术同行/外部客户/大众，未指定默认领导层）、汇报范围（源文件哪些部分进 deck、哪些排除）、场景（内部汇报/外部展示/培训）、交付形态（单文件 deck 默认/多页/竖版/滚动叙事）**；能推断的先推断并标注依据，不一来一回
+2. 一次性列齐反问清单向用户批量确认：**页面总数、汇报对象（领导层/技术同行/外部客户/大众，未指定默认领导层）、汇报范围（源文件哪些部分进 deck、哪些排除）、场景（年度总结/项目验收/方案评审/培训分享）、交付形态（单文件 deck 默认/多页/竖版/滚动叙事）**；能推断的先推断并标注依据，不一来一回
 3. 识别核心结论和数据支撑点
 4. 标记需要图表辅助说明的内容
 5. 确认输出目录与页面规模
@@ -139,7 +139,7 @@ Phase 4: 交互HTML     → 委派 robot-aiot-interactive-html-author 逐页编�
 
 产物：`doc-web/<project>_演示母稿.md`，以 `templates/deck-manuscript.md` 为骨架填充（含图表需求总表、素材图映射表、主题节奏表、能量段位表），填充后必须跑 `scripts/lint_manuscript.py` 且 `[MS-FAIL]` 清零。
 
-**【确认门 G1，阻塞】**：母稿 lint 清零后向用户出示完整母稿，用户确认"不需要调整"后才能进入 Phase 3；用户提出修改 → 修订母稿重跑 lint 重新送审；G1 未过就绘图按阻塞项处理。G1 确认后母稿冻结为图表与页面的唯一内容源，后续内容变更须修订母稿并重新过 G1。
+**【确认门 G1，阻塞】**：母稿 lint 清零后向用户出示完整母稿，用户确认"不需要调整"后才能进入 Phase 3；用户提出修改 → 修订母稿重跑 lint 重新送审；G1 未过就绘图按阻塞项处理。G1 确认后母稿冻结为图表与页面的唯一内容源，后续内容变更须修订母稿并重新过 G1。G1 通过后先产两页 showcase 样张供用户确认风格基调（细化见 `references/phase2-pagination.md`"两页 showcase 确认门"），确认通过后再进 Phase 3 图表阶段。
 
 ---
 
@@ -152,7 +152,7 @@ Phase 4: 交互HTML     → 委派 robot-aiot-interactive-html-author 逐页编�
 2. 调用 `robot-aiot-arch-diagram` 生成 SVG/HTML 格式图表
 3. **默认全部新绘，不复用历史图表产物**（其他工作流目录的旧图表仅作内容参考）；确需复用必须用户明确同意
 4. 首页架构图确定全局主色基调，后续页面保持配色统一；输出目录已有既有页面/品牌色时，直接沿用其配色 token 锁定主色，无需等首页产出
-5. 图表产出直接为 HTML，无需 XML→HTML 桥接
+5. 图表产出直接输出 SVG/HTML，不经过 XML 中间格式
 6. 数据统计图表（饼图/箱线图/热力图/网络拓扑等）按 `robot-aiot-arch-diagram` 的数据图表规则路由；页面需要嵌入 Mermaid/PlantUML 源码图时，Phase 4 由 `robot-aiot-interactive-html-author` 构建期渲染嵌入
 7. 图表数量多（>6 张）时：先锁定全局风格 token（皮肤/主色/箭头语义/viewBox/网格/数据标注纪律），再分批派发并行 sub agent 生成，避免风格漂移
 8. 委派前置落盘：进入 Phase 3 前跑 `robot-aiot-arch-diagram` 与 `robot-aiot-interactive-html-author` 各自的 `scripts/precheck_deps.sh`，输出存产出目录 `_gen/precheck-<skill名>.txt`；exit≠0 中止；批次无记录视同未执行前置检查
@@ -187,9 +187,9 @@ Phase 4: 交互HTML     → 委派 robot-aiot-interactive-html-author 逐页编�
    - 翻页键位全可用（多页形态为导航链接全可用）、`prefers-reduced-motion` 降级即时切换
    - 零外部请求、1920x1080 设计画布 + scale-to-fit 视口自适应（任意窗口无滚动条完整可见）、单页 DOM ≤ 500
    - 母稿四要素、动效备注与图表数据语义无缺页、无篡改
-   - 母稿素材图映射表中该页有素材时必须已上屏（压缩缩略图 + 网格平铺无滚动 + 点击放大 lightbox）
-    - 用户无风格偏好时：三标题页预览已出并经用户定稿，全套锁定无混用
-     - 多页批次：源页（旧源拷贝或新制）入批前必须先单页过 `scripts/lint_deck_html.py`；批次终验一次调用 `scripts/check_deck_batch.py`（静态硬约束 + lint 全量检查含 SVG 线/箭头契约 #8 + 导航链闭合：中间页 prev/next 顺序指向相邻页、首末页禁用）+ `scripts/check_notes_hidden.py`（话术容器隐藏断言）+ `scripts/shoot_anim.py`（t100/t6000 双时间点动画触发截图）+ 逐图目检全过；验证产物落盘 `test-run/<批次>/` 不删除
+    - 母稿素材图映射表中该页有素材时必须已上屏（压缩缩略图 + 网格平铺无滚动 + 点击放大 lightbox）
+   - 用户无风格偏好时：三标题页预览已出并经用户定稿，全套锁定无混用
+   - 多页批次：源页（旧源拷贝或新制）入批前必须先单页过 `scripts/lint_deck_html.py`；批次终验一次调用 `scripts/check_deck_batch.py`（静态硬约束 + lint 全量检查含 SVG 线/箭头契约 #8 + 导航链闭合：中间页 prev/next 顺序指向相邻页、首末页禁用）+ `scripts/check_notes_hidden.py`（话术容器隐藏断言）+ `scripts/shoot_anim.py`（t100/t6000 双时间点动画触发截图）+ 逐图目检全过；母稿登记的静态页以 `--static-pages` 传入 `check_deck_batch.py` 与 `shoot_anim.py` 豁免动画触发检查；验证产物落盘 `test-run/<批次>/` 不删除
 
 阻塞条件：所有页面生成完毕且通过编写 skill 的交付前审查才算完成。
 

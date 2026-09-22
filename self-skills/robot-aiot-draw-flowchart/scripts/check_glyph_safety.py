@@ -10,7 +10,7 @@ their Unicode neighbours (arrows U+2190-21FF, math operators U+2200-22FF,
 enclosed alphanumerics U+2460-24FF).
 
 Safe set: ordinary CJK / Latin letters / digits, ASCII punctuation, and
-—— 、，。（）【】：+ / · “” (contract line 233).
+—— 、，。（）【】：+ / · “” (located by the §SVG 文本字形安全 section name).
 
 Scope: SVG <text> content only. HTML page text is exempt (browsers fall back
 per glyph); this rule binds SVG text and PNGs exported via CairoSVG.

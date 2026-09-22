@@ -13,7 +13,6 @@ from collections.abc import Sequence
 from pathlib import Path
 
 SCRIPT_DIR = Path(__file__).resolve().parent
-ROOT = SCRIPT_DIR.parent
 if str(SCRIPT_DIR) not in sys.path:
     sys.path.insert(0, str(SCRIPT_DIR))
 
@@ -29,7 +28,9 @@ from validate_svg import run_check  # noqa: E402
 
 
 def _load_generator():
-    spec = importlib.util.spec_from_file_location("fireworks_template_generator", SCRIPT_DIR / "generate-from-template.py")
+    spec = importlib.util.spec_from_file_location(
+        "fireworks_template_generator", SCRIPT_DIR / "generate-from-template.py"
+    )
     if spec is None or spec.loader is None:
         raise RuntimeError("cannot load diagram generator")
     module = importlib.util.module_from_spec(spec)
@@ -48,7 +49,9 @@ def command_doctor(_: argparse.Namespace) -> int:
         "ffmpeg": {"ok": shutil.which("ffmpeg") is not None},
         "motion_renderer": motion_runtime,
     }
-    probes["raster_export"] = {"ok": probes["cairosvg"]["ok"] or probes["rsvg-convert"]["ok"]}
+    probes["raster_export"] = {
+        "ok": probes["cairosvg"]["ok"] or probes["rsvg-convert"]["ok"]
+    }
     probes["animation_export"] = {"ok": motion_runtime["ok"], "optional": True}
     print(json.dumps(probes, indent=2, sort_keys=True))
     return 0 if probes["python"]["ok"] and probes["raster_export"]["ok"] else 1
@@ -64,19 +67,25 @@ def command_validate(args: argparse.Namespace) -> int:
     # intentionally AI-authored/static, so accepting JSON for it here would
     # promise a render path that does not exist.
     _load_generator().parse_style(diagram.style_index)
-    print(json.dumps({
-        "ok": True,
-        "schema_version": diagram.schema_version,
-        "input_schema": diagram.input_schema,
-        "mode": diagram.mode,
-        "style": {
-            "id": diagram.style_index,
-            "name": diagram.semantic_report["visual_theme"],
-        },
-        "semantics": dict(diagram.semantic_report),
-        "nodes": len(diagram.nodes),
-        "edges": len(diagram.edges),
-    }, indent=2, sort_keys=True))
+    print(
+        json.dumps(
+            {
+                "ok": True,
+                "schema_version": diagram.schema_version,
+                "input_schema": diagram.input_schema,
+                "mode": diagram.mode,
+                "style": {
+                    "id": diagram.style_index,
+                    "name": diagram.semantic_report["visual_theme"],
+                },
+                "semantics": dict(diagram.semantic_report),
+                "nodes": len(diagram.nodes),
+                "edges": len(diagram.edges),
+            },
+            indent=2,
+            sort_keys=True,
+        )
+    )
     return 0
 
 
@@ -88,8 +97,20 @@ def command_render(args: argparse.Namespace) -> int:
     args.output.write_text(svg, encoding="utf-8")
     if args.report:
         args.report.parent.mkdir(parents=True, exist_ok=True)
-        args.report.write_text(json.dumps(report, ensure_ascii=False, indent=2, sort_keys=True) + "\n", encoding="utf-8")
-    print(json.dumps({"ok": True, "svg": str(args.output), "report": str(args.report) if args.report else None}, sort_keys=True))
+        args.report.write_text(
+            json.dumps(report, ensure_ascii=False, indent=2, sort_keys=True) + "\n",
+            encoding="utf-8",
+        )
+    print(
+        json.dumps(
+            {
+                "ok": True,
+                "svg": str(args.output),
+                "report": str(args.report) if args.report else None,
+            },
+            sort_keys=True,
+        )
+    )
     return 0
 
 
@@ -112,17 +133,23 @@ def command_inspect(args: argparse.Namespace) -> int:
         role = element.get("data-graph-role")
         if role:
             roles[role] = roles.get(role, 0) + 1
-    print(json.dumps({
-        "generator": root.get("data-generator"),
-        "schema_version": root.get("data-schema-version"),
-        "style_id": root.get("data-style-id"),
-        "visual_theme": root.get("data-visual-theme"),
-        "diagram_type": root.get("data-diagram-type"),
-        "semantic_profile": root.get("data-semantic-profile"),
-        "semantic_valid": root.get("data-semantic-valid"),
-        "viewBox": root.get("viewBox"),
-        "roles": roles,
-    }, indent=2, sort_keys=True))
+    print(
+        json.dumps(
+            {
+                "generator": root.get("data-generator"),
+                "schema_version": root.get("data-schema-version"),
+                "style_id": root.get("data-style-id"),
+                "visual_theme": root.get("data-visual-theme"),
+                "diagram_type": root.get("data-diagram-type"),
+                "semantic_profile": root.get("data-semantic-profile"),
+                "semantic_valid": root.get("data-semantic-valid"),
+                "viewBox": root.get("viewBox"),
+                "roles": roles,
+            },
+            indent=2,
+            sort_keys=True,
+        )
+    )
     return 0
 
 
@@ -154,18 +181,14 @@ def command_animate(args: argparse.Namespace) -> int:
     return 0
 
 
-def command_examples(_: argparse.Namespace) -> int:
-    examples = [str(path.relative_to(ROOT)) for path in sorted((ROOT / "fixtures").glob("*")) if path.suffix in {".json", ".svg"}]
-    print(json.dumps({"examples": examples}, indent=2))
-    return 0
-
-
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description=__doc__)
     subparsers = parser.add_subparsers(dest="command", required=True)
     subparsers.add_parser("doctor").set_defaults(func=command_doctor)
 
-    validate = subparsers.add_parser("validate", help="validate and normalize diagram JSON")
+    validate = subparsers.add_parser(
+        "validate", help="validate and normalize diagram JSON"
+    )
     validate.add_argument("mode")
     validate.add_argument("input", type=Path)
     validate.set_defaults(func=command_validate)
@@ -179,14 +202,20 @@ def build_parser() -> argparse.ArgumentParser:
 
     check = subparsers.add_parser("check", help="check an SVG artifact")
     check.add_argument("svg", type=Path)
-    check.add_argument("--check", action="append", choices=("xml", "markers", "collisions", "geometry", "composition"))
+    check.add_argument(
+        "--check",
+        action="append",
+        choices=("xml", "markers", "collisions", "geometry", "composition"),
+    )
     check.set_defaults(func=command_check)
 
     inspect = subparsers.add_parser("inspect", help="print semantic SVG metadata")
     inspect.add_argument("svg", type=Path)
     inspect.set_defaults(func=command_inspect)
 
-    export = subparsers.add_parser("export-html", help="create an offline interactive HTML viewer")
+    export = subparsers.add_parser(
+        "export-html", help="create an offline interactive HTML viewer"
+    )
     export.add_argument("svg", type=Path)
     export.add_argument("output", type=Path)
     export.add_argument("--title")
@@ -207,7 +236,6 @@ def build_parser() -> argparse.ArgumentParser:
     animate.add_argument("--dry-run", action="store_true")
     animate.set_defaults(func=command_animate)
 
-    subparsers.add_parser("examples").set_defaults(func=command_examples)
     return parser
 
 
@@ -215,8 +243,17 @@ def main(argv: Sequence[str] | None = None) -> int:
     args = build_parser().parse_args(argv)
     try:
         return int(args.func(args))
-    except (OSError, RuntimeError, ValueError, json.JSONDecodeError, ET.ParseError) as error:
-        print(json.dumps({"ok": False, "error": str(error)}, ensure_ascii=False), file=sys.stderr)
+    except (
+        OSError,
+        RuntimeError,
+        ValueError,
+        json.JSONDecodeError,
+        ET.ParseError,
+    ) as error:
+        print(
+            json.dumps({"ok": False, "error": str(error)}, ensure_ascii=False),
+            file=sys.stderr,
+        )
         return 1
 
 

@@ -9,7 +9,7 @@
 
 契约来源: references/diagram-embed-rendering.md §一（1.1 前置 / 1.2 六步 / 1.3 包装页 /
 1.4 缓存）、§三（3.1 嵌入决策表 / 3.2 尺寸清晰度）、§四（4.1 降级阶梯 / 4.2 禁止事项）。
-包装页模板: templates/mermaid-wrapper.html（§1.3 逐字提取，本脚本填充三处占位）。
+包装页模板: templates/mermaid-wrapper.html（§1.3 逐字提取，本脚本填充四处占位）。
 
 六步管线（§1.2）:
   1 启动 headless Chrome（--remote-debugging-port；env MERMAID_RENDER_DEBUG_PORT 优先，

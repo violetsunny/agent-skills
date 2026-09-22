@@ -297,9 +297,9 @@ Before emitting SVG, verify **every** item:
 
 ---
 
-## 10. Worked YAML — full inputs for `example-dp-security-matrix.html`
+## 10. Worked YAML — 输入契约示例（示例文件不随本 skill 分发）
 
-The complete inputs that map to the shipped canonical example. Every coordinate in that SVG is derivable from §2 applied to these inputs.
+The complete inputs of the canonical example. Every coordinate of the target SVG is derivable from §2 applied to these inputs.
 
 canonical 副本：`templates/type-dp-security-matrix.yaml` — 参数化文档契约，复制后手工填参绘图；不是 generate-from-template.py 的输入（该脚本只接受 containers/nodes/arrows JSON），以 templates 为准
 ```yaml
@@ -377,4 +377,4 @@ Run §2 with these inputs:
 - `role_col_x(j) = [232, 396, 560, 724]` ✓
 - Focal cell at `(row=5, col=3)` → rect `(724, 340, 148, 36)` with accent stroke 1.4 ✓
 
-A fresh generation from this YAML produces a diagram visually indistinguishable from the shipped `example-dp-security-matrix.html`.
+A fresh generation from this YAML reproduces the canonical example diagram（输入契约示例，示例文件不随本 skill 分发）.

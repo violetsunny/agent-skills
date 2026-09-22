@@ -1,121 +1,77 @@
-# Environment doctor
+# 环境诊断（doctor）
 
-Load this file when the user asks to run diagnostics, a health check, or an environment doctor for this skill, or asks for first-run troubleshooting (e.g. "跑一下环境诊断", "check why PNG export fails", "run the doctor").
+当用户要求为本 skill 运行诊断、健康检查或环境 doctor，或要求首次运行排障时加载本文件（例如"跑一下环境诊断"、"check why PNG export fails"、"run the doctor"）。
 
-The goal is a one-shot report that checks local readiness for this skill's import/export and command routing, without mutating user files or installing dependencies.
+目标是一次性产出报告，检查本地环境对本 skill 导入/导出与命令路由的就绪程度，不修改用户文件、不安装依赖。
 
-Resolve the skill installation from this loaded reference, not from the
-user's current working directory. A normal project directory is the expected
-place to invoke the doctor and must not be treated as a repository-path error.
+skill 安装根目录从本 reference 被加载时的路径解析，不从用户当前工作目录解析。普通项目目录是调用 doctor 的预期位置，不得当作仓库路径错误处理。
 
-Use two diagnostic modes:
+诊断只有一种模式：**installed-skill 模式**——检查运行时与解析出的 skill 安装目录，不要求任何维护者专属的仓库文件。
 
-- **Installed-skill mode** (default): check the runtime and the resolved skill
-  installation. Do not require maintainer-only repository files.
-- **Maintainer-checkout mode**: use this only when the resolved installation
-  root contains `CONTRIBUTING.md`, `.github/workflows/ci.yml`, and
-  `scripts/verify-plugin-package.py`. Add the repository integrity checks below.
+## 输入
 
-## Inputs
+可选参数：
 
-Optional flags:
+- `--strict` — 最终汇总中把 warning 视为 failure。
+- `--json` — 在人类可读汇总之外额外输出机器可读的 JSON 报告。
 
-- `--strict` — treat warnings as failures in the final summary.
-- `--json` — print a machine-readable JSON report in addition to human summary.
+未提供参数时按标准模式运行。
 
-If no flags are provided, run in standard mode.
+## 必查项
 
-## Required checks
+按以下顺序执行全部检查，每项报告为 `pass`、`warn` 或 `fail`。
 
-Run all checks in this order and report each as `pass`, `warn`, or `fail`.
+1. Python 运行时
+- 先解析 `python3`，再解析 `python`。名字在 PATH 上但无法报告自身版本的候选不算解析成功：继续落到下一个候选。（Windows 自带的 `python3` App Execution Alias 是 Microsoft Store 存根而非解释器，且排在 python.org 安装之前。）完全无法启动的名字同样视为无效候选，报告为该项检查失败，而不是终止整个运行。
+- 要求版本 >= 3.10。
+- 找不到任何 Python 解释器时记 `fail`。
+- 版本低于 3.10 时记 `fail`。
 
-1. Python runtime
-- Resolve `python3` first, then `python`. A name that is on PATH but cannot report
-  its own version does not win the resolution: fall through to the next candidate.
-  (Windows ships a `python3` App Execution Alias that is a Microsoft Store stub, not
-  an interpreter, and it sits on PATH ahead of a python.org install.) A name that
-  cannot be launched at all counts as the same kind of dud, and is reported as a
-  failed check rather than ending the run.
-- Require version >= 3.10.
-- `fail` if no Python interpreter is found.
-- `fail` if version is below 3.10.
-
-2. Playwright availability for PNG export
-- Check whether Playwright import works in the active Python interpreter (`import playwright`).
-- Check whether Chromium is installed for Playwright (`playwright install --help` availability is sufficient for command presence; prefer also checking browser cache when practical).
-- If missing, mark `warn` and print exact setup hint:
+2. PNG 导出所需的 Playwright 可用性
+- 检查当前 Python 解释器中 Playwright 是否可导入（`import playwright`）。
+- 检查 Playwright 的 Chromium 是否已安装（`playwright install --help` 可用即说明命令存在；条件允许时优先同时检查浏览器缓存）。
+- 缺失时记 `warn` 并打印准确的安装提示：
   - `pip install playwright && playwright install chromium`
-- Never auto-install dependencies.
+- 永不自动安装依赖。
 
-3. Expected script presence (maintainer-checkout mode only)
-- Verify these repository scripts exist:
-  - `scripts/verify-drawio-import.py`
-  - `scripts/verify-mermaid-import.py`
-  - `scripts/verify-motion.py`
-  - `scripts/lint-skin.py`
-  - `scripts/verify-docs-sync.py`
-- Missing scripts are `fail` in maintainer-checkout mode.
-- In installed-skill mode, report that maintainer scripts are not applicable;
-  their absence is not a warning or failure.
+3. 常见路径错误
+- 在解析出的安装根目录下确认 `SKILL.md` 存在。不要相对用户当前项目搜索它，也不要指引用户进入维护者仓库。
+- 当路径含空格且给出的命令示例未加引号时，提示 Windows 路径引号风险。
+- 检测命令输出中引用的本地已安装 skill 路径是否不存在（如输出包含此类路径）。
+- 以上均记 `warn` 并给出精确的修复建议。
+- 解析出的 `SKILL.md` 缺失时，应建议重新安装或更新 robot-aiot-draw-flowchart，而不是切换到仓库 checkout。
 
-4. Plugin wiring surfaces (maintainer-checkout mode only)
-- Verify Claude command files exist and point to their references:
-  - `commands/export-diagram.md` -> `references/export.md`
-  - `commands/import-drawio.md` -> `references/import-drawio.md`
-  - `commands/import-mermaid.md` -> `references/import-mermaid.md`
-  - `commands/profile.md` -> `references/profiles.md`
-  - `commands/doctor.md` -> `references/doctor.md`
-- Verify Pi prompt files exist and point to their references:
-  - `prompts/export-diagram.md` -> `references/export.md`
-  - `prompts/import-mermaid.md` -> `references/import-mermaid.md`
-  - `prompts/profile.md` -> `references/profiles.md`
-  - `prompts/doctor.md` -> `references/doctor.md`
-- Missing files are `fail`.
-- Mismatched reference routing is `fail`.
-- In installed-skill mode, report that maintainer command/prompt wiring is not
-  applicable; partial or absent repository routing trees are not failures.
+## 输出契约
 
-5. Common path mistakes
-- Verify `SKILL.md` beneath the resolved installation root. Do not search for it
-  relative to the user's current project and do not instruct users to enter the
-  maintainer repository.
-- Detect Windows path quoting risk when paths contain spaces and the provided command examples omit quotes.
-- Detect references to local installed skill paths that do not exist (if command output includes one).
-- Mark these as `warn` with a precise fix suggestion.
-- A missing resolved `SKILL.md` should suggest reinstalling or updating Diagram
-  Design, not changing into a repository checkout.
+始终打印：
 
-## Output contract
-
-Always print:
-
-1. A compact summary line:
+1. 一行紧凑汇总：
 - `Doctor summary: <PASS|WARN|FAIL> (<pass_count> pass, <warn_count> warn, <fail_count> fail)`
 
-2. A checklist with one line per check:
+2. 每项检查一行的清单：
 - `[PASS] Python 3.11.9 found at ...`
 - `[WARN] Playwright not installed ...`
-- `[FAIL] Missing scripts/verify-docs-sync.py`
+- `[FAIL] SKILL.md not found under resolved installation root`
 
-3. A `Next actions` section only when warn/fail exists.
+3. 仅当存在 warn/fail 时输出 `Next actions` 小节。
 
-4. If `--json` is present, append JSON object with:
-- `status`, `counts`, `checks[]` (`name`, `status`, `message`, `fix` optional), `timestamp`.
+4. 提供 `--json` 时追加 JSON 对象，包含：
+- `status`、`counts`、`checks[]`（`name`、`status`、`message`、可选 `fix`）、`timestamp`。
 
-## Safety and behavior rules
+## 安全与行为规则
 
-- Read-only diagnostics only: do not modify files, do not install packages, do not run destructive git commands.
-- If any command fails unexpectedly, capture stderr and continue remaining checks.
-- Never claim a check passed unless verified directly in this run.
-- Prefer explicit, copy-pastable remediation commands.
+- 只做只读诊断：不修改文件、不安装包、不执行破坏性 git 命令。
+- 任一命令意外失败时，捕获 stderr 并继续其余检查。
+- 除非本次运行中直接验证过，否则永不宣称某项检查通过。
+- 优先给出显式、可直接复制粘贴的修复命令。
 
-## Example result
+## 结果示例
 
 ```text
-Doctor summary: WARN (6 pass, 2 warn, 0 fail)
+Doctor summary: WARN (5 pass, 1 warn, 0 fail)
 [PASS] Python 3.11.9 found at /usr/bin/python3
 [WARN] Playwright package not found in active interpreter
-[PASS] scripts/verify-drawio-import.py present
+[PASS] SKILL.md present under resolved installation root
 ...
 
 Next actions

@@ -19,6 +19,7 @@ metadata:
 
 | 依赖 skill | 用途 |
 |------|------|
+| archify | 架构图/流程图生成的运行时支撑 |
 | diagram-design | 编辑级设计系统、39类视觉类型规则、Taste Gate 审查 |
 | ui-ux-pro-max | XML→HTML 桥接稿的 UI 参考与非阻塞 UI 检查 |
 
@@ -54,6 +55,14 @@ bash "$HOME/.agents/skills/robot-aiot-draw-flowchart/scripts/precheck_deps.sh"
 | --- | --- |
 | 线性 / 分支 / 循环 / 并行 / 子流程 / 泳道 | `references/flowchart-patterns.md` |
 | 分层架构图（L1~L5 容器、跨层连接、数据支撑区） | `references/layered-architecture.md` |
+| IT 现状图（改造前旧格局、痛点标注、文件级交接） | `references/type-it-state.md` |
+| 循环/飞轮图（环状推进 + 中心共享状态回写；注意与 `references/design-system.md` 中作为动画模式的 "loop" 区分，此处是图表类型） | `references/type-loop.md` |
+| 鱼骨图 / 石川图（根因分析） | `references/type-fishbone.md` |
+| 维恩图 / 集合交集 | `references/type-venn.md` |
+| 金字塔 / 漏斗 | `references/type-pyramid.md` |
+| 散点图（相关性/分布） | `references/type-scatter.md` |
+| 用户故事地图（叙事顺序 × 发布切线） | `references/type-story-map.md` |
+| Wardley 地图（价值链 × 演化阶段） | `references/type-wardley.md` |
 
 > ⚠️ `mxgraph.flowchart.*` 命名空间形状在 XML→HTML 映射表中暂无对应 CSS，转换会触发未映射警告，属已知缺口。
 
@@ -63,6 +72,7 @@ bash "$HOME/.agents/skills/robot-aiot-draw-flowchart/scripts/precheck_deps.sh"
 
 ## 风格系统
 
+- 风格×图表类型适配矩阵与 12 风格唯一索引：`references/style-diagram-matrix.md`（style-1 至 style-12 各规范文件的显式链接均在其中）
 - 配色权威：`references/color-schemes.md`（科技蓝/暗夜黑/清新绿/告警红/升级紫 + 状态语义）
 - 样式权威：`references/style-consistency.md`（节点/容器/箭头/文本标准值；示例冲突以它为准）
 - 机器人图标：只从 `references/robot-icons.md` 复制，不手绘

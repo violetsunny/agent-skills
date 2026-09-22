@@ -1,6 +1,6 @@
 # 逐页交互 HTML 编写规则
 
-本文件定义 Phase 4 逐页交互 HTML 的编写规则。
+本文件定义逐页交互 HTML 的编写规则（由调用方母稿逐页派生）。
 
 ## 总体结构
 
@@ -53,7 +53,7 @@
 }
 ```
 
-主色来自 Phase 3 首页架构图，其余 token 按 `design-system-standards.md` 规则派生。
+主色来自调用方图表真源中的首页架构图，其余 token 按 `design-system-standards.md` 规则派生。
 
 ## 画布约束
 
@@ -208,7 +208,7 @@ SVG 路径用 `stroke-dasharray` + `stroke-dashoffset`；柱状图从底部生�
 
 ## 图表引用
 
-优先内联 Phase 3 生成的图表 HTML 中的 SVG 内容，或通过 iframe/object 引用。
+优先内联调用方图表生产环节产出的图表 HTML 中的 SVG 内容，或通过 iframe/object 引用。
 不修改图表节点坐标、结构关系和数据语义。
 
 ## 素材图网格与 lightbox

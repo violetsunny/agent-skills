@@ -403,9 +403,11 @@ def run_checks(
         bg, bg_note = detect_background(root, vb)
     notes.append(bg_note)
     if relative_luminance(bg) > 0.2:
-        warnings.append(
-            f"detected background {to_hex(bg)} is light — this checker targets dark-theme SVGs"
+        notes.append(
+            f"abstain: detected background {to_hex(bg)} is light — "
+            "this checker targets dark-theme SVGs; skipping dark-theme checks (exit 0)"
         )
+        return errors, warnings, notes
 
     content_pts: list[tuple[float, float]] = []
     text_count = 0

@@ -1,8 +1,8 @@
-# Sketchy Filter (hand-drawn variant)
+# Sketchy Filter（手绘变体）
 
-Optional displacement filter that wobbles every stroke and edge slightly — turns any minimal variant into a hand-drawn "editorial" register without changing layout. Use when the diagram accompanies an essay rather than technical docs.
+可选的位移滤镜，让每条描边和边缘轻微抖动——不改布局，把任何极简变体变成手绘"编辑风"寄存器。图伴随随笔（而非技术文档）时使用。
 
-## Grammar
+## 语法
 
 ```svg
 <defs>
@@ -21,7 +21,7 @@ Optional displacement filter that wobbles every stroke and edge slightly — tur
 <text ...>Labels go here</text>
 ```
 
-## Tuning
+## 调参
 
 | Parameter | Range | Effect |
 |---|---|---|
@@ -30,14 +30,14 @@ Optional displacement filter that wobbles every stroke and edge slightly — tur
 | `scale` | 1–6 | 1 barely-there, 1.5 default, 2 visible, 4+ cartoon. |
 | `seed` | integer | Swap for a different random pattern. |
 
-## Critical rule
-Filter shapes, NOT text. Displacement-mapped text becomes illegible. Structure your SVG so text is in a sibling group outside the filtered group.
+## 关键规则
+滤镜作用于形状，不作用于文本。经位移映射的文本会不可读。组织 SVG 时让文本位于滤镜组之外的兄弟分组中。
 
-## When to use
-- Essay / blog post / newsletter where the diagram is the hero of a narrative page.
-- "Working sketch" register — showing something is mid-thought, not final architecture.
+## 何时使用
+- 随笔/博客/newsletter，图是叙事页面的主角。
+- "工作草图"寄存器——表达某物处于思考中途，不是最终架构。
 
-## When not to use
-- Technical documentation (precision matters).
-- Diagrams with dense labels or tight alignments (filter reads as noise).
-- Dark variants — wobble reads as artifact on dark backgrounds. Test first.
+## 何时不用
+- 技术文档（精确性优先）。
+- 标签密集或对齐紧凑的图（滤镜会被读成噪点）。
+- 深色变体——抖动在深色背景上会被读作渲染瑕疵。先测试。

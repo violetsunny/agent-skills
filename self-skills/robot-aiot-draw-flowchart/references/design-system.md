@@ -242,6 +242,8 @@ Rules:
 
 Expand SVG `viewBox` height by ~60px.
 
+自动化自检（§6 箭头 marker 尺寸与连接点扇形规则）：`python3 scripts/check_design_geometry.py <file.svg>` — 校验 markerWidth/viewBox 比例、同边连接点间距 ≥12px 等；exit 0 = 无 error（允许 warning/note），1 = 有 error。
+
 ---
 
 ## §7 Layout & Spacing
@@ -311,6 +313,8 @@ Quick check: if a coordinate ends in 1, 2, 3, 5, 6, 7, 9 — fix it.
 If you exceed, split into two diagrams (overview + detail).
 
 分层架构图例外：层容器内的能力卡不计入通用节点预算（节点总数不受 ≤9 限制）；箭头预算同样豁免——按连通分量分组计预算，每个独立连通分量（如一个独立垂直栈/烟囱，各含自身层间箭头）内箭头仍受 ≤12 约束，多个互不相连的分量的箭头总数不受单图 12 条上限判定。
+
+自动化自检（§7 4px 网格与复杂度预算）：`python3 scripts/check_design_geometry.py <file.svg>` — 校验坐标/尺寸 4px 整除与节点 ≤9、箭头 ≤12、强调 ≤2 预算（依赖 `data-graph-role="node"` 标注，缺标注时报 SKIP 不猜测）；exit 0 = 无 error（允许 warning/note），1 = 有 error。
 
 ### Page layout
 
@@ -392,6 +396,8 @@ Run before producing any diagram.
 - [ ] Every font size, coord, width, height, gap divisible by 4?
 - [ ] From the installed skill directory, did `python3 scripts/self_check.py <file>` pass? (Accessible-SVG contract, single-file safety, motion basics; ships with the skill.)
 - [ ] If animated, does the complete static/no-JS frame work, does reduced motion hide/disable playback, and is the controller copied verbatim from `assets/template-motion.html`? From a repository checkout, also run `python3 <repo-root>/scripts/verify-motion.py path/to/generated.html` plus the skin linter; from an installed skill, manually check print and static-query states on top of the self-check.
+
+> 适用范围说明：`self_check.py` / `lint-skin.py` 交付门仅约束 template/motion 包装页产物（`assets/template*.html` 系）。`scripts/interactive_html.py` 与 `fireworks.py export-html` 产出的交互 viewer 使用 canonical viewer 脚本生成，结构与包装页不同，豁免该门（对其跑 self_check 必然 FAIL，属预期，不代表产物有缺陷）。
 
 **Typography:**
 

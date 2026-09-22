@@ -10,8 +10,6 @@
 
 Google → OpenAI → Azure → OpenRouter → DashScope → Z.AI → MiniMax → Replicate → Jimeng → Seedream → Agnes
 
-codex-cli 永不自动选择。
-
 ### Quality 预设
 
 - **normal** = 1K 快速预览
@@ -22,7 +20,7 @@ codex-cli 永不自动选择。
 - Reference-Image 身份保持：用简短硬编码语言，禁止长描述
 - prompt 不含文字/字母，文案在后期叠加
 - Batch 模式优先，每图最多 3 次重试
-- Model 解析优先级：CLI > EXTEND.md > env > built-in default
+- Model 解析优先级：显式指定 > 环境变量
 
 ## Banner/封面设计
 
@@ -76,7 +74,7 @@ Minimalist / Bold Typography / Gradient Flow / Geometric Abstract / Photo-driven
 4. **提示用户** — 输出 `[NO-AI-IMAGE] 未检测到图像生成 API Key，封面/配图已降级为 CSS/程序化渲染`
 5. **不尝试调用脚本** — 跳过 AI 生图步骤，直接进入 CSS/程序化路径
 
-检测方式：检查环境变量中是否存在以下任一 Key：`GEMINI_API_KEY`、`OPENAI_API_KEY`、`AZURE_OPENAI_API_KEY`、`DASHSCOPE_API_KEY`、`MINIMAX_API_KEY`、`REPLICATE_API_TOKEN`。全部缺失即触发降级。
+检测方式：检查环境变量中是否存在以下任一 Key：`GEMINI_API_KEY`、`OPENAI_API_KEY`、`AZURE_OPENAI_API_KEY`、`OPENROUTER_API_KEY`、`DASHSCOPE_API_KEY`、`MINIMAX_API_KEY`、`REPLICATE_API_TOKEN`。全部缺失即触发降级。注：仅检测主流 7 家 Key；使用 Z.AI/Jimeng/Seedream/Agnes 等其余 Provider 时以对应环境变量存在为准，不触发降级。
 
 ## 约束
 
@@ -84,7 +82,7 @@ Minimalist / Bold Typography / Gradient Flow / Geometric Abstract / Photo-driven
 2. 封面图必须包含品牌标识且不得遮挡标题
 3. 所有配图需人工校验与内容的相关性
 4. 用户未明确要求时不主动使用 AI 生图
-5. PPT 静态版不使用动效，交互版按需添加
+5. 本工作流全部产物不使用动效
 6. 无 API Key 时必须降级，不得虚构生成结果或静默跳过
 
 ## 截图取景与配图 Prompt 的母稿流程应用

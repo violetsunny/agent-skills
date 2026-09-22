@@ -484,9 +484,9 @@ deck 换肤素材库。每套预设 = 一组语义 token 覆盖集，直接覆�
 
 ### 2.31 signal
 
-- **look**: 机构董事会汇报风——navy 与奶油双表面逐页互换、古金唯一 accent（仅规线 / 标题内斜体强调 / 统计数字三用途）、serif 展示 9.5vw 行高 0.96、单页填充 ≤50% 不对称留白、零阴影零渐变。
+- **look**: 机构董事会汇报风——navy 与奶油双表面（全 deck 锁定一个底面，禁逐页互换；另一表面仅作页内反转强调块）、古金唯一 accent（仅规线 / 标题内斜体强调 / 统计数字三用途）、serif 展示 9.5vw 行高 0.96、单页填充 ≤50% 不对称留白、零阴影零渐变。
 - **pick-when**: 机构 / 董事会 / 克制严肃；想要董事会材料式权威与编辑精度的产品。
-- **核心 token**: 双表面——navy `#1C2644`（alt `#232F55`）与奶油 `#F0ECE3`（alt `#E6E0D4`）逐页互换；navy 面 `--text-primary:#E2DCD0` `--text-secondary:#8A96A8`（三级 `#4E5A6E`），奶油面 `--text-primary:#1A2030` `--text-secondary:#5A6270`（三级 `#9AA0A8`）；`--primary-color:#C8A870`（古金唯一 accent） `--outline-color:#2E3D5C`（深面）/`#CAC4B4`（浅面）；on-primary 不适用（金从不作填充）。
+- **核心 token**: 双表面——navy `#1C2644`（alt `#232F55`）与奶油 `#F0ECE3`（alt `#E6E0D4`），全 deck 锁定一个底面、另一表面仅作页内反转强调；navy 面 `--text-primary:#E2DCD0` `--text-secondary:#8A96A8`（三级 `#4E5A6E`），奶油面 `--text-primary:#1A2030` `--text-secondary:#5A6270`（三级 `#9AA0A8`）；`--primary-color:#C8A870`（古金唯一 accent） `--outline-color:#2E3D5C`（深面）/`#CAC4B4`（浅面）；on-primary 不适用（金从不作填充）。
 - **字体·形状**: 展示体 `"Songti SC","SimSun",Georgia,serif`（600-700；display 9.5vw 行高 0.96 负字距）/ 正文 `"PingFang SC","Microsoft YaHei",system-ui,sans-serif`（400）/ 数据 `ui-monospace,"SF Mono",Consolas,monospace`（500，uppercase，0.14-0.22em）；圆角 0px（唯一 donut 50% / 时间线点 9px / 图例 2px）；密度中低不对称（单页填充 ≤50%）；阴影无渐变无（仅全幅图底 scrim）；暗页 80px 网格纹理 3% 白指纹。
 - **签名动效**: entry `cubic-bezier(0.16,1,0.3,1)` 0.5-0.85s 错峰（delay 0-6）/ exit（翻页）`cubic-bezier(0.77,0,0.175,1)` / ambient 无。
 - **页型配方要点**:
@@ -526,7 +526,7 @@ deck 换肤素材库。每套预设 = 一组语义 token 覆盖集，直接覆�
 
 ### 2.34 studio
 
-- **look**: 高压工作室宣言风——近黑与酸黄二元反转（或反之）、次级色用同色透明度档不用灰、sans 900 uppercase 负字距 12vw 封面、1px 发丝 chrome + 2px stat 顶规、零阴影零渐变。
+- **look**: 高压工作室宣言风——近黑与酸黄二元配色（全 deck 锁定一个底面，或反之，禁逐页反转互换；另一表面仅作页内反转强调块）、次级色用同色透明度档不用灰、sans 900 uppercase 负字距 12vw 封面、1px 发丝 chrome + 2px stat 顶规、零阴影零渐变。
 - **pick-when**: 宣言 / 高压 / 二元反转；想要设计工作室式攻击性自信的产品。注意：深底 + 酸色属 Lazy Defaults 限制区，仅用户明确点名或有品牌理由时使用，且整套一致、不混用、霓虹不进正文。
 - **核心 token**: 二元反转——近黑 `#1C1C1C`（alt `#242422`）底 + 酸黄 `#F5D200`（alt `#F0CC00`）字，或反之；深面 `--text-secondary:rgba(245,210,0,0.58)`（三级 0.32），浅面 `--text-secondary:rgba(28,28,28,0.62)`（三级 0.35）——同色透明度档不用灰；`--primary-color:#F5D200` `--outline-color:#2E2E2C`（深面）/`rgba(28,28,28,0.18)`（浅面）；on-primary `#1C1C1C`（黄底近黑字，显式）。
 - **字体·形状**: 展示体 `"PingFang SC","Microsoft YaHei",system-ui,sans-serif`（900，uppercase，负字距 −0.01..−0.03em；12vw 封面 / 7.5vw 声明）/ 正文同栈（400/500）/ 数据 `ui-monospace,"SF Mono",Consolas,monospace`（500，仅元数据）；圆角 0px；密度低刻意稀疏；阴影无渐变无（深度 = 双表面反转 + 1px 发丝 chrome / 2px stat 顶规与图表基线 + 900 字重质量）。
@@ -534,9 +534,9 @@ deck 换肤素材库。每套预设 = 一组语义 token 覆盖集，直接覆�
 - **页型配方要点**:
   - cover: 近黑底 + 12vw sans 900 uppercase 大标题 + 三栏 mono 元数据 footer（工作室 × 客户 / 标题 / 工作室名）。
   - stat-grid: stat-card 2px 顶规 + 酸黄大数字 + 发丝分隔。
-  - quote: 7.5vw 声明页（表面反转：黄底黑字）。
+  - quote: 7.5vw 声明页（页内 accent 色块反转：黄底黑字——组件级强调，非页级主题反转，全 deck 仍单主题）。
   - timeline: 发丝轴 + 方角节点 + em-dash 随表面 accent 色。
-  - closing: 二元反转收底 + mono 元数据 footer 重现。
+  - closing: 同表面收底 + mono 元数据 footer 重现（可用黄底黑字 accent 块，禁页级主题反转）。
 
 ### 2.35 vellum
 
@@ -554,17 +554,17 @@ deck 换肤素材库。每套预设 = 一组语义 token 覆盖集，直接覆�
 
 ### 2.36 porcelain-indigo
 
-- **look**: 冷瓷学术杂志风——瓷白冷底、深靛蓝单墨（墨即主题色），暗靛反转页（墨底瓷字）作节奏，1px 靛蓝发丝线分栏，serif 展示 + mono 栏目标签 chrome，零彩色零阴影零渐变。
+- **look**: 冷瓷学术杂志风——瓷白冷底、深靛蓝单墨（墨即主题色），全 deck 单瓷白表面不反转（节奏靠发丝线分栏与留白层级），1px 靛蓝发丝线分栏，serif 展示 + mono 栏目标签 chrome，零彩色零阴影零渐变。
 - **pick-when**: 冷静 / 理性 / 深度内容；想要学术期刊式克制与工程文化气质的科技研究、数据分享、技术发布产品。锁定 M 系登记版式（M01-M10），不与 S 系混用。
 - **核心 token**: `--surface-color:#F1F3F5` `--surface-muted:#E4E8EC` `--text-primary:#0A1F3D` `--text-secondary:#0A1F3D`（降 opacity 至 60%） `--primary-color:#0A1F3D`（双色单墨，墨即主色） `--secondary-color:#152A4A` `--tertiary-color:#E4E8EC` `--outline-color:#0A1F3D`（20% 软发丝）；on-primary `#F1F3F5`（墨底瓷字，显式）。
-- **字体·形状**: 展示体 `"Songti SC","SimSun",Georgia,serif`（400-600，紧行高）/ 正文 `"PingFang SC","Microsoft YaHei",system-ui,sans-serif`（400）/ 数据与栏目标签 `ui-monospace,"SF Mono",Consolas,monospace`（uppercase，0.1-0.16em）；圆角 0px；密度中低（两段式页标题-内容间距 65-86px）；阴影无渐变无（深度 = 墨/纸反转页 + 发丝线）。
+- **字体·形状**: 展示体 `"Songti SC","SimSun",Georgia,serif`（400-600，紧行高）/ 正文 `"PingFang SC","Microsoft YaHei",system-ui,sans-serif`（400）/ 数据与栏目标签 `ui-monospace,"SF Mono",Consolas,monospace`（uppercase，0.1-0.16em）；圆角 0px；密度中低（两段式页标题-内容间距 65-86px）；阴影无渐变无（深度 = 发丝线分栏 + 留白层级；on-primary 墨底瓷字仅限组件级强调块，禁页级反转）。
 - **签名动效**: entry `cubic-bezier(0.19,1,0.22,1)` 0.4s / exit `cubic-bezier(0.755,0.05,0.855,0.06)` 0.6s / ambient 无。
 - **页型配方要点**:
   - cover: M01 开场封面——深靛 hero-dark 底 + 瓷白 serif 巨字（192px 档）+ mono kicker（场合·主讲人），页眉不写页码。
   - stat-grid: M03 数据大字报——瓷白底 3×2 六格统计卡，数字深靛，卡间 1px 靛蓝发丝线，数字过长用 K/M 简写。
   - quote: M08 大引用页——dark 优先（靛底瓷字），serif 金句 111px 档逐句揭示 + 出处 lead 65% 透明度。
   - timeline: M06 两列流水线——mono 靛蓝步骤编号 + fragment 分步点亮；旧/新范式对照改 M09（左列 55% 透明度弱化）。
-  - closing: M07 悬念问题页——靛蓝 hero-dark + 巨字三行断在语义处；多幕 deck 用 M02 幕封收束（hero dark/light 交替呼吸）。
+  - closing: M07 悬念问题页——靛蓝 hero-dark + 巨字三行断在语义处；多幕 deck 用 M02 幕封收束（全篇单色系，呼吸靠 hero 档与非 hero 档轮换制造，禁 dark/light 翻面）。
 
 ### 2.37 kraft-journal
 

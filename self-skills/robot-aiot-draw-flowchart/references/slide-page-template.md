@@ -143,7 +143,7 @@ font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
 
 ```html
 <div class="chart-zone">
-  <iframe src="../<图表名>.html" width="100%" height="100%" frameborder="0"></iframe>
+  <iframe src="../flow/<图表名>.html" width="100%" height="100%" frameborder="0"></iframe>
 </div>
 ```
 

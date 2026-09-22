@@ -61,7 +61,7 @@
 1. 机器人样式统一：只从 `robot-icons.md` 复制，不手绘
 2. 配色选择：按状态选主题色，从 `color-schemes.md` 取值
 3. 图表类型选择：简单顺序选线性，有判断选分支，有重试选循环，多角色选泳道，架构展示选分层架构图
-4. 文件打开：`.html` 双击浏览器打开；`.svg` 可导入 draw.io 重绘（见 `import-drawio.md`）
+4. 文件打开：`.html` 双击浏览器打开；已有 `.drawio` 源可提取结构后按本 skill 规范重绘（见 `import-drawio.md`；本 skill 不产出 draw.io XML，硬约束 1）
 5. 已生成图表修改：改生成脚本重跑，不在编辑器手改坐标
 
 ## 交付前自审
@@ -76,7 +76,7 @@
 
 样式一致性必检（路径 B 按 `style-consistency.md` 的属性映射执行，如 fontSize→font-size）：
 
-1. 普通节点 `fontSize=12`、`strokeWidth=2`、`arcSize=15`、`shadow=0`、`fillColor=#FFFFFF`
+1. 普通节点 `fontSize=12`、`strokeWidth=2`、`arcSize=6–8`、`shadow=0`、`fillColor=#FFFFFF`
 2. 分层容器 `strokeWidth=3`，层标签 `fontSize=16`
 3. 所有箭头 `strokeWidth=3`
 4. 虚线只用于反馈/循环
@@ -95,4 +95,4 @@ archify 路径额外检查：
 1. 模式映射正确
 2. SVG 无硬编码 fill/stroke 十六进制
 3. `.toolbar`、`<script>`、`:root`、`[data-theme]` 未被破坏
-4. 通过 `node bin/archify.mjs validate` 或 `check`
+4. 通过 `"$ARCHIFY" validate` 或 `check`（`$ARCHIFY` = `$HOME/.agents/skills/archify/bin/archify.mjs`，绝对路径约定见 SKILL.md 路径 C）

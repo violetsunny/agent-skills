@@ -2,6 +2,23 @@
 
 Not all styles work equally well for every diagram type. Use this guide to pick the best style.
 
+## 12 风格文件索引
+
+| 风格 | 规范文件 |
+|---|---|
+| 1 Flat Icon | [style-1-flat-icon.md](style-1-flat-icon.md) |
+| 2 Dark Terminal | [style-2-dark-terminal.md](style-2-dark-terminal.md) |
+| 3 Blueprint | [style-3-blueprint.md](style-3-blueprint.md) |
+| 4 Notion Clean | [style-4-notion-clean.md](style-4-notion-clean.md) |
+| 5 Glassmorphism | [style-5-glassmorphism.md](style-5-glassmorphism.md) |
+| 6 Claude Official | [style-6-claude-official.md](style-6-claude-official.md) |
+| 7 OpenAI Official | [style-7-openai.md](style-7-openai.md) |
+| 8 Dark Luxury | [style-8-dark-luxury.md](style-8-dark-luxury.md) |
+| 9 C4 Review Canvas | [style-9-c4-review-canvas.md](style-9-c4-review-canvas.md) |
+| 10 Cloud Fabric | [style-10-cloud-fabric.md](style-10-cloud-fabric.md) |
+| 11 Event Transit | [style-11-event-transit.md](style-11-event-transit.md) |
+| 12 Ops Pulse | [style-12-ops-pulse.md](style-12-ops-pulse.md) |
+
 ## Engineering-first styles (9–12)
 
 Styles 9–12 pair a visual language with an executable semantic contract. They
@@ -20,7 +37,7 @@ bends per edge, and no semantic edge duplicated for visual effects.
 
 ## Architecture Diagram
 | Style | Suitability | Notes |
-|-------|----------|
+|-------|------------|-------|
 | 1 Flat Icon | Excellent | Default choice; colorful node fills, clear layering |
 | 2 Dark Terminal | Excellent | Popular for dev blogs; use colored borders on dark bg |
 | 3 Blueprint | Excellent | Perfect for formal architecture docs |
@@ -50,7 +67,7 @@ bends per edge, and no semantic edge duplicated for visual effects.
 | 3 Blueprint | Excellent | Formal, technical documentation |
 | 4 Notion Clean | Excellent | Best for Notion-embedded sequence diagrams |
 | 5 Glassmorphism | Poor | Glass effects make lifelines hard to read |
-| 6 Claude Official | Excellent | Ward contrast |
+| 6 Claude Official | Excellent | Warm contrast |
 | 7 OpenAI Official | Excellent | Minimal, precise; ideal for API docs |
 | 8 Dark Luxury *(AI-authored)* | Good | Dramatic contrast; dark lifelines suit developer blogs and premium tech docs |
 
@@ -69,10 +86,10 @@ bends per edge, and no semantic edge duplicated for visual effects.
 ## Mind Map / Concept Map
 | Style | Suitability | Notes |
 |-------|------------|-------|
-| 1 Flat Icon | Excellent branches, engaging |
+| 1 Flat Icon | Excellent | Colorful branches, engaging |
 | 2 Dark Terminal | Good | Neon-like branches on dark bg |
 | 3 Blueprint | Poor | Blueprint grid conflicts with radial layout |
-| 4 Notion Clean | Excellent | Ideal for n brainstorming |
+| 4 Notion Clean | Excellent | Ideal for brainstorming |
 | 5 Glassmorphism | Excellent | Stunning visual for presentations |
 | 6 Claude Official | Good | Warm, readable |
 | 7 OpenAI Official | Good | Clean and minimal |
@@ -95,7 +112,7 @@ bends per edge, and no semantic edge duplicated for visual effects.
 |-------|------------|-------|
 | 1 Flat Icon | Good | Colorful use case ellipses |
 | 2 Dark Terminal | Poor | Stick figures less visible on dark bg |
-| 3 rint | Excellent | Classic UML aesthetic |
+| 3 Blueprint | Excellent | Classic UML aesthetic |
 | 4 Notion Clean | Excellent | Perfect for product requirement docs |
 | 5 Glassmorphism | Poor | Unnecessary visual noise |
 | 6 Claude Official | Excellent | Warm, professional |
@@ -105,7 +122,7 @@ bends per edge, and no semantic edge duplicated for visual effects.
 ## State Machine Diagram
 | Style | Suitability | Notes |
 |-------|------------|-------|
-Flat Icon | Good | Colorful states |
+| 1 Flat Icon | Good | Colorful states |
 | 2 Dark Terminal | Good | Glowing states and transitions |
 | 3 Blueprint | Excellent | Best for formal UML state machines |
 | 4 Notion Clean | Excellent | Clean for documentation |
@@ -115,7 +132,7 @@ Flat Icon | Good | Colorful states |
 | 8 Dark Luxury *(AI-authored)* | Good | High contrast for state transitions; editorial quality |
 
 ## Network Topology
-| Style | Suitabili |
+| Style | Suitability | Notes |
 |-------|------------|-------|
 | 1 Flat Icon | Excellent | Colorful device icons |
 | 2 Dark Terminal | Excellent | Cyberpunk-style network maps |
@@ -131,9 +148,9 @@ Flat Icon | Good | Colorful states |
 |-------|------------|-------|
 | 1 Flat Icon | Excellent | Color-coded checkmarks |
 | 2 Dark Terminal | Good | Works for dev tool comparisons |
-| 3 Blor | Grid conflicts with table layout |
+| 3 Blueprint | Poor | Grid conflicts with table layout |
 | 4 Notion Clean | Excellent | Perfect for Notion-embedded tables |
-| 5 Glassmorphism | Poor | Distabular data |
+| 5 Glassmorphism | Poor | Distracts from tabular data |
 | 6 Claude Official | Excellent | Clean, warm |
 | 7 OpenAI Official | Excellent | Minimal, precise |
 | 8 Dark Luxury *(AI-authored)* | Fair | Dark bg non-standard for comparison tables; use cautiously |

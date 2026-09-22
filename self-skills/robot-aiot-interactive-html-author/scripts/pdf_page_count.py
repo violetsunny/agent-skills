@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""PDF 页数断言（interactive-html-authoring.md 打印样式节：交付前 chrome --print-to-pdf 导出后断言 页数 == slide 数）。
+"""PDF 页数断言（interactive-html-authoring.md「打印与导出」节：交付前 chrome --print-to-pdf 导出后断言 页数 == slide 数）。
 
 用法:
   "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" --headless=new \
