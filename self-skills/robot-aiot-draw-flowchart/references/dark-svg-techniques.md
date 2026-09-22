@@ -264,7 +264,7 @@ Data:    [ DB A ]        [ DB B ]     [ Cache ]
 
 适用于直绘 SVG 主路径。import 重绘（drawio/mermaid）流程的格式与尺寸档位仍以 output-spec.md 为准。
 
-1. 输出单个自包含 `.svg` 文件——零外部依赖；仅联网发布场景且需要品牌 webfont 时允许加 Google Fonts `@import`（零外链交付物禁止，一律系统字体栈）。
+1. 输出单个自包含 `.svg` 文件——零外部依赖；仅联网发布场景且需要品牌 webfont 时允许加 Google Fonts `@import`（零外链交付物禁止，基准见 design-system.md §5"模板默认零外链"）。
 2. 根 `<svg>` 必须带 `xmlns="http://www.w3.org/2000/svg"`。
 3. `viewBox` 按内容 + 30px padding 设置；不写固定 `width`/`height` 属性，让 SVG 响应式缩放。
 4. `<style>`、`<defs>`、marker、pattern 全部置于文件顶部。

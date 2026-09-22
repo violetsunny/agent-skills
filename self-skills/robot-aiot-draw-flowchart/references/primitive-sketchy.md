@@ -23,12 +23,12 @@
 
 ## 调参
 
-| Parameter | Range | Effect |
+| 参数 | 范围 | 效果 |
 |---|---|---|
-| `baseFrequency` | 0.01–0.04 | Lower = lazy wavy lines; higher = jittery. 0.02 default. |
-| `numOctaves` | 1–3 | More = more noise detail. 2 is plenty. |
-| `scale` | 1–6 | 1 barely-there, 1.5 default, 2 visible, 4+ cartoon. |
-| `seed` | integer | Swap for a different random pattern. |
+| `baseFrequency` | 0.01–0.04 | 值越低线条越慵懒波浪，越高越抖动。默认 0.02。 |
+| `numOctaves` | 1–3 | 值越高噪声细节越多。2 已足够。 |
+| `scale` | 1–6 | 1 几乎无感，1.5 默认，2 明显可见，4+ 卡通化。 |
+| `seed` | 整数 | 换一个值即得不同的随机图案。 |
 
 ## 关键规则
 滤镜作用于形状，不作用于文本。经位移映射的文本会不可读。组织 SVG 时让文本位于滤镜组之外的兄弟分组中。
