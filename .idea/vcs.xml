@@ -2,6 +2,24 @@
 <project version="4">
   <component name="VcsDirectoryMappings">
     <mapping directory="" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/key-skills-git/ECC" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/key-skills-git/OpenSpec" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/key-skills-git/andrej-karpathy-skills" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/key-skills-git/anthropics-skills" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/key-skills-git/archify" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/key-skills-git/baoyu-skills" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/key-skills-git/caveman" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/key-skills-git/claude-code-java" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/key-skills-git/diagram-design" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/key-skills-git/frontend-slides" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/key-skills-git/i-have-adhd" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/key-skills-git/matt-skills" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/key-skills-git/ponytail" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/key-skills-git/ppt-master" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/key-skills-git/scientific-agent-skills" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/key-skills-git/superpowers" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/key-skills-git/ui-ux-pro-max-skill" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/key-skills-git/vercel-agent-skills" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/skills/Apple-Hig-Designer" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/skills/a-stock-data" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/skills/global-stock-data" vcs="Git" />
