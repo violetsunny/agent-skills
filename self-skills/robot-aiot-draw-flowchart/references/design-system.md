@@ -32,6 +32,8 @@ Use for any supported visual type when a reader will learn more from a visual th
 
 Before drawing, ask: *Would the reader learn more from this than from a well-written paragraph?* If no, don't draw.
 
+> **编号说明：** §3 为预留跳号，本文件无 §3 内容；`design-system.md §N` 引用以实际存在的章节为准。
+
 ---
 
 ## §4 Universal Anti-patterns
@@ -54,6 +56,8 @@ These mark "AI slop" schematics of any type:
 | Any breach of the six §6 connector rules | Diagonal slants, labels touching their stroke, masks clipped by a later node, overlapping paths, shared attach points, transit behind a non-endpoint box — each is an automatic fail; §6 states them in full |
 
 Type-specific anti-patterns live in each type reference.
+
+> **阴影例外登记（唯一）：** `style-6-claude-official.md`（Style 6 官方风格）允许使用其定义的 `feDropShadow` 软阴影（`dy=2`、`stdDeviation=6`、`flood-color=#00000008`），作为本表 "Shadow on any element" 禁令的唯一官方例外，仅限 Style 6 产物；其余风格与元素一律禁止。
 
 ---
 
@@ -262,6 +266,14 @@ Expand SVG `viewBox` height by ~60px.
 | Border radius | 4, 6, 8 |
 
 Exempt: stroke widths (0.8, 1, 1.2), opacity values, and the 22×22 dot-pattern.
+
+**全局字号例外清单（风格锁定值，豁免 4px 网格与字号集）：**
+- 风格皮肤 1–8 的锁定字号（如 Style 6 的 16/14/13px、Style 8 的 21/14/13/11/10/9px），见各 `style-N-*.md`
+- 参数化图表类型的 11 / 10 / 9 / 6.5px 刻度与注记字号
+- `dark-svg-techniques.md` 的 7–16px 深色字号阶梯
+- `primitive-annotation.md` 的 14px 斜体 callout
+
+清单之外的数值仍必须遵守 4px 网格与字号集。
 
 Quick check: if a coordinate ends in 1, 2, 3, 5, 6, 7, 9 — fix it.
 

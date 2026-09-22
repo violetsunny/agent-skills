@@ -27,10 +27,9 @@ skill 安装根目录从本 reference 被加载时的路径解析，不从用户
 - 找不到任何 Python 解释器时记 `fail`。
 - 版本低于 3.10 时记 `fail`。
 
-2. PNG 导出所需的 Playwright 可用性
-- 检查当前 Python 解释器中 Playwright 是否可导入（`import playwright`）。
-- 检查 Playwright 的 Chromium 是否已安装（`playwright install --help` 可用即说明命令存在；条件允许时优先同时检查浏览器缓存）。
-- 缺失时记 `warn` 并打印准确的安装提示：
+2. HTML→PNG 截图路径所需的 Playwright 可用性（见 export.md）
+- HTML→PNG 截图路径（见 export.md）：探测当前 Python 解释器中 `import playwright` 是否可用，及其 Chromium 是否已安装（`playwright install --help` 可用即算命令存在，条件允许时优先检查浏览器缓存）。
+- 缺失时标 `warn` 并打印精确安装提示：
   - `pip install playwright && playwright install chromium`
 - 永不自动安装依赖。
 

@@ -1,4 +1,6 @@
-# PNG Export
+# PNG 导出（SVG→PNG 光栅化）
+
+> **分工声明：** 本文件管 SVG→PNG 光栅化（cairosvg / rsvg-convert / svg2png.js 栈）；HTML 产物导出（HTML→PNG 截图、多图 gallery、OG 卡片）见 [`export.md`](export.md)。两文件互指，不重复内容。
 
 Load this reference only when the bundled `generate-diagram.sh` fallback is insufficient or a specific renderer must be selected.
 

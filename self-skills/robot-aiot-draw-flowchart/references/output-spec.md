@@ -1,6 +1,6 @@
-# Draw.io import output spec — format × size × detail × audience
+# 输出规格 — format × size × detail × audience
 
-Four dials decide what an imported diagram becomes. Set them **before** redrawing — they change the deliverable, layout, type ramp, node count, and wording, so retrofitting them afterwards means redrawing.
+四个刻度决定一张导入/重绘图表最终成为什么。适用于所有来源路径：draw.io 导入只是来源之一，另含 Mermaid 导入、以及从文字描述直接生成。在重绘**之前**设定它们——它们改变交付物、布局、字号梯度、节点数量与措辞，事后补设意味着重画。
 
 | Dial | Question it answers | Default |
 |---|---|---|

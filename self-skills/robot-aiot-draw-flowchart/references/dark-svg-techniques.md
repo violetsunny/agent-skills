@@ -258,19 +258,19 @@ Data:    [ DB A ]        [ DB B ]     [ Cache ]
 - 图例：最低图表元素下方 ≥20px，且在所有区域边界之外。
 - 标题块：距左上角 20px，位于内容区之外。
 - viewBox：内容包围盒 + 四边各 30px padding。
-- 与通用规则的关系：本节是深色直绘的排版节奏（行距/列距/消息距/内边距）；svg-layout-best-practices.md 的净空下限（组件间 80px 等）继续有效，两个数值冲突时取更大者。
+- 与通用规则的关系：本节是深色直绘的排版节奏（行距/列距/消息距/内边距）；间距与网格基准以 design-system.md §7 为唯一权威（节点间距取 20/24/32/40/48px 允许集、4px 网格），本节数值是深色场景的增量节奏，与通用允许值冲突时取更大者。
 
 ## 8. 独立 .svg 输出规格
 
 适用于直绘 SVG 主路径。import 重绘（drawio/mermaid）流程的格式与尺寸档位仍以 output-spec.md 为准。
 
-1. 输出单个自包含 `.svg` 文件——除可选的 Google Fonts `@import` 外零外部依赖。
+1. 输出单个自包含 `.svg` 文件——零外部依赖；仅联网发布场景且需要品牌 webfont 时允许加 Google Fonts `@import`（零外链交付物禁止，一律系统字体栈）。
 2. 根 `<svg>` 必须带 `xmlns="http://www.w3.org/2000/svg"`。
 3. `viewBox` 按内容 + 30px padding 设置；不写固定 `width`/`height` 属性，让 SVG 响应式缩放。
 4. `<style>`、`<defs>`、marker、pattern 全部置于文件顶部。
 5. 居中标签用 `text-anchor="middle"`；文字不得溢出所在框。
 6. 中文标签：`font-family` 追加 `'Noto Sans SC','PingFang SC'` 回退，并加宽框体——CJK 字符更宽。
-7. 等宽字体引用（可选，离线环境自动回退系统等宽字体）：
+7. 等宽字体引用（可选，**仅联网发布场景**；零外链交付物禁止 `@import`，离线环境自动回退系统等宽字体）：
 
 ```svg
 <style>

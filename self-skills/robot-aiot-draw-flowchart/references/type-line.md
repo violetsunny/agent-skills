@@ -12,7 +12,7 @@
 - **Vertex dots:** only on the focal series (`r=4`, filled). Other series: line only.
 - **Area fill (optional):** `<polygon>` closing back to `y=420` (x-axis baseline) at 0.08 opacity. Use for the focal series only when the area meaning is important.
 - **Multi-series:** up to 5 series. Focal = `accent`. Others = `series-1`, `series-2`, `series-3`, `series-4` from style-guide.md. Apply series palette in order — don't skip.
-- **Legend:** horizontal strip at the bottom. Swatch = 16×8px rect with the series fill/stroke. One entry per series.
+- **Legend:** horizontal strip at the bottom. Swatch = 16×8px rect with the series fill/stroke. One entry per series. Exception — the slopegraph variant uses a 24px line segment plus its endpoint dot as the legend key (see Slopegraph § Layout conventions), because stroke weight is what marks the focal series there.
 
 ### Polyline pattern
 
@@ -58,7 +58,7 @@ Not for: three or more states (that is the **line chart** above, or a bump chart
 - **Series count:** 4–10 — deliberately more than the parent chart's cap of 5. That cap exists because eight-vertex polylines tangle in mid-plot; a slopegraph has no mid-plot, so what sets the ceiling here is endpoint labels colliding, not the lines. Below 4 a sentence or a pair of bars says it better.
 - **No gridlines.** Every endpoint prints its own value, so a gridline carries nothing the figure has not already said; the two axis rules *are* the scale. This is a real departure from the parent line chart, where the gridlines do the reading.
 - **Domain:** pick round bounds that contain the data and state them in the source line. The shipped example runs 100–550ms over `y` 420 → 40, i.e. 0.84px per millisecond. The parent chart's include-zero rule does not bind here: a slope is unchanged by moving the origin, provided *both* axes move together. What a tight domain does do is magnify every slope equally, so state the bounds and let the reader calibrate.
-- **Legend keys are a 24px line plus its dot**, not the 16×8 rect the parent section specifies — the parent prose being stale on this point（输入契约示例，示例文件不随本 skill 分发）. A slopegraph key has to show stroke weight, because weight is what marks the focal series.
+- **Legend keys are a 24px line plus its dot**, not the parent chart's 16×8 rect — the parent § Layout conventions registers this as the slopegraph exception. A slopegraph key has to show stroke weight, because weight is what marks the focal series.
 - **Dots at both endpoints** — `r=3` non-focal, `r=4` focal. Also a departure: the line chart puts dots on the focal series only, because it has eight vertices per series and dots everywhere would be mush. A slopegraph has exactly two per series and both are where a value is read.
 - **4px grid** applies to the designed constants — axis positions, gutter edges, state-caption baselines. Endpoint `y` values are data-scaled and exempt; snapping them would move the data. Two inherited constants are also off-grid and stay that way: the legend rule at `y=462` and the `LEGEND`/source baseline at `478`, which every chart type in `assets/` shares. Matching the house rhythm beats matching the grid here — moving them 4px would misalign this variant against bar, line, scatter and treemap to satisfy a rule none of them satisfies either.
 

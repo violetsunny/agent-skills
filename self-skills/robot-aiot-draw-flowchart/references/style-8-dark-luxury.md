@@ -1,8 +1,7 @@
 # Style 8 — Dark Luxury
 
-Inspired by the `dark-gold` theme from [Understand-Anything](https://github.com/nicholasgasior/understand-anything).
-Deep black canvas with warm champagne-gold accents and hybrid serif/sans typography.
-Uniquely warm among all dark styles — closest peer is style-2 (Dark Terminal) but with a premium editorial feel.
+深黑画布配暖香槟金 accent，衬线/无衬线混排。本文件字号（21/14/13/11/10/9px）为风格锁定值，豁免 4px 网格（例外清单登记在 design-system.md §7）。
+在全部深色风格中独树一帜的暖调——最接近的同侪是 style-2（Dark Terminal），但更具高端编辑感。
 
 ## Color Tokens
 
@@ -177,9 +176,9 @@ Optional: subtle ambient radial glow around the central cluster
 
 | Style | Background | Accent | Typography |
 |-------|-----------|--------|-----------|
-| Style 2 Dark Terminal | `#0f0f1a` (blue-black) | `#00ff88` (neon green) | monospace throughout |
+| Style 2 Dark Terminal | `#0f0f1a`（蓝黑） | 多主题 accent 调色板（紫 `#a855f7`、绿 `#10b981`、蓝 `#3b82f6` 等，按主题/层选色） | 全等宽 |
 | **Style 8 Dark Luxury** | `#0a0a0a` (pure black) | `#d4a574` (champagne gold) | serif titles + sans body |
-| Style 3 Blueprint | `#0a1628` (navy) | `#4fc3f7` (cyan) | sans-serif |
+| Style 3 Blueprint | `#0a1628`（藏青） | `#00b4d8`（cyan，辅 `#48cae4`） | 等宽（'Courier New'） |
 
 **When to choose Style 8**: architecture/pipeline docs where you want editorial gravitas —
 README hero images, conference slides, knowledge-base diagrams, premium product docs.

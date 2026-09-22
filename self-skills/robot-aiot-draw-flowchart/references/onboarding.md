@@ -41,7 +41,7 @@ future diagrams use your tokens
 
 ---
 
-## § URL
+## URL
 
 ### 调用方式
 
@@ -175,7 +175,7 @@ onboarding 之后，用户应：
 
 ---
 
-## § Skill
+## Skill
 
 从携带自身设计系统的已安装 Agent Skill（如 `brand-design` 或 `ui-kit` 类 skill）提取 token。
 
@@ -232,7 +232,7 @@ onboarding 之后，用户应：
 
 ---
 
-## § Folder
+## Folder
 
 从本地目录提取 token——checkout 的设计系统仓库、Figma 导出，或用户指的任何文件夹。
 

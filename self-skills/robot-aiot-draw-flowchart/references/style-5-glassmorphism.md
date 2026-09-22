@@ -111,7 +111,8 @@ font-weight: 400 normal, 600 semi-bold, 700 bold titles
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 600"
      width="960" height="600">
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+    /* @import 仅联网发布场景允许；零外链交付物删除下行，字体栈自动回退系统字体 */
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&amp;display=swap');
     text { font-family: 'Inter', -apple-system, 'SF Pro Display', 'PingFang SC', 'Microsoft YaHei', 'Microsoft JhengHei', 'SimHei', sans-serif; fill: #f0f6fc; }
   </style>
   <defs>

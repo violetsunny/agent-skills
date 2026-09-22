@@ -14,7 +14,7 @@
 
 - 2026-09-19 用户裁决：生产 deck 存在技术评审/方案汇报场景，S23 代码版式/S24 Diff 对照登记保留；验证 deck 样本自指（deck 自身代码）可接受，因其定位是测试用例非交付物。
 - agent-skills 仓库 self-skills/robot-aiot-arch-diagram 是 ~/.agents/skills 安装副本的源，改安装副本后须镜像回仓库（_mideameta.json 仅安装侧有）。
-- 用户裁决 r4-anim-p01-p10 为 deck 风格真源且主题单色系（全 light 或全 dark，禁交替），已改母稿表/lint/phase2/style-lock/web-slide-strategies；验证批次只放 test-run/，写生产目录须用户明示。
+- 用户裁决 r4-anim-p01-p10 为 deck 风格真源且主题严格单色系（全 light 或全 dark，禁页级翻面；2026-09-22 裁决 A 重申，页内组件级 accent 色块反转允许）
 - 2026-09-21 裁决：两演示 workflow 统一为 源文件→反问(页数/对象/范围)→母稿G1→图表G2→回写母稿→生成；PPT母稿禁动效标注，Web母稿每页必带动效备注节。
 
 ## 踩坑记录

@@ -1,4 +1,6 @@
-# Export to PNG / SVG
+# Export to PNG / SVG（HTML 产物导出）
+
+分工声明：本文件管 **HTML 产物导出流程**（从生成的图表 HTML 中提取 `<svg>` 产出 `.svg`/`.png`，含多图 gallery 源的识别）；**SVG→PNG 光栅化**（cairosvg / rsvg-convert / svg2png.js 渲染栈）见 [`png-export.md`](png-export.md)。两文件互指，各管各的。
 
 Convert a generated diagram HTML file into a portable `.svg` and/or `.png` next to it. **Manual only — never run unprompted.**
 
@@ -29,7 +31,7 @@ If the user explicitly asks for "a screenshot of the whole page including the ca
    - Ensure the opening tag has `xmlns="http://www.w3.org/2000/svg"`. Add it if missing.
    - Ensure a `viewBox` is present. The skill's templates always include one; warn the user if absent rather than guessing.
    - Preserve `role="img"`, `aria-labelledby`, and the first-child `<title>` / `<desc>` exactly as authored.
-   - Inject Google Fonts `@import` so the SVG renders with correct typography in a browser. **XML-escape the `&` separators as `&amp;`** — a standalone `.svg` is parsed as strict XML, where a bare `&` starts an entity reference and makes the whole file fail to parse. (Don't copy the raw URL from the HTML `<link href>`; that ampersand form is only valid in HTML.)
+   - **条件注入** Google Fonts `@import`：**仅当**产物用于**联网发布场景**（在线文章、允许网络访问的单文件 HTML）且需要品牌 webfont 时注入，使 SVG 在浏览器中排版正确；**零外部请求交付物**（离线演示页、调用方工作流产物、调用方声明零外链）禁止注入，一律系统字体栈。注入时**必须把 `&` 分隔符 XML 转义为 `&amp;`**——独立 `.svg` 按严格 XML 解析，裸 `&` 会启动实体引用并导致整个文件解析失败。（不要从 HTML 的 `<link href>` 复制原始 URL；那种 ampersand 形式只在 HTML 中有效。）
      ```svg
      <defs>
        <style>@import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&amp;family=Geist:wght@400;500;600&amp;family=Geist+Mono:wght@400;500;600&amp;display=swap');</style>
