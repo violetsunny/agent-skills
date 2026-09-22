@@ -181,4 +181,55 @@ A/B 约 84 对同源 references 文件。合法差异白名单（diff 后逐 hun
 1. 修复只改 `self-skills/`（唯一真源），提交格式 `FIX:/FEAT:/CHORE: <标题> JIRA: main DIFF: <详述>`，禁止 push。
 2. 提交前：rsync 五 skill → diff SYNC-OK → 回归三件套 → `git status` 确认无 __pycache__/.DS_Store 混入。
 3. `_mideameta.json` 仅安装侧有，rsync 必 exclude，不回写仓库。
-4. 市场端 skillId SKILL_CS30SK20260814000011855853 仍绑旧名注册、description 为旧版（含 GIF 字样）——重新发布/下架待用户决定；`docs/skills-overview.md` 待 sync skill module 5 再生成。
+4. 市场端与 skills-overview.md 的遗留动作见「十、Handoff」待办计划，按规程执行即可，不再重复确认。
+
+## 十、Handoff（交接现状，2026-09-22 定稿）
+
+### 已做（六提交在 main，未 push）
+
+| commit | 内容 |
+|---|---|
+| 91ef3f33 | 622 文件深审 134 项修复 + 裁决 A 严格单色系落地（141 文件） |
+| 251c883f | 补漏：draw-flowchart 同源 24 项对齐 + arch-diagram profiles/primitive-icons 中文化（23 文件） |
+| 63e2590b | IHA signal 预设页级反转清零（交叉复查唯一 FAIL 项 I19） |
+| 06a36938 | 第 4 轮：同源镜像清零 + 中文化全量（英文散文 628→79 余皆白名单）+ IHA 单色限定 14 处 + workflow 4 项 + A 侧砍动画/GIF 链 v6.0.0（157 文件，删 10 文件） |
+| 2487f17b | 第 5 轮终修：A design-system 全文中文化 + B color-schemes 镜像 3 裁决 + dark-svg 指针统一 + primitive-sketchy 两侧调参表（5 文件） |
+| 6c7d9080 | 本清单文档 |
+
+### 已验证（五轮，全部闭环）
+
+1. 第 1 轮深审：7 并行 subagent 全读 622 文件，134 项发现（硬违规 11/矛盾死链 59/判断项 64）。
+2. 第 2 轮：70 项必须修逐项签名复核落地；2 处 grep 假阴性人工排除。
+3. 第 3 轮交叉复查：3 个全新只读 subagent 157 条取证，156 PASS + 1 FAIL（I19，已修）。
+4. 第 4 轮扫描：同源 84 对逐对 diff + 两 workflow 10 项 + IHA/全局签名 8 项，发现全部修复。
+5. 第 5 轮回归：手术侧 8/8 PASS；抽验侧 6/8 PASS + 2 项漏修遗留（已终修并复归 PASS）。
+6. 终态：五 skill rsync+diff SYNC-OK、verify-docs-sync 两侧 exit 0、precheck_deps.sh 两侧 exit 0、verify-plugin-package/self_check 实跑 exit 0、全部 py_compile/bash -n/node --check 通过、git 工作区干净。
+
+### 已决策（定案，直接执行不再确认）
+
+- 八节裁决索引全部条目为最终定案。
+- A 侧无动画无 GIF（v6.0.0）；B 侧与 IHA 保留动画能力；deck 壳翻页入场动画属交互预览，保留。
+- codex-cli 禁令句保留；onboarding-map.json Codex 枚举豁免；arcSize=15（draw.io XML 百分比语义）豁免；studio :532「双表面反转」保留。
+- 验证产物落盘交付项目 test-run/<批次>/，人工确认前禁止清理；/tmp 只放过程性临时文件。
+
+### 待办计划（按序执行）
+
+1. **市场端更新**：skillId SKILL_CS30SK20260814000011855853 仍绑旧名 leadership-ppt 且 description 为旧版（含 GIF 字样）。做法：`skill_marketplace(action='publish', name='robot-aiot-draw-flowchart')` 以新名重新发布覆盖；旧名注册项若无法覆盖则先下架。B/IHA/PPT/WEB 四个 skill 的 description 若有变更一并重发布。
+2. **docs/skills-overview.md 再生成**：跑 robot-aiot-self-skill-sync 的 module 5，消除旧名 leadership-ppt 残留；生成后 diff 核对五 skill 名称与 version（A=6.0.0）。
+3. **key-skills-git/ 未跟踪目录**：7-9 月旧 skill 仓库（用户自行放置），默认不动不入库；确认无引用价值后由用户删除或加 .gitignore。
+
+### 踩坑经验（环境类，工程类见开头 6 条根因教训）
+
+- 完整版 puppeteer 的 Chromium 下载本机超 5 分钟 → svg2png.js 用 puppeteer-core+系统 Chrome 回退，CHROME_PATH 可覆盖（A/B 两侧副本已同步）。
+- 本机 Intel macOS 无 poppler bottle、无 Keynote（仅 WPS）→ keynote_verify.sh 走 slide images 直出 PNG；渲染终审只能 WPS 人工。
+- 本机无 rg 命令；zsh 变量不分词 → 用 grep 工具或系统 grep；多目录遍历用数组。
+- subagent 输出可能丢失但工作已落地（或相反）→ 一律主 agent 签名 grep 抽验，不信汇报。
+- 核验过程跑 python 会自产 __pycache__ → 全程 PYTHONDONTWRITEBYTECODE=1，提交前 find 复查。
+
+### 接下来怎么做最好
+
+- 任何五 skill 改动流程：读本清单对应专项 → 改 self-skills/（唯一真源）→ 回归三件套（签名 grep 清零 + 门禁实跑 exit 0 + rsync/diff SYNC-OK）→ 对照 G1-G11 勾验 → FIX: 格式提交 → 涉及 description/version 变更时同步市场端。
+- 同源修复必须 A/B 成对 diff（M2）；修复后验证「落点」而非只验证「改过」（教训 2：限定语落错节）。
+- 大改动（删文件/改名/砍功能）必须追加全仓悬空引用扫描（D1 模式）+ 一轮全新只读回归 subagent。
+- 验证 subagent 指令三要素：只读禁改 + 白名单前置 + 证据格式（文件:行号+最短引文）；多轮验证每轮换新 subagent，避免上下文污染。
+- 英文措辞与中文关键词双向 grep，防假阴性（教训 3）。
