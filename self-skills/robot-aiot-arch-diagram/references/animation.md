@@ -1,49 +1,49 @@
-# Optional animation
+# 可选动画
 
-Animation explains a complete static diagram; it never supplies missing meaning. Load this reference only when motion is explicitly requested or materially clarifies order, accumulation, evaluation, containment, or propagation. Otherwise use mode `none` and ship static HTML.
+动画用于解释一张已经完整的静态图；它从不补齐缺失的含义。仅当动效被明确要求，或能实质澄清顺序、累积、评估、包含或传播时，才加载本 reference。否则使用 `none` 模式并交付静态 HTML。
 
-## Modes
+## 模式
 
-Choose one mode per figure with `data-motion-mode="none|reveal|step|loop"`.
+每张图用 `data-motion-mode="none|reveal|step|loop"` 选定一种模式。
 
-| Mode | Behavior | Controls / implementation | Use |
+| 模式 | 行为 | 控件 / 实现 | 用途 |
 |---|---|---|---|
-| `none` | Complete stable figure | No JavaScript | Default, print, screenshot, export, reduced-motion fallback with playback controls unavailable |
-| `reveal` | One deterministic autoplay run ending complete | CSS-only for ≤5s; otherwise use the scoped controller | Short ordered explanation; never auto-replay |
-| `step` | Paused semantic states | Minimal inline JS for Play, Pause, Replay, Previous, Next | Teaching, comparison, policy traces |
-| `loop` | One decorative token repeats without changing meaning | CSS-only default | Quiet flow hint; ≥3s cycle |
+| `none` | 完整稳定图形 | 无 JavaScript | 默认、打印、截图、导出、reduced-motion 回退（播放控件不可用） |
+| `reveal` | 一次确定性自动播放，结束于完整状态 | ≤5s 用纯 CSS；否则用作用域控制器 | 简短的顺序讲解；绝不自动重播 |
+| `step` | 可暂停的语义状态 | 最小内联 JS 提供 Play、Pause、Replay、Previous、Next | 教学、对比、策略追踪 |
+| `loop` | 一个装饰性 token 循环，不改变含义 | 默认纯 CSS | 安静的流动提示；周期 ≥3s |
 
-Only `loop` repeats. Queue state, typing, field values, policy outcomes, containment, and audit entries use `reveal` or `step` and finish complete.
+只有 `loop` 允许重复。队列状态、打字、字段值、策略结果、包含关系与审计条目用 `reveal` 或 `step`，且必须结束于完整状态。
 
-`reveal` is the sole sanctioned autoplay mode: it may run once on initial load when motion was explicitly requested, then remains complete. It never restarts on viewport re-entry or without an explicit Replay action.
+`reveal` 是唯一获准的自动播放模式：仅在动效被明确要求时可于初次加载运行一次，之后保持完整状态。视口重入或无显式 Replay 动作时绝不重新播放。
 
-## Static-first enhancement contract
+## 静态优先增强契约
 
-1. **Source is complete.** Every semantic node, label, connector, status, and outcome is visible in the HTML/SVG before enhancement. Only selectors below `.motion-ready` may hide or transform them.
-2. **Stable capture.** Initial `data-frame="static"`, `?motion=static`, print, no-JS, and standalone SVG export expose the complete frame and hide controls/decorative tokens. Do not capture after an arbitrary delay.
-3. **CSS owns presentation.** Use CSS transitions/keyframes for appearance and travel. Minimal inline JavaScript is allowed only to bind explicit controls, update step/state attributes, schedule deterministic steps, and update the dedicated live-status region. No fetches, markup injection, path measurement, or mutation of semantic diagram labels or values.
-4. **One clock.** Use `--motion-fast: 160ms`, `--motion-step: 480ms`, `--motion-hold: 720ms`, and `--motion-total` ≤ `8000ms`; derive delays from integer steps. No randomness, springs, or transition-event timing.
-5. **Explicit order.** Mark items `data-motion-item data-step="N"` for integer steps 1–8. DOM order follows narrative order. At most two items enter per step.
-6. **Stable end.** Completion exposes all items and sets `data-frame="end"`. Replay resets to step 0 first. Pause clears the pending timer and resume continues from the same step.
-7. **Scoped state.** Controls operate on their nearest `[data-motion-root]`; IDs, timers, live regions, and step state never cross figure boundaries.
-8. **Failure-safe startup.** JavaScript adds `.motion-ready` only after controls are bound and the initial render succeeds. A script error before that point leaves the complete source visible.
+1. **源即完整。** 每个语义节点、标签、连线、状态与结果在增强前都已在 HTML/SVG 中可见。只有 `.motion-ready` 之下的选择器可以隐藏或变换它们。
+2. **稳定捕获。** 初始 `data-frame="static"`、`?motion=static`、打印、无 JS、独立 SVG 导出都呈现完整帧，并隐藏控件与装饰 token。不得在任意延迟后捕获。
+3. **CSS 负责呈现。** 外观与位移用 CSS transitions/keyframes。最小内联 JavaScript 仅允许：绑定显式控件、更新 step/state 属性、调度确定性步骤、更新专用 live-status 区域。禁止 fetch、markup 注入、路径测量、修改语义图表标签或值。
+4. **单一时钟。** 使用 `--motion-fast: 160ms`、`--motion-step: 480ms`、`--motion-hold: 720ms`、`--motion-total` ≤ `8000ms`；延迟由整数步骤推导。禁止随机数、弹簧物理、transition 事件计时。
+5. **显式顺序。** 用 `data-motion-item data-step="N"` 标记条目，N 取整数 1–8。DOM 顺序跟随叙事顺序。每步最多两个条目入场。
+6. **稳定终点。** 完成时呈现全部条目并设 `data-frame="end"`。Replay 先重置到第 0 步。Pause 清除待触发 timer，resume 从同一步继续。
+7. **作用域状态。** 控件只作用于最近的 `[data-motion-root]`；ID、timer、live region、步骤状态绝不跨图边界。
+8. **失败安全启动。** JavaScript 仅在控件绑定且初始渲染成功后才添加 `.motion-ready`。在此之前脚本出错，完整源内容保持可见。
 
-## Semantic primitives
+## 语义基元
 
-Every primitive has text, count, symbol, pattern, or outline in addition to color.
+除颜色外，每个基元都必须有文本、计数、符号、图案或轮廓。
 
-| Primitive | Mechanism | Static / reduced-motion result | Limit |
+| 基元 | 机制 | 静态 / reduced-motion 结果 | 上限 |
 |---|---|---|---|
-| **Path draw** | Decorative duplicate path with `pathLength="1"` and animated dash offset | Base labeled connector remains visible | ≤2 paths; one active |
-| **Staggered reveal** (stage reveal) | `data-motion-item` + opacity/translate ≤8px | All stages visible | ≤8 steps, 12 items |
-| **Queue counter** (queue accumulation) | Stable slots; item reveal plus visible numeric count | Final queue and count visible | ≤5 items; no reorder |
-| **Typing / field population** | Full accessible string; clipped decorative overlay or labeled row reveal | Complete text/fields visible once | ≤32 typed chars or 6 fields |
-| **Policy evaluation** (rule evaluation) | Ordered rule rows with text statuses and a current-row outline | Every state and outcome visible | 3–6 rules; 2 traces |
-| **Flow token** | `aria-hidden` token on a fixed path | Token hidden; connector remains | One token; loop ≥3s |
-| **Containment** | Reveal children, then persistent labeled boundary | Children and boundary visible | One boundary transition |
-| **Audit append** | Chronological rows revealed; stable timestamp/sequence | Complete ordered log visible | ≤5 appended rows |
+| **Path draw**（路径绘制） | `pathLength="1"` 的装饰性复制路径 + dash offset 动画 | 带标签的基础连线保持可见 | ≤2 条路径；同时 1 条活动 |
+| **Staggered reveal**（分阶段揭示） | `data-motion-item` + opacity/translate ≤8px | 所有阶段可见 | ≤8 步、12 个条目 |
+| **Queue counter**（队列累积） | 稳定槽位；条目揭示加可见数字计数 | 最终队列与计数可见 | ≤5 个条目；禁止重排 |
+| **Typing / field population**（打字/字段填充） | 完整可访问字符串；裁剪式装饰覆盖层或按行揭示并带标签 | 完整文本/字段一次性可见 | ≤32 个打字字符或 6 个字段 |
+| **Policy evaluation**（规则评估） | 有序规则行 + 文本状态 + 当前行轮廓 | 每个状态与结果可见 | 3–6 条规则；2 条 trace |
+| **Flow token**（流动 token） | 固定路径上的 `aria-hidden` token | token 隐藏；连线保留 | 1 个 token；周期 ≥3s |
+| **Containment**（包含） | 先揭示子元素，再显示持久的带标签边界 | 子元素与边界可见 | 1 次边界过渡 |
+| **Audit append**（审计追加） | 按时间顺序揭示行；时间戳/序号稳定 | 完整有序日志可见 | ≤5 行追加 |
 
-Do not animate layout coordinates, connector routes, `viewBox`, node dimensions, or semantic text. Avoid zoom, parallax, bounce, shake, glow, particles, and indefinite blinking.
+不要给布局坐标、连线路径、`viewBox`、节点尺寸或语义文本加动画。避免缩放、视差、弹跳、抖动、发光、粒子与无限闪烁。
 
 ```css
 :root {
@@ -82,60 +82,60 @@ Do not animate layout coordinates, connector routes, `viewBox`, node dimensions,
 }
 ```
 
-## Interactive controls and keyboard
+## 交互控件与键盘
 
-Every interactive `step` figure provides native buttons for **Play, Pause, Replay, Previous, and Next**, outside the SVG. Use `data-motion-action="play|pause|replay|prev|next"`, ≥44×44px targets, visible focus, disabled state for unavailable actions, and `aria-pressed` for play/pause state.
+每个交互式 `step` 图都在 SVG 之外提供 **Play、Pause、Replay、Previous、Next** 原生按钮。使用 `data-motion-action="play|pause|replay|prev|next"`、≥44×44px 触达目标、可见焦点、不可用动作的 disabled 状态、play/pause 状态的 `aria-pressed`。
 
-When focus is within the motion root: `ArrowRight` advances, `ArrowLeft` goes back, `Home` resets, `End` completes, `Space` toggles play/pause when focus is not already on a native control, and unmodified `R` replays. Never intercept `R` when Control, Command, or Alt is held. Do not capture keys from inputs, links, or unrelated regions. Never move focus as the frame changes.
+焦点位于 motion root 内时：`ArrowRight` 前进、`ArrowLeft` 后退、`Home` 重置、`End` 直达结束、`Space` 在焦点不位于原生控件上时切换播放/暂停、无修饰键的 `R` 重播。Control、Command 或 Alt 按下时绝不拦截 `R`。不从输入框、链接或无关区域抢键。帧变化时绝不移动焦点。
 
-Provide visible instructions and a scoped `role="status" aria-live="polite" aria-atomic="true"`. Keep that live region inside the motion root but outside `[data-motion-controls]`, so hiding controls for reduced/static states cannot hide announcements. Announce user actions such as “Step 3 of 5: first divergence”; do not announce every autoplay frame. Controls operate only on their nearest `[data-motion-root]`.
+提供可见的使用说明与作用域化的 `role="status" aria-live="polite" aria-atomic="true"`。live region 放在 motion root 内、`[data-motion-controls]` 外，确保 reduced/static 状态隐藏控件时不会连带隐藏播报。只播报用户动作（如"第 3/5 步：首次分歧"）；不播报自动播放的每一帧。控件只作用于最近的 `[data-motion-root]`。
 
-Use [`assets/template-motion.html`](../assets/template-motion.html) rather than inventing another controller. Its inline controller is the executable implementation contract: copy that script body verbatim. The skin linter rejects modified or additional controllers, even when they carry `data-diagram-controls`. Replace diagram content and slug-prefixed IDs, but preserve the controller and its state/control attributes.
+使用 [`assets/template-motion.html`](../assets/template-motion.html)，不要另发明控制器。其内联控制器是可执行实现契约：逐字复制该 script 主体。皮肤 linter 会拒绝被修改或额外新增的控制器，即使它们带有 `data-diagram-controls`。替换图表内容与 slug 前缀 ID，但保留控制器及其 state/control 属性。
 
-## Reduced motion, color, and accessibility
+## Reduced motion、颜色与无障碍
 
-- `prefers-reduced-motion: reduce` initializes at the complete static frame, disables and hides every playback control, hides decorative movement, and exposes `data-motion-state="reduced"` plus status text that playback is unavailable. It never presents partial-step announcements beside a complete frame.
-- The SVG's `<title>` and `<desc>` describe the complete meaning, not the animation. Interaction instructions remain visible HTML text.
-- Decorative overlays carry `aria-hidden="true" focusable="false"`. Semantic text exists once in the accessibility tree.
-- State is never color-only: policy uses symbol + `PASS/FAIL/SKIPPED/NOT REACHED`; queues show counts; active stages use number/label/outline.
-- Nothing flashes or changes luminance more than three times per second.
+- `prefers-reduced-motion: reduce` 以完整静态帧初始化，禁用并隐藏所有播放控件，隐藏装饰性动效，暴露 `data-motion-state="reduced"` 及"播放不可用"的状态文本。绝不在完整帧旁显示部分步骤的播报。
+- SVG 的 `<title>` 与 `<desc>` 描述完整含义，而不是动画。交互说明保持为可见的 HTML 文本。
+- 装饰性覆盖层带 `aria-hidden="true" focusable="false"`。语义文本在无障碍树中只出现一次。
+- 状态绝不仅靠颜色：策略用符号 + `PASS/FAIL/SKIPPED/NOT REACHED`；队列显示计数；活动阶段用编号/标签/轮廓。
+- 任何元素每秒闪烁或亮度变化不超过 3 次。
 
-## Complexity and deterministic timing
+## 复杂度与确定性时序
 
-Motion does not raise the static diagram budget: ≤8 semantic steps (target 3–6), ≤12 marked items, ≤2 simultaneous reveals, ≤2 drawn paths, one flow-token loop, 160–600ms transitions, 400–1200ms holds, ≤24px translation, and 3–8s total autoplay.
+动效不提高静态图预算：≤8 个语义步骤（目标 3–6）、≤12 个标记条目、≤2 个同时揭示、≤2 条绘制路径、1 个 flow-token 循环、160–600ms 过渡、400–1200ms 停留、≤24px 位移、自动播放总时长 3–8s。
 
-Declare `data-step-count`; do not infer steps from transition events. Set `--motion-total` to step count × `--motion-hold` and keep it within the 8-second budget. Use one `setTimeout` chain per root, derive its hold from `--motion-hold`, clear it on Pause/Replay/page hide and immediately after rendering the final step, and never use `setInterval` for semantic playback. Pause when `document.visibilityState` becomes hidden and do not catch up later. `?motion=step&step=N` may expose an exact zero-duration frame for visual regression only when `N` is a non-negative base-10 integer from 0 through `data-step-count`; missing, fractional, negative, and over-budget values leave normal playback in place.
+声明 `data-step-count`；不要从 transition 事件推断步骤。`--motion-total` 设为步骤数 × `--motion-hold`，保持在 8 秒预算内。每个 root 只用一条 `setTimeout` 链，其停留时长由 `--motion-hold` 推导，在 Pause/Replay/页面隐藏时以及渲染完最后一步后立即清除，语义播放绝不用 `setInterval`。`document.visibilityState` 变为 hidden 时暂停，事后不补播。`?motion=step&step=N` 仅当 `N` 是 0 到 `data-step-count` 之间的非负十进制整数时，才暴露零时长的精确帧供视觉回归；缺失、小数、负数、超范围的值一律保持正常播放。
 
-The final-state capture contract is synchronous: `?motion=static`, `<html data-motion="static">`, or mode `none` exposes every semantic item, hides controls and decorative overlays, and sets `data-frame="static"`. Wait for `document.fonts.ready` before capture. Two captures from the same URL, viewport, fonts, and device scale must be pixel-identical; random delays, generated IDs, clocks, and runtime path measurement are forbidden.
+终态捕获契约是同步的：`?motion=static`、`<html data-motion="static">` 或模式 `none` 暴露每个语义条目、隐藏控件与装饰覆盖层、设置 `data-frame="static"`。捕获前等待 `document.fonts.ready`。同一 URL、视口、字体、设备缩放下两次捕获必须像素级一致；禁止随机延迟、生成式 ID、时钟、运行时路径测量。
 
-## Export and verification
+## 导出与验证
 
-PNG and SVG exports are static final-state artifacts unless the user explicitly requests a named step. Before capture, open `?motion=static`, await `document.fonts.ready`, and assert `data-frame="static"`. SVG extraction omits HTML controls and scripts; source-visible semantic markup keeps the result complete.
+PNG 与 SVG 导出是静态终态产物，除非用户明确要求某个具名步骤。捕获前打开 `?motion=static`，等待 `document.fonts.ready`，断言 `data-frame="static"`。SVG 提取会省略 HTML 控件与脚本；源内可见的语义标记保证结果完整。
 
-Run:
+运行：
 
 ```bash
 python3 scripts/self_check.py path/to/animated-diagram.html
 ```
 
-The executable gate in installed-skill mode is `self_check.py` (canonical motion controller, external requests, accessibility contract); `verify-motion.py`/`lint-skin.py` are repository maintainer gates (see `doctor.md`) and are not shipped with the installed skill.
+`self_check.py` 是日常门禁（canonical 运动控制器、外部请求、无障碍契约）；`verify-motion.py`/`lint-skin.py` 是完整校验器，随包分发，深度检查时用（见 `doctor.md`）。
 
-The verifier checks mode/state declarations, contiguous steps, motion budgets, complete SVG naming, no-JS source visibility, decorative accessibility, the full control set, live status, reduced-motion/print CSS, keyboard handling, page-hide pause, bounded static/test overrides, immediate final-step stop, and exact canonical-controller identity. Its adversarial tests mutate the canonical template to prove each failure is rejected.
+校验器检查：模式/状态声明、步骤连续性、动效预算、SVG 命名完整性、无 JS 源可见性、装饰元素无障碍、完整控件集、live status、reduced-motion/打印 CSS、键盘处理、页面隐藏暂停、有界 static/test 覆盖、最后一步立即停止、canonical 控制器逐字一致。其对抗性测试对 canonical 模板注入变异，证明每类失败都会被拒绝。
 
-Then verify in a browser:
+然后在浏览器中验证：
 
-1. Disable JavaScript: the complete diagram remains visible and meaningful.
-2. Emulate `prefers-reduced-motion: reduce`: the final state is complete, playback controls are hidden and disabled, and the DOM status says playback is unavailable.
-3. Use keyboard only: Tab reaches each native control; Enter/Space operate it; Left/Right/Home/End step without moving focus.
-4. Pause, resume, and replay twice: ordering and final state are identical.
-5. Capture `?motion=static` twice after `document.fonts.ready`: pixels are stable.
-6. Print preview plus PNG/SVG export: controls and decorative tokens are absent, while all semantic labels and relationships remain.
+1. 禁用 JavaScript：完整图表保持可见且有含义。
+2. 模拟 `prefers-reduced-motion: reduce`：终态完整，播放控件隐藏且禁用，DOM 状态显示播放不可用。
+3. 只用键盘：Tab 到达每个原生控件；Enter/Space 激活；Left/Right/Home/End 步进且不移动焦点。
+4. 暂停、恢复、重播两次：顺序与终态一致。
+5. `document.fonts.ready` 后捕获 `?motion=static` 两次：像素稳定。
+6. 打印预览加 PNG/SVG 导出：控件与装饰 token 缺席，所有语义标签与关系保留。
 
-## Anti-patterns
+## 反模式
 
-- Unrequested autoplay, autoplay outside the single sanctioned `reveal` run, viewport re-entry, or an endless semantic loop.
-- A blank/partial no-JS or reduced-motion frame.
-- Motion that rescues an over-dense or unlabeled static diagram.
-- Pass/fail, queue fullness, or outcome encoded only by hue.
-- Remote scripts, general application logic, runtime geometry, or duplicated semantic text.
-- Capturing at wall-clock delay instead of the explicit static override.
+- 未被请求的自动播放、唯一获准的 `reveal` 之外的自动播放、视口重入重播、语义内容无限循环。
+- 无 JS 或 reduced-motion 下的空白/不完整帧。
+- 用动效拯救过密或无标签的静态图。
+- pass/fail、队列满度或结果仅靠色相编码。
+- 远程脚本、通用应用逻辑、运行时几何计算、重复的语义文本。
+- 用墙钟延迟捕获，而不是显式 static 覆盖。

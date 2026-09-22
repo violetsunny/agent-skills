@@ -147,7 +147,7 @@ Geist 没有 CJK 覆盖。标签含日文、中文或韩文时，在那些 `<tex
 <text font-family="'Geist', 'Noto Sans TC', 'PingFang TC', 'Microsoft JhengHei', sans-serif">認證服務</text>
 ```
 
-Hiragino/Yu Gothic 栈不含谚文字形，韩文标签必须用韩文栈——不要复用日文栈。Noto Sans KR 随皮肤字体链接分发，因此它领衔该栈、本地字体族跟随；韩文在字体之外所需的字重、下限与标题规则见 [`style-guide.md`](style-guide.md#korean-labels)。日文字体也只覆盖汉字集的子集，且会以日文字形变体渲染简体字，因此中文标签必须用中文栈；简体与繁体因同一原因是两个独立的栈。中文栈通过本地安装字体解析——不为其添加外部 web font；繁体中文在字体之外所需的字重、下限与标题规则见 [`style-guide.md`](style-guide.md#traditional-chinese-labels)。mono 副标签用 `'Geist Mono', 'Noto Sans Mono CJK JP', monospace`（日文）、`'Geist Mono', 'Noto Sans Mono CJK KR', monospace`（韩文）或 `'Geist Mono', 'Noto Sans Mono CJK SC', monospace` / `'Geist Mono', 'Noto Sans Mono CJK TC', monospace`（中文）。宽度预算按**每个全角 CJK 字符 1em**，不是拉丁平均字形上加几个百分点；`verify-treemap.py` 对 Unicode 宽/全角字符采用该保守契约，并将组合记号视为零宽度。CJK 优先 12px 节点名而非 8px 副标签；谚文与汉字低于 12px 会发糊，因此把 12px 当下限而不是 10px。实际宽度仍随回退字体变化，翻译标签后运行相应的几何校验器。
+Hiragino/Yu Gothic 栈不含谚文字形，韩文标签必须用韩文栈——不要复用日文栈。Noto Sans KR 随皮肤字体链接分发，因此它领衔该栈、本地字体族跟随；韩文在字体之外所需的字重、下限与标题规则见 [`style-guide.md`](style-guide.md#韩文标签)。日文字体也只覆盖汉字集的子集，且会以日文字形变体渲染简体字，因此中文标签必须用中文栈；简体与繁体因同一原因是两个独立的栈。中文栈通过本地安装字体解析——不为其添加外部 web font；繁体中文在字体之外所需的字重、下限与标题规则见 [`style-guide.md`](style-guide.md#繁体中文标签)。mono 副标签用 `'Geist Mono', 'Noto Sans Mono CJK JP', monospace`（日文）、`'Geist Mono', 'Noto Sans Mono CJK KR', monospace`（韩文）或 `'Geist Mono', 'Noto Sans Mono CJK SC', monospace` / `'Geist Mono', 'Noto Sans Mono CJK TC', monospace`（中文）。宽度预算按**每个全角 CJK 字符 1em**，不是拉丁平均字形上加几个百分点；`verify-treemap.py` 对 Unicode 宽/全角字符采用该保守契约，并将组合记号视为零宽度。CJK 优先 12px 节点名而非 8px 副标签；谚文与汉字低于 12px 会发糊，因此把 12px 当下限而不是 10px。实际宽度仍随回退字体变化，翻译标签后运行相应的几何校验器。
 
 ---
 

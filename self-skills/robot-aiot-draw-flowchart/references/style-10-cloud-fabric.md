@@ -1,90 +1,76 @@
-# Style 10: Cloud Fabric
+# Style 10: Cloud Fabric（云部署拓扑）
 
-A deployment-topology view for regions, VPCs/networks, compute, data stores,
-and cross-boundary traffic. It answers “where does this run?” without turning
-the diagram into a vendor icon poster.
+面向 region、VPC/网络、计算、数据存储与跨边界流量的部署拓扑视图。它回答"这东西跑在哪里？"，同时不把图表变成厂商图标海报。
 
-## Best fit
+## 最适合
 
-- Multi-region and disaster-recovery reviews
-- Cloud deployment and network ownership maps
-- Kubernetes cluster/namespace placement
-- Migration plans and platform boundary discussions
+- 多区域与容灾评审
+- 云部署与网络归属地图
+- Kubernetes 集群/namespace 布局
+- 迁移方案与平台边界讨论
 
-## Visual tokens
+## 视觉 token
 
-| Token | Value |
+| Token | 值 |
 |---|---|
-| Canvas | `#edf5fb` with a restrained blue grid |
-| Card | `#ffffff` |
-| Primary text | `#102a43` |
-| Boundary | `#7fa3c2` |
-| Traffic | `#2563eb` |
-| Write | `#ea580c` |
-| Data | `#059669` |
-| Cross-region | `#7c3aed`, dashed |
+| 画布 | `#edf5fb` 配克制的蓝色网格 |
+| 卡片 | `#ffffff` |
+| 主文本 | `#102a43` |
+| 边界 | `#7fa3c2` |
+| 流量 | `#2563eb` |
+| 写入 | `#ea580c` |
+| 数据 | `#059669` |
+| 跨区域 | `#7c3aed`，虚线 |
 
-Nested boundaries carry a small `GLOBAL`, `REGION`, or `NETWORK` badge. Nodes
-use a manifest-backed neutral glyph plus provider metadata. A colored ownership
-spine makes each nested deployment boundary readable even in grayscale.
+嵌套边界带一个小的 `GLOBAL`、`REGION` 或 `NETWORK` 徽章。节点使用 manifest 支持的中性字形加供应商元数据。彩色归属脊线让每个嵌套部署边界即使在灰度下也可读。
 
-## Required semantic contract
+## 必需语义契约
 
-Select `semantic_profile: "cloud-fabric"` and provide:
+选择 `semantic_profile: "cloud-fabric"` 并提供：
 
 - `diagram_type: "deployment"`
-- `platform_profile`: `provider-neutral`, `aws`, `azure`, `gcp`, or `kubernetes`
+- `platform_profile`：`provider-neutral`、`aws`、`azure`、`gcp` 或 `kubernetes`
 - `icon_manifest_version: "2026.07-neutral.1"`
-- at least one `deployment_kind: "region"` boundary
-- every node: `deployment_id` and a manifest-backed `icon_id`
-- every cross-deployment edge: a non-empty `via`
+- 至少一个 `deployment_kind: "region"` 边界
+- 每个节点：`deployment_id` 与 manifest 支持的 `icon_id`
+- 每条跨部署边：非空 `via`
 
-Boundary parents must form an acyclic tree, nesting depth is capped at four,
-child boundaries stay at least `16px` inside their parent, and nodes stay at
-least `20px` inside their assigned deployment.
+边界父级必须构成无环树，嵌套深度上限四层，子边界距父边界内侧至少 `16px`，节点距其所属部署内侧至少 `20px`。
 
-## Icon policy
+## 图标政策
 
-The bundled manifest contains provider-neutral geometric glyphs. It records
-official AWS, Azure, and Google Cloud asset URLs as adapter metadata; it does
-not redistribute vendor trademarks. If a user supplies an official icon pack,
-preserve its license and version outside this repository and map it through the
-manifest boundary.
+内置 manifest 只含供应商中性的几何字形。它把 AWS、Azure、Google Cloud 官方资产 URL 记录为适配器元数据；不再分发厂商商标。用户提供官方图标包时，在本仓库之外保留其许可与版本，并通过 manifest 边界映射接入。
 
-Never invent a vendor service logo. Unknown `icon_id` values fail validation.
+绝不发明厂商服务 logo。未知 `icon_id` 值校验不通过。
 
-## Composition rules
+## 构图规则
 
-- Show deployment ownership through nesting, not background color alone
-- Use a shallow `global → region → network` hierarchy where possible
-- Keep ingress paths vertical and regional data paths aligned
-- Name cross-boundary mechanisms (`peering`, `transit gateway`, `service mesh`)
-- Zero crossings in official samples; use no more than two bends per edge
-- Do not encode both logical service architecture and every subnet in one view
-- Reserve the icon/provider area before fitting text; no title or subtitle may cross a card edge
-- Place ingress mechanism labels in inter-boundary whitespace, clear of Region and Network headers
+- 部署归属用嵌套表达，不只靠背景色
+- 尽可能用浅的 `global → region → network` 层级
+- ingress 路径保持垂直，区域内数据路径对齐
+- 跨边界机制要命名（`peering`、`transit gateway`、`service mesh`）
+- 官方样例零交叉；每条边不超过两个弯
+- 不在一张视图里同时编码逻辑服务架构与每个子网
+- 先预留图标/供应商区域再排文字；标题或副标题不得跨越卡片边缘
+- ingress 机制标签放在边界间空白处，避开 Region 与 Network 头部
 
-## Signature checklist
+## 签名检查清单
 
-- Pale cloud grid and explicit `global → region → network` nesting
-- Ownership spines plus `GLOBAL`, `REGION`, and `NETWORK` boundary badges
-- Manifest-backed globe, compute, database, gateway, stream, or observe glyphs
-- Top-right platform/region/deployment-mode stamp and named cross-boundary mechanisms
+- 浅色云网格与显式 `global → region → network` 嵌套
+- 归属脊线加 `GLOBAL`、`REGION`、`NETWORK` 边界徽章
+- manifest 支持的 globe、compute、database、gateway、stream 或 observe 字形
+- 右上角 platform/region/deployment-mode 戳记与命名的跨边界机制
 
-## Prompt cues
+## 提示词线索
 
 - English: `multi-region deployment map`, `cloud landing zone map`, `region/VPC ownership map`
 - 中文：`多区域部署图`、`云部署拓扑`、`Region/VPC 归属图`
-- Copyable cue: `Use Style 10 Cloud Fabric; show global ingress, Region and VPC ownership, neutral cloud glyphs, deployment mode, and every cross-boundary mechanism.`
+- 可复制线索：`Use Style 10 Cloud Fabric; show global ingress, Region and VPC ownership, neutral cloud glyphs, deployment mode, and every cross-boundary mechanism.`
 
-## Do not blend with
+## 禁止混搭
 
-Do not use C4 abstraction labels, transit-map station numbering, or live SRE
-metric cards. When deployment evidence is absent, fall back to a generic Style
-1–7 architecture view instead of inventing cloud ownership.
+不要使用 C4 抽象标签、交通图站点编号或实时 SRE 指标卡。缺少部署证据时，回退到通用 Style 1–7 架构视图，而不是发明云归属。
 
-## Fixture
+## 测试样本
 
-`fixtures/cloud-fabric-style10.json`（内部测试集，不随 skill 分发）demonstrates
-active-active checkout deployment with two regions, explicit VPC ownership,
-and neutral glyphs.
+`fixtures/cloud-fabric-style10.json`（内部测试集，不随 skill 分发）演示双活 checkout 部署：两个 region、显式 VPC 归属、中性字形。

@@ -3,9 +3,9 @@
 深黑画布配暖香槟金 accent，衬线/无衬线混排。本文件字号（21/14/13/11/10/9px）为风格锁定值，豁免 4px 网格（例外清单登记在 design-system.md §7）。
 在全部深色风格中独树一帜的暖调——最接近的同侪是 style-2（Dark Terminal），但更具高端编辑感。
 
-## Color Tokens
+## 颜色 token
 
-| Token | Value | Usage |
+| Token | 值 | 用途 |
 |-------|-------|-------|
 | Background | `#0a0a0a` | 画布填充（最深黑，无蓝调） |
 | Surface | `#111111` | 节点/面板填充 |
@@ -44,7 +44,7 @@ Code / path text:       'Cascadia Code', 'SF Mono', 'Courier New', monospace
 
 六个色桶覆盖全色轮——相邻两桶颜色不相似：
 
-| Bucket | Border Color | Use For |
+| 色桶 | 边框色 | 用于 |
 |--------|-------------|---------|
 | Code / Logic | `#5a9e6f` (sage green) | 函数、类、模块、算法 |
 | Service / API | `#a78bfa` (soft violet) | 服务、endpoint、API、网关 |
@@ -68,7 +68,7 @@ Code / path text:       'Cascadia Code', 'SF Mono', 'Courier New', monospace
 
 ## 箭头体系
 
-| Flow Type | Color | Stroke | Dash | Marker |
+| 流类型 | 颜色 | 描边 | 虚线 | 箭头 |
 |-----------|-------|--------|------|--------|
 | Primary / structural | `#d4a574` (gold) | 2px solid | none | 金色箭头 |
 | Data flow | `#6ee7b7` (mint) | 1.5px solid | none | 薄荷色箭头 |
@@ -166,7 +166,7 @@ Code / path text:       'Cascadia Code', 'SF Mono', 'Courier New', monospace
 
 ## ViewBox 推荐
 
-| Diagram | ViewBox |
+| 图类型 | ViewBox |
 |---------|---------|
 | 标准架构图 | `0 0 960 600` |
 | 竖版 pipeline / flow | `0 0 960 820` |
@@ -174,7 +174,7 @@ Code / path text:       'Cascadia Code', 'SF Mono', 'Courier New', monospace
 
 ## 同类风格对比
 
-| Style | Background | Accent | Typography |
+| 风格 | 背景 | Accent | 排版 |
 |-------|-----------|--------|-----------|
 | Style 2 Dark Terminal | `#0f0f1a`（蓝黑） | 多主题 accent 调色板（紫 `#a855f7`、绿 `#10b981`、蓝 `#3b82f6` 等，按主题/层选色） | 全等宽 |
 | **Style 8 Dark Luxury** | `#0a0a0a`（纯黑） | `#d4a574`（香槟金） | serif 标题 + sans 正文 |

@@ -167,7 +167,7 @@ Geist 与 Instrument Serif 不含汉字。繁中 `<text>` 元素扩展自己的 
 四个选项：
 
 1. **跑 onboarding** —— 见 [`onboarding.md`](onboarding.md)。给一个 URL；skill 提取色板 + 字体并重写本文件。
-2. **手工编辑** —— 改上表中的 hex 值。改完跑一遍 pre-output taste gate，验证 accent 在新纸色上仍然读作"焦点"。
+2. **手工编辑** —— 改上表中的 hex 值。改完跑一遍输出前品味门，验证 accent 在新纸色上仍然读作"焦点"。
 3. **品牌交接** —— 把现成的 design-token JSON 贴进这里的新章节，并把其 token 映射到上面的语义角色。
 4. **客户档案** —— 用 [`profiles.md`](profiles.md) 保存与切换命名皮肤，或把皮肤绑定到项目。
 

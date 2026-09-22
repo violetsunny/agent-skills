@@ -1,4 +1,4 @@
-# Style 4: Notion Clean
+# Style 4: Notion Clean（Notion 简约）
 
 极简、文档友好。为嵌入 Notion、Confluence 或 GitHub wiki 设计。
 

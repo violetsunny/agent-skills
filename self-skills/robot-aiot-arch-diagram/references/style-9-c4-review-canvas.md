@@ -1,4 +1,4 @@
-# Style 9: C4 Review Canvas
+# Style 9: C4 Review Canvas（C4 评审画布）
 
 面向 C4 context、container、component 图的评审室画布。暖纸色表面与确定性铅笔回声让设计讨论有人味，而底层几何保持精确。
 

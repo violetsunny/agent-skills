@@ -1,23 +1,23 @@
-# Style 8 — Dark Luxury
+# Style 8 — Dark Luxury（深色奢华）
 
 深黑画布配暖香槟金 accent，衬线/无衬线混排。本文件字号（21/14/13/11/10/9px）为风格锁定值，豁免 4px 网格（例外清单登记在 design-system.md §7）。
 在全部深色风格中独树一帜的暖调——最接近的同侪是 style-2（Dark Terminal），但更具高端编辑感。
 
-## Color Tokens
+## 颜色 token
 
-| Token | Value | Usage |
+| Token | 值 | 用途 |
 |-------|-------|-------|
-| Background | `#0a0a0a` | Canvas fill (deepest black, no blue tint) |
-| Surface | `#111111` | Node / panel fill |
-| Elevated | `#1a1a1a` | Secondary panels, sub-headers |
-| Accent gold | `#d4a574` | Primary arrows, titles, borders, cluster containers |
-| Accent dim | `#c9a96e` | Muted gold borders, secondary accents, cluster labels |
-| Accent bright | `#e8c49a` | Highlights, selected state stroke |
-| Text primary | `#f5f0eb` | Main labels (warm near-white) |
-| Text secondary | `#a39787` | Sub-labels, descriptions |
-| Text muted | `#6b5f53` | Annotations, fine print |
+| Background | `#0a0a0a` | 画布填充（最深黑，无蓝调） |
+| Surface | `#111111` | 节点/面板填充 |
+| Elevated | `#1a1a1a` | 次级面板、子页眉 |
+| Accent gold | `#d4a574` | 主箭头、标题、边框、cluster 容器 |
+| Accent dim | `#c9a96e` | 弱化金边框、次级 accent、cluster 标签 |
+| Accent bright | `#e8c49a` | 高亮、选中态描边 |
+| Text primary | `#f5f0eb` | 主标签（暖近白） |
+| Text secondary | `#a39787` | 子标签、描述 |
+| Text muted | `#6b5f53` | 注释、细字 |
 
-## Typography
+## 排版
 
 ```
 Title / Section label:  Georgia, 'Times New Roman', serif
@@ -36,26 +36,26 @@ Code / path text:       'Cascadia Code', 'SF Mono', 'Courier New', monospace
                         font-size: 10-11px, fill: #a39787
 ```
 
-**Rule**: Georgia serif is used ONLY for diagram titles and cluster/section labels (≥14px).
-All node names, arrow labels, and fine-print use sans-serif. This prevents CJK readability issues
-at small sizes while preserving the luxury editorial hook where it's most visible.
+**规则**：Georgia serif 只用于图表标题与 cluster/section 标签（≥14px）。
+所有节点名、箭头标签、细字一律 sans-serif。这样在小字号下避开 CJK 可读性问题，
+同时在最显眼处保留奢华编辑感的钩子。
 
-## Node Semantic Color Buckets
+## 节点语义色桶
 
-Six buckets cover the full color wheel — no two adjacent bucket colors are similar:
+六个色桶覆盖全色轮——相邻两桶颜色不相似：
 
-| Bucket | Border Color | Use For |
+| 色桶 | 边框色 | 用于 |
 |--------|-------------|---------|
-| Code / Logic | `#5a9e6f` (sage green) | functions, classes, modules, algorithms |
-| Service / API | `#a78bfa` (soft violet) | services, endpoints, APIs, gateways |
-| Data / Storage | `#38bdf8` (sky blue) | databases, tables, files, caches |
-| Concept / Domain | `#f87171` (soft rose) | concepts, domains, entities, topics |
-| Infra / Config | `#fbbf24` (amber yellow) | infrastructure, config, scripts, pipelines |
-| Meta / Doc | `#94a3b8` (cool gray) | documents, schemas, resources, sources |
+| Code / Logic | `#5a9e6f` (sage green) | 函数、类、模块、算法 |
+| Service / API | `#a78bfa` (soft violet) | 服务、endpoint、API、网关 |
+| Data / Storage | `#38bdf8` (sky blue) | 数据库、表、文件、缓存 |
+| Concept / Domain | `#f87171` (soft rose) | 概念、领域、实体、topic |
+| Infra / Config | `#fbbf24` (amber yellow) | 基础设施、配置、脚本、pipeline |
+| Meta / Doc | `#94a3b8` (cool gray) | 文档、schema、资源、来源 |
 
-All nodes share: `rx="6"` rounded rect, `fill="#111111"`, `stroke-width="1.5"`, stroke color matches bucket.
+所有节点共用：`rx="6"` 圆角矩形、`fill="#111111"`、`stroke-width="1.5"`、stroke 色随色桶。
 
-### SVG node example (Code / Logic):
+### SVG 节点示例（Code / Logic）：
 
 ```xml
 <rect x="60" y="100" width="260" height="52" rx="6"
@@ -66,18 +66,18 @@ All nodes share: `rx="6"` rounded rect, `fill="#111111"`, `stroke-width="1.5"`, 
       font-size="10" fill="#a39787">React component · state management</text>
 ```
 
-## Arrow System
+## 箭头体系
 
-| Flow Type | Color | Stroke | Dash | Marker |
+| 流类型 | 颜色 | 描边 | 虚线 | 箭头 |
 |-----------|-------|--------|------|--------|
-| Primary / structural | `#d4a574` (gold) | 2px solid | none | gold arrowhead |
-| Data flow | `#6ee7b7` (mint) | 1.5px solid | none | mint arrowhead |
-| Control / trigger | `#fdba74` (amber-orange) | 1.5px solid | none | orange arrowhead |
-| Reference / semantic | `#a39787` (warm muted) | 1px dashed | `4,3` | muted arrowhead |
-| Dependency | `#a78bfa` (violet) | 1px dashed | `6,3` | violet arrowhead |
-| Feedback / loop | `#d4a574` (gold) | 1.5px curved | — | gold arrowhead |
+| Primary / structural | `#d4a574` (gold) | 2px solid | none | 金色箭头 |
+| Data flow | `#6ee7b7` (mint) | 1.5px solid | none | 薄荷色箭头 |
+| Control / trigger | `#fdba74` (amber-orange) | 1.5px solid | none | 橙色箭头 |
+| Reference / semantic | `#a39787` (warm muted) | 1px dashed | `4,3` | 弱化色箭头 |
+| Dependency | `#a78bfa` (violet) | 1px dashed | `6,3` | 紫色箭头 |
+| Feedback / loop | `#d4a574` (gold) | 1.5px curved | — | 金色箭头 |
 
-### SVG arrow markers (add to `<defs>`):
+### SVG arrow markers（加进 `<defs>`）：
 
 ```xml
 <defs>
@@ -107,12 +107,12 @@ All nodes share: `rx="6"` rounded rect, `fill="#111111"`, `stroke-width="1.5"`, 
 </defs>
 ```
 
-### Arrow label placement
+### 箭头标签摆放
 
-Use **offset-first**: place label 6–8px above horizontal arrows (not centered on the line).
-Add background rect (`fill="#0a0a0a" opacity="0.9"`) only when the label still collides with another element.
+**偏移优先**：标签放水平箭头上方 6–8px（不居中压线）。
+仅当标签仍与其他元素碰撞时补背景矩形（`fill="#0a0a0a" opacity="0.9"`）。
 
-## Container / Cluster Style
+## 容器 / Cluster 样式
 
 ```xml
 <!-- Layer cluster container -->
@@ -128,16 +128,16 @@ Add background rect (`fill="#0a0a0a" opacity="0.9"`) only when the label still c
       fill="#c9a96e" opacity="0.7">LAYER NAME</text>
 ```
 
-## Background Treatment
+## 背景处理
 
-No gradient needed — depth comes from contrast levels:
+不需要渐变——纵深来自对比度层级：
 
-1. Canvas `#0a0a0a` — absolute black floor
-2. Node surface `#111111` — first elevation (+1 stop)
-3. Panel/sub-header `#1a1a1a` — second elevation (+2 stops)
-4. Gold `#d4a574` — the only warmth; draws the eye to structure
+1. 画布 `#0a0a0a` —— 绝对黑地板
+2. 节点表面 `#111111` —— 第一级抬升（+1 stop）
+3. 面板/子页眉 `#1a1a1a` —— 第二级抬升（+2 stops）
+4. 金色 `#d4a574` —— 唯一暖色；把视线引向结构
 
-Optional: subtle ambient radial glow around the central cluster
+可选：中心 cluster 周围的微弱环境辉光
 ```xml
 <radialGradient id="glow" cx="50%" cy="50%" r="30%">
   <stop offset="0%" stop-color="#d4a574" stop-opacity="0.04"/>
@@ -146,7 +146,7 @@ Optional: subtle ambient radial glow around the central cluster
 <rect width="960" height="600" fill="url(#glow)"/>
 ```
 
-## Full `<style>` Block
+## 完整 `<style>` 块
 
 ```xml
 <style>
@@ -164,23 +164,23 @@ Optional: subtle ambient radial glow around the central cluster
 </style>
 ```
 
-## ViewBox Recommendations
+## ViewBox 推荐
 
-| Diagram | ViewBox |
+| 图类型 | ViewBox |
 |---------|---------|
-| Standard architecture | `0 0 960 600` |
-| Tall pipeline / flow | `0 0 960 820` |
-| Wide multi-layer | `0 0 1200 600` |
+| 标准架构图 | `0 0 960 600` |
+| 竖版 pipeline / flow | `0 0 960 820` |
+| 宽版多层 | `0 0 1200 600` |
 
-## Comparable Styles
+## 同类风格对比
 
-| Style | Background | Accent | Typography |
+| 风格 | 背景 | Accent | 排版 |
 |-------|-----------|--------|-----------|
 | Style 2 Dark Terminal | `#0f0f1a`（蓝黑） | 多主题 accent 调色板（紫 `#a855f7`、绿 `#10b981`、蓝 `#3b82f6` 等，按主题/层选色） | 全等宽 |
-| **Style 8 Dark Luxury** | `#0a0a0a` (pure black) | `#d4a574` (champagne gold) | serif titles + sans body |
+| **Style 8 Dark Luxury** | `#0a0a0a`（纯黑） | `#d4a574`（香槟金） | serif 标题 + sans 正文 |
 | Style 3 Blueprint | `#0a1628`（藏青） | `#00b4d8`（cyan，辅 `#48cae4`） | 等宽（'Courier New'） |
 
-**When to choose Style 8**: architecture/pipeline docs where you want editorial gravitas —
-README hero images, conference slides, knowledge-base diagrams, premium product docs.
+**何时选 Style 8**：需要编辑级分量感的架构/pipeline 文档——
+README hero 图、大会幻灯片、知识库图表、高端产品文档。
 
-**See also**: [dark-svg-techniques.md](dark-svg-techniques.md) for dark-canvas techniques that apply across dark styles — background grid, semi-transparent fill + opaque mask double-rect, z-order, contrast hard floors, and per-type dark recipes.
+**另见**：[dark-svg-techniques.md](dark-svg-techniques.md)——适用于所有深色风格的深色画布技法：背景网格、半透明填充+不透明遮罩双矩形、z-order、对比度硬下限、分类型深色配方。

@@ -1,53 +1,53 @@
-# User Journey Map
+# User Journey Map（用户旅程图）
 
-**Best for:** what a person does across the stages of an experience and how it *feels* at each one. The sentiment curve is the load-bearing element — without it this is just a process diagram with extra rows, so if you can't name a sentiment for every stage, use **Process** or **Timeline** instead.
+**最适合：** 一个人在体验各阶段做了什么、每个阶段*感受*如何。情绪曲线是承重元素——没有它这只是多了几行的流程图，所以若无法为每个阶段命名一种情绪，改用 **Process** 或 **Timeline**。
 
-## Layout conventions
+## 布局约定
 
-Vertical stack, top to bottom, for one persona:
+单一 persona 的垂直堆叠，自上而下：
 
-- **Stage headers** — 5 equal columns, 200px wide, 24px gutters (max 6 stages). Each column: a Geist Mono 8px uppercase tracked eyebrow (`STAGE 1` … `STAGE 5`) over the stage name in Geist sans 12px weight 600, both centered on the column.
-- **Sentiment band (the differentiator)** — a 160px-tall plot area directly under the headers. 3 horizontal reference hairlines at `rule` 0.10 opacity mark the levels `HIGH` / `NEUTRAL` / `LOW` — Geist Mono 8px `muted`, anchored `end` in a 64px left margin. **Never emoji, never `writing-mode` vertical text for these labels.** A smooth `muted` 1.5px polyline runs through one `r=5` dot per stage, each value snapped to one of five ordinal levels (`HIGH`, `MED-HIGH`, `NEUTRAL`, `MED-LOW`, `LOW`) — only the three that are actually used need a labeled hairline. The trough stage's dot and its incoming segment are `accent`; everything else on the curve is `muted`.
-- **Content rows** — up to 3 labelled bands below the sentiment band, each with a Geist Mono 8px uppercase row label sitting in the left margin (same column as the sentiment level labels, never rotated):
-  - `ACTIONS` — what the user does, Geist sans 12px, one short line per stage.
-  - `TOUCHPOINTS` — the surface the action happens on (email, app, docs…), Geist Mono 9px `muted`.
-  - An optional third row for a metric or owner, same treatment as touchpoints.
-  Rows are separated by hairlines that span the full plot width (from the left margin edge to the last stage's right edge).
-- **Pain markers** — on stages where sentiment drops, a small dashed-stroke tag box (`rx=2`, `accent @ 0.50` stroke dashed `3,3`, no fill or a faint accent tint) sits under that stage's actions cell, with a Geist Mono 8px label naming the friction. Max 2 per diagram, and only on the trough — tagging every stage erases the signal.
-- **Legend** — horizontal strip at the bottom per the global rule (hairline separator above, 160–180px between entries): three keys, in order — the sentiment line, the trough-stage highlight, and the pain-marker tag. The trough key is not optional: the dip is the finding, so the reader needs the highlight named.
+- **阶段头** —— 5 个等宽列，200px 宽，24px 间距（最多 6 阶段）。每列：Geist Mono 8px 大写加字距眉标（`STAGE 1` … `STAGE 5`）置于 Geist sans 12px 字重 600 的阶段名上方，两者都在列上居中。
+- **情绪带（差异化元素）** —— 头部正下方 160px 高的绘图区。3 条水平参考发丝线以 `rule` 0.10 不透明度标记 `HIGH` / `NEUTRAL` / `LOW` 三档——Geist Mono 8px `muted`，在 64px 左边距内 `end` 锚定。**这些标签绝不用 emoji、绝不用 `writing-mode` 竖排文字。** 一条平滑 `muted` 1.5px 折线穿过每阶段一个 `r=5` 圆点，每个值吸附到五个序数档位之一（`HIGH`、`MED-HIGH`、`NEUTRAL`、`MED-LOW`、`LOW`）——只有实际用到的三档需要带标签的发丝线。低谷阶段的圆点及其入段用 `accent`；曲线上其余全部 `muted`。
+- **内容行** —— 情绪带下方最多 3 个带标签的横带，每行标签为 Geist Mono 8px 大写，放在左边距内（与情绪档位标签同列，绝不旋转）：
+  - `ACTIONS` —— 用户做什么，Geist sans 12px，每阶段一行短句。
+  - `TOUCHPOINTS` —— 动作发生的界面（email、app、docs…），Geist Mono 9px `muted`。
+  - 可选第三行放指标或负责人，处理方式与 touchpoints 相同。
+  行与行之间用横跨整个绘图宽度的发丝线分隔（从左边距边缘到末阶段右缘）。
+- **痛点标记** —— 情绪下降的阶段，在该阶段 actions 单元格下方放一个虚线描边小标签盒（`rx=2`、`accent @ 0.50` 虚线 `3,3` 描边、无填充或淡 accent 填充），Geist Mono 8px 标签写明摩擦点。每图最多 2 个，且只在低谷——每个阶段都标记等于抹掉信号。
+- **图例** —— 按全局规则放底部水平条（上方发丝分隔线，条目间距 160–180px）：三个键，顺序为——情绪线、低谷阶段高亮、痛点标记标签。低谷键不可省略：下凹就是发现，读者需要这个高亮被命名。
 
-## Connector note
+## 连线说明
 
-The sentiment polyline is a **data curve**, not a connector between nodes — §6 rule 1 (mandatory orthogonal elbows) does not apply to it. This exemption covers the sentiment curve **only**; any other connector in a journey map (there normally are none) still follows the standard connector rules.
+情绪折线是**数据曲线**，不是节点间连线——§6 规则 1（强制正交肘）不适用于它。此豁免**仅**覆盖情绪曲线；旅程图中的其他任何连线（通常没有）仍遵循标准连线规则。
 
-## Geometry
+## 几何
 
-- Stage grid: left margin 64px, then 5 columns of 200px with 24px gutters (`col_left = 64 + i·224`).
-- Sentiment band: 160px tall. Hairlines at the top (`HIGH`), middle (`NEUTRAL`), and bottom (`LOW`) of the band, 80px apart.
-- Dot x = the horizontal center of its stage column. Dot y = the snapped level's hairline y (or the interpolated position for an unlabeled level).
-- Row height: enough for one line of text plus, in the `ACTIONS` row only, up to two stacked 16px-tall pain-marker boxes.
+- 阶段网格：左边距 64px，之后 5 列各 200px、间距 24px（`col_left = 64 + i·224`）。
+- 情绪带：160px 高。发丝线位于带的顶部（`HIGH`）、中部（`NEUTRAL`）、底部（`LOW`），间距 80px。
+- 圆点 x = 所属阶段列的水平中心。圆点 y = 吸附档位的发丝线 y（无标签档位用插值位置）。
+- 行高：容纳一行文字；仅 `ACTIONS` 行额外容纳最多两个堆叠的 16px 高痛点标记盒。
 
-## Focal rule
+## 焦点规则
 
-Exactly 2 accent elements: the trough dot + its incoming curve segment (counts as one), and its pain marker(s) (counts as the other). Nothing else on the map is `accent`.
+恰好 2 个 accent 元素：低谷圆点 + 其入段曲线（计一个），及其痛点标记（计另一个）。图上其他任何元素都不用 `accent`。
 
-## Complexity budget
+## 复杂度预算
 
-Max 6 stages · max 3 content rows · 5 sentiment levels (ordinal, named — never numeric) · max 2 pain markers · max 2 accent elements.
+最多 6 阶段 · 最多 3 个内容行 · 5 个情绪档位（序数、命名——绝不用数值）· 最多 2 个痛点标记 · 最多 2 个 accent 元素。
 
-## Anti-patterns
+## 反模式
 
-- **No sentiment curve.** If every stage feels the same, or you can't name a feeling, you're drawing a process — use **Process** or **Timeline**.
-- **More than 6 stages.** Split into two journeys (e.g. acquisition and retention) rather than cramming a wide funnel into one map.
-- **Numeric sentiment axis** (a 0–100 score). Sentiment here is ordinal — five named levels, not a chart of a continuous metric.
-- **Emoji as sentiment markers.** Use the named levels and hairlines; emoji don't localize, print, or hold up at small sizes.
-- **Multiple personas on one map.** Overlaying two sentiment curves erases both. One map per persona.
-- **Pain markers on every stage.** If nothing is un-marked, nothing is focal.
-- **`writing-mode` vertical row labels.** Horizontal only, in the left margin — same rule as every other type in this skill.
-- **Using it for an internal system flow with no human in it.** No person, no sentiment, no journey map — that's an architecture or data-flow diagram.
+- **没有情绪曲线。** 每个阶段感受相同或无法命名感受时，你在画流程——改用 **Process** 或 **Timeline**。
+- **超过 6 阶段。** 拆成两段旅程（如获客与留存），不要把宽漏斗塞进一张图。
+- **数值情绪轴**（0–100 分）。这里的情绪是序数——五个命名档位，不是连续指标图表。
+- **用 emoji 做情绪标记。** 用命名档位与发丝线；emoji 不本地化、不便于打印、小尺寸下不成立。
+- **单图多 persona。** 叠加两条情绪曲线会同时抹掉两条。一个 persona 一张图。
+- **每个阶段都放痛点标记。** 没有未标记项就没有焦点。
+- **`writing-mode` 竖排行标签。** 只允许水平，放左边距内——与本 skill 其他所有类型同一规则。
+- **用于没有人类参与的内部系统流。** 没有人就没有情绪、没有旅程图——那是 architecture 或 data-flow 图。
 
-## Examples
+## 示例
 
-- minimal light. *Trial to paid: the first week*, 5 stages, trough at "Hit the limit".
-- minimal dark, same data.
-- full editorial: container framing + 3 varied-width summary cards + footer.
+- minimal light。*Trial to paid: the first week*，5 阶段，低谷在 "Hit the limit"。
+- minimal dark，同数据。
+- full editorial：容器框 + 3 张不同宽度摘要卡 + 页脚。

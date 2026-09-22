@@ -1,26 +1,26 @@
-# Venn / Set Overlap
+# Venn / Set Overlap（韦恩图/集合重叠）
 
-**Best for:** intersection of concepts/domains, shared attributes between categories, "where A meets B", ikigai-style frames (desirable × feasible × viable).
+**最适合：** 概念/领域的交集、类别间的共享属性、"A 与 B 的交汇处"、ikigai 式框架（desirable × feasible × viable）。
 
-## Layout conventions
-- **Prefer 2 or 3 circles.** Avoid 4+ (unreadable — use a matrix instead).
-- Circle stroke: 1px hairline, color per-set (ink, muted, soft).
-- Circle fill: very low-opacity tint — `rgba(45,49,66,0.04)` for ink set, `rgba(79,93,117,0.05)` for muted. Tints compound naturally in overlap regions.
-- Radii: equal when sets are comparable in size; proportional when sets are meaningfully different. Don't fake equal sizes for aesthetics.
-- **Set labels** placed outside the circle, NEVER crossing the stroke. Geist 12–14px 600 for the set name, optional Geist Mono 9px sublabel.
-- **Intersection labels** placed inside the overlap region, Geist 12px 600, centered. For small overlaps, use a leader line to a label in clear space.
-- **Coral accent** on the ONE focal intersection — the "sweet spot". Either coral label stroke OR clipPath-bounded coral fill tint (`rgba(235,108,54,0.10)`).
-- Circle centers and radii divisible by 4.
+## 布局约定
+- **优先 2 或 3 个圆。** 避免 4 个以上（不可读——改用矩阵）。
+- 圆描边：1px 发丝线，按集合着色（ink、muted、soft）。
+- 圆填充：极低不透明度 tint——ink 集合用 `rgba(45,49,66,0.04)`，muted 集合用 `rgba(79,93,117,0.05)`。重叠区域的 tint 会自然叠加。
+- 半径：集合规模可比时取等；差异有含义时按比例。不要为美观伪造等大。
+- **集合标签**放在圆外，绝不跨越描边。集合名用 Geist 12–14px 600，可选 Geist Mono 9px 子标签。
+- **交集标签**放在重叠区域内，Geist 12px 600，居中。重叠区太小时用引线把标签引到空白处。
+- **coral 强调**只用于唯一焦点交集——"sweet spot"。要么 coral 标签描边，要么 clipPath 限界的 coral 填充 tint（`rgba(235,108,54,0.10)`）。
+- 圆心坐标与半径可被 4 整除。
 
-## Anti-patterns
-- Unlabeled regions — reader can't tell which set is which.
-- Circles that don't overlap when overlap is the point.
-- Equal-sized circles when sets are obviously different (dishonest).
-- Coral on multiple overlap regions (focal signal dies).
-- Labels sitting on top of circle strokes (illegible).
-- 4+ circles where 2–3 would do.
+## 反模式
+- 区域无标签——读者分不清哪个是哪个。
+- 重叠才是重点，圆却不相交。
+- 集合明显不等大却画等大圆（不诚实）。
+- coral 用于多个重叠区（焦点信号失效）。
+- 标签压在圆描边上（不可读）。
+- 2–3 个圆够用却画 4 个以上。
 
-## Examples
+## 示例
 - minimal light
 - minimal dark
 - full editorial

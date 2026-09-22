@@ -1,64 +1,64 @@
-# UML Class Diagram
+# UML Class Diagram（UML 类图）
 
-**Best for:** the static structure of an object model — classes, what they own, what they inherit, and what they merely depend on. The distinguishing content is the **operations compartment** and the **typed relationship vocabulary** (the arrowheads carry meaning). ER cannot express either — use this type only when operations or the inheritance/composition vocabulary are the point of the diagram, and `type-er.md` when the story is entities and cardinality.
+**最适合：** 对象模型的静态结构——类、类拥有什么、继承什么、仅仅依赖什么。区分性内容是**操作栏（operations compartment）**与**带类型的关系词汇**（箭头形状承载含义）。ER 两者都表达不了——仅当操作或继承/组合词汇是图的重点时用本类型，故事是实体与基数时用 `type-er.md`。
 
-**Other UML diagrams — route elsewhere.** UML is a family; only the class diagram gets its own grammar here:
+**其他 UML 图——路由到别处。** UML 是一个家族；这里只有类图拥有自己的语法：
 
-| UML diagram | Use instead |
+| UML 图 | 改用 |
 |---|---|
-| Sequence | [type-sequence.md](type-sequence.md) |
-| State machine | [type-state.md](type-state.md) |
-| Component | [type-architecture.md](type-architecture.md) |
-| Deployment | [type-architecture.md](type-architecture.md) |
-| Activity | [type-swimlane.md](type-swimlane.md) or [type-flowchart.md](type-flowchart.md) |
-| Conceptual / domain ER | [type-er.md](type-er.md) |
+| 时序图 | [type-sequence.md](type-sequence.md) |
+| 状态机 | [type-state.md](type-state.md) |
+| 组件图 | [type-architecture.md](type-architecture.md) |
+| 部署图 | [type-architecture.md](type-architecture.md) |
+| 活动图 | [type-swimlane.md](type-swimlane.md) 或 [type-flowchart.md](type-flowchart.md) |
+| 概念 / 领域 ER | [type-er.md](type-er.md) |
 
-## Layout conventions
+## 布局约定
 
-- Each class is a **single box** (`rx=6`), divided by full-width hairlines into up to three compartments. Compartment heights follow content — never pad to a uniform height.
-  1. **Name** — class name in Geist sans, 12px, weight 600, **centered**. An interface carries a Geist Mono 8px `«interface»` stereotype line above the name. An abstract class sets the name in *italic*.
-  2. **Attributes** — one line each, Geist Mono 9px, left-aligned: `+ name: Type`. Visibility markers: `+` public, `-` private, `#` protected.
-  3. **Operations** — one line each, Geist Mono 9px, left-aligned: `+ method(arg): Return`.
-  Omit a compartment entirely when a class has no members in it (an interface with no attributes skips that compartment).
-- Attribute/operation lines are a single combined string, not the two-column field/type layout ER uses — that visual distinction keeps the two types from reading the same.
-- Coral (accent) is reserved for the class being implemented or extended (the focal type) — accent-tint fill, accent stroke. Its inbound inheritance/realization edges count as **one** additional accent element (treated as a group), for 2 accent elements total per diagram.
+- 每个类是**单个盒子**（`rx=6`），用全宽发丝线分成最多三个栏。栏高随内容——绝不填充到统一高度。
+  1. **Name**——类名 Geist sans、12px、weight 600、**居中**。接口在名称上方带一行 Geist Mono 8px `«interface»` 构造型。抽象类的名称用*斜体*。
+  2. **Attributes**——每行一个，Geist Mono 9px，左对齐：`+ name: Type`。可见性标记：`+` public、`-` private、`#` protected。
+  3. **Operations**——每行一个，Geist Mono 9px，左对齐：`+ method(arg): Return`。
+  某个类在某一栏没有成员时，整栏省略（没有属性的接口跳过该栏）。
+- 属性/操作行是单个组合字符串，不是 ER 用的两列 field/type 布局——这个视觉区分让两个类型不会被读成同一种。
+- coral（accent）保留给正在被实现或被继承的类（焦点类型）——accent-tint 填充、accent 描边。它的入向继承/实现边算作**一个**额外 accent 元素（作为一组处理），每图共 2 个 accent 元素。
 
-## Relationship vocabulary
+## 关系词汇
 
-Define every marker used in `<defs>` and show all six in the legend, even the ones not used in the diagram body — the legend is this type's complete grammar reference.
+用到的每种 marker 都在 `<defs>` 中定义，且图例中展示全部六种——即使图身没用到的也展示——图例是本类型的完整语法参考。
 
-| Relationship | Line | Ending (at the target/owner end) |
+| 关系 | 线型 | 端点（目标/owner 端） |
 |---|---|---|
-| Inheritance (`extends`) | solid | large **hollow triangle** — `paper` fill, `ink` stroke |
-| Realization (`implements`) | dashed `5,4` | same hollow triangle |
-| Composition (owns, cascades) | solid | **filled diamond** at the OWNER end, `ink` fill |
-| Aggregation (has, independent) | solid | **hollow diamond** at the OWNER end |
-| Association | solid | plain open arrowhead, multiplicity at BOTH ends |
-| Dependency (uses) | dashed `4,3` | plain open arrowhead |
+| 继承（`extends`） | 实线 | 大**空心三角**——`paper` 填充、`ink` 描边 |
+| 实现（`implements`） | 虚线 `5,4` | 同款空心三角 |
+| 组合（拥有、级联删除） | 实线 | OWNER 端**实心菱形**，`ink` 填充 |
+| 聚合（持有、相互独立） | 实线 | OWNER 端**空心菱形** |
+| 关联 | 实线 | 普通开放箭头，两端都标多重性 |
+| 依赖（uses） | 虚线 `4,3` | 普通开放箭头 |
 
-Multiplicities (`1`, `0..*`, `1..*`) sit in Geist Mono 8px, 10–12px off the box edge, on an opaque mask over the line — same convention as ER cardinality labels.
+多重性（`1`、`0..*`、`1..*`）用 Geist Mono 8px，距盒子边缘 10–12px，置于线上的不透明遮罩上——与 ER 基数标签同一约定。
 
-## Connector rules
+## 连接线规则
 
-All six design-system.md §6 connector rules apply in full — orthogonal rounded elbows (`r=8`), no diagonals, bridge/hop for unavoidable crossings, fanned attach points ≥12px apart when several relationships share an edge, masked labels with the 6–10px gap, connectors drawn before boxes. Prefer laying classes out so relationships resolve to straight lines or single-elbow routes; a class diagram with every edge bridging is over budget — split by package instead.
+design-system.md §6 的全部六条连接线规则完整适用——正交圆角肘（`r=8`）、禁斜线、不可避免的交叉用桥/跨、多条关系共用一条边时接入点扇形展开且间距 ≥12px、标签带遮罩与 6–10px 间隙、先画连接线再画盒子。优先通过类的排布让关系解析为直线或单肘路由；每条边都要架桥的类图已超预算——改按 package 拆分。
 
-## Complexity budget
+## 复杂度预算
 
-Max 7 classes, max 8 relationships, max 5 members per compartment (overflow becomes a Geist Mono `…` line), max 2 accent elements. Over budget → split by package.
+最多 7 个类、最多 8 条关系、每栏最多 5 个成员（溢出变成一行 Geist Mono `…`）、最多 2 个 accent 元素。超预算 → 按 package 拆分。
 
-Seven is the ceiling rather than the target. Three compartments per box makes a class diagram dense fast, so treat 4–5 classes as the normal size; the shipped example uses all seven only because it doubles as the legend for the full relationship vocabulary.
+七是上限不是目标。每盒三栏让类图很快就密，所以把 4–5 个类当常态；交付示例用满七个，只因为它同时充当完整关系词汇的图例。
 
-## Anti-patterns
+## 反模式
 
-- Getters and setters listed as operations — they're noise; show behavior that matters.
-- Every attribute and method dumped in — a class diagram is an argument, not a header file.
-- Composition and aggregation used interchangeably — the filled diamond means the part dies with the whole. Say so, or use the hollow diamond.
-- Association arrows with no multiplicity.
-- Drawing a class diagram when there's no inheritance and no operations — that's ER.
-- Stereotype guillemets on everything, not just the interfaces/abstracts that need them.
-- Boxes padded to equal height.
+- 把 getter/setter 列为操作——它们是噪音；只展示要紧的行为。
+- 把每个属性和方法都倒进去——类图是一个论点，不是头文件。
+- 组合与聚合混用——实心菱形意味着部分随整体消亡。要么说清楚，要么用空心菱形。
+- 关联箭头没有多重性。
+- 没有继承也没有操作却画类图——那是 ER。
+- 给所有东西都加构造型书名号，而不只是需要的接口/抽象类。
+- 盒子被填充到等高。
 
-## Examples
+## 示例
 
 - minimal light
 - minimal dark

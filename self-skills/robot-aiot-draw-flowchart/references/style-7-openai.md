@@ -1,8 +1,8 @@
-# Style 7: OpenAI Official
+# Style 7: OpenAI Official（OpenAI 官方风格）
 
-Clean, modern aesthetic matching OpenAI's documentation and research diagrams — minimal but precise.
+干净、现代的美学，与 OpenAI 文档和研究图表一致——极简但精确。
 
-## Color Palette
+## 配色
 
 ```
 Background:     #ffffff  (pure white)
@@ -17,7 +17,7 @@ Orange accent:  #f97316  (highlights, warnings)
 Gray accent:    #71717a  (secondary elements)
 ```
 
-## Typography
+## 排版
 
 ```
 font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica Neue, 'PingFang SC', 'Microsoft YaHei', 'Microsoft JhengHei', 'SimHei', sans-serif
@@ -26,11 +26,11 @@ font-weight: 600 for titles, 500 for labels, 400 for descriptions
 letter-spacing: 0
 ```
 
-No custom fonts. System font stack only for maximum compatibility.
+不用自定义字体。仅用系统字体栈，兼容性最高。
 
-## Node Boxes
+## 节点盒
 
-Clean, minimal boxes with subtle borders:
+干净、极简的盒子配细边框：
 
 ```xml
 <!-- Standard node -->
@@ -44,16 +44,16 @@ Clean, minimal boxes with subtle borders:
       fill="#10a37f"/>
 ```
 
-**Key techniques:**
-1. White fill with light gray border (no shadows)
-2. Optional colored left-border accent strip (4px wide)
-3. `rx="8"` for subtle rounding
-4. `stroke-width: 1.5` — thin, precise borders
-5. No gradients, no shadows, no decorative elements
+**关键技法：**
+1. 白色填充配浅灰边框（无阴影）
+2. 可选的彩色左边框 accent 条（4px 宽）
+3. `rx="8"` 微圆角
+4. `stroke-width: 1.5`——细而精确的边框
+5. 无渐变、无阴影、无装饰元素
 
-## Arrows
+## 箭头
 
-Thin, precise arrows with subtle colors:
+细而精确的箭头，颜色克制：
 
 ```xml
 <defs>
@@ -77,16 +77,16 @@ Thin, precise arrows with subtle colors:
       stroke="#10a37f" stroke-width="1.5" marker-end="url(#arrow-oai-green)"/>
 ```
 
-**Arrow guidelines:**
-- Prefer straight lines (orthogonal routing with right angles)
-- `stroke-width: 1.5` — thin and precise
-- Filled polygon arrowheads (not stroke-based)
-- Gray for default, green for primary/accent flows
-- Dashed (`stroke-dasharray="4,3"`) for optional/async flows
+**箭头准则：**
+- 优先直线（直角正交布线）
+- `stroke-width: 1.5`——细而精确
+- 填充多边形箭头（非描边式）
+- 默认用灰色，主流/强调流用绿色
+- 可选/异步流用虚线（`stroke-dasharray="4,3"`）
 
-## Arrow Labels
+## 箭头标签
 
-Minimal, small labels:
+极简小标签：
 
 ```xml
 <text x="340" y="133" text-anchor="middle" fill="#6e6e80" font-size="12">
@@ -94,15 +94,15 @@ Minimal, small labels:
 </text>
 ```
 
-Labels should be:
-- 12px, gray color (`#6e6e80`)
-- No background rect by default (white background is usually sufficient); add a white fallback rect only when offsetting cannot prevent a collision
-- Short, technical language
-- Midpoint of arrow
+标签要求：
+- 12px，灰色（`#6e6e80`）
+- 默认不加背景矩形（白底通常足够）；仅当偏移仍无法避免碰撞时补白色 fallback 矩形
+- 简短、技术化的措辞
+- 位于箭头中点
 
-## Database Shapes
+## 数据库形状
 
-Clean cylinders with thin borders:
+细边框的干净圆柱体：
 
 ```xml
 <ellipse cx="200" cy="100" rx="50" ry="12" fill="#ffffff" stroke="#e5e5e5" stroke-width="1.5"/>
@@ -111,9 +111,9 @@ Clean cylinders with thin borders:
 <ellipse cx="200" cy="140" rx="50" ry="12" fill="none" stroke="#e5e5e5" stroke-width="1.5"/>
 ```
 
-## Grouping Containers
+## 分组容器
 
-Dashed rect containers for logical grouping:
+虚线矩形容器用于逻辑分组：
 
 ```xml
 <rect x="80" y="80" width="400" height="200" rx="8" ry="8"
@@ -123,9 +123,9 @@ Dashed rect containers for logical grouping:
 </text>
 ```
 
-## Node Content
+## 节点内容
 
-Clean, minimal text layout:
+干净、极简的文字排布：
 
 ```xml
 <rect x="100" y="100" width="180" height="80" rx="8" ry="8"
@@ -140,32 +140,34 @@ Clean, minimal text layout:
 </text>
 ```
 
-**Content guidelines:**
-- 1-2 lines per box
-- Main label: 16px, font-weight: 600, near-black
-- Description: 13px, font-weight: 400, gray
-- Center-aligned text within boxes
+**内容准则：**
+- 每盒 1-2 行
+- 主标签：16px，font-weight: 600，近黑
+- 描述：13px，font-weight: 400，灰色
+- 盒内文字居中对齐
 
-## Layout Principles
+## 布局原则
 
-**Precise, grid-aligned layout:**
-- Snap all coordinates to 8px grid
-- Consistent 100px horizontal spacing
-- Consistent 120px vertical spacing
-- Generous whitespace (40px+ margins)
-- No decorative elements
+**精确、对齐网格的布局：**
+- 所有坐标吸附到 8px 网格
+- 水平间距统一 100px
+- 垂直间距统一 120px
+- 充足留白（40px+ 边距）
+- 无装饰元素
 
-**OpenAI minimalism:**
-- Only use color when semantically meaningful (brand green for primary flow)
-- White boxes on white background — differentiation through border and label only
-- Avoid: shadows, gradients, patterns, icons, decorative elements
-- Prefer: straight lines, orthogonal routing, thin strokes
+**OpenAI 极简主义：**
+- 仅在语义需要时用色（品牌绿标主流）
+- 白底白盒——只靠边框与标签区分
+- 避免：阴影、渐变、图案、图标、装饰元素
+- 优先：直线、正交布线、细描边
 
-## SVG Template
+## SVG 模板
 
 canonical 副本：`templates/style-7-openai.svg` — 复制使用，以 templates 为准
 ```xml
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 600" width="960" height="600">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 600" width="960" height="600" role="img" aria-labelledby="style-7-openai-title style-7-openai-desc">
+  <title id="style-7-openai-title">OpenAI official style diagram</title>
+  <desc id="style-7-openai-desc">Pure white minimal style skeleton</desc>
   <style>
     text { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica Neue, 'PingFang SC', 'Microsoft YaHei', 'Microsoft JhengHei', 'SimHei', sans-serif; }
   </style>
@@ -200,17 +202,17 @@ canonical 副本：`templates/style-7-openai.svg` — 复制使用，以 templat
 </svg>
 ```
 
-## Design Philosophy
+## 设计哲学
 
-OpenAI Official style emphasizes:
-- **Minimalism**: White on white, only essential visual elements
-- **Precision**: Thin strokes, sharp corners (rx=8), grid-aligned
-- **Clarity**: Content-first, no visual noise
-- **Brand consistency**: `#10a37f` green used sparingly for primary flows
+OpenAI 官方风格强调：
+- **极简**：白上白，只保留必要视觉元素
+- **精确**：细描边、利落圆角（rx=8）、对齐网格
+- **清晰**：内容优先，无视觉噪音
+- **品牌一致**：`#10a37f` 绿色只少量用于主流
 
-Avoid:
-- Shadows and gradients
-- Colorful fills (white fill only)
-- Thick borders (>2px)
-- Decorative elements (icons, patterns, textures)
-- Custom fonts (system stack only)
+避免：
+- 阴影与渐变
+- 彩色填充（只用白色填充）
+- 粗边框（>2px）
+- 装饰元素（图标、图案、纹理）
+- 自定义字体（只用系统字体栈）

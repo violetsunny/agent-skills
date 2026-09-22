@@ -1,13 +1,13 @@
-# Export block registry（`--registry`）
+# 导出 block 注册表（`--registry`）
 
-为 Traceable block decomposition 图的 `data-block-*` 元数据产出机器可读的 `.registry.json` sidecar。**仅限用户明确要求——绝不主动执行，且只在 `--registry` 时执行。**
+为可追溯 block 分解图的 `data-block-*` 元数据产出机器可读的 `.registry.json` sidecar。**仅限用户明确要求——绝不主动执行，且只在 `--registry` 时执行。**
 
 ## 触发条件
 
 以下情况加载本文件：
 
 - 用户要求导出图表 HTML 文件的 block registry——导出请求的 `--registry` 形式（单独使用，或与 `--svg-only`/`--png-only`/`--scale`/`--output` 组合）。
-- 用户用自然语言索要 Traceable block decomposition 图（见 [`semantic-patterns.md` § 8](semantic-patterns.md)）背后的 block 元数据、ID 列表、registry 或可追溯数据，且要结构化数据而非图片。
+- 用户用自然语言索要可追溯 block 分解图（见 [`semantic-patterns.md` § 8](semantic-patterns.md)）背后的 block 元数据、ID 列表、registry 或可追溯数据，且要结构化数据而非图片。
 
 本文件只管辖 `--registry`。SVG/PNG 光栅化是独立流程——见 [`export.md`](export.md)。两者可在同一次命令调用中运行，但不共享任何逻辑；把本流程当作独立流程，不是那个流程的扩展。
 
@@ -15,7 +15,7 @@
 
 registry 只捕获源 HTML `data-block-*` 属性中已书写的内容（定义见 [`semantic-patterns.md` § 8](semantic-patterns.md)）——不多不少。它是**投影，不是第二真源**：JSON 中每个值都必须能追溯到文件中字面存在的属性值。本流程绝不从图表文本、节点位置或自身判断去推断、概括或补充 block 记录。
 
-只适用于使用 Traceable block decomposition 模式的图（携带 `data-block-id` 的 Tree 节点）。其他任何图——包括未用该模式的普通 Tree 图——没有 block 可提取；见*边界情况*。
+只适用于使用可追溯 block 分解模式的图（携带 `data-block-id` 的 Tree 节点）。其他任何图——包括未用该模式的普通 Tree 图——没有 block 可提取；见*边界情况*。
 
 ## JSON schema
 

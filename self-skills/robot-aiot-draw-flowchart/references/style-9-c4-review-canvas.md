@@ -1,90 +1,80 @@
-# Style 9: C4 Review Canvas
+# Style 9: C4 Review Canvas（C4 评审画布）
 
-A review-room canvas for C4 context, container, and component diagrams. The
-warm paper surface and deterministic pencil echoes make design discussion feel
-human while the underlying geometry remains exact.
+面向 C4 context、container、component 图的评审室画布。暖纸色表面与确定性铅笔回声让设计讨论有人味，而底层几何保持精确。
 
-## Best fit
+## 最适合
 
-- Architecture Decision Records and design reviews
-- C4 context, container, or component views
-- Responsibility and dependency reviews
-- Diagrams that need annotations without looking like a slide template
+- 架构决策记录（ADR）与设计评审
+- C4 context、container 或 component 视图
+- 职责与依赖评审
+- 需要标注但不想长得像幻灯片模板的图表
 
-## Visual tokens
+## 视觉 token
 
-| Token | Value |
+| Token | 值 |
 |---|---|
-| Canvas | `#f7f2e8` |
-| Card | `#fffdf7` |
-| Primary text | `#24312f` |
-| Boundary | `#8c7d68`, dashed |
-| Primary relationship | `#365f56` |
-| State change | `#a44a3f` |
-| Data/read | `#356a8a` |
-| Asynchronous | `#7a5c99` |
+| 画布 | `#f7f2e8` |
+| 卡片 | `#fffdf7` |
+| 主文本 | `#24312f` |
+| 边界 | `#8c7d68`，虚线 |
+| 主关系 | `#365f56` |
+| 状态变更 | `#a44a3f` |
+| 数据/读取 | `#356a8a` |
+| 异步 | `#7a5c99` |
 
-Use Avenir/system sans-serif. Keep type labels uppercase and small; keep
-descriptions sentence-like and technologies terse.
+使用 Avenir/系统 sans-serif。类型标签保持大写且小；描述写成句子形态，技术栈从简。
 
-## Required semantic contract
+## 必需语义契约
 
-Select `semantic_profile: "c4-review"` and provide:
+选择 `semantic_profile: "c4-review"` 并提供：
 
 - `diagram_type: "c4"`
-- one `c4_level`: `context`, `container`, or `component`
-- `scope`, `title`, integer `rough_seed`, and a legend
-- every node: `c4_type`, `label`, and `description`
-- container/component nodes: `technology` and a card at least `170×96`
-- every relationship: short `label` and explicit `protocol`
+- 一个 `c4_level`：`context`、`container` 或 `component`
+- `scope`、`title`、整数 `rough_seed`，以及图例
+- 每个节点：`c4_type`、`label`、`description`
+- container/component 节点：`technology` 与至少 `170×96` 的卡片
+- 每条关系：短 `label` 与显式 `protocol`
 
-Do not mix a deeper C4 element into a higher-level view. The runtime rejects a
-component in a container view and rejects unknown boundary parents.
+不要把更深层的 C4 元素混进更高层视图。运行时拒绝 container 视图中出现 component，也拒绝未知边界父级。
 
-## Roughness without geometry drift
+## 有粗糙感但几何不漂移
 
-The `rough_seed` creates stable decorative second strokes. Decorations use
-`data-graph-role="decoration"`; the ordinary orthogonal path remains the only
-semantic edge. A seed must reproduce byte-identical SVG across runs.
+`rough_seed` 生成稳定的装饰性第二笔触。装饰使用 `data-graph-role="decoration"`；普通正交路径仍是唯一语义边。同一 seed 必须跨运行复现字节级一致的 SVG。
 
-Never jitter:
+绝不抖动：
 
-- node bounds or port anchors
-- the semantic route or arrowhead
-- label bounds
-- container gutters
+- 节点包围盒或端口锚点
+- 语义路径或箭头
+- 标签包围盒
+- 容器沟槽
 
-## Composition rules
+## 构图规则
 
-- One abstraction level per canvas
-- At least `40px` between nodes and `20px` inside boundaries
-- Zero undeclared crossings and zero bridge crossings for official samples
-- At most two bends per relationship; prefer aligned straight paths
-- Put external people/systems outside the system boundary with a clear gutter
-- Keep labels short enough to sit in whitespace, not on top of cards
-- Wrap responsibility copy to at most two lines; keep technology in the lower-right safe area
+- 每张画布只有一个抽象层级
+- 节点间至少 `40px`，边界内侧至少 `20px`
+- 官方样例零未声明交叉、零桥接交叉
+- 每条关系最多两个弯；优先对齐的直路径
+- 外部人员/系统放在系统边界外，留清晰沟槽
+- 标签足够短以落在空白处，不压在卡片上
+- 职责文案最多折两行；技术栈放右下安全区
 
-## Signature checklist
+## 签名检查清单
 
-- Top-right dashed review stamp showing the C4 level and review state
-- Uppercase C4 type, responsibility copy, and a separate technology footer on each card
-- Dashed external-system cards and deterministic pencil echoes that never alter geometry
-- Two-line relationship badges: action first, protocol in brackets below
+- 右上角虚线评审戳记，显示 C4 层级与评审状态
+- 每张卡片有大写 C4 类型、职责文案与独立的技术栈页脚
+- 虚线外部系统卡片与绝不改变几何的确定性铅笔回声
+- 两行关系徽章：动作在上，协议在下方括号内
 
-## Prompt cues
+## 提示词线索
 
 - English: `C4 review board`, `ADR review canvas`, `container responsibility review`
 - 中文：`C4 评审画布`、`ADR 评审图`、`职责边界评审图`
-- Copyable cue: `Use Style 9 C4 Review Canvas; show one C4 level, responsibilities, technologies, review state, and relationship protocols.`
+- 可复制线索：`Use Style 9 C4 Review Canvas; show one C4 level, responsibilities, technologies, review state, and relationship protocols.`
 
-## Do not blend with
+## 禁止混搭
 
-Do not add Region/VPC ownership bands, event-metro stations, or golden-signal
-metric chips. If those facts dominate the request, route to Style 10, 11, or
-12 instead of turning the C4 review into a mixed abstraction canvas.
+不要添加 Region/VPC 归属带、事件地铁站点或黄金信号指标片。这些事实主导请求时，改路由到 Style 10、11 或 12，而不是把 C4 评审变成混合抽象画布。
 
-## Fixture
+## 测试样本
 
-`fixtures/c4-review-canvas-style9.json`（内部测试集，不随 skill 分发）demonstrates
-a checkout container review with a deterministic seed and a 100-point
-showcase composition score.
+`fixtures/c4-review-canvas-style9.json`（内部测试集，不随 skill 分发）演示一次 checkout container 评审：确定性 seed，showcase 构图得分 100 分。

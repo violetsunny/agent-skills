@@ -1,81 +1,70 @@
-# Style 11: Event Transit
+# Style 11: Event Transit（事件地铁图）
 
-A transit-map metaphor for event-driven systems. Topics are rails, processing
-steps are stations, declared junctions are branch points, and dead letters get
-a visibly separate route.
+事件驱动系统的交通地图隐喻。Topic 是轨道，处理步骤是站点，声明的 junction 是分支点，死信走一条视觉上分离的路线。
 
-## Best fit
+## 最适合
 
-- Kafka/Pulsar/NATS topology reviews
-- Event choreography and consumer-group discussions
-- Stream processing, retry, and DLQ runbooks
-- Schema evolution and materialized-view pipelines
+- Kafka/Pulsar/NATS 拓扑评审
+- 事件编排与 consumer-group 讨论
+- 流处理、重试与 DLQ runbook
+- Schema 演进与物化视图管线
 
-## Visual tokens
+## 视觉 token
 
-| Token | Value |
+| Token | 值 |
 |---|---|
-| Canvas | `#fbf7ee` with transit dots |
-| Card | `#fffdf8` |
-| Primary rail | `#e4475b` |
-| State projection | `#00897b` |
-| Read/consumer | `#2563eb` |
-| DLQ | `#c62828`, dashed |
-| Text | `#17213c` |
+| 画布 | `#fbf7ee` 配交通点阵 |
+| 卡片 | `#fffdf8` |
+| 主轨道 | `#e4475b` |
+| 状态投影 | `#00897b` |
+| 读取/consumer | `#2563eb` |
+| DLQ | `#c62828`，虚线 |
+| 文本 | `#17213c` |
 
-The dark casing beneath a rail is decoration. The colored path with
-`data-graph-role="edge"` remains the ordinary semantic connector. Semantic
-rails use a maximum `2.8px` stroke and fixed user-space arrowheads so markers do
-not grow with line width.
+轨道下方的深色外壳是装饰。带 `data-graph-role="edge"` 的彩色路径仍是普通语义连线。语义轨道最大 `2.8px` 描边，箭头用固定的 user-space 形态，marker 不随线宽放大。
 
-## Required semantic contract
+## 必需语义契约
 
-Select `semantic_profile: "event-transit"` and provide:
+选择 `semantic_profile: "event-transit"` 并提供：
 
 - `diagram_type: "event_stream"`
-- one to four topics, each with unique `id` and `color`
-- every node: `transit_role` and optional/required topic metadata
-- stations/junctions: `operation`
-- consumers: `consumer_group`
-- rail stations: unique integer `station_order`
-- rail edges: `transit_type: "rail"`, topic id, `right → left` ports
+- 一到四个 topic，各有唯一 `id` 与 `color`
+- 每个节点：`transit_role` 与可选/必需的 topic 元数据
+- 站点/junction：`operation`
+- consumer：`consumer_group`
+- 轨道站点：唯一整数 `station_order`
+- 轨道边：`transit_type: "rail"`、topic id、`right → left` 端口
 
-A rail edge must connect consecutive station orders on one horizontal
-centerline with at least `64px` clearance. A dead-letter edge must target a
-real `dlq` node. Multiple rail departures are only valid from a `junction`.
+轨道边必须在同一水平中线上连接相邻的 station order，净空至少 `64px`。死信边必须指向真实的 `dlq` 节点。多条轨道出发仅在 `junction` 处有效。
 
-## Composition rules
+## 构图规则
 
-- One horizontal centerline per topic rail
-- Use branches only where the node is declared as a junction
-- Put DLQ and state-store terminals below their owning station
-- Reserve dashed red for dead-letter/retry semantics
-- Show partition, lag, or schema facts as short badges
-- Zero bridge crossings and no duplicated rail overlay in official samples
-- Keep at least `64px` clear rail between adjacent station cards
-- Use compact user-space arrowheads and a subtle casing; the semantic rail stays at or below `2.8px`
+- 每条 topic 轨道一条水平中线
+- 仅在节点声明为 junction 处使用分支
+- DLQ 与状态存储终点放在所属站点下方
+- 虚线红色专用于死信/重试语义
+- partition、lag、schema 事实用短徽章展示
+- 官方样例零桥接交叉、无重复轨道叠压
+- 相邻站点卡片之间保持至少 `64px` 的干净轨道
+- 使用紧凑的 user-space 箭头与细微外壳；语义轨道保持 ≤ `2.8px`
 
-## Signature checklist
+## 签名检查清单
 
-- Dark top-right `EVENT METRO` line stamp and a signed topic-line count
-- Numbered station medallions, compact midpoint chevrons, and one rail centerline per topic
-- Distinct junction dot, dashed DLQ terminal with `×`, and state-store terminal with a square glyph
-- Partition, schema, latency, fan-out, lag, replay, and state badges attached to stations
+- 右上角深色 `EVENT METRO` 线路戳记与签名的 topic 线路数
+- 编号站点圆章、紧凑的中点 chevron、每 topic 一条轨道中线
+- 独特的 junction 圆点、带 `×` 的虚线 DLQ 终点、带方形字形的状态存储终点
+- 站点挂载 partition、schema、latency、fan-out、lag、replay、state 徽章
 
-## Prompt cues
+## 提示词线索
 
 - English: `event metro map`, `topic rail map`, `Kafka topology`, `stream choreography map`
 - 中文：`事件地铁图`、`事件轨道图`、`Topic 线路图`、`Kafka 拓扑图`
-- Copyable cue: `Use Style 11 Event Transit; render topics as thin metro rails, processors as numbered stations, declared junctions, consumer groups, DLQ, and state projections.`
+- 可复制线索：`Use Style 11 Event Transit; render topics as thin metro rails, processors as numbered stations, declared junctions, consumer groups, DLQ, and state projections.`
 
-## Do not blend with
+## 禁止混搭
 
-Do not nest Region/VPC deployment boundaries, label cards as C4 containers, or
-attach golden-signal dashboards to every station. A request/response flow with
-no topic, consumer-group, or stream evidence should use a generic flow style.
+不要嵌套 Region/VPC 部署边界、把卡片标成 C4 container，或给每个站点挂黄金信号仪表盘。没有 topic、consumer-group 或流证据的请求/响应流程应使用通用流程风格。
 
-## Fixture
+## 测试样本
 
-`fixtures/event-transit-style11.json`（内部测试集，不随 skill 分发）shows a checkout
-event line with schema validation, fraud enrichment, a declared junction,
-DLQ, and materialized state.
+`fixtures/event-transit-style11.json`（内部测试集，不随 skill 分发）展示一条 checkout 事件线路：schema 校验、fraud enrichment、声明的 junction、DLQ 与物化状态。

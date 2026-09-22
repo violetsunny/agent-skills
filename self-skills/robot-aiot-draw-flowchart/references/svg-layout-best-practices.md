@@ -131,7 +131,7 @@
 
 可用的箭头覆盖字段（按推荐使用顺序）：
 
-| Field | Type | When to Use |
+| 字段 | 类型 | 何时使用 |
 |-------|------|-------------|
 | `source_port` / `target_port` | `"left"` / `"right"` / `"top"` / `"bottom"` | 箭头出/入边不对 |
 | `corridor_x` | `[x, ...]` | 提示垂直段走该 x 通道（软偏好） |
@@ -215,7 +215,7 @@ EOF
 - ❌ `fill=#fff` → ✅ `fill="#ffffff"`
 - ❌ `marker-end=` → ✅ `marker-end="url(#arrow)"`
 - ❌ `L 29450` → ✅ `L 290,220`
-- ❌ Missing `</svg>` at end
+- ❌ 末尾缺少 `</svg>`
 
 **校验**（生成后运行）：
 

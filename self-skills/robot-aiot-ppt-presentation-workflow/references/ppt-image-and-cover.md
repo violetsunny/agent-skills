@@ -96,7 +96,7 @@ Minimalist / Bold Typography / Gradient Flow / Geometric Abstract / Photo-driven
 
 1. **Phase 1 盘点**：素材图清单记录来源路径、内容类型（网页 / App / 代码 / dashboard / 设计稿）、处理目标（保真 / 统一美化 / 再设计）
 2. **Phase 4 前合成**：逐张确定取景 7 参数 → 程序化合成（目标比例画布 + 统一背景 + 截图等比放入）→ 落 `doc-ppt/assets/`，命名 `{页号}-{语义}.png`
-3. **上屏**：按 `slide-image-framing.md` 走 `.img-frame` 容器；截图 / UI / 文字密集图一律 contain，场景照片与 AI 氛围图 cover
+3. **上屏**：按 `robot-aiot-draw-flowchart/references/slide-image-framing.md` 走 `.img-frame` 容器；截图 / UI / 文字密集图一律 contain，场景照片与 AI 氛围图 cover
 4. **母稿联动**：合成产物写回母稿素材图映射表（页面 | 素材图 | 用途）；Phase 4 按表盘点，表中素材必须上屏，不得静默忽略
 
 ### 取景 7 参数定义
@@ -153,7 +153,7 @@ ratio:21:9, background:grid, padding:standard, inset:subtle, shadow:none, corner
 
 页面画布固定 1920×1080（scale-to-fit 壳，见 `phase4-page-authoring.md`）；槽位比例从页面布局换算：
 
-| PPT 布局（`slide-layout-strategies.md` / `slide-image-framing.md` §3） | 图片槽位比例 | 取景要点 |
+| PPT 布局（本地 `slide-layout-strategies.md` / 外部 `robot-aiot-draw-flowchart/references/slide-image-framing.md` §3，运行时路径 `~/.agents/skills/robot-aiot-draw-flowchart/references/`） | 图片槽位比例 | 取景要点 |
 |---|---|---|
 | 截图展示（设备框 + 标注） | 16:10 或 4:3 | 标注用静态 HTML/SVG 叠加层，不烧进像素 |
 | 图文分栏（50/50 或 60/40） | 16:10 / 4:3 | alignment 跟随文字列，图与正文区顶对齐 |

@@ -1,18 +1,18 @@
-# Scatter Plot
+# Scatter Plot（散点图）
 
-**Best for:** correlation and distribution — two continuous variables plotted against each other. Use when the relationship (or lack of one) between variables is the message, or when you need to identify clusters, outliers, and high/low performers.
+**最适合：** 相关性与分布——两个连续变量互相对照绘制。当变量间的关系（或没有关系）就是信息，或需要识别簇、离群点与高/低表现者时使用。
 
-## Layout conventions
+## 布局约定
 
-- **Plot area margins:** left 80px, bottom 60px, top 40px, right 40px — inside `0 0 1000 500` viewBox.
-- **Point count:** 5–30 points. Fewer → just describe the relationship in prose; more → bin into a density contour.
-- **Axes:** X at y=420 (baseline), Y at x=80. Both use Geist Mono 8px gridline labels. Gridlines 4–6 per axis at equal intervals.
-- **Point shape:** `<circle>` r=5 for standard points, r=6 for focal. Focal point in `accent` fill. Others in `muted @ 0.20` fill + `muted` stroke.
-- **Labels on points (optional):** Geist Mono 8px next to a point. Use a paper-fill rect mask behind the label. Label at most 2–3 points; not all.
-- **Trend line (optional):** `<line>` from lower-left to upper-right, stroke `rgba(45,49,66,0.25)` dashed 4,3. Never force a perfect fit — only add if the trend is visually obvious.
-- **Quadrant dividers (optional):** light dashed lines at the median x and y to split into quadrants. Label each quadrant in Geist Mono 8px, muted.
+- **绘图区边距：** 左 80px、下 60px、上 40px、右 40px——在 `0 0 1000 500` viewBox 内。
+- **点数：** 5–30 个。更少 → 直接用文字描述关系；更多 → 分箱成密度等值线。
+- **轴：** X 在 y=420（基线），Y 在 x=80。均用 Geist Mono 8px 网格线标签。每轴 4–6 条等距网格线。
+- **点形状：** 标准点 `<circle>` r=5，焦点 r=6。焦点用 `accent` 填充。其余用 `muted @ 0.20` 填充 + `muted` 描边。
+- **点标签（可选）：** Geist Mono 8px 置于点旁。标签下垫 paper 填充矩形遮罩。最多标注 2–3 个点；不要全标。
+- **趋势线（可选）：** `<line>` 从左下到右上，描边 `rgba(45,49,66,0.25)`、虚线 4,3。绝不强拟合——仅在趋势肉眼明显时添加。
+- **象限分隔线（可选）：** 在中位 x 与 y 处画浅色虚线分成象限。每个象限用 Geist Mono 8px、muted 标注。
 
-### Point pattern
+### 点模式
 
 ```svg
 <!-- Non-focal point — paper mask + circle -->
@@ -24,52 +24,52 @@
 <circle cx="X" cy="Y" r="6" fill="rgba(235,108,54,0.15)" stroke="#eb6c36" stroke-width="1.2"/>
 ```
 
-## Anti-patterns
+## 反模式
 
-- More than 30 points without clustering (jitter/mush) — when the crowd itself is the story, hand it to the **beeswarm variant** below, which packs instead of jittering.
-- Forced trend line when the data is genuinely scattered — dishonest.
-- Point labels on every point (label the focal and 1–2 notable outliers only).
-- Ad-hoc bubble size encoding on a plain scatter. Size perception is unreliable enough that it earns its own contract: when the third value genuinely matters, use the **bubble variant** below, which pins area to the value and gates it with `scripts/verify-bubble.py`; when it doesn't, a third axis label or a focal choice says it cheaper.
-- Axes that don't include zero when the absolute position matters; axes that do include zero when the range is tiny and far from zero.
+- 超过 30 个点又不做聚簇（抖动/糊成一团）——当密集本身是故事时，交给下面的 **beeswarm 变体**，它做排挤而不是抖动。
+- 数据确实散乱却强画趋势线——不诚实。
+- 每个点都加标签（只标焦点与 1–2 个显著离群点）。
+- 在普通散点图上临时加气泡大小编码。面积感知本就不可靠，值得拥有自己的契约：第三个值确实重要时，用下面的 **bubble 变体**，它把面积钉死到数值并用 `scripts/verify-bubble.py` 把关；不重要时，第三个轴标签或一个焦点选择更便宜。
+- 绝对位置重要时轴不含零；范围极小且远离零时轴却含零。
 
-### Bubble
+### Bubble（气泡）
 
-**Best for:** three quantities per item — x, y, and a magnitude — where the *joint* reading is the story: which items combine a bad position with a big footprint. The shipped example plots services by p95 latency and error rate with area as request volume, and the point of the figure is exactly the multiplication a two-variable scatter cannot do — the slowest service barely matters and the risky one is not the slowest.
+**最适合：** 每项三个数量——x、y 和一个量级——且*联合*阅读才是故事：哪些项把糟糕的位置与巨大的体量组合在一起。交付示例按 p95 延迟与错误率绘制服务、面积为请求量，图的重点恰是两变量散点做不了的乘法——最慢的服务几乎无关紧要，风险最高的并不是最慢的。
 
-Not for: a third value that is really a category (use the focal accent or facet it); two variables (that is the parent scatter — size on everything is decoration); or magnitudes spanning several orders (the small bubbles vanish; bin, or plot the magnitude on an axis of its own).
+不适用于：第三个值其实是类别（用焦点 accent 或分面）；两个变量（那是父类型 scatter——给所有东西加大小只是装饰）；量级横跨多个数量级（小气泡会消失；分箱，或把量级单独画一根轴）。
 
-#### Layout conventions
+#### 布局约定
 
-- **Same plot frame as the parent:** margins left 80, bottom 60, top 40, right 40 inside `0 0 1000 500`; X rule at `y=420`, Y rule at `x=80`; gridlines at the parent's positions; legend on the house rhythm (rule `y=462`, `LEGEND` at `478`, keys at `490`).
-- **Item count:** 5–15. Below 5 the leave-one-out scale check has nothing to hold onto and a table says it better; above 15 the areas start stacking and the reading degrades to a density cloud — which is the parent's contour territory, not this.
-- **Radius from area:** `r = K·√value` for one constant K across the figure, sized so the largest bubble stays inside the plot (the shipped example uses `K = 1.4` on requests-per-second, giving 10.8–42px). State the area scale in the source line.
-- **Bound axis ticks:** every tick carries `data-tick` (axis) and `data-value` (the number it prints). 4–6 per axis at equal intervals, Geist Mono 8px, same placement as the parent.
-- **Paper underlay per bubble**, same radius, painted immediately beneath — the translucent fill must not show gridlines through itself, because the fill's job is to read as one solid area.
-- **Draw order: largest first.** A small bubble painted early is buried under a later giant and its area is unreadable. `verify-bubble.py` checks paint order on every overlapping pair.
-- **Labels:** the focal bubble plus at most 2–3 outliers a reader will look for, Geist Mono 8px small-caps on a paper mask, each bound to its bubble with `data-name`. Never all of them.
-- **4px grid** applies to the designed constants — axis rules, gridlines, tick baselines, legend rows. Bubble centres and radii are data-scaled and exempt; snapping them would move the data.
+- **与父类型相同的绘图框架：** `0 0 1000 500` 内边距左 80、下 60、上 40、右 40；X rule 在 `y=420`，Y rule 在 `x=80`；网格线在父类型的位置；图例按标准节奏（rule `y=462`、`LEGEND` 在 `478`、色样在 `490`）。
+- **项数：** 5–15。低于 5，leave-one-out 标度检查无从下手，表格说得更好；高于 15，面积开始堆叠，阅读退化成密度云——那是父类型的等值线领域，不是这里的。
+- **半径由面积导出：** 全图一个常数 K，`r = K·√value`，尺寸保证最大气泡留在绘图区内（交付示例按 requests-per-second 用 `K = 1.4`，得到 10.8–42px）。在 source line 里声明面积标度。
+- **绑定轴刻度：** 每个刻度携带 `data-tick`（轴）与 `data-value`（它打印的数字）。每轴 4–6 个等距，Geist Mono 8px，位置与父类型相同。
+- **每个气泡下垫 paper 底衬**，同半径，紧贴其下绘制——半透明填充不得透出网格线，因为填充的职责是被读成一整块面积。
+- **绘制顺序：最大的先画。** 先画的小气泡会被后画的巨无霸埋住，面积不可读。`verify-bubble.py` 对每个重叠对检查绘制顺序。
+- **标签：** 焦点气泡加上读者会找的至多 2–3 个离群点，Geist Mono 8px small-caps 置于 paper 遮罩上，各自用 `data-name` 绑定到其气泡。绝不全部标注。
+- **4px 网格**适用于设计常量——轴 rule、网格线、刻度基线、图例行。气泡圆心与半径按数据缩放，豁免；吸附它们等于移动数据。
 
-#### Colour
+#### 颜色
 
-- **One accent bubble, and an `ink` opacity ramp for everything else** — never a hue per item. Every labelled bubble is named where it sits, so hue would re-encode what the labels already carry.
-- **The accent marks the editorially focal item, not the biggest or the worst single number.** In the shipped example it marks the service whose *combination* is the risk: near-peak volume on the worst error rate.
-- **The ramp runs faintest-on-largest** (0.14 on the largest fill up to 0.35 on the smallest in the shipped example). This is ink-mass compensation, not an encoding: a giant bubble at the same opacity as a small one dominates the page by area alone, so opacity scales down as area scales up and every bubble ends up with comparable visual weight. Tone is **not** a fourth variable — the legend must say which end of the ramp is which, in skin-neutral terms ("faintest fill is the largest bubble" survives both skins; "darkest" ships false on one of them).
-- **Every bubble keeps a `muted` stroke** (6.11:1 on light paper, 7.07:1 on dark) — the fills sit at opacities well under 3:1, so the stroke is what carries WCAG 1.4.11 for the mark's edge. The focal bubble's accent stroke measures 2.86:1 on light paper; as with the focal bar, line and slopegraph, its data is carried redundantly — position, label, and the legend naming it in words — and the accent adds only *which bubble is focal*.
-- **Labels stay `ink` or `muted`**, including the focal one. Accent text at 8px misses AA on light paper.
+- **一个 accent 气泡，其余全部走 `ink` 不透明度渐变**——绝不每项一个色相。每个带标签的气泡都在其位置具名，色相只会重复编码标签已承载的信息。
+- **accent 标记编辑意图上的焦点项，不是最大或单项数字最糟的那个。** 交付示例中它标记的是*组合*即风险的服务：接近峰值的量配上最糟的错误率。
+- **渐变是最大者最淡**（交付示例中最大填充 0.14 到最小 0.35）。这是墨量补偿，不是编码：巨无霸气泡若与小球同不透明度，仅凭面积就统治页面，所以面积越大不透明度越低，让每个气泡的视觉重量相当。色调**不是**第四个变量——图例必须用皮肤中立的措辞说明渐变哪端是哪端（"faintest fill is the largest bubble" 两种皮肤都成立；"darkest" 在其中一种是假的）。
+- **每个气泡保留 `muted` 描边**（浅色纸 6.11:1，深色纸 7.07:1）——填充的不透明度远低于 3:1，标记边缘的 WCAG 1.4.11 由描边承担。焦点气泡的 accent 描边在浅色纸上实测 2.86:1；与焦点 bar、line、slopegraph 一样，其数据被冗余承载——位置、标签、图例文字点名——accent 只补充*哪个气泡是焦点*。
+- **标签保持 `ink` 或 `muted`**，焦点的也是。8px 的 accent 文字在浅色纸上达不到 AA。
 
-#### Honest-data rule
+#### 诚实数据规则
 
-**Area encodes the third value — never radius.** Radius-proportional sizing squares the claim: a 6× value reads as 36× the ink. `scripts/verify-bubble.py` gates it, along with the two axis scales.
+**面积编码第三个值——绝不是半径。** 半径成正比会把声明平方：6× 的值被读成 36× 的墨量。`scripts/verify-bubble.py` 对此把关，连同两条轴标度。
 
-- **One linear scale per axis, every bubble on it.** A bubble nudged aside because two crowd each other reads as a different number; crowded bubbles are data, and the honest fixes are a hairline of separation (which the largest-first rule provides) or fewer items — never a moved centre.
-- **Axes include zero, or the source line states the bounds.** A bubble's position is read against the origin in a way a slopegraph's is not. No log scale without saying so — and area next to a log axis is a reading most audiences get wrong, so prefer not at all.
-- **Omitted items are counted in the footnote.** A bubble chart with the inconvenient giant quietly missing is the same lie as a truncated axis.
-- **A non-positive magnitude cannot be a bubble.** Area has no sign; omit the item and say so.
-- **Round once, then draw from the rounded number**, so the declared value and the drawn geometry are two statements of one number rather than two chances to disagree.
+- **每轴一个线性标度，每个气泡都在其上。** 因两个气泡互相拥挤而被挪开的气泡读起来是另一个数字；拥挤是数据，诚实的修法是一条发丝分离线（largest-first 规则已提供）或减少项数——绝不是移动圆心。
+- **轴包含零，或 source line 声明边界。** 气泡的位置是相对原点被读的，slopegraph 则不是。不声明就不用对数轴——而且面积挨着对数轴是多数受众会读错的组合，最好完全不用。
+- **被省略的项在脚注计数。** 悄悄缺掉碍事巨无霸的气泡图，与截断轴是同一种谎言。
+- **非正量级不能成为气泡。** 面积没有符号；省略该项并说明。
+- **只舍入一次，然后从舍入后的数字绘制**，让声明值与绘制几何是同一数字的两次陈述，而不是两次不一致的机会。
 
-#### Declaring the values
+#### 声明数值
 
-**Every drawn quantity is bound to an attribute stating the value it encodes.** The data circle carries all three values; the paper underlay is scenery and carries nothing.
+**每个绘制的数量都绑定到一个声明其编码值的属性。** 数据圆携带全部三个值；paper 底衬是布景，什么都不带。
 
 ```svg
 <!-- A bubble: position from two shared linear scales, area from the size.
@@ -86,63 +86,63 @@ Not for: a third value that is really a category (use the focal accent or facet 
 <text data-tick="x" data-value="300" x="608" y="440" fill="#4f5d75" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle">300</text>
 ```
 
-What each binding buys, and what it costs to omit:
+每个绑定买到什么，省略它付出什么：
 
-| Binding | Without it |
+| 绑定 | 没有它 |
 |---|---|
-| `data-x` / `data-y` on the circle | A nudged centre could not be caught — the drawn position would be the only statement of the value. |
-| `data-size` on the circle | Nothing pins area to the value, and radius-proportional sizing renders identically plausible. |
-| `data-name` on the circle | An unnamed bubble cannot be labelled or cross-checked, and drops out of every comparison silently. |
-| `data-name` on a label | Two labels could be exchanged between bubbles, renaming both, with every number still correct in isolation. |
-| `data-tick` / `data-value` on a tick | The printed axis could be relabelled wholesale — every bubble honestly placed on a scale the axis lies about. |
+| 圆上的 `data-x` / `data-y` | 被挪动的圆心无法被抓——绘制位置将成为数值的唯一陈述。 |
+| 圆上的 `data-size` | 没有东西把面积钉到数值上，半径成正比的画法看起来同样可信。 |
+| 圆上的 `data-name` | 无名气泡无法被标注或交叉核对，并悄悄退出所有比较。 |
+| 标签上的 `data-name` | 两个标签可以在气泡间互换、双双改名，而每个数字孤立看仍正确。 |
+| 刻度上的 `data-tick` / `data-value` | 打印的轴可以被整体改标——每个气泡都诚实地落在一条轴撒谎的标度上。 |
 
-`scripts/verify-bubble.py` derives both axis scales and the area constant from the set itself (Theil–Sen, leave-one-out, so one dishonest bubble cannot drag the line it is measured against), requires at most one accent bubble, checks paint order on overlaps, and holds every bound label and tick against the mark it describes. Deliberately **not** `data-series`: that attribute is the slopegraph contract, and using it here would put every bubble file inside `verify-slopegraph.py`'s scope.
+`scripts/verify-bubble.py` 从点集自身推导两条轴标度与面积常数（Theil–Sen、leave-one-out，一个不诚实的气泡无法拖动用来度量它自己的线），要求至多一个 accent 气泡，检查重叠处的绘制顺序，并把每个绑定标签与刻度对照其描述的标记。刻意**不用** `data-series`：那是 slopegraph 的契约，在这里用会把每个 bubble 文件划进 `verify-slopegraph.py` 的辖区。
 
-**No `transform` on any of it.** The checker reads raw `cx`/`cy`/`r` and `x`/`y` attributes, so a transform on a bubble, a bound label, an ancestor `<g>`, or in a CSS rule moves the rendered mark away from the number that was verified. Bake the offset into the coordinates. The rotated value-axis caption is fine — it is neither verified geometry nor a bound label.
+**任何元素不得带 `transform`。** 校验器读取原始 `cx`/`cy`/`r` 与 `x`/`y` 属性，所以气泡、绑定标签、祖先 `<g>` 或 CSS 规则上的 transform 会把渲染出的标记移离被校验的数字。把偏移烧进坐标。旋转的数值轴标题没问题——它既非被校验几何也非绑定标签。
 
-#### Anti-patterns
+#### 反模式
 
-- Radius proportional to the value — the type's one unforgivable error.
-- Moving a bubble to stop it overlapping a neighbour, or drawing a small bubble under a large one.
-- A hue per item instead of the ink ramp plus a single accent, or a legend that reads the ramp as data.
-- A log axis the source line never states, or a truncated axis with no stated bounds.
-- Labelling every bubble (the focal plus 2–3 outliers, no more).
-- A `transform` on a bubble, a bound label, an ancestor group, or in CSS.
-- An unbound visible string: a label or an axis tick with no attribute stating the same thing.
-- Size on a value nobody will read — if the areas do not change the story, this is the parent scatter wearing a costume.
+- 半径与值成正比——本类型唯一不可饶恕的错误。
+- 为避开邻居而移动气泡，或把小气泡画在大气泡底下。
+- 每项一个色相，而不是 ink 渐变加单一 accent；或把渐变当数据读的图例。
+- source line 从未声明的对数轴，或不声明边界的截断轴。
+- 标注每个气泡（焦点加 2–3 个离群点，不能更多）。
+- 气泡、绑定标签、祖先组或 CSS 上的 `transform`。
+- 未绑定的可见字符串：标签或轴刻度没有属性陈述同一事实。
+- 给没人会读的值加大小——面积若不改变故事，这就是穿了戏服的父类型 scatter。
 
-### Beeswarm
+### Beeswarm（蜂群图）
 
-**Best for:** a full distribution where every unit deserves its own mark — one dot per item on a single shared value axis, dodged perpendicular so nothing overlaps. Use when the *shape* of the crowd and its outliers are the story a summary number would hide: the shipped example plots 138 per-request latency samples for one endpoint, and the point of the figure is that a healthy median and an ugly p99 are the same dataset.
+**最适合：** 每个单元都值得拥有自己标记的完整分布——单一共享值轴上每项一个点，垂直方向排挤避免任何重叠。当人群的*形状*与其离群点是汇总数字会掩盖的故事时使用：交付示例为一个端点绘制 138 个逐请求延迟样本，图的重点是健康的中位数与难看的 p99 来自同一数据集。
 
-Not for: two variables (that is the parent scatter); comparing distributions across many groups (facet, or reach for a ridgeline); more than ~300 items (the packing outgrows the band — bin into a histogram); or a handful of values (below 20 there is no distribution to swarm, and a table says it shorter).
+不适用于：两个变量（那是父类型 scatter）；跨大量组比较分布（分面，或用 ridgeline）；超过约 300 项（排挤超出条带——分箱成直方图）；或只有几个值（低于 20 没有可群集的分布，表格说得更短）。
 
-#### Layout conventions
+#### 布局约定
 
-- **One value axis, horizontal, at the parent's baseline** (`y=420` inside `0 0 1000 500`, plot margins left 80, right 40), with 4–6 bound ticks at equal intervals in Geist Mono 8px and **vertical gridlines only** — the swarm axis has no scale to grid, and a horizontal rule through the band would invite reading the packing offsets as values.
-- **Dot count: 20–300**, one dot per item, all at one radius (the shipped example uses `r=4`). Both ends of the budget are enforced by `scripts/verify-beeswarm.py`.
-- **Greedy dodge around a midline** (`y=230` in the shipped example): each dot takes the first free slot alternating above/below at a fixed pitch of `2r+2`. The dodge is packing, not data — any collision-free arrangement is legitimate, and the algorithm is not part of the contract.
-- **Labels: the focal dot plus the outliers a reader will look for, at most 6.** Geist Mono 8px small-caps on a paper mask, one tier per label, alternating sides of the band, each tied to its dot by an unbound hairline leader and bound to it with `data-name`.
-- **4px grid** applies to the designed constants — the axis rule, gridlines, tick baselines, legend rows. Dot positions are data-scaled on the value axis and packing-scaled on the swarm axis, and both are exempt; snapping them would move the data.
+- **一条值轴，水平，位于父类型的基线**（`0 0 1000 500` 内 `y=420`，绘图边距左 80、右 40），4–6 个等距绑定刻度、Geist Mono 8px，且**只有垂直网格线**——群集轴没有可网格化的标度，横穿条带的水平线会邀请读者把排挤偏移读成数值。
+- **点数：20–300**，每项一个点，全部同一半径（交付示例用 `r=4`）。预算两端都由 `scripts/verify-beeswarm.py` 强制。
+- **围绕中线的贪心排挤**（交付示例 `y=230`）：每个点以 `2r+2` 的固定间距在上下交替取第一个空位。排挤是打包，不是数据——任何无碰撞的排布都合法，算法不属于契约。
+- **标签：焦点点加读者会找的离群点，至多 6 个。** Geist Mono 8px small-caps 置于 paper 遮罩上，每个标签一档，条带两侧交替，各自用一条未绑定的发丝引线连到其点，并用 `data-name` 绑定。
+- **4px 网格**适用于设计常量——轴 rule、网格线、刻度基线、图例行。点位置在值轴上按数据缩放、在群集轴上按排挤缩放，两者都豁免；吸附它们等于移动数据。
 
-#### Colour
+#### 颜色
 
-- **One ink fill for every non-focal dot** (`ink` at 0.55 in the shipped example) plus a `muted` stroke for the mark's edge, and **at most one accent dot**. Density must read as swarm *thickness*, never as tone: opacity as a value encoding while also dodging says one thing twice in two different lies, so `verify-beeswarm.py` requires the non-focal fill to be literally identical across the swarm.
-- **The accent marks the editorially focal item** — in the shipped example the single slowest request, the one the title is about — never a hue per group. Groups are a facet decision, not a palette decision.
-- **The focal dot keeps the shared radius.** Its cues are the accent fill and stroke, its label, and the legend naming it in words; a bigger focal dot is a second encoding and breaks the packing.
+- **所有非焦点点用同一种 ink 填充**（交付示例 `ink` @ 0.55）加 `muted` 描边作标记边缘，且**至多一个 accent 点**。密度必须被读成群集*厚度*，绝不是色调：一边排挤一边把不透明度当值编码，是用两种不同的谎言把一件事说两遍，所以 `verify-beeswarm.py` 要求非焦点填充在整个群集中逐字相同。
+- **accent 标记编辑意图上的焦点项**——交付示例中是唯一最慢的请求、标题所讲的那个——绝不是每组一个色相。分组是分面决策，不是调色板决策。
+- **焦点点保持共享半径。** 它的线索是 accent 填充与描边、它的标签、图例的文字点名；更大的焦点点是第二编码，还会破坏排挤。
 
-#### Honest-data rule
+#### 诚实数据规则
 
-**The value axis is exact and shared; the swarm axis carries no meaning — and says so.** The legend or source line states that the vertical spread is packing, states the axis bounds, and counts anything omitted. `scripts/verify-beeswarm.py` gates the geometry half.
+**值轴精确且共享；群集轴不承载任何含义——并且明说。** 图例或 source line 声明垂直展开是排挤、声明轴边界、并对任何省略计数。`scripts/verify-beeswarm.py` 把关几何的一半。
 
-- **No dot is dropped, binned, or jittered off its true value.** One dot = one item at exactly its value on one linear scale derived from the set itself (Theil-Sen, leave-one-out, so one dishonest dot cannot drag the line it is measured against).
-- **Overlap is resolved by the perpendicular dodge, never by moving a dot along the value axis.** Two items with one value share a position and dodge apart; crowding is data, and the honest rendering of a crowd is thickness.
-- **No two dots overprint.** A dot painted over another turns density into darkness, which the eye reads as a value nobody declared.
-- **Linear scale only in the shipped grammar.** A log axis needs its own declaration before the checker could hold it to anything, so it is refused rather than half-trusted; if the spread demands log, say so in the source line and expect the gate to disagree until the grammar grows the declaration.
+- **不丢点、不分箱、不把点抖离其真实值。** 一个点 = 一项，恰好落在由点集自身推导的一条线性标度上（Theil-Sen、leave-one-out，一个不诚实的点无法拖动用来度量它自己的线）。
+- **重叠由垂直排挤解决，绝不沿值轴移动点。** 同值的两项共享位置并排挤分开；拥挤是数据，拥挤的诚实渲染是厚度。
+- **任何两点不得叠印。** 画在另一个点上的点把密度变成黑暗，眼睛会把它读成一个没人声明过的值。
+- **交付语法只允许线性标度。** 对数轴在校验器能对其问责之前需要自己的声明，所以它被拒绝而不是被半信半疑地接受；若分布确实需要 log，在 source line 里说明，并预期门禁会不同意，直到语法长出该声明。
 
-#### Declaring the values
+#### 声明数值
 
-**Every dot is bound to the value it encodes.** `data-value` on a `<circle>` is the beeswarm contract — deliberately not `data-series` (slopegraph), `data-ranks` (bump) or `data-size` (bubble), so no sibling checker claims a beeswarm file and this one claims none of theirs. Detection is element-scoped: `data-value` also appears on `<text>` axis ticks in the bubble contract, so only a `<circle>` binding it puts a file inside this gate. The paper underlay beneath each dot is scenery and carries nothing.
+**每个点都绑定到它编码的值。** `<circle>` 上的 `data-value` 是 beeswarm 契约——刻意不用 `data-series`（slopegraph）、`data-ranks`（bump）或 `data-size`（bubble），让兄弟校验器不认领 beeswarm 文件、本校验器也不认领它们的。检测按元素限定作用域：`data-value` 在 bubble 契约中也出现在 `<text>` 轴刻度上，所以只有绑定它的 `<circle>` 才把文件划进本门禁。每个点下的 paper 底衬是布景，什么都不带。
 
 ```svg
 <!-- A dot: position on the shared value scale, x = 80 + 2·ms. The cy is
@@ -159,32 +159,32 @@ Not for: two variables (that is the parent scatter); comparing distributions acr
 <text data-tick="x" data-value="200" x="480" y="440" fill="#4f5d75" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle">200</text>
 ```
 
-What each binding buys, and what it costs to omit:
+每个绑定买到什么，省略它付出什么：
 
-| Binding | Without it |
+| 绑定 | 没有它 |
 |---|---|
-| `data-value` on the circle | A dot nudged along the value axis could not be caught — the drawn position would be the only statement of the value. |
-| `data-name` on the focal/outlier circles | An unnamed outlier cannot be labelled or cross-checked, and two swapped labels rename both dots silently. The name must be non-empty and unique to one dot: two dots sharing a name collapse into one entry, so a single label satisfies both. |
-| `data-name` on a label | The label floats free — it could name a dot that is not there, or drift to a neighbour. |
-| `data-tick` / `data-value` on a tick | The printed axis could be relabelled wholesale — every dot honestly placed on a scale the axis lies about. |
+| 圆上的 `data-value` | 沿值轴被挪动的点无法被抓——绘制位置将成为数值的唯一陈述。 |
+| 焦点/离群圆上的 `data-name` | 无名离群点无法被标注或交叉核对，两个互换的标签会悄悄给两个点改名。名称必须非空且唯一点对应：两个点共享一个名称会塌缩成一个条目，一个标签就能同时满足两个点。 |
+| 标签上的 `data-name` | 标签自由漂浮——它可以指向不存在的点，或漂到邻居上。 |
+| 刻度上的 `data-tick` / `data-value` | 打印的轴可以被整体改标——每个点都诚实地落在一条轴撒谎的标度上。 |
 
-`scripts/verify-beeswarm.py` derives the value scale from the dots themselves, requires dots sharing a value to share a position, refuses any overprinted pair, holds every dot to one radius and every non-focal dot to one fill, caps the accent at one dot and the labels at six, requires every `data-name` to be non-empty and unique, and checks every bound label and tick against the mark it describes; `scripts/test-verify-beeswarm.py` proves each check in both polarities and pins the sibling scope treaty in both directions.
+`scripts/verify-beeswarm.py` 从点自身推导值标度，要求同值的点共享位置，拒绝任何叠印对，把每个点约束到一个半径、每个非焦点点约束到一种填充，把 accent 上限设为一个点、标签上限六个，要求每个 `data-name` 非空且唯一，并把每个绑定标签与刻度对照其描述的标记；`scripts/test-verify-beeswarm.py` 对每项检查在两种极性下验证，并在两个方向上钉死兄弟辖区条约。
 
-**Nothing may position a mark except its own attributes.** The checker reads raw `cx`/`cy`/`r` and `x`/`y`, so anything applied afterwards invalidates the check that passed. Every carrier is refused — the `transform` attribute, an inline `style="…"`, and a rule in a `<style>` block — on a dot, on a bound label or tick, or on an ancestor `<g>`/`<svg>`. So is every positioning property, not just `transform`: the Level 2 individual properties `translate`/`rotate`/`scale`, the SVG geometry properties `cx`/`cy`/`r`/`x`/`y` (CSS beats the presentation attribute), and CSS motion path. Bake the offset into the coordinates. `line-height`, `color` and font declarations are untouched — they do not move anything.
+**除自身属性外，任何东西不得为标记定位。** 校验器读取原始 `cx`/`cy`/`r` 与 `x`/`y`，所以之后施加的任何东西都会让已通过的检查失效。每种载体都被拒绝——`transform` 属性、内联 `style="…"`、`<style>` 块中的规则——无论作用于点、绑定标签或刻度、还是祖先 `<g>`/`<svg>`。每个定位属性也一样，不只是 `transform`：Level 2 独立属性 `translate`/`rotate`/`scale`、SVG 几何属性 `cx`/`cy`/`r`/`x`/`y`（CSS 优先于 presentation attribute）、CSS motion path。把偏移烧进坐标。`line-height`、`color` 与字体声明不受影响——它们不移动任何东西。
 
-#### Anti-patterns
+#### 反模式
 
-- Moving a dot along the value axis to open up space — the type's one unforgivable error.
-- Binning or averaging before plotting (that is a histogram wearing a costume), or quietly dropping the inconvenient outlier.
-- Dot size as a second encoding (that is the **bubble variant**), or opacity as a value encoding while also dodging.
-- Meaning smuggled into the swarm axis: sorting the dodge by a second variable, or a midline drawn as if it were a scale.
-- A hue per group instead of one ink plus a single accent.
-- Labelling more than the focal dot and a handful of outliers.
-- Positioning a dot, a bound label, a tick or an ancestor group from CSS — `transform`, `translate`, `rotate`, `scale`, a geometry property (`cx`/`cy`/`r`/`x`/`y`) or a motion path — whether as an attribute, an inline `style`, or a rule in a `<style>` block.
-- Two dots wearing the same `data-name`, or an empty one: a name that identifies two marks identifies neither.
-- An unbound visible string: a label or an axis tick with no attribute stating the same thing.
+- 沿值轴移动点来腾空间——本类型唯一不可饶恕的错误。
+- 绘制前分箱或求平均（那是穿了戏服的直方图），或悄悄丢掉碍事的离群点。
+- 点大小作第二编码（那是 **bubble 变体**），或一边排挤一边把不透明度当值编码。
+- 往群集轴里偷运含义：按第二个变量给排挤排序，或把中线画得像标度。
+- 每组一个色相，而不是一种 ink 加单一 accent。
+- 标注超过焦点点与少数几个离群点。
+- 从 CSS 为点、绑定标签、刻度或祖先组定位——`transform`、`translate`、`rotate`、`scale`、几何属性（`cx`/`cy`/`r`/`x`/`y`）或 motion path——无论是属性、内联 `style` 还是 `<style>` 块中的规则。
+- 两个点戴同一个 `data-name`，或名称为空：标识两个标记的名称哪个也标识不了。
+- 未绑定的可见字符串：标签或轴刻度没有属性陈述同一事实。
 
-## Examples
+## 示例
 
 - minimal light
 - minimal dark

@@ -1,43 +1,43 @@
-# Dependency Graph
+# Dependency Graph（依赖图）
 
-**Best for:** what depends on what, across packages, modules, or services — specifically to show two things a **tree** cannot structurally express: (a) a node with **more than one parent** (a shared dependency that several things converge on), and (b) a **cycle**. If neither appears in the data — every node has exactly one parent and nothing points backward — use [Tree](type-tree.md) instead; say so explicitly rather than forcing a graph layout on tree-shaped data.
+**最适合：** 包、模块或服务之间谁依赖谁——专门展示 **tree** 在结构上无法表达的两件事：(a) 一个节点有**多于一个父节点**（多个对象汇聚到的共享依赖），(b) **环**。若数据中两者都不存在——每个节点恰好一个父节点且没有反向指向——改用 [Tree](type-tree.md)；明确说明这一点，而不是把图形布局强加在树形数据上。
 
-## Layout conventions
+## 布局约定
 
-- **Ranked layers.** Nodes sit in horizontal rank rows by dependency depth: rank 0 (entry points nothing depends on) at the top, deeper ranks below. Forward edges point downward across ranks, or run horizontal within a single rank row when a dependency compresses to the same depth as its dependent (e.g. a shallow sibling dependency) — never upward outside the one marked cycle. Rank rows are 120px apart.
-- Nodes are the standard node-box pattern (§6): `rx=6`, 160px wide, 56px tall.
-- **Fan-in badge.** Every node carries a Geist Mono 8px badge in its top-right corner, inside a small `rx=2` box, showing how many nodes depend on it (`4 in`). A mask fully inside a node is a badge chip, not a label — legitimate under §6 rule 6. The node with the highest fan-in is the diagram's structural story; size nothing else to compete with it.
-- **Node treatments** (§5 Node type → treatment):
-  - Internal package/service → white fill + `ink` stroke.
-  - External / third-party → `ink @ 0.03` fill + `ink @ 0.30` stroke (the External/Cloud treatment).
-  - Leaf with no outgoing edges → `ink @ 0.05` fill + `muted` stroke.
-- **The cycle.** At most one back-edge points upward against rank order. It is the editorial point of the diagram: `accent` stroke, dashed `5,4`, `marker-end="url(#arrow-accent)"`, routed **around the outside** of the node stack — never straight through the middle, and never behind a node it doesn't connect to — with a masked Geist Mono 8px `CYCLE` label at its visible end. The two nodes the cycle touches stay in their normal node treatment (§5) — no accent stroke or fill on the nodes themselves, or the 2-accent budget is blown on the wrong elements.
-- **Focal rule:** the 2 accent elements permitted per diagram are the back-edge and its `CYCLE` label. Nothing else in a dependency graph is accent.
-- All six §6 Mandatory connector rules apply in full, no exemptions: rounded right-angle elbows (`r=8`) between off-axis nodes, 6–10px label-margin, no overlapping connectors (bridge/hop at crossings), fanned attach points (≥12px apart) where multiple edges share a box edge, no connector passing behind a non-endpoint box, no label mask clipped by a later-painted node.
+- **分级层。** 节点按依赖深度排在水平层级行中：rank 0（无依赖的入口点）在顶部，更深的层级在下方。前向边跨层向下指，或在依赖被压缩到与依赖者同深度时（如浅层兄弟依赖）在同一层级行内水平走——除唯一标记的环外绝不向上。层级行间距 120px。
+- 节点用标准节点盒模式（§6）：`rx=6`，宽 160px，高 56px。
+- **Fan-in 徽章。** 每个节点右上角携带 Geist Mono 8px 徽章，置于 `rx=2` 小盒内，显示有多少节点依赖它（`4 in`）。完全位于节点内部的遮罩是徽章 chip 而非标签——在 §6 规则 6 下合法。fan-in 最高的节点是图的结构故事；其他任何元素不得在尺寸上与它竞争。
+- **节点处理**（§5 Node type → treatment）：
+  - 内部包/服务 → 白色填充 + `ink` 描边。
+  - 外部 / 第三方 → `ink @ 0.03` 填充 + `ink @ 0.30` 描边（External/Cloud 处理）。
+  - 无出边的叶子 → `ink @ 0.05` 填充 + `muted` 描边。
+- **环。** 最多一条回边逆层级顺序向上指。它是全图的编辑重点：`accent` 描边、虚线 `5,4`、`marker-end="url(#arrow-accent)"`，沿节点栈**外侧**布线——绝不直穿中间，绝不从无关节点后面经过——可见端配带遮罩的 Geist Mono 8px `CYCLE` 标签。环触及的两个节点保持常规节点处理（§5）——节点本身不加 accent 描边或填充，否则 2 强调色预算浪费在错误元素上。
+- **焦点规则：** 每图允许的 2 个 accent 元素是回边及其 `CYCLE` 标签。依赖图中其他任何元素都不用 accent。
+- §6 全部六条强制连线规则完整适用，无豁免：离轴节点间圆角直角肘（`r=8`）、6–10px 标签边距、连线不重叠（交叉处 bridge/hop）、多条边共享盒边时扇形分布锚点（间距 ≥12px）、连线不从非端点盒后穿过、标签遮罩不被后绘节点裁切。
 
-## Complexity budget
+## 复杂度预算
 
-| Limit | Rule |
+| 上限 | 规则 |
 |---|---|
-| Max nodes | 9 |
-| Max edges | 14 |
-| Max rank layers | 4 |
-| Max highlighted cycles | 1 |
-| Max accent elements | 2 |
+| 最大节点数 | 9 |
+| 最大边数 | 14 |
+| 最大层级数 | 4 |
+| 最大高亮环数 | 1 |
+| 最大 accent 元素数 | 2 |
 
-Over budget: collapse a leaf cluster into one aggregate node labelled with its count (e.g. `+6 leaves`), and say so in a caption — don't silently drop nodes.
+超预算：把一个叶子簇折叠为一个聚合节点并标注数量（如 `+6 leaves`），在说明中写明——不要静默丢弃节点。
 
-## Anti-patterns
+## 反模式
 
-- Drawing a dependency graph when the data is actually a tree (single parent everywhere, no cycles) — use Tree instead.
-- Forward edges that point upward without being the one marked cycle.
-- A hairball layout with no rank ordering — rank first, always; ranking is what makes the graph readable, not an optional polish pass.
-- One node per file instead of per package/module/service — the graph is about dependency structure, not the filesystem.
-- Unlabelled external dependencies — version or registry belongs in the Geist Mono sublabel (`v3.23 · npm`), not left implicit.
-- Highlighting more than one cycle in a single diagram — pick the one that matters editorially; a second cycle competes with the first and neither reads.
-- Omitting the fan-in badges — without them the reader can't see at a glance where dependencies concentrate, which is the entire reason this type exists over a plain tree.
+- 数据实际是树（处处单父、无环）却画依赖图——改用 Tree。
+- 前向边向上指却不是那条唯一标记的环。
+- 无层级排序的毛球布局——永远先分级；分级让图可读，不是可选的润色步骤。
+- 按文件而非按包/模块/服务画节点——图讲的是依赖结构，不是文件系统。
+- 外部依赖无标注——版本或 registry 写进 Geist Mono 子标签（`v3.23 · npm`），不留隐含。
+- 单图高亮多个环——选编辑上重要的那一个；第二个环与第一个竞争，两个都读不出来。
+- 省略 fan-in 徽章——没有它们读者无法一眼看出依赖集中在哪里，而这正是本类型相对普通 tree 存在的理由。
 
-## Examples
+## 示例
 
 - minimal light
 - minimal dark

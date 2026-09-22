@@ -85,7 +85,7 @@ letter-spacing: 0.02em for labels
       fill="none" marker-end="url(#arrow-purple)"/>
 ```
 
-## SVG Template
+## SVG 模板
 
 ```xml
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 600"

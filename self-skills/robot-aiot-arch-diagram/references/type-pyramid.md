@@ -1,33 +1,33 @@
-# Pyramid / Funnel
+# Pyramid / Funnel（金字塔/漏斗）
 
-**Best for:** hierarchy of needs, prioritization ranks, value pyramids, conversion funnels, content importance stacks.
+**最适合：** 需求层级、优先级排序、价值金字塔、转化漏斗、内容重要性堆叠。
 
-## Two orientations — pick one
-- **Pyramid** (point up) — narrow apex = most important / rarest / most valuable. Base is broadest / foundational.
-- **Funnel** (point down) — narrow end = conversion (smallest group). Top is widest / audience.
+## 两种方向——选一种
+- **金字塔**（尖朝上）——窄顶 = 最重要 / 最稀有 / 最有价值。底部最宽 / 最基础。
+- **漏斗**（尖朝下）——窄端 = 转化（最小群体）。顶部最宽 / 受众。
 
-Don't mix orientations on one diagram.
+同一张图不要混用两种方向。
 
-## Layout conventions
-- 4–6 layers. Each layer is a trapezoid built from an SVG `<polygon>` with 4 points.
-- Consistent layer height (56–72px).
-- Widths decrease linearly from base to apex (pyramid) or top to bottom (funnel). When showing real funnel data, widths must be honest (proportional to count/percentage).
-- Each layer has:
-  - **Name label** centered inside the trapezoid — Geist 12–14px 600.
-  - **Sublabel** below or beside the name — Geist Mono 9–10px.
-  - **Side annotation** (right or left) — optional. For funnels: drop-off percentage here (`−40%`).
-- Fill: subtle graded tints OR all paper-2 with hairline dividers (cleaner). Pick one.
-- Stroke: 1px hairline between layers; outer silhouette 1px muted or ink.
-- **Coral on ONE layer only**: apex of pyramid, conversion layer of funnel, or critical bottleneck.
-- Optional left-margin axis arrow + Geist Mono label (`rarer ↑`, `drop-off ↓`).
+## 布局约定
+- 4–6 层。每层是一个梯形，用 4 点 SVG `<polygon>` 构建。
+- 层高一致（56–72px）。
+- 宽度自底向顶（金字塔）或自顶向底（漏斗）线性递减。展示真实漏斗数据时宽度必须诚实（与数量/百分比成正比）。
+- 每层包含：
+  - **名称标签**在梯形内居中——Geist 12–14px 600。
+  - **子标签**在名称下方或旁边——Geist Mono 9–10px。
+  - **侧注**（右或左）——可选。漏斗的流失率放这里（`−40%`）。
+- 填充：细微的渐变 tint，或全部 paper-2 + 发丝分隔线（更干净）。二选一。
+- 描边：层间 1px 发丝线；外轮廓 1px muted 或 ink。
+- **coral 只用于一层**：金字塔顶、漏斗转化层或关键瓶颈。
+- 可选左边距轴箭头 + Geist Mono 标签（`rarer ↑`、`drop-off ↓`）。
 
-## Anti-patterns
-- 7+ layers (illegible — compress or split).
-- Pyramid for non-hierarchical data (use a tree or bar chart).
-- Dishonest widths (fake equal spacing when drops are unequal).
-- Coral on the base layer (dilutes the "apex = rare" signal).
+## 反模式
+- 7 层以上（不可读——压缩或拆分）。
+- 用金字塔表达非层级数据（改用树形图或柱状图）。
+- 不诚实的宽度（流失率不等却伪造等距）。
+- coral 用在底层（稀释"顶 = 稀有"的信号）。
 
-## Examples
+## 示例
 - minimal light
 - minimal dark
 - full editorial

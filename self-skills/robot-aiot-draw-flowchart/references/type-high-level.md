@@ -1,14 +1,14 @@
-# High-Level
+# High-Level（端到端数据栈总览图）
 
-**Best for:** end-to-end data stack overviews — ingestion → storage → query → analytics → visualization — deployed on a container orchestrator (Kubernetes, ECS, Nomad). Combines a phase chevron banner, deployment boundary, orchestration bar, identity footer, and (optionally) a right-side vertical chevron strip for cross-cutting concerns (Orchestration, Security, Observability).
+**最适合：** 端到端数据栈总览——ingestion → storage → query → analytics → visualization——部署在容器编排器（Kubernetes、ECS、Nomad）上。组合阶段 chevron 横幅、部署边界、编排条、身份 footer，以及可选的右侧纵向 chevron 条带承载横切关注点（Orchestration、Security、Observability）。
 
-This type is **parametric**. The diagram is fully determined by a small list of inputs (chevrons, sources, components, connections). The formulas below tell you exactly where every shape lands given those inputs — two generations from the same inputs must produce visually identical SVG.
+本类型是**参数化**的。图形由一小组输入（chevrons、sources、components、connections）完全决定。下面的公式精确给出给定这些输入时每个形状的落点——相同输入的两次生成必须产出视觉完全相同的 SVG。
 
 ---
 
-## 1. Inputs — the parameter contract
+## 1. 输入——参数契约
 
-Before drawing, collect these from the user (or accept them as a YAML/JSON block). Everything in this reference is derived from these inputs. Don't invent geometry on the fly.
+绘图前先向用户收集这些输入（或接受一个 YAML/JSON 块）。本参考中的一切都从这些输入推导。不要临场发明几何。
 
 canonical 副本：`templates/type-high-level.yaml` — 参数化文档契约，复制后手工填参绘图；不是 generate-from-template.py 的输入（该脚本只接受 containers/nodes/arrows JSON），以 templates 为准
 ```yaml
@@ -50,30 +50,30 @@ focal: "MinIO"                  # exactly one; defaults to first kind=node under
 dark: false
 ```
 
-**Reserved chevron names** (always vertical, even if `vertical: true` is omitted): `Orchestration`, `Security`, `Observability`, `Governance`, `Backup`.
+**保留 chevron 名**（即使省略 `vertical: true` 也始终为纵向）：`Orchestration`、`Security`、`Observability`、`Governance`、`Backup`。
 
-**Reserved `kind` values:**
-- `node` — a standard box inside the cluster (default).
-- `bar` — a horizontal strip spanning the cluster top. Typically one (Orchestration); see §5 for the pairing rule.
-- `cross-cutting` — a horizontal strip spanning the body width (stops at the strip margin), stacked below the cluster. **Zero or more allowed**; each stacks 44 px below the previous (§2.5) and pairs 1:1 with a vertical chevron (§5).
+**保留 `kind` 值：**
+- `node`——集群内的标准框（默认）。
+- `bar`——横跨集群顶部的水平条带。通常只有一个（Orchestration）；配对规则见 §5。
+- `cross-cutting`——横跨主体宽度（止于条带边距）的水平条带，堆叠在集群下方。**允许零个或多个**；每行在上一行下方 44px 处堆叠（§2.5），并与一个纵向 chevron 1:1 配对（§5）。
 
-**Optional `color`** (per component, hex string): tints the component's container and content while leaving connectors untouched. See §3.4. Use sparingly — a custom color is a semantic flag (e.g., red = security concern), not decoration.
+**可选 `color`**（逐组件，hex 字符串）：为组件的容器与内容着色，连接线保持不动。见 §3.4。少用——自定义颜色是语义标记（如红色 = 安全关注点），不是装饰。
 
-**Source `type` values** → icon mapping (use `references/primitive-icons.md`):
+**Source `type` 值** → icon 映射（用 `references/primitive-icons.md`）：
 - `db` → `database`
-- `ftp` → `bucket` or upload arrow
+- `ftp` → `bucket` 或上传箭头
 - `web` → `internet`
 - `legacy` → `server`
 - `api` → `api`
-- Any explicit icon name in `primitive-icons.md` is also accepted.
+- `primitive-icons.md` 中的任意显式 icon 名也可接受。
 
 ---
 
-## 2. Layout formulas — deterministic geometry
+## 2. 布局公式——确定性几何
 
-Every coordinate below is derived from the inputs. **No hardcoded numbers in examples that aren't justified here.**
+下面的每个坐标都由输入推导。**示例中不得出现未在此处论证的硬编码数字。**
 
-### 2.1 Canvas
+### 2.1 画布
 
 ```
 has_vertical       = any(c.vertical or c.name in reserved_names for c in chevrons)
@@ -87,11 +87,11 @@ viewBox_h          = max(540, strip_y_bot + 112)             # 112 reserved for 
 viewBox            = f"0 0 1000 {viewBox_h}"
 ```
 
-Every horizontal element (chevron banner, cluster, orchestration bar, identity / cross-cutting bars) ends at `effective_w`. The right strip sits at `x = 1000 - right_strip_w` (= 972). The 8-px band between them is visual breathing room — never put content there.
+每个水平元素（chevron 横幅、集群、编排条、身份 / 横切条）都止于 `effective_w`。右侧条带位于 `x = 1000 - right_strip_w`（= 972）。两者之间的 8px 带是视觉呼吸空间——绝不在那里放内容。
 
-`viewBox_h` grows when more than one cross-cutting bar is declared: 1 crosscut → 540, 2 → 600 (or 584 if you want it tight; the rule rounds to the next multiple of 20 for clean grids).
+声明多于一条横切条时 `viewBox_h` 增长：1 条 crosscut → 540，2 条 → 600（想紧凑可用 584；规则向上取整到 20 的下一个倍数以对齐网格）。
 
-### 2.2 Horizontal chevron banner
+### 2.2 横向 chevron 横幅
 
 ```
 y_banner           = 4
@@ -105,21 +105,21 @@ x_boundaries       = cumulative_sum([0] + widths)                 # length sum_c
 chevron_cx(C)      = (x_boundaries[index(C)] + x_boundaries[index(C)+1]) / 2
 ```
 
-**Polygon shapes:**
-- First (leftmost): `(x0,4) (x1-12,4) (x1,18) (x1-12,32) (x0,32)`
-- Middle: `(x0,4) (x1-12,4) (x1,18) (x1-12,32) (x0,32) (x0+12,18)`
-- Last (rightmost): `(x0,4) (effective_w,4) (effective_w,32) (x0,32) (x0+12,18)`
+**Polygon 形状：**
+- 第一个（最左）：`(x0,4) (x1-12,4) (x1,18) (x1-12,32) (x0,32)`
+- 中间：`(x0,4) (x1-12,4) (x1,18) (x1-12,32) (x0,32) (x0+12,18)`
+- 最后一个（最右）：`(x0,4) (effective_w,4) (effective_w,32) (x0,32) (x0+12,18)`
 
-Fills alternate `#2d3142` / `#3d4460` (light mode) or `#3d4460` / `#4a5270` (dark mode). Labels: paper-colored mono `font-size=7`, `letter-spacing=0.14em`, `text-anchor=middle`, centered at `chevron_cx, 21`.
+填充交替 `#2d3142` / `#3d4460`（light 模式）或 `#3d4460` / `#4a5270`（dark 模式）。标签：paper 色 mono `font-size=7`、`letter-spacing=0.14em`、`text-anchor=middle`，以 `chevron_cx, 21` 为中心。
 
-**Color override** (per chevron, both horizontal and vertical): a chevron may declare an optional `color: "#hex"` that replaces the alternation fill for that one chevron. Use it to flag a phase that pairs with a custom-colored component (e.g., `Security` chevron in red when the Identity bar uses `color: "#b85450"`). Rules:
+**颜色覆盖**（逐 chevron，横向纵向均可）：chevron 可声明可选的 `color: "#hex"`，替换该 chevron 的交替填充。用于标记与自定义颜色组件配对的阶段（如 Identity 条用 `color: "#b85450"` 时，`Security` chevron 着红色）。规则：
 
-- Override applies to the polygon fill only. The label stays paper-colored — never recolor chevron labels.
-- The alternation index doesn't shift; neighboring chevrons keep their natural fill, even if it produces two adjacent same-fill chevrons. Don't try to "fix" this — overrides should be rare (≤ 2 per diagram).
-- In dark mode, use the same hex unless contrast against paper labels suffers; if it does, pick a darker shade for dark mode and document it as a `color_dark` field on that chevron.
-- A chevron color override is independent of any paired component's color, but pairing them (same hex on chevron + bar) is the conventional way to make the column "read" as one concern.
+- 覆盖只作用于 polygon 填充。标签保持 paper 色——绝不重染 chevron 标签。
+- 交替索引不移动；相邻 chevron 保持自然填充，即使产生两个相邻同填充的 chevron。不要试图"修复"——覆盖应当罕见（每图 ≤ 2 个）。
+- 深色模式下使用同一 hex，除非与 paper 标签的对比度受损；若受损，为深色模式选一个更暗的色阶，并在该 chevron 上以 `color_dark` 字段记录。
+- chevron 颜色覆盖与配对组件的颜色相互独立，但把两者配对（chevron + 条带同 hex）是让该列"读作"同一关注点的惯例做法。
 
-### 2.3 Source zone (dashed, external)
+### 2.3 Source 区（虚线，外部）
 
 ```
 sources_x          = 4
@@ -128,9 +128,9 @@ sources_w          = x_boundaries[1] - 8           # width of the first chevron,
 sources_h          = 336
 ```
 
-Stroke: `rgba(45,49,66,0.20)`, `stroke-width=0.8`, `stroke-dasharray=6,3`, `rx=6`. Zone fill: `rgba(45,49,66,0.02)`.
+描边：`rgba(45,49,66,0.20)`、`stroke-width=0.8`、`stroke-dasharray=6,3`、`rx=6`。区域填充：`rgba(45,49,66,0.02)`。
 
-### 2.4 Cluster boundary (solid)
+### 2.4 集群边界（实线）
 
 ```
 cluster_x          = x_boundaries[1] + 4           # starts at end of source zone + 4px gutter
@@ -139,11 +139,11 @@ cluster_w          = effective_w - cluster_x       # extends to right strip / ca
 cluster_h          = 336
 ```
 
-Stroke: `rgba(45,49,66,0.18)`, `stroke-width=1.2`, `rx=8`. Fill: `rgba(45,49,66,0.02)`. K8s icon + label at `(cluster_x + 16, 352)` (icon) and `(cluster_x + 40, 362)` (text).
+描边：`rgba(45,49,66,0.18)`、`stroke-width=1.2`、`rx=8`。填充：`rgba(45,49,66,0.02)`。K8s icon + 标签在 `(cluster_x + 16, 352)`（icon）与 `(cluster_x + 40, 362)`（文字）。
 
-### 2.5 Cross-cutting bars (identity, observability, …)
+### 2.5 横切条（identity、observability、…）
 
-Zero or more `kind: cross-cutting` components stack below the cluster. Each gets its own 40-px row with a 4-px gap.
+零个或多个 `kind: cross-cutting` 组件堆叠在集群下方。每个占一条 40px 的行，行间 4px 间隙。
 
 ```
 crosscuts          = [c for c in components if c.kind == "cross-cutting"]   # ordered as declared
@@ -153,18 +153,18 @@ cross_w            = effective_w - 4               # spans body width, stops at 
 cross_h            = 40
 ```
 
-Stroke: `rgba(45,49,66,0.20)`, `stroke-width=0.8`, `rx=6`. Fill: `rgba(45,49,66,0.05)`. Icon at `(16, cross_y(k) + 10)`, name centered at `(effective_w / 2, cross_y(k) + 22)`, subtitle at `(effective_w / 2, cross_y(k) + 34)`.
+描边：`rgba(45,49,66,0.20)`、`stroke-width=0.8`、`rx=6`。填充：`rgba(45,49,66,0.05)`。Icon 在 `(16, cross_y(k) + 10)`，名称居中在 `(effective_w / 2, cross_y(k) + 22)`，副标题在 `(effective_w / 2, cross_y(k) + 34)`。
 
-Reserved cross-cutting *concerns* (informational; user can name the actual bar whatever they want):
-- **Identity / Security** — Keycloak, LDAP/AD, Okta, Auth0, OIDC providers
-- **Observability** — Prometheus + Grafana, Datadog, OpenTelemetry, Loki
-- **Backup / DR** — Velero, Restic, snapshot orchestrators
-- **Governance / Lineage** — OpenMetadata, DataHub, Apache Atlas
-- **Secrets / config** — Vault, Sealed Secrets, External Secrets
+保留的横切*关注点*（仅供参考；实际条带名称用户可自定）：
+- **Identity / Security**——Keycloak、LDAP/AD、Okta、Auth0、OIDC 提供商
+- **Observability**——Prometheus + Grafana、Datadog、OpenTelemetry、Loki
+- **Backup / DR**——Velero、Restic、快照编排器
+- **Governance / Lineage**——OpenMetadata、DataHub、Apache Atlas
+- **Secrets / config**——Vault、Sealed Secrets、External Secrets
 
-Each cross-cutting bar pairs 1:1 with a vertical chevron in the right strip (§5).
+每条横切条与右侧条带中的一个纵向 chevron 1:1 配对（§5）。
 
-### 2.6 Orchestration bar component (inside cluster)
+### 2.6 编排条组件（集群内）
 
 ```
 bar_x              = cluster_x + 12
@@ -173,9 +173,9 @@ bar_w              = cluster_w - 24
 bar_h              = 44
 ```
 
-Stroke: `rgba(45,49,66,0.18)`, `stroke-width=0.8`, `rx=4`. Fill: `rgba(45,49,66,0.05)`. Tool icon at the far right (`bar_x + bar_w - 50, 58`); name centered at `(bar_x + bar_w/2, 71)`; subtitle at `(bar_x + bar_w/2, 84)`.
+描边：`rgba(45,49,66,0.18)`、`stroke-width=0.8`、`rx=4`。填充：`rgba(45,49,66,0.05)`。工具 icon 在最右端（`bar_x + bar_w - 50, 58`）；名称居中在 `(bar_x + bar_w/2, 71)`；副标题在 `(bar_x + bar_w/2, 84)`。
 
-### 2.7 Component nodes (inside cluster)
+### 2.7 组件节点（集群内）
 
 ```
 node_w             = 152
@@ -184,7 +184,7 @@ node_cx(N)         = chevron_cx(N.chevron)         # ← non-negotiable
 node_x(N)          = node_cx(N) - node_w/2
 ```
 
-If a chevron has K nodes assigned, stack them vertically:
+一个 chevron 分配到 K 个节点时，纵向堆叠：
 
 ```
 first_top_y        = 120 if any bar in this column else 64
@@ -192,11 +192,11 @@ gap                = 16
 row_top(k)         = first_top_y + k * (node_h + gap)   # k = 0..K-1
 ```
 
-**Focal node:** `fill="rgba(235,108,54,0.08)"`, `stroke="#eb6c36"`, `stroke-width=1.2`. Title text in accent color. All other nodes: white fill, `stroke=rgba(45,49,66,0.25)`, `stroke-width=1`.
+**焦点节点：** `fill="rgba(235,108,54,0.08)"`、`stroke="#eb6c36"`、`stroke-width=1.2`。标题文字用 accent 色。其余所有节点：白色填充、`stroke=rgba(45,49,66,0.25)`、`stroke-width=1`。
 
-Role badge top-left at `(node_x+8, node_y+6)`, size 12 high. Icon top-right at `(node_x+node_w-32, node_y+6)`, 24×24, monochrome via `currentColor`. Name centered at `(node_cx, node_y+44)` size 11 sans semibold. Subtitle at `(node_cx, node_y+56)` size 8 mono muted.
+角色徽章在左上角 `(node_x+8, node_y+6)`，高 12。Icon 在右上角 `(node_x+node_w-32, node_y+6)`，24×24，经 `currentColor` 单色化。名称居中在 `(node_cx, node_y+44)`，size 11 sans semibold。副标题在 `(node_cx, node_y+56)`，size 8 mono muted。
 
-### 2.8 Source nodes (inside dashed zone)
+### 2.8 Source 节点（虚线区内）
 
 ```
 src_node_w         = sources_w - 8
@@ -207,9 +207,9 @@ src_gap            = 16
 src_row_top(k)     = src_first_top_y + k * (src_node_h + src_gap)
 ```
 
-Same role-badge / icon / name / subtitle pattern as cluster nodes (icon at `src_node_x+54, row_top(k)+6`; name centered at `src_node_x+src_node_w/2, row_top(k)+42`; subtitle one line below). Role badge text: `EXT`. Caps at 4 sources; for more, split into a separate diagram.
+与集群节点相同的角色徽章 / icon / 名称 / 副标题模式（icon 在 `src_node_x+54, row_top(k)+6`；名称居中在 `src_node_x+src_node_w/2, row_top(k)+42`；副标题在下一行）。角色徽章文字：`EXT`。上限 4 个 source；更多时拆成单独的图。
 
-### 2.9 Right strip — vertical chevrons
+### 2.9 右侧条带——纵向 chevron
 
 ```
 strip_x            = 1000 - right_strip_w       # 972 when present
@@ -222,35 +222,35 @@ heights            = [floor_to_4(strip_h_total / len(verticals))] * len(vertical
 heights[-1]       += strip_h_total - sum(heights)       # last absorbs remainder
 ```
 
-Examples:
-- 2 verticals (Orchestration + Security), 1 crosscut → `heights = [192, 196]`, layout `[40..232, 232..428]`.
-- 3 verticals (Orchestration + Security + Observability), 2 crosscuts → `strip_y_bot = 472`, `strip_h_total = 432`, `heights = [144, 144, 144]`, layout `[40..184, 184..328, 328..472]`.
+示例：
+- 2 个纵向（Orchestration + Security）、1 条 crosscut → `heights = [192, 196]`，布局 `[40..232, 232..428]`。
+- 3 个纵向（Orchestration + Security + Observability）、2 条 crosscut → `strip_y_bot = 472`、`strip_h_total = 432`、`heights = [144, 144, 144]`，布局 `[40..184, 184..328, 328..472]`。
 
-Adjacent edges share the same y (no gap), like horizontal chevrons share x at their boundary.
+相邻边共享同一 y（无间隙），如同横向 chevron 在边界处共享 x。
 
-**Polygon shapes** (top-to-bottom flow, mirrors horizontal §2.2):
-- First (topmost): flat top, point at bottom — `(strip_x, y0) (strip_x+strip_w, y0) (strip_x+strip_w, y1-12) (strip_x+strip_w/2, y1) (strip_x, y1-12)`
-- Middle: notch on top, point on bottom — `(strip_x, y0) (strip_x+strip_w/2, y0+12) (strip_x+strip_w, y0) (strip_x+strip_w, y1-12) (strip_x+strip_w/2, y1) (strip_x, y1-12)`
-- Last (bottommost): notch on top, flat bottom — `(strip_x, y0) (strip_x+strip_w/2, y0+12) (strip_x+strip_w, y0) (strip_x+strip_w, y1) (strip_x, y1)`
+**Polygon 形状**（自上而下流动，镜像横向 §2.2）：
+- 第一个（最上）：平顶、底端出尖——`(strip_x, y0) (strip_x+strip_w, y0) (strip_x+strip_w, y1-12) (strip_x+strip_w/2, y1) (strip_x, y1-12)`
+- 中间：顶部凹口、底部出尖——`(strip_x, y0) (strip_x+strip_w/2, y0+12) (strip_x+strip_w, y0) (strip_x+strip_w, y1-12) (strip_x+strip_w/2, y1) (strip_x, y1-12)`
+- 最后一个（最下）：顶部凹口、平底——`(strip_x, y0) (strip_x+strip_w/2, y0+12) (strip_x+strip_w, y0) (strip_x+strip_w, y1) (strip_x, y1)`
 
-Fills alternate `#2d3142` / `#3d4460` (same palette as horizontals). Labels: paper-colored mono `font-size=7`, `letter-spacing=0.14em`, **rotated −90°**, anchored at `(strip_x + strip_w/2, (y0+y1)/2)`.
+填充交替 `#2d3142` / `#3d4460`（与横向同一调色板）。标签：paper 色 mono `font-size=7`、`letter-spacing=0.14em`、**旋转 −90°**，锚定在 `(strip_x + strip_w/2, (y0+y1)/2)`。
 
-Vertical chevrons honor the per-chevron `color` override documented in §2.2 — apply the hex to the polygon fill, leave the rotated label paper-colored. Pair the override with the same hex on the chevron's paired bar/crosscut to bind them visually as one concern.
+纵向 chevron 同样遵循 §2.2 记录的逐 chevron `color` 覆盖——把 hex 应用到 polygon 填充，旋转标签保持 paper 色。把覆盖与该 chevron 配对的条带/crosscut 上的同一 hex 配对使用，在视觉上把它们绑定为同一关注点。
 
 ---
 
-## 3. Connector rules (mandatory)
+## 3. 连接线规则（强制）
 
-These are non-negotiable. Pick the style **automatically** from the topology — do not let the user override style on focal-touching or bar-originating edges.
+这些规则不可协商。样式从拓扑**自动**选定——不允许用户在接触焦点或从 bar 出发的边上覆盖样式。
 
-| `style` | Stroke | Width | Dash | Marker | When required |
+| `style` | 描边 | 宽度 | 虚线 | Marker | 何时必须 |
 |---|---|---|---|---|---|
-| `primary` | `#eb6c36` | 1.2 | — | `arrow-accent` | Every edge whose endpoint is the `focal` node. |
-| `secondary` | `#4f5d75` | 1.0 | — | `arrow` | Default for source→component and component→component when neither endpoint is focal. |
-| `trigger` | `#4f5d75` | 1.0 | `4,3` | `arrow-sm` | Every edge originating from a `kind: bar` component. |
-| `query` | `rgba(45,49,66,0.30)` | 1.0 | `4,3` | `arrow` | Read-back edges (e.g., focal ↔ Trino). |
+| `primary` | `#eb6c36` | 1.2 | — | `arrow-accent` | 每条以 `focal` 节点为端点的边。 |
+| `secondary` | `#4f5d75` | 1.0 | — | `arrow` | 两端都不是焦点时，source→component 与 component→component 的默认样式。 |
+| `trigger` | `#4f5d75` | 1.0 | `4,3` | `arrow-sm` | 每条从 `kind: bar` 组件出发的边。 |
+| `query` | `rgba(45,49,66,0.30)` | 1.0 | `4,3` | `arrow` | 回读边（如 focal ↔ Trino）。 |
 
-**Defs block** (required, exactly these four markers):
+**Defs 块**（必需，恰好这四个 marker）：
 
 ```svg
 <defs>
@@ -261,92 +261,92 @@ These are non-negotiable. Pick the style **automatically** from the topology —
 </defs>
 ```
 
-### 3.1 Exit / entry sides (non-negotiable)
+### 3.1 出边 / 入边（不可协商）
 
-| Edge kind | Exit side of source | Entry side of target |
+| 边类型 | 源的出边 | 目标的入边 |
 |---|---|---|
-| Source → cluster node | **right** of source node | **left** of target |
-| Component → component (within cluster) | **right** | **left** |
-| Bar component → node | **bottom** of bar | **top** of node |
-| Cross-cutting bar | — (emits no edges) | — |
-| Vertical chevron | — (labels only; emits no edges) | — |
+| Source → 集群节点 | source 节点**右侧** | 目标**左侧** |
+| Component → component（集群内） | **右侧** | **左侧** |
+| Bar 组件 → 节点 | bar **底边** | 节点**顶边** |
+| 横切条 | —（不发出任何边） | — |
+| 纵向 chevron | —（仅作标签；不发出任何边） | — |
 
-### 3.2 Routing
+### 3.2 路由
 
-- Orthogonal elbows, **at most two bends** per path.
-- Use a Q-bezier 8-px corner radius at every bend.
-- Z-order: draw **all connectors before any node rectangle** (so node fills mask the line ends).
-- Exactly one `marker-end` per `<path>` / `<line>`. Never both `marker-start` and `marker-end`.
-- Labels: every `primary` and `secondary` connector gets a label (small mono, opaque paper-filled rect mask behind). `trigger` and `query` connectors are unlabelled.
+- 正交折线，每条路径**至多两个弯折**。
+- 每个弯折用 Q-bezier 8px 圆角。
+- Z 序：**所有连接线画在任何节点矩形之前**（让节点填充遮住线端）。
+- 每条 `<path>` / `<line>` 恰好一个 `marker-end`。绝不同时用 `marker-start` 和 `marker-end`。
+- 标签：每条 `primary` 与 `secondary` 连接线都带标签（小号 mono，背后垫不透明 paper 填充矩形遮罩）。`trigger` 与 `query` 连接线不带标签。
 
-### 3.3 Crossings
+### 3.3 交叉
 
-- Avoid. Re-route via the chevron divider trunk (§4) before accepting a crossing.
-- If unavoidable, the path drawn second carries a 6-px arc hop over the first.
+- 避免。先经 chevron 分隔干线（§4）重新路由，再考虑接受交叉。
+- 无法避免时，后画的路径在先画的路径上方带一个 6px 弧形跳跃。
 
-### 3.4 Component color override
+### 3.4 组件颜色覆盖
 
-A component may declare an optional `color: "#hex"` (CSS color string). The override **only** retints the component's container and content — connectors are never recolored. Edges keep their topology-driven style from §3.
+组件可声明可选的 `color: "#hex"`（CSS 颜色字符串）。覆盖**只**重新着色组件的容器与内容——连接线绝不重染。边保持 §3 中由拓扑驱动的样式。
 
-**Where the color is applied** (given `C = color`):
+**颜色应用位置**（设 `C = color`）：
 
-| Element | Light mode | Dark mode |
+| 元素 | Light 模式 | Dark 模式 |
 |---|---|---|
-| Container fill (`rect` body) | `rgba(C, 0.06)` | `rgba(C, 0.10)` |
-| Container stroke | `rgba(C, 0.35)` (`stroke-width=1` for nodes, `0.8` for bars) | `rgba(C, 0.45)` |
-| Role badge stroke (nodes) | `rgba(C, 0.40)` | `rgba(C, 0.55)` |
-| Role badge text (nodes) | `rgba(C, 0.85)` | `rgba(C, 1.0)` |
-| Icon fill / stroke | `C` | lighten `C` by ~15% (or use `C` if already light) |
-| Name text | `C` | lighten `C` |
-| Subtitle text | **unchanged** (`muted`) | **unchanged** (`muted`) |
-| Connectors touching this component | **unchanged** (still topology-driven) | **unchanged** |
+| 容器填充（`rect` 主体） | `rgba(C, 0.06)` | `rgba(C, 0.10)` |
+| 容器描边 | `rgba(C, 0.35)`（节点 `stroke-width=1`，bar `0.8`） | `rgba(C, 0.45)` |
+| 角色徽章描边（节点） | `rgba(C, 0.40)` | `rgba(C, 0.55)` |
+| 角色徽章文字（节点） | `rgba(C, 0.85)` | `rgba(C, 1.0)` |
+| Icon 填充 / 描边 | `C` | `C` 提亮约 15%（本身已亮则直接用 `C`） |
+| 名称文字 | `C` | `C` 提亮 |
+| 副标题文字 | **不变**（`muted`） | **不变**（`muted`） |
+| 接触该组件的连接线 | **不变**（仍由拓扑驱动） | **不变** |
 
-The subtitle stays muted because it's parenthetical metadata — only the primary identity (name + icon + border) carries the color signal.
+副标题保持 muted，因为它是括注性元数据——只有主身份（名称 + icon + 边框）承载颜色信号。
 
-**Rules**:
+**规则**：
 
-- **Never on the focal node.** The focal node is already colored with the accent (§2.7). A `color` on the focal node is ignored — accent wins.
-- **Never on source nodes.** Sources live outside the cluster and stay neutral.
-- **Cap at 2 custom-colored components** per diagram (in addition to the focal). Three or more colored things erases the signal — the same reason §1 limits accent to 1–2 elements.
-- **No color on connectors.** If you find yourself wanting a colored edge, the right move is to pick a different `style` from §3, not to override.
+- **绝不用于焦点节点。** 焦点节点已用 accent 着色（§2.7）。焦点节点上的 `color` 被忽略——accent 优先。
+- **绝不用于 source 节点。** Source 位于集群之外，保持中性。
+- 每图自定义颜色组件**上限 2 个**（焦点之外）。三个及以上带色元素会抹掉信号——与 §1 把 accent 限制在 1–2 个元素是同一理由。
+- **连接线不上色。** 如果你想要一条带色的边，正确做法是从 §3 选一个不同的 `style`，而不是覆盖。
 
-**Semantic uses** (recommended):
-- `#b85450` (rust-red) — Security / Identity (Keycloak, Vault)
-- `#5a7d9a` (slate-blue) — Observability (Prometheus, Datadog)
-- `#7a8c47` (olive-green) — Governance / Lineage (OpenMetadata)
-- `#8c6d3f` (warm-brown) — Backup / DR
+**语义用途**（推荐）：
+- `#b85450`（rust-red）——安全 / 身份（Keycloak、Vault）
+- `#5a7d9a`（slate-blue）——可观测（Prometheus、Datadog）
+- `#7a8c47`（olive-green）——治理 / 血缘（OpenMetadata）
+- `#8c6d3f`（warm-brown）——备份 / DR
 
-Stick to these unless the user's brand demands otherwise. Random hex per component is exactly the failure mode this skill avoids.
+除非用户品牌另有要求，坚持使用这些。逐组件随机 hex 正是本 skill 要避免的失败模式。
 
 ---
 
-## 4. Block branching rules (fan-out)
+## 4. 块状分支规则（fan-out）
 
-The single biggest reproducibility hazard. Fix these rules and the diagram becomes predictable.
+可复现性的头号大敌。固定这些规则，图形才可预测。
 
-### 4.1 Source fan-out (one source → N components)
+### 4.1 Source fan-out（一个 source → N 个组件）
 
 ```
 exit_x   = source.right
 trunk_x  = cluster_x - 8                     # 4-px gutter before cluster border
 ```
 
-Path per target: `M exit_x,source_cy → H trunk_x → V target_cy → H target.left`. Use Q-bezier corners.
+每个目标的路径：`M exit_x,source_cy → H trunk_x → V target_cy → H target.left`。弯折用 Q-bezier。
 
-### 4.2 Component fan-out (one component → N components)
+### 4.2 Component fan-out（一个组件 → N 个组件）
 
 ```
 exit_x   = node.right
 trunk_x  = x_boundaries[index(source.chevron) + 1] + 4   # 4 px past the chevron divider
 ```
 
-Path per target: `M exit_x,source_cy → H trunk_x → V target_cy → H target.left`.
+每个目标的路径：`M exit_x,source_cy → H trunk_x → V target_cy → H target.left`。
 
-### 4.3 Fan-out cap
+### 4.3 Fan-out 上限
 
-**Max 3 outgoing edges per node.** Above 3, introduce a hub (usually the `focal` node). The chevron banner is the legend; if a node is fanning out to four downstream targets, it's secretly the hub — make it explicit.
+**每个节点至多 3 条出边。** 超过 3 条就引入 hub（通常是 `focal` 节点）。chevron 横幅就是图例；一个节点向 4 个下游目标扇出时，它实际上就是 hub——把它显式化。
 
-### 4.4 Bar drops (Airflow → N nodes)
+### 4.4 Bar 垂降（Airflow → N 个节点）
 
 ```
 drop_x(target) = target.cx
@@ -354,109 +354,109 @@ drop_y_start   = bar.bottom
 drop_y_end     = target.top
 ```
 
-Straight vertical line, `style: trigger`. One per target. No bends — bar drops never elbow.
+垂直直线，`style: trigger`。每个目标一条。无弯折——bar 垂降绝不折线。
 
-### 4.5 Source vertical staggering
+### 4.5 Source 纵向错位
 
-When multiple sources connect to the same single target (e.g. four sources → NiFi), stagger their entry y on the target:
+多个 source 连接同一个目标时（如 4 个 source → NiFi），让它们在目标上的入点 y 错开：
 
 ```
 entry_y(k) = target.top + 8 + k * (target_h - 16) / (N - 1)   # k = 0..N-1, evenly spaced
 ```
 
-This avoids overlapping arrowheads at the target's left edge.
+这样避免目标左边缘上的箭头重叠。
 
 ---
 
-## 5. Vertical chevrons — semantics
+## 5. 纵向 chevron——语义
 
-Reserved names `Orchestration`, `Security`, `Observability`, `Governance`, `Backup` always render in the right strip (§2.9). Any chevron with `vertical: true` is treated as a reserved-style vertical regardless of name. The rules:
+保留名 `Orchestration`、`Security`、`Observability`、`Governance`、`Backup` 始终渲染在右侧条带（§2.9）。任何 `vertical: true` 的 chevron 无论名称都按保留式纵向处理。规则：
 
-- **Pairing rule (mandatory, 1:1):** every vertical chevron pairs with exactly one cross-spanning component, and every cross-spanning component pairs with exactly one vertical chevron. The two component kinds that pair:
-  - `kind: bar` — lives inside the cluster (top row). Conventionally paired with `Orchestration`.
-  - `kind: cross-cutting` — lives below the cluster, one row per component. Paired with `Security`, `Observability`, `Governance`, etc.
+- **配对规则（强制，1:1）：** 每个纵向 chevron 恰好与一个横跨组件配对，每个横跨组件也恰好与一个纵向 chevron 配对。可配对的两种组件 kind：
+  - `kind: bar`——位于集群内（顶行）。惯例与 `Orchestration` 配对。
+  - `kind: cross-cutting`——位于集群下方，每组件一行。与 `Security`、`Observability`、`Governance` 等配对。
 
-  If the inputs declare a vertical chevron without a paired component (or vice versa), halt and ask the user — the diagram is incomplete.
+  输入声明了没有配对组件的纵向 chevron（或反之）时，停下来询问用户——图形不完整。
 
-- **Count constraint:** `len(verticals) == len(bars) + len(crosscuts)`. The right strip is split evenly among all verticals (§2.9), so visual alignment between a chevron and its bar/row is approximate — the *label* is what matters, not the y-pixel match.
+- **数量约束：** `len(verticals) == len(bars) + len(crosscuts)`。右侧条带在所有纵向项之间均分（§2.9），因此 chevron 与其条带/行的视觉对齐是近似的——重要的是*标签*，不是 y 像素级对齐。
 
-- **Ordering convention:** declare verticals top-down in the order: bar-paired first (Orchestration), then crosscut-paired in the same order the crosscuts appear below the cluster. This keeps the visual reading order consistent.
+- **排序惯例：** 纵向项自上而下声明：先 bar 配对者（Orchestration），再按 crosscut 在集群下方出现的相同顺序声明 crosscut 配对者。这保持视觉阅读顺序一致。
 
-- **No edges:** vertical chevrons emit no connectors themselves. They are *labels for a column of cross-cutting concern*.
+- **无边：** 纵向 chevron 自身不发出连接线。它们是*一列横切关注点的标签*。
 
-- **No node placement:** no `kind: node` may be assigned to a vertical chevron. Nodes always belong to a horizontal phase.
+- **不放节点：** 任何 `kind: node` 都不得分配给纵向 chevron。节点永远属于横向阶段。
 
-- **Right strip presence:** if any vertical chevron exists, the right strip is reserved (`effective_w = 964`) and **all** horizontal chevron widths and cluster geometry shrink accordingly. Do not draw a vertical chevron on top of the cluster.
+- **右侧条带的存在性：** 只要存在任何纵向 chevron，右侧条带即被保留（`effective_w = 964`），**所有**横向 chevron 宽度与集群几何相应缩小。不要把纵向 chevron 画在集群上方。
 
-The visual contract: the vertical chevron's column visually "owns" the bar/cross-cutting row at its approximate y-band. Orchestration (top of strip) ↔ Airflow bar (top of cluster). Security ↔ Identity bar. Observability ↔ monitoring bar (below identity). And so on.
+视觉契约：纵向 chevron 的列在视觉上"拥有"其近似 y 带内的 bar/横切行。Orchestration（条带顶部）↔ Airflow bar（集群顶部）。Security ↔ Identity 条。Observability ↔ monitoring 条（identity 下方）。依此类推。
 
 ---
 
-## 6. Dark mode
+## 6. 深色模式
 
-When `dark: true`, swap these tokens:
+`dark: true` 时，交换这些 token：
 
 | Token | Light | Dark |
 |---|---|---|
-| Page paper | `#f5f5f5` | `#1c1f2e` |
-| Ink | `#2d3142` | `#f5f5f5` |
-| Muted text | `#4f5d75` | `rgba(245,245,245,0.65)` |
-| Chevron dark fill | `#2d3142` | `#3d4460` |
-| Chevron light fill | `#3d4460` | `#4a5270` |
-| Chevron label | `#f5f5f5` | `#f5f5f5` (unchanged) |
-| Dashed border | `rgba(45,49,66,0.20)` | `rgba(245,245,245,0.22)` |
-| Cluster border | `rgba(45,49,66,0.18)` | `rgba(245,245,245,0.18)` |
-| Node fill | white | `rgba(245,245,245,0.06)` |
-| Node stroke | `rgba(45,49,66,0.25)` | `rgba(245,245,245,0.20)` |
-| Focal fill | `rgba(235,108,54,0.08)` | `rgba(240,138,89,0.12)` |
-| Focal stroke | `#eb6c36` | `#f08a59` |
-| Accent connector | `#eb6c36` | `#f08a59` |
-| Dot pattern | `rgba(45,49,66,0.10)` | `rgba(245,245,245,0.10)` |
+| 页面 paper | `#f5f5f5` | `#1c1f2e` |
+| 墨色 | `#2d3142` | `#f5f5f5` |
+| Muted 文字 | `#4f5d75` | `rgba(245,245,245,0.65)` |
+| Chevron 暗填充 | `#2d3142` | `#3d4460` |
+| Chevron 亮填充 | `#3d4460` | `#4a5270` |
+| Chevron 标签 | `#f5f5f5` | `#f5f5f5`（不变） |
+| 虚线边框 | `rgba(45,49,66,0.20)` | `rgba(245,245,245,0.22)` |
+| 集群边框 | `rgba(45,49,66,0.18)` | `rgba(245,245,245,0.18)` |
+| 节点填充 | white | `rgba(245,245,245,0.06)` |
+| 节点描边 | `rgba(45,49,66,0.25)` | `rgba(245,245,245,0.20)` |
+| 焦点填充 | `rgba(235,108,54,0.08)` | `rgba(240,138,89,0.12)` |
+| 焦点描边 | `#eb6c36` | `#f08a59` |
+| Accent 连接线 | `#eb6c36` | `#f08a59` |
+| 点阵图案 | `rgba(45,49,66,0.10)` | `rgba(245,245,245,0.10)` |
 
 ---
 
-## 7. Reproducibility checklist (the taste gate)
+## 7. 可复现性检查清单（品味门）
 
-Before emitting SVG, verify **every** item. If any fails, fix it — don't ship.
+输出 SVG 前，逐项核对**每一**条。任何一条不过就修复——不要交付。
 
-1. Every cluster `node.cx` equals its chevron's `cx` (§2.2 + §2.7). This is what makes the chevron banner a real legend.
-2. Every chevron `width` is a multiple of 4 and ≥ 120.
-3. The reserved right strip (28 px) exists **iff** any vertical chevron is declared. If yes, `effective_w = 964`; if no, `effective_w = 1000`.
-4. Exactly **one** `focal` node. If `focal` is unset in inputs, default to the first `kind: node` under chevron "Storage".
-5. Every edge whose endpoint is the focal node uses `style: primary` (accent stroke + `arrow-accent` marker).
-6. Every edge originating from a `kind: bar` component uses `style: trigger` (dashed + `arrow-sm`).
-7. The cross-cutting bar (if any) emits **no** edges.
-8. No node has > 3 outgoing edges, or if it does, it is the declared `focal` / hub.
-9. All `<path>` and `<line>` connectors are emitted **before** any node `<rect>` (z-order).
-10. Each vertical chevron pairs **1:1** with exactly one `bar` or `cross-cutting` component (§5 pairing rule). `len(verticals) == len(bars) + len(crosscuts)`.
-11. `viewBox_h = max(540, strip_y_bot + 112)` — grow the canvas when multiple crosscuts are declared so the legend still fits.
-12. Custom component colors (§3.4) apply only to container + icon + name; connectors stay topology-driven. Cap at 2 custom-colored components in addition to the focal.
-13. The diagram passes design-system.md §9 (4-px grid; ≤ 2 accent elements; mono only for technical content; hairlines; no shadows; no `rounded-2xl`).
-
----
-
-## 8. Anti-patterns
-
-- Chevron banner omitted — it's the key that maps visual columns to functional phases.
-- Node x-center off-chevron (§7 #1) — breaks the "banner-as-legend" contract.
-- Vertical chevron drawn on the cluster (overlay) instead of in a reserved right strip.
-- More than one focal node — MinIO/S3 (or whichever storage hub) is *the* focal point.
-- External zone with solid border — dashed border is the signal that these components are outside the cluster.
-- Identity bar inside the cluster boundary — it applies to all components and must span the full canvas width.
-- Vertical chevron without a paired bar/cross-cutting component — see §5 pairing rule.
-- Bar-component edges drawn solid — orchestration triggers must be dashed.
-- Source fanning out to >3 components without a hub.
+1. 每个集群 `node.cx` 等于其 chevron 的 `cx`（§2.2 + §2.7）。这是 chevron 横幅成为真正图例的前提。
+2. 每个 chevron `width` 是 4 的倍数且 ≥ 120。
+3. 保留右侧条带（28px）**当且仅当**声明了任何纵向 chevron。有则 `effective_w = 964`；无则 `effective_w = 1000`。
+4. 恰好**一个** `focal` 节点。输入未设置 `focal` 时，默认取 chevron "Storage" 下第一个 `kind: node`。
+5. 每条以焦点节点为端点的边用 `style: primary`（accent 描边 + `arrow-accent` marker）。
+6. 每条从 `kind: bar` 组件出发的边用 `style: trigger`（虚线 + `arrow-sm`）。
+7. 横切条（如有）**不**发出任何边。
+8. 没有节点出边 > 3；若有，它必须是声明的 `focal` / hub。
+9. 所有 `<path>` 与 `<line>` 连接线在任何节点 `<rect>` **之前**输出（z 序）。
+10. 每个纵向 chevron 与恰好一个 `bar` 或 `cross-cutting` 组件 **1:1** 配对（§5 配对规则）。`len(verticals) == len(bars) + len(crosscuts)`。
+11. `viewBox_h = max(540, strip_y_bot + 112)`——声明多条 crosscut 时扩大画布，让图例仍然放得下。
+12. 自定义组件颜色（§3.4）只作用于容器 + icon + 名称；连接线保持拓扑驱动。焦点之外自定义颜色组件上限 2 个。
+13. 图形通过 design-system.md §9（4px 网格；accent 元素 ≤ 2；mono 只用于技术内容；发丝线；无阴影；无 `rounded-2xl`）。
 
 ---
 
-## 9. Examples
+## 8. 反模式
 
-- horizontal-only, 5 phases, light skin.
-- same, dark skin.
-- same, editorial-card frame.
-- adds vertical Orchestration + Security chevrons, Airflow bar, Keycloak cross-cutting. **Reference render of the full parametric pattern.**
-- vertical pattern, dark skin.
-- vertical pattern, editorial-card frame.
-- unclustered five-phase data stack (Sources → Ingest → Data Lake → Query → Consume), zone-based flow without a container-orchestrator boundary. The MinIO lake is the focal node; vertical concerns are flattened into the horizontal chevron banner. Light skin.
-- same, dark skin.
-- same, editorial-card frame.
+- 省略 chevron 横幅——它是把视觉列映射到功能阶段的钥匙。
+- 节点 x 中心偏离 chevron（§7 第 1 条）——破坏"横幅即图例"契约。
+- 把纵向 chevron 画在集群上（覆盖），而不是放在保留的右侧条带里。
+- 多于一个焦点节点——MinIO/S3（或充当存储 hub 的那个组件）是*唯一*焦点。
+- 外部区域用实线边框——虚线边框才是这些组件在集群之外的信号。
+- Identity 条画在集群边界内——它作用于所有组件，必须横跨画布全宽。
+- 纵向 chevron 没有配对的 bar/cross-cutting 组件——见 §5 配对规则。
+- Bar 组件的边画成实线——编排触发必须是虚线。
+- Source 无 hub 直接扇出到 >3 个组件。
+
+---
+
+## 9. 示例
+
+- 纯横向、5 阶段、light 皮肤。
+- 同上，dark 皮肤。
+- 同上，editorial-card 外框。
+- 增加纵向 Orchestration + Security chevron、Airflow bar、Keycloak 横切条。**完整参数化模式的参考渲染。**
+- 纵向模式，dark 皮肤。
+- 纵向模式，editorial-card 外框。
+- 无集群的五阶段数据栈（Sources → Ingest → Data Lake → Query → Consume），基于 zone 的流动，无容器编排器边界。MinIO 湖是焦点节点；纵向关注点被压平进横向 chevron 横幅。Light 皮肤。
+- 同上，dark 皮肤。
+- 同上，editorial-card 外框。

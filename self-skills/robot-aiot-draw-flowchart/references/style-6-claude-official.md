@@ -1,6 +1,6 @@
-# Style 6: Claude Official
+# Style 6: Claude Official（Claude 官方风格）
 
-Inspired by Anthropic's Claude blog technical diagrams — warm, approachable, professional.
+借鉴 Anthropic Claude 博客技术图——温暖、亲和、专业。本文件字号（16/14/13px）、盒子圆角 12px、节点间距 80px 为风格锁定值，豁免 4px 网格与通用数值阶梯（例外清单登记在 design-system.md §7）。本文件的 `feDropShadow` 软阴影（`filter id="shadow-soft"`）是 design-system.md §4 阴影禁令的唯一官方登记例外（见该文件「阴影例外登记」），仅限 Style 6 产物使用。
 
 ```
 Background:     #f8f6f3  (warm cream)
@@ -24,7 +24,7 @@ Semantic colors:
 Arrow color:     #5a5a5a  (consistent dark gray)
 ```
 
-## Typography
+## 排版
 
 ```
 font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue',
@@ -33,23 +33,23 @@ font-size:   16px node labels, 14px descriptions, 13px arrow labels
 font-weight: 600 for node labels, 400 for descriptions, 700 for titles
 ```
 
-## Box Shapes
+## 盒子形状
 
 ```xml
-<!-- Agent node (teal-green) -->
+<!-- Agent 节点（青绿） -->
 <rect rx="12" ry="12" fill="#9dd4c7" stroke="#4a4a4a" stroke-width="2.5"/>
 
-<!-- Input/Source node (soft blue) -->
+<!-- 输入/源节点（柔蓝） -->
 <rect rx="12" ry="12" fill="#a8c5e6" stroke="#4a4a4a" stroke-width="2.5"/>
 
-<!-- Infrastructure node (warm beige) -->
+<!-- 基础设施节点（暖米） -->
 <rect rx="12" ry="12" fill="#f4e4c1" stroke="#4a4a4a" stroke-width="2.5"/>
 
-<!-- Storage/State node (light gray) -->
+<!-- 存储/状态节点（浅灰） -->
 <rect rx="12" ry="12" fill="#e8e6e3" stroke="#4a4a4a" stroke-width="2.5"/>
 ```
 
-## Arrows
+## 箭头
 
 ```xml
 <defs>
@@ -59,35 +59,35 @@ font-weight: 600 for node labels, 400 for descriptions, 700 for titles
   </marker>
 </defs>
 
-<!-- Arrow line -->
+<!-- 箭头线 -->
 <line stroke="#5a5a5a" stroke-width="2" marker-end="url(#arrow-claude)"/>
 
-<!-- Or use simple line without arrowhead for cleaner look -->
+<!-- 或用无箭头的简单线条，观感更干净 -->
 <line stroke="#5a5a5a" stroke-width="2"/>
 ```
 
-## Arrow Semantics
+## 箭头语义
 
-Use different arrow styles to convey meaning:
+用不同箭头样式传达含义：
 
-| Flow Type | Color | Stroke | Dash | Usage |
+| 流类型 | 颜色 | 描边 | 虚线 | 用途 |
 |-----------|-------|--------|------|-------|
-| Primary data flow | #5a5a5a | 2px solid | none | Main request/response path |
-| Memory write | #5a5a5a | 2px | `5,3` | Write/store operations |
-| Memory read | #5a5a5a | 2px solid | none | Retrieval from store |
-| Control/trigger | #5a5a5a | 1.5px | `3,2` | Event triggers |
+| 主数据流 | #5a5a5a | 2px 实线 | 无 | 主请求/响应路径 |
+| 记忆写入 | #5a5a5a | 2px | `5,3` | 写入/存储操作 |
+| 记忆读取 | #5a5a5a | 2px 实线 | 无 | 从存储检索 |
+| 控制/触发 | #5a5a5a | 1.5px | `3,2` | 事件触发 |
 
 ```xml
-<!-- Solid arrow for reads -->
+<!-- 读操作用实线箭头 -->
 <line stroke="#5a5a5a" stroke-width="2" marker-end="url(#arrow-claude)"/>
 
-<!-- Dashed arrow for writes -->
+<!-- 写操作用虚线箭头 -->
 <line stroke="#5a5a5a" stroke-width="2" stroke-dasharray="5,3" marker-end="url(#arrow-claude)"/>
 ```
 
-## Arrow Labels
+## 箭头标签
 
-Arrow labels should be **technical and specific**, positioned mid-arrow:
+箭头标签应**技术且具体**，定位于箭头中段：
 
 ```xml
 <text x="..." y="..." fill="#5a5a5a" font-size="13" text-anchor="middle">
@@ -95,31 +95,31 @@ Arrow labels should be **technical and specific**, positioned mid-arrow:
 </text>
 ```
 
-Good labels: `query(text)`, `retrieve(top_k=5)`, `embed(768d)`, `POST /api/search`
-Avoid vague labels: "Process", "Send", "Get"
+好标签：`query(text)`、`retrieve(top_k=5)`、`embed(768d)`、`POST /api/search`
+避免模糊标签："Process"、"Send"、"Get"
 
-## Node Content Guidelines
+## 节点内容准则
 
-Node content should include **technical details**, not just concepts:
+节点内容应包含**技术细节**，不只是概念：
 
-**Good examples:**
+**好例子：**
 - "Vector Store" → "Vector Store" + "• 768-dim embeddings" + "• Cosine similarity"
 - "LLM" → "GPT-4" + "• 8K context" + "• Temperature: 0.7"
 - "Memory" → "Redis Cache" + "• TTL: 5min" + "• Max: 4K tokens"
 
-**Avoid vague descriptions:**
-- "Process data" → specify what processing
-- "Store information" → specify storage type and format
-- "Handle requests" → specify request type and method
+**避免模糊描述：**
+- "Process data" → 写明具体处理
+- "Store information" → 写明存储类型与格式
+- "Handle requests" → 写明请求类型与方法
 
-Use 2-3 lines per node:
-1. Component name (bold, 16px)
-2. Technical detail or implementation (14px)
-3. Key parameter or constraint (14px, optional)
+每节点用 2-3 行：
+1. 组件名（粗体，16px）
+2. 技术细节或实现（14px）
+3. 关键参数或约束（14px，可选）
 
-## Layer Labels
+## 层标签
 
-For multi-layer architectures, add layer labels on the left side:
+多层架构在左侧加层标签：
 
 ```xml
 <text x="30" y="130" fill="#6a6a6a" font-size="14" font-weight="600">Input</text>
@@ -127,18 +127,18 @@ For multi-layer architectures, add layer labels on the left side:
 <text x="30" y="490" fill="#6a6a6a" font-size="14" font-weight="600">Storage</text>
 ```
 
-Position at the vertical center of each layer.
+定位于每层的垂直中心。
 
-## Legend Requirement
+## 图例要求
 
-When using 2+ arrow types or colors, include a legend in the bottom-right corner:
+使用 2 种以上箭头类型或颜色时，在右下角放图例：
 
 ```xml
 <rect x="720" y="500" width="220" height="80" rx="8" ry="8"
       fill="#ffffff" stroke="#4a4a4a" stroke-width="1.5"/>
 <text x="735" y="522" fill="#1a1a1a" font-size="13" font-weight="600">Legend</text>
 
-<!-- Legend items -->
+<!-- 图例条目 -->
 <line x1="735" y1="540" x2="765" y2="540" stroke="#5a5a5a" stroke-width="2"/>
 <text x="775" y="545" fill="#6a6a6a" font-size="12">Read operation</text>
 
@@ -146,22 +146,24 @@ When using 2+ arrow types or colors, include a legend in the bottom-right corner
 <text x="775" y="565" fill="#6a6a6a" font-size="12">Write operation</text>
 ```
 
-Position: bottom-right, 20px margin from edges.
+位置：右下角，距边缘 20px。
 
-## Layout Principles
+## 布局原则
 
-- **Generous spacing**: Minimum 80px between node edges
-- **Horizontal alignment**: Same-layer nodes align perfectly
-- **Vertical flow**: Top-to-bottom preferred
-- **Symmetry**: Balanced composition
-- **Clean lines**: Orthogonal routing — vertical then horizontal, or vice versa
+- **宽松间距**：节点边缘间最小 80px（风格锁定值）
+- **水平对齐**：同层节点完全对齐
+- **纵向流**：优先自上而下
+- **对称**：构图均衡
+- **干净线条**：正交布线——先纵后横，或先横后纵
 
-## SVG Template
+## SVG 模板
 
 canonical 副本：`templates/style-6-claude.svg` — 复制使用，以 templates 为准
 ```xml
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 600"
-     width="960" height="600">
+     width="960" height="600" role="img" aria-labelledby="style-6-claude-title style-6-claude-desc">
+  <title id="style-6-claude-title">Claude official style diagram</title>
+  <desc id="style-6-claude-desc">Warm cream editorial style skeleton</desc>
   <style>
     text { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI',
                    'Helvetica Neue', Arial, 'PingFang SC', 'Microsoft YaHei', 'Microsoft JhengHei', 'SimHei', sans-serif;
@@ -177,38 +179,38 @@ canonical 副本：`templates/style-6-claude.svg` — 复制使用，以 templat
     </filter>
   </defs>
 
-  <!-- Warm cream background -->
+  <!-- 暖米白背景 -->
   <rect width="960" height="600" fill="#f8f6f3"/>
 
-  <!-- Title (optional) -->
+  <!-- 标题（可选） -->
   <text x="480" y="40" text-anchor="middle" fill="#1a1a1a"
         font-size="20" font-weight="700">Diagram Title</text>
 
-  <!-- Nodes -->
-  <!-- Agent node example -->
+  <!-- 节点 -->
+  <!-- Agent 节点示例 -->
   <rect x="100" y="100" width="180" height="80" rx="12" ry="12"
         fill="#9dd4c7" stroke="#4a4a4a" stroke-width="2.5"
         filter="url(#shadow-soft)"/>
   <text x="190" y="145" text-anchor="middle" fill="#1a1a1a"
         font-size="16" font-weight="600">Agent name</text>
 
-  <!-- Edges -->
+  <!-- 边 -->
   <line x1="190" y1="180" x2="190" y2="240"
         stroke="#5a5a5a" stroke-width="2" marker-end="url(#arrow-claude)"/>
   <text x="210" y="215" fill="#5a5a5a" font-size="13">Publish</text>
 </svg>
 ```
 
-## Design Philosophy
+## 设计哲学
 
-Claude's official style emphasizes:
-- **Warmth**: Cream background, soft fills
-- **Clarity**: High contrast text, generous spacing
-- **Professionalism**: Consistent stroke weights, aligned elements
-- **Approachability**: Rounded corners, friendly colors
+Claude 官方风格强调：
+- **温暖**：米白背景、柔和填充
+- **清晰**：高对比文本、宽松间距
+- **专业**：一致的描边粗细、对齐的元素
+- **亲和**：圆角、友好色彩
 
-Avoid:
-- Harsh shadows or gradients
-- Overly saturated colors
-- Thin stroke weights (< 2px)
-- Cluttered layouts
+避免：
+- 生硬阴影或渐变
+- 过饱和颜色
+- 过细描边（< 2px）
+- 拥挤布局

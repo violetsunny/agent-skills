@@ -1,13 +1,13 @@
 ---
 name: robot-aiot-draw-flowchart
 description: >
-  机器人/IoT 业务图表绘制与页面化能力。draw.io XML 图表生成（可编辑主路径）+ XML→HTML 稳定桥接转换 + 领导汇报静态页面 HTML 生成。覆盖流程图、分层架构、时序、状态机、ER、UML 类/用例、网络拓扑、时间线、Agent/记忆架构等 39+ 图表类型；内置机器人视觉语言、配色与样式一致性体系、几何/构图校验、PNG/GIF 导出与 drawio/Mermaid 导入重绘；支持 Mermaid 源码写作（23 类图表语法）与 .excalidraw/SVG/PNG 三件套离线导出、数据统计图表（饼图/箱线图/热力图/网络拓扑等）绘制规则、深色主题直绘技法与出版级示意图迭代流程；XML→HTML 转换保留原始样式/布局/层级/配色；静态页面固定 1920x1080 画布，内化语义 token、高级感设计标准与交付审查流程。
-version: 5.4.0
+  机器人/IoT 业务图表绘制与页面化能力。draw.io XML 图表生成（可编辑主路径）+ XML→HTML 稳定桥接转换 + 领导汇报静态页面 HTML 生成。覆盖流程图、分层架构、时序、状态机、ER、UML 类/用例、网络拓扑、时间线、Agent/记忆架构等 39+ 图表类型；内置机器人视觉语言、配色与样式一致性体系、几何/构图校验、PNG 导出与 drawio/Mermaid 导入重绘；支持 Mermaid 源码写作（23 类图表语法）与 .excalidraw/SVG/PNG 三件套离线导出、数据统计图表（饼图/箱线图/热力图/网络拓扑等）绘制规则、深色主题直绘技法与出版级示意图迭代流程；XML→HTML 转换保留原始样式/布局/层级/配色；静态页面固定 1920x1080 画布，内化语义 token、高级感设计标准与交付审查流程。
+version: 6.0.0
 author: kangll13
 license: MIT
 metadata:
   hermes:
-    tags: [flowchart, draw.io, robot-vacuum, diagram, xml, architecture, layered-architecture, svg, sequence, state-machine, er, uml, network-topology, timeline, png-export, gif-motion, xml-to-html, slide-html, slide-deck]
+    tags: [flowchart, draw.io, robot-vacuum, diagram, xml, architecture, layered-architecture, svg, sequence, state-machine, er, uml, network-topology, timeline, png-export, xml-to-html, slide-html, slide-deck]
     related_skills: []
 ---
 
@@ -38,7 +38,7 @@ bash "$HOME/.agents/skills/robot-aiot-draw-flowchart/scripts/precheck_deps.sh"
 3. **draw.io XML 输出** — 可编辑 .drawio/.xml 文件，支持 PPT 工作流与团队协作
 4. **XML→HTML 桥接转换** — 将 XML 图表稳定转换为 HTML 预览稿，保留原始样式/布局/层级/配色，作为 PPT 前的视觉约束层
 5. **静态页面 HTML** — 固定 1920x1080 画布的领导汇报逐页 HTML，内化语义 token、高级感设计标准与交付审查
-6. **工程化质量管线** — 构图契约、几何校验、复杂度预算、视觉复查门、PNG/GIF 导出
+6. **工程化质量管线** — 构图契约、几何校验、复杂度预算、视觉复查门、PNG 导出
 7. **导入重绘** — 已有 `.drawio` / Mermaid 源可提取结构后按本 SKILL 规范重绘（Mermaid 扩展类型 pie/mindmap/gitGraph/timeline/quadrantChart/C4/sankey 等均已支持）
 8. **Mermaid 写作与三件套导出** — 23 类 Mermaid 图表源码写作规范；离线产出 `.mmd` + `.excalidraw` + SVG/PNG 三件套
 9. **数据统计图表** — 图表选型矩阵、matplotlib/seaborn/plotly/networkx 工具链分工、出版级规格与色彩无障碍审查
@@ -56,7 +56,7 @@ bash "$HOME/.agents/skills/robot-aiot-draw-flowchart/scripts/precheck_deps.sh"
 | 线性 / 分支 / 循环 / 并行 / 子流程 / 泳道 | `references/flowchart-patterns.md` |
 | 分层架构图（L1~L5 容器、跨层连接、数据支撑区） | `references/layered-architecture.md` |
 | IT 现状图（改造前旧格局、痛点标注、文件级交接） | `references/type-it-state.md` |
-| 循环/飞轮图（环状推进 + 中心共享状态回写；注意与 `references/design-system.md` 中作为动画模式的 "loop" 区分，此处是图表类型） | `references/type-loop.md` |
+| 循环/飞轮图（环状推进 + 中心共享状态回写，图表类型） | `references/type-loop.md` |
 | 鱼骨图 / 石川图（根因分析） | `references/type-fishbone.md` |
 | 维恩图 / 集合交集 | `references/type-venn.md` |
 | 金字塔 / 漏斗 | `references/type-pyramid.md` |
@@ -112,14 +112,14 @@ bash "$HOME/.agents/skills/robot-aiot-draw-flowchart/scripts/precheck_deps.sh"
 3. **重绘不转换** — 丢弃源坐标/颜色/字体，只保留内容拓扑
 4. **保真度账单** — 报告合并/折叠/丢弃了什么；不得凭空补组件，不得静默丢组件
 
-## 导出与动图
+## 导出
 
 - **PNG**：`generate-diagram.sh`（cairosvg）；CJK/emoji 回退、浏览器产 SVG、Puppeteer 转换见 `references/png-export.md`
 - **Excalidraw 三件套**：`.mmd` 源码 + 可在 excalidraw.com 编辑的 `.excalidraw` + SVG/PNG，离线流程见 `references/export-excalidraw.md`
 - **画布级图片**：设计哲学驱动的高品质视觉输出（封面/Banner/印刷/社交配图），规则见 `references/canvas-image-generation.md`；带标签的出版级示意图（神经网络架构/系统图/生物通路）走 `references/scientific-schematic-iteration.md` 的阈值审查迭代流程
 - **SVG/PNG 从 HTML 导出**：`references/export.md`（只导出 `<svg>` 本体，丢编辑壳；导出必须用户明确要求）
-- **GIF**：`scripts/motion.py`（经 `fireworks.py animate`），契约见 `references/motion-effects.md`
 - **离线交互 HTML**：`python3 $SKILL_ROOT/scripts/export-interactive-html.py` / `scripts/interactive_html.py`
+- **环境诊断**：首次运行排障（Python 运行时、SVG→PNG 光栅化栈、HTML→PNG Playwright 路径、安装路径检查）见 `references/doctor.md`
 
 ## XML→HTML 桥接转换
 
@@ -366,7 +366,7 @@ bash "$HOME/.agents/skills/robot-aiot-draw-flowchart/scripts/precheck_deps.sh"
 3. 不在组件里散落硬编码颜色，优先引用根变量
 4. 正文默认不小于 `16px`，说明/标签默认不小于 `12px`
 5. 可选视觉增强不得改动已验证的布局坐标
-6. 静态版不做滚动动画、入场动画、循环动效
+6. 不做滚动动画、入场动画、循环动效（本 skill 仅静态产物）
 7. 不伪造精确数字；占位数据必须显式标注"示意"
 8. 不使用 AI 紫/霓虹渐变、纯黑硬阴影、纯黑大面积背景（品牌色本身为紫色时例外，且须整套汇报一致）
 9. 不出现编号眉标、装饰状态点、版本号页脚等 AI 痕迹（完整清单见 `references/slide-premium-design.md` 第 9 节）
@@ -408,6 +408,5 @@ bash "$HOME/.agents/skills/robot-aiot-draw-flowchart/scripts/precheck_deps.sh"
 2. XML 交付前必须通过结构完整性 + 样式一致性自审
 3. XML→HTML 桥接交付前必须通过保真校验，任一阻塞项不满足不得进入 PPT 阶段
 4. 静态页面 HTML 交付前必须通过高级感审查，阻塞项全部通过方可交付
-5. 动图不改变静态语义，不提高复杂度预算；GIF 为唯一动图媒介
-6. 导入重绘不得发明或静默丢弃组件
-7. 校验失败必须显式报告，不得绕过后再宣称成功
+5. 导入重绘不得发明或静默丢弃组件
+6. 校验失败必须显式报告，不得绕过后再宣称成功

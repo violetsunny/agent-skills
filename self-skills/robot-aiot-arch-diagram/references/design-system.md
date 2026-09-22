@@ -101,7 +101,7 @@
 - **Arrow label** — Geist Mono，8px — 箭头上的注记
 - **Editorial aside** — Instrument Serif *斜体*，14px — 仅用于 callout
 
-**韩文标签** — Geist 与 Instrument Serif 不含谚文字形。在该 `<text>` 上扩展字体族，按每个 Unicode 宽字符/全角字符 1em、其余按拉丁步进宽度预算，且谚文永不低于 12px。完整规则见 [`style-guide.md`](style-guide.md#korean-labels)。
+**韩文标签** — Geist 与 Instrument Serif 不含谚文字形。在该 `<text>` 上扩展字体族，按每个 Unicode 宽字符/全角字符 1em、其余按拉丁步进宽度预算，且谚文永不低于 12px。完整规则见 [`style-guide.md`](style-guide.md#韩文标签)。
 
 **Mono 只用于技术内容** — 永不做整体"开发感"字体，永不用 JetBrains Mono。
 
@@ -325,6 +325,8 @@ SVG `viewBox` 高度扩 ~60px。
 | 最大动效（可选） | 8 步、12 个标记项、2 个同时项 — 见 [animation.md](animation.md) |
 
 超出预算时拆成两张图（总览 + 详情）。
+
+分层架构图例外：层容器内的能力卡不计入通用节点预算（节点总数不受 ≤9 限制）；箭头预算同样豁免——按连通分量分组计预算，每个独立连通分量（如一个独立垂直栈/烟囱，各含自身层间箭头）内箭头仍受 ≤12 约束，多个互不相连的分量的箭头总数不受单图 12 条上限判定。
 
 > **类型索引导航：** 40 类视觉类型完整清单（含 IT current-state `type-it-state.md`、Loop `type-loop.md`、Fishbone `type-fishbone.md`、Venn `type-venn.md`、Pyramid `type-pyramid.md`、Scatter `type-scatter.md`、Story map `type-story-map.md`、Wardley map `type-wardley.md` 等）见 SKILL.md「图表类型选择」；各类型布局规则与类型专属预算在对应 `references/type-*.md`。注意区分：Loop 图表类型（飞轮/增强循环）与动画模式 `loop`（`animation.md`，循环播放）是两回事。
 

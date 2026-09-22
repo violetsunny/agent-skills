@@ -1,20 +1,20 @@
-# Swimlane
+# Swimlane（泳道图）
 
-**Best for:** cross-functional processes, RACI-style flows, vendor handoffs, multi-team shipping workflows.
+**最适合：** 跨职能流程、RACI 式流转、供应商交接、多团队发布工作流。
 
-## Layout conventions
-- Horizontal lanes (or vertical columns) — one per actor/team. Label each lane in the left margin (or top) with a Geist Mono eyebrow.
-- Lane dividers: 1px hairlines.
-- Process steps are rectangles placed inside the lane of the actor performing them; arrows show flow.
-- Handoffs (arrows crossing lane boundaries) are the most important edges — consider coral on the handoff that introduces the most coupling or latency.
-- Don't force equal step count per lane; a lane with one step is fine.
+## 布局约定
+- 水平泳道（或垂直列）——每个参与者/团队一条。每条泳道在左侧留白（或顶部）用 Geist Mono eyebrow 标注。
+- 泳道分隔线：1px 发丝线。
+- 流程步骤为矩形，放在执行者的泳道内；箭头表示流转。
+- 交接（跨泳道边界的箭头）是最重要的边——可给引入最多耦合或延迟的那个交接上 coral。
+- 不强求每条泳道步骤数相同；只有一步的泳道完全没问题。
 
-## Anti-patterns
-- Lanes without labels.
-- A step drawn across two lanes (pick one owner).
-- Arrows that snake back and forth — reorder steps so the flow is mostly straight.
+## 反模式
+- 无标签的泳道。
+- 一个步骤横跨两条泳道（选定唯一 owner）。
+- 箭头来回穿梭——重排步骤，让流向大体走直线。
 
-## Examples
+## 示例
 - minimal light
 - minimal dark
 - full editorial

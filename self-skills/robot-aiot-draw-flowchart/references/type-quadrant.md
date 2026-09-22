@@ -1,81 +1,81 @@
-# Quadrant
+# Quadrant（象限图）
 
-**Best for:** prioritization (Impact × Effort), positioning (Reach × Frequency), portfolio maps, 2×2 decision frames.
+**最适合：** 优先级排序（Impact × Effort）、定位（Reach × Frequency）、组合地图、2×2 决策框架。
 
-## Layout conventions
-- 2×2 grid. Axis lines: 1px ink cross through the center.
-- **Axis labels: Jobs-minimal.** One single word at each arrow tip — no glyphs baked into the label (no `↑` / `→` / `←` / `↓`), no parentheticals, no "HIGH / LOW" modifiers. Geist Mono 9px regular weight, tracked 0.18em, uppercase. Flank the arrow tips — never sit labels on top of the axis line. Shorten the arrow enough (~60–80px inside the viewBox edge) to leave breathing room for the labels beyond the tips.
-- Never label at the midpoint.
-- Items: small labeled dots (`r=4`) positioned in the quadrants. Labels 8–10px away; don't let labels cross axis lines.
-- Coral on the "do first" item (typically top-right).
-- Limit to ~12 items; cluster or split beyond that.
+## 布局约定
+- 2×2 网格。轴线：1px ink 十字穿过中心。
+- **轴标签：Jobs-minimal。** 每个箭头尖端只放一个词——标签中不嵌入字形符号（无 `↑` / `→` / `←` / `↓`）、无括号附注、无 "HIGH / LOW" 修饰。Geist Mono 9px 常规字重，字距 0.18em，大写。放在箭头尖端两侧——绝不把标签压在轴线上。箭头适当缩短（距 viewBox 边缘约 60–80px），给尖端之外的标签留出呼吸空间。
+- 绝不在中点放标签。
+- 条目：象限内带标签的小圆点（`r=4`）。标签距点 8–10px；不让标签跨越轴线。
+- "优先做"的条目（通常右上）用珊瑚色。
+- 上限约 12 个条目；超出就聚类或拆分。
 
-## Anti-patterns
-- Four filled quadrants in different colors — position + label does the work; color noise weakens it.
-- Items placed on axis lines (ambiguous quadrant).
-- Missing axis names.
+## 反模式
+- 四个象限填不同颜色——位置 + 标签已经完成表达；颜色噪声反而削弱它。
+- 条目压在轴线上（象限归属不明）。
+- 缺轴名。
 
-## Examples
+## 示例
 - minimal light
 - minimal dark
 - full editorial
-- consultant special (see below)
+- consultant special（见下文）
 
 ---
 
-## Consultant special (2×2 scenario matrix)
+## Consultant special（2×2 情景矩阵）
 
-A **layout variant** of the standard quadrant — same house skin (warm paper, dot pattern, Instrument Serif title, Geist mono eyebrows, coral focal rule). The grammar shifts: axes hold a **range** rather than a measurement; cells hold **named scenarios** rather than positioned items.
+标准象限图的**布局变体**——同一套房屋皮肤（暖纸色、点阵、Instrument Serif 标题、Geist mono 眉标、珊瑚焦点规则）。语法变化：轴承载一个**范围**而非度量；单元格承载**命名情景**而非定位条目。
 
-**Use when:** you're framing four futures, archetypes, or strategic options across two independent drivers — classic scenario planning, positioning frames, or 2×2 strategy decks (BCG/McKinsey territory). The reader should come away with four named bets, not a point cloud.
+**使用场景：** 跨两个独立驱动因素框定四种未来、原型或战略选项——经典情景规划、定位框架或 2×2 战略文稿（BCG/McKinsey 领域）。读者应带走四个命名的赌注，而不是一团散点。
 
-**Do not use** for prioritization, density maps, or anything where the *position inside* a cell carries meaning — that's the standard quadrant above.
+**不要用于**优先级排序、密度图，或任何*单元格内位置*承载含义的场景——那是上面的标准象限图。
 
-### What makes it the consultant variant
+### 它为何是 consultant 变体
 
-| Move | Standard quadrant | Consultant special |
+| 手法 | 标准象限图 | Consultant special |
 |---|---|---|
-| Axis arrows | single-ended | **double-ended** — both axes have `marker-start` + `marker-end` |
-| Cell content | small dots with labels | **named scenario + 1–3 line description** |
-| Quadrant corner | short tag (e.g. DO FIRST) | **numbered tag + axis combination** (`01 · DIMENSION-A / DIMENSION-B`) |
-| Focal accent | coral on one *item* | coral on one *quadrant* — tinted bg + coral stroke + coral corner tag |
-| Axes | 1px muted ink | **1.2px ink** (slightly heavier — the axes carry more of the figure) |
+| 轴箭头 | 单端 | **双端**——两轴都有 `marker-start` + `marker-end` |
+| 单元格内容 | 带标签小圆点 | **命名情景 + 1–3 行描述** |
+| 象限角标 | 短 tag（如 DO FIRST） | **编号 tag + 轴组合**（`01 · DIMENSION-A / DIMENSION-B`） |
+| 焦点强调 | 珊瑚色标一个*条目* | 珊瑚色标一个*象限*——淡色背景 + 珊瑚描边 + 珊瑚角标 |
+| 轴线 | 1px muted ink | **1.2px ink**（略重——轴承担更多图形表达） |
 
-Both variants use the same Jobs-minimal axis labels: one word at each arrow tip, no glyphs, no parentheticals. The only axis difference is that the consultant variant uses double-ended arrows instead of single-ended.
+两个变体使用同样的 Jobs-minimal 轴标签：每个箭头尖端一个词，无字形符号，无括号附注。唯一的轴差异是 consultant 变体用双端箭头替代单端。
 
-Everything else — paper, dot pattern, typography, legend strip, 4px grid, complexity budget — is the house default. Don't invent new colors or fonts for this variant.
+其余一切——paper、点阵、字体排印、图例条、4px 网格、复杂度预算——都是房屋默认值。不要为该变体发明新颜色或新字体。
 
-### Style tokens (in-house)
+### 样式 token（内部）
 
-- **Paper / bg / pattern**: defaults from `style-guide.md` (`paper`, 22×22 dot pattern at 10% ink).
-- **Axis lines**: `ink` (`#2d3142`), `stroke-width: 1.2`, `marker-start` + `marker-end` both pointing outward.
-- **Focal quadrant tint**: `rgba(235,108,54,0.04)` full rect behind the focal cell.
-- **Focal cell**: `accent-tint` fill, `accent` stroke at 1.2px. Corner tag in `accent`, weight 600.
-- **Non-focal cells**: `store` treatment (`ink @ 0.04` fill, `muted @ 0.28` stroke).
-- **Cell title**: Geist sans, 16px, weight 600, `ink`.
-- **Cell description**: Geist sans, 11px, `muted`, 1–3 lines, left-aligned inside the cell.
-- **Corner tag**: Geist Mono, 8px, uppercase, tracked `0.18em`, `muted` (or `accent` on focal). Format: `NN · DIMENSION-A / DIMENSION-B` — the two axis-dimension words must match the axis labels exactly.
-- **Axis labels**: Geist Mono 9px **regular weight** (not bold), tracked `0.18em`, uppercase, `ink`. **One word per tip.** No arrow glyphs in the label, no `HIGH / LOW` parentheticals, no multi-line sublabels. The word itself *is* the label. Position labels *beyond* the arrow tips (not on the axis line):
-  - Top tip: `text-anchor="middle"`, ~12px above the arrow tip
-  - Bottom tip: `text-anchor="middle"`, ~20px below the arrow tip
-  - Left tip: `text-anchor="end"`, ~12px left of the arrow tip, `dominant-baseline="middle"`
-  - Right tip: `text-anchor="start"`, ~12px right of the arrow tip, `dominant-baseline="middle"`
+- **Paper / 背景 / 纹理**：`style-guide.md` 默认值（`paper`，22×22 点阵 10% ink）。
+- **轴线**：`ink`（`#2d3142`），`stroke-width: 1.2`，`marker-start` + `marker-end` 都朝外。
+- **焦点象限淡色**：`rgba(235,108,54,0.04)` 整块矩形垫在焦点单元格后。
+- **焦点单元格**：`accent-tint` 填充，`accent` 描边 1.2px。角标用 `accent`，字重 600。
+- **非焦点单元格**：`store` 处理（`ink @ 0.04` 填充，`muted @ 0.28` 描边）。
+- **单元格标题**：Geist sans，16px，字重 600，`ink`。
+- **单元格描述**：Geist sans，11px，`muted`，1–3 行，单元格内左对齐。
+- **角标**：Geist Mono，8px，大写，字距 `0.18em`，`muted`（焦点为 `accent`）。格式：`NN · DIMENSION-A / DIMENSION-B`——两个轴维度词必须与轴标签完全一致。
+- **轴标签**：Geist Mono 9px **常规字重**（不加粗），字距 `0.18em`，大写，`ink`。**每尖端一个词。** 标签中无箭头字形、无 `HIGH / LOW` 括号附注、无多行副标签。词本身*就是*标签。标签放在箭头尖端*之外*（不在轴线上）：
+  - 上尖端：`text-anchor="middle"`，尖端上方约 12px
+  - 下尖端：`text-anchor="middle"`，尖端下方约 20px
+  - 左尖端：`text-anchor="end"`，尖端左侧约 12px，`dominant-baseline="middle"`
+  - 右尖端：`text-anchor="start"`，尖端右侧约 12px，`dominant-baseline="middle"`
 
-### Layout conventions
+### 布局约定
 
-- Four cells, equal size (240×160 or 280×180 are good defaults), arranged with a 40–60px gap from the axis cross.
-- Axis cross passes *between* the cells, not through them.
-- Arrow tips live ~20–40px outside the outermost cell edge; single-word axis labels sit ~12px beyond each tip (see Axis labels above).
-- Exactly one focal cell. Picking none makes it a placeholder template; picking two erases the signal.
-- Keep the legend strip + horizontal rule at the bottom — same as the standard quadrant. Legend swatches should show both "headline bet" (coral) and "candidate future" (neutral).
+- 四个等大单元格（240×160 或 280×180 是好默认值），与轴十字保持 40–60px 间隙排列。
+- 轴十字从单元格*之间*穿过，不穿过单元格。
+- 箭头尖端位于最外单元格边缘外约 20–40px；单词轴标签位于各尖端外约 12px（见上方轴标签）。
+- 恰好一个焦点单元格。不选是占位模板；选两个抹掉信号。
+- 底部保留图例条 + 水平线——与标准象限图相同。图例色样应同时展示 "headline bet"（珊瑚）与 "candidate future"（中性）。
 
-### Anti-patterns (variant-specific)
+### 反模式（变体专属）
 
-- Plain white background — the warm paper + dot pattern is load-bearing across the skill; dropping it to "look consultant" turns the diagram generic.
-- Sans-serif H1 — keep Instrument Serif for the page title. The title/diagram contrast is the house signature.
-- Unnamed cells ("Scenario 1/2/3/4") in a shipped diagram — OK as a blank template; not OK as a finished artifact.
-- Coral on more than one cell — same focal rule as everywhere else in the skill.
-- 3×3 or 2×3 grids — those are different diagrams, not this variant.
-- Positioning dots *inside* the cells — if position matters, use the standard quadrant.
-- Bolded axis labels, arrow glyphs in the text (`↑ DRIVER`), or "HIGH / LOW" parentheticals — all forbidden. Jobs-minimal is non-negotiable on this variant.
-- Corner tags that disagree with the axis labels (e.g. axis says `REMOTE / IN-PERSON` but the tag reads `HIGH REMOTE / LOW AI`). Reader parses this as a bug in three seconds.
+- 纯白背景——暖纸色 + 点阵是全 skill 的承重元素；为了"看起来像咨询"而丢掉它会让图表变得平庸。
+- 无衬线 H1——页面标题保持 Instrument Serif。标题/图表对比是房屋签名。
+- 交付图表中单元格无名（"Scenario 1/2/3/4"）——作空白模板可以；作成品不行。
+- 珊瑚色标多个单元格——与 skill 其他所有地方相同的焦点规则。
+- 3×3 或 2×3 网格——那是不同的图，不是本变体。
+- 在单元格*内部*定位圆点——位置有意义时，用标准象限图。
+- 轴标签加粗、文本中嵌箭头字形（`↑ DRIVER`）、或 "HIGH / LOW" 括号附注——全部禁止。本变体上 Jobs-minimal 没有商量余地。
+- 角标与轴标签不一致（如轴写 `REMOTE / IN-PERSON` 而角标写 `HIGH REMOTE / LOW AI`）。读者三秒内就会把它当 bug。

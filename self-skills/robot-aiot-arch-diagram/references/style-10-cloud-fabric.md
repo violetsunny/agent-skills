@@ -1,4 +1,4 @@
-# Style 10: Cloud Fabric
+# Style 10: Cloud Fabric（云部署拓扑）
 
 面向 region、VPC/网络、计算、数据存储与跨边界流量的部署拓扑视图。它回答"这东西跑在哪里？"，同时不把图表变成厂商图标海报。
 

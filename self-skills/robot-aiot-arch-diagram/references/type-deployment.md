@@ -1,44 +1,44 @@
-# Deployment
+# Deployment（部署图）
 
-**Best for:** where the software actually *runs* — hosts, VMs, pods, and managed services placed inside environment or network-boundary zones, with replica counts and versioned artifacts called out. Architecture answers "what talks to what"; deployment answers "what is installed on which host, in which environment, behind which network boundary, at how many replicas." If the diagram has no physical-placement decision to show — no zone boundary, no replica count, no version that matters — use `type-architecture.md` instead; redrawing the logical architecture with hostnames bolted on is the most common deployment anti-pattern.
+**最适合：** 软件实际*运行*在哪里——主机、VM、pod 与托管服务放置在环境或网络边界 zone 内，标注副本数与带版本的制品。Architecture 回答"什么和什么通信"；deployment 回答"什么装在哪个主机上、在哪个环境、在哪个网络边界后、有几个副本"。若图中没有物理放置决策可展示——无 zone 边界、无副本数、无重要版本——改用 `type-architecture.md`；把逻辑架构重画一遍再钉上主机名是最常见的部署图反模式。
 
-## Layout conventions
+## 布局约定
 
-Three nesting levels, outermost to innermost — reuses the containment grammar from `type-nested.md`, specialized for infrastructure:
+三个嵌套层级，从外到内——复用 `type-nested.md` 的包含语法，面向基础设施特化：
 
-1. **Zone** — an environment or network boundary (`edge`, `prod / eu-west-1`, `data`). A large rect, `rx=8`, fill `ink @ 0.02`, stroke `ink @ 0.20` dashed `4,4`. A Geist Mono 8px (or 7px for tight layouts) uppercase tracked eyebrow label sits inside the top-left corner, on a paper-colored mask over the border. Zones are drawn **first** — before arrows and nodes — so labels and boxes paint over them (z-order: bg → zones → arrows → labels → nodes).
-2. **Infrastructure node** — a host, VM, pod, or managed service inside a zone. The §6 node-box pattern (design-system.md) at `rx=6`, with a rectangular type tag (`rx=2`, **not** a pill) carrying `POD` / `VM` / `MANAGED` / `CDN` in the top-left corner.
-3. **Artifact chip** — what is deployed onto that node. A small 24px-tall rect `rx=4`, fill `ink @ 0.05`, stroke `muted`, holding the image or service name in Geist sans 12px (left-aligned) plus a Geist Mono 9px version tag (right-aligned, e.g. `v2.4.1`). A node can carry more than one chip (stacked with an 8px gap) when more than one artifact is co-located (a sidecar, for example).
+1. **Zone** —— 环境或网络边界（`edge`、`prod / eu-west-1`、`data`）。大矩形，`rx=8`，填充 `ink @ 0.02`，描边 `ink @ 0.20` 虚线 `4,4`。Geist Mono 8px（紧凑布局用 7px）大写加字距眉标放在左上角内侧，压在边界线上的 paper 色遮罩上。Zone **最先**绘制——在箭头与节点之前——让标签和盒子盖在其上（z-order：bg → zones → arrows → labels → nodes）。
+2. **基础设施节点** —— zone 内的主机、VM、pod 或托管服务。§6 节点盒模式（design-system.md），`rx=6`，左上角带矩形类型标签（`rx=2`，**不是**胶囊形），写 `POD` / `VM` / `MANAGED` / `CDN`。
+3. **制品 chip** —— 部署到该节点上的东西。24px 高小矩形 `rx=4`，填充 `ink @ 0.05`，描边 `muted`，内含 Geist sans 12px 镜像或服务名（左对齐）加 Geist Mono 9px 版本标签（右对齐，如 `v2.4.1`）。多个制品共存时（例如 sidecar）一个节点可携带多个 chip（以 8px 间隙堆叠）。
 
-**Replica badge.** A node running N copies carries a right-aligned Geist Mono 8px badge (`x3`) inside its own small `rx=2` box in the node's top-right corner. A mask fully inside a node is a badge chip and is a legitimate exception to the "mask must not overlap a later node" rule (design-system.md §6 rule 6) — it's part of that same node.
+**副本徽章。** 运行 N 个副本的节点在右上角自带 `rx=2` 小盒内放右对齐 Geist Mono 8px 徽章（`x3`）。完全位于节点内部的遮罩是徽章 chip，属于"遮罩不得与后绘节点重叠"规则的合法例外（design-system.md §6 规则 6）——它是同一节点的一部分。
 
-**Network paths.** Orthogonal elbows between nodes (design-system.md §6, elbow formula and port-selection rules in `type-architecture.md`), labelled with protocol and port in Geist Mono 8px (`HTTPS:443`, `TLS:5432`). A path that crosses a zone boundary is `link`-blue; a path that stays inside one zone is `muted`. Async or replication paths are dashed `5,4`.
+**网络路径。** 节点间正交肘线（design-system.md §6，肘线公式与端口选择规则见 `type-architecture.md`），用 Geist Mono 8px 标注协议与端口（`HTTPS:443`、`TLS:5432`）。跨 zone 边界的路径用 `link` 蓝；停留在单一 zone 内的路径用 `muted`。异步或复制路径用虚线 `5,4`。
 
-**Focal rule.** The 2 accent elements are the single-point-of-failure or the newly-introduced piece — never more than 2. In the canonical example: the RDS primary (accent-tint fill, accent stroke) and the replication path to its standby (accent, dashed).
+**焦点规则。** 2 个 accent 元素是单点故障或新引入的部件——绝不超过 2 个。canonical 示例中：RDS 主库（accent-tint 填充、accent 描边）与到备库的复制路径（accent、虚线）。
 
-## Complexity budget
+## 复杂度预算
 
-| Limit | Rule |
+| 上限 | 规则 |
 |---|---|
-| Max zones | 3 |
-| Max infrastructure nodes | 6 |
-| Max artifact chips | 9 |
-| Max network paths | 8 |
-| Max accent elements | 2 |
+| 最大 zone 数 | 3 |
+| 最大基础设施节点数 | 6 |
+| 最大制品 chip 数 | 9 |
+| 最大网络路径数 | 8 |
+| 最大 accent 元素数 | 2 |
 
-Over budget → split into one deployment diagram per environment.
+超预算 → 按环境拆分为多张部署图。
 
-## Anti-patterns
+## 反模式
 
-- Redrawing the logical architecture with hostnames bolted on. If no placement decision is visible (which host, which zone, how many replicas), use `type-architecture.md` instead.
-- Zones that are just visual grouping with no boundary meaning — a zone must be a real environment or network boundary, not a layout convenience.
-- Artifact chips without a version tag. The version is why the diagram exists; an unversioned chip is a wasted box.
-- One node drawn per replica instead of a single node with a replica badge.
-- Cloud-vendor icon soup standing in for named nodes — name the host or service, don't decorate it.
-- Unlabelled network paths. Protocol and port are the content of a deployment diagram, not decoration.
-- Mixing two environments in one diagram (e.g. staging and production nodes side by side without a zone boundary that actually separates them).
+- 把逻辑架构重画一遍再钉上主机名。若看不到放置决策（哪台主机、哪个 zone、几个副本），改用 `type-architecture.md`。
+- Zone 只是视觉分组而无边界含义——zone 必须是真实环境或网络边界，不是布局便利。
+- 制品 chip 无版本标签。版本是这张图存在的理由；无版本的 chip 是白画的盒子。
+- 每个副本画一个节点，而不是单节点加副本徽章。
+- 用云厂商图标汤代替命名节点——写出主机或服务名，不要装饰它。
+- 网络路径无标注。协议与端口是部署图的内容，不是装饰。
+- 单图混两个环境（如 staging 与 production 节点并排却没有真正分隔它们的 zone 边界）。
 
-## Examples
+## 示例
 
 - minimal light
 - minimal dark

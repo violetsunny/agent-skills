@@ -1,92 +1,66 @@
-# Composition Quality Contract
+# 构图质量契约
 
-This contract applies to every visual style. Style references control color,
-typography, material, corner radius, and decorative treatment. They never
-weaken geometry or composition quality.
+本契约适用于每一种视觉风格。风格 reference 控制颜色、字体排印、材质、圆角与装饰处理。它们绝不削弱几何或构图质量。
 
-## Official showcase profile
+## 官方 showcase profile
 
-Use `"quality_profile": "showcase"` for official samples and polished delivery
-artifacts. The renderer and validator enforce all of these budgets:
+官方样例与精修交付物使用 `"quality_profile": "showcase"`。渲染器与校验器强制执行以下全部预算：
 
-| Metric | Showcase limit |
+| 指标 | Showcase 上限 |
 |---|---:|
-| Edge crossings | 0 |
-| Bridge jumps | 0 |
-| Bends on one edge | 2 maximum |
-| Bends in the six-node reference topology | 8 maximum |
-| Route length / direct Manhattan length | 1.35 maximum |
-| Shortest route segment | 16px minimum |
-| Node-to-node whitespace | 40px minimum |
-| Node-to-container gutter | 20px minimum |
-| Edge-label clearance from unrelated geometry | 4px minimum |
+| 边交叉 | 0 |
+| 桥接跨越 | 0 |
+| 单边弯数 | 最多 2 |
+| 六节点参考拓扑弯数 | 最多 8 |
+| 路径长度 / 直接曼哈顿长度 | 最多 1.35 |
+| 最短路径段 | 至少 16px |
+| 节点间空白 | 至少 40px |
+| 节点到容器沟槽 | 至少 20px |
+| 边标签与无关几何的净空 | 至少 4px |
 
-The six-node reference topology currently scores 100 with four total bends,
-zero crossings, zero bridges, a route-stretch maximum of 1.0, 50px minimum
-node spacing, and 20px minimum container gutter.
+六节点参考拓扑当前得分 100：总弯数 4、零交叉、零桥接、路径拉伸最大 1.0、节点间距最小 50px、容器沟槽最小 20px。
 
-## Layout grammar
+## 布局语法
 
-1. Establish containers, their header reservations, and node rows before any
-   edge is routed.
-2. Keep nodes in a row aligned to the same y coordinate and use consistent
-   heights for equivalent semantic roles.
-3. Reserve one empty inter-container corridor for cross-layer routes. A route
-   may cross a container boundary only through an open gap and must not run on
-   top of the border.
-4. Route the primary horizontal flow first. Route cross-layer context and
-   feedback paths through separate, non-overlapping corridor segments.
-5. Use distinct node ports when several edges share a side. Never stack
-   multiple arrowheads on one coordinate.
-6. Prefer a monotone orthogonal route. If a connection needs more than two
-   bends, change the node placement before adding waypoints.
-7. Treat every external title, subtitle, tag, side label, edge label, legend,
-   footer, and title block as an obstacle with measurable bounds.
-8. Keep legends outside business-flow corridors. Use a single horizontal row
-   when the canvas has enough width.
-9. Fit long single-line node titles to the card width. Do not let text touch or
-   cross the node border.
-10. If the topology cannot meet the showcase limits, simplify the composition,
-    split it into focused diagrams, or explicitly use the standard profile for
-    a non-showcase engineering stress artifact.
+1. 先确立容器、其头部预留区与节点行，再布任何边。
+2. 同一行的节点对齐到相同 y 坐标，等价语义角色使用一致高度。
+3. 为跨层路径预留一条空的容器间走廊。路径只能穿过开放间隙跨越容器边界，绝不压在边框线上。
+4. 先布主水平流。跨层上下文与反馈路径走独立的、互不重叠的走廊段。
+5. 多条边共享一侧时使用不同的节点端口。绝不把多个箭头堆在同一坐标。
+6. 优先单调正交路径。连接需要超过两个弯时，先改节点摆放再加折点。
+7. 把每个外部标题、副标题、tag、侧标签、边标签、图例、页脚与标题块都当作有可度量包围盒的障碍物。
+8. 图例保持在业务流走廊之外。画布宽度足够时用单一水平行。
+9. 长的单行节点标题要适配卡片宽度。文字不得触碰或跨越节点边框。
+10. 拓扑无法满足 showcase 上限时，简化构图、拆成聚焦的多张图，或对非 showcase 的工程压力产物显式使用 standard profile。
 
-## Style identity boundary
+## 风格身份边界
 
-Styles may vary these properties freely within their own reference:
+各风格可在自己的 reference 内自由变化这些属性：
 
-- background, palette, semantic accent colors;
-- font family, title alignment, and typographic hierarchy;
-- card fill, border treatment, shadow, glow, and corner radius;
-- blueprint title blocks, terminal chrome, or restrained brand details.
+- 背景、调色板、语义强调色；
+- 字体族、标题对齐、排印层级；
+- 卡片填充、边框处理、阴影、辉光、圆角；
+- blueprint 标题块、terminal 外壳，或克制的品牌细节。
 
-Styles must share these structural properties for a direct comparison:
+直接对比时各风格必须共享这些结构属性：
 
-- topology and edge direction;
-- row/column alignment;
-- port assignment and corridor positions;
-- crossing, bridge, bend, stretch, spacing, and gutter budgets;
-- semantic SVG roles required by the validator.
+- 拓扑与边方向；
+- 行/列对齐；
+- 端口分配与走廊位置；
+- 交叉、桥接、弯数、拉伸、间距、沟槽预算；
+- 校验器要求的语义 SVG role。
 
-Visual effects never create a second business connector. Pencil echoes, rail
-casings, critical-path glow, and similar layers use
-`data-graph-role="decoration"` with `data-owner`; exactly one ordinary
-`data-graph-role="edge"` carries the source, target, route, and arrowhead.
+视觉效果绝不制造第二条业务连线。铅笔回声、轨道外壳、关键路径辉光及类似图层使用 `data-graph-role="decoration"` 加 `data-owner`；恰好一条普通 `data-graph-role="edge"` 承载 source、target、路径与箭头。
 
-## Validation
+## 校验
 
-Run both gates before delivery:
+交付前运行两道门：
 
 ```bash
 python3 scripts/validate_svg.py diagram.svg --check geometry
 python3 scripts/validate_svg.py diagram.svg --check composition
 ```
 
-`scripts/validate-svg.sh` runs both automatically. A successful render without
-these gates is still a draft.
+`scripts/validate-svg.sh` 会自动跑两者。没经过这些门的成功渲染仍是草稿。
 
-Dense legacy diagrams live under `fixtures/stress/`（内部测试集，不随 skill 分发）.
-They preserve routing pressure cases and are not visual quality references.
-The public 12-style showcase keeps a distinct engineering scene for every
-style. The internal `fixtures/quality-baseline/` set（内部测试集，不随 skill 分发）
-applies one shared Agent Runtime Architecture topology to all 11
-generator-backed styles; Style 8 remains the static, AI-authored exception.
+密集的遗留压力图保留布线压力用例，不是视觉质量参考。12 风格 showcase 为每种风格保留独立的工程场景；质量基线把同一个共享的 Agent Runtime Architecture 拓扑应用到全部 11 种生成器支持的风格，Style 8 是静态的、AI 手工编写的例外。

@@ -292,4 +292,4 @@ Data:    [ DB A ]        [ DB B ]     [ Cache ]
 - [ ] 空心 marker（继承/聚合/开放箭头）用底色填充，深色下语义可读
 - [ ] 图例在所有边界外；viewBox = 内容 + 30px；无固定 width/height
 - [ ] 中文标签有 CJK 字体回退且框宽足够
-- [ ] 自动检查已跑：`python3 $SKILL_ROOT/scripts/check_dark_svg.py <file.svg> [--bg HEX]` —— 按本文件 §2 硬约束/§7-§8 规格机检深色 SVG（7px 字号下限、正文对比度 ≥4.5:1、图形元素 ≥3:1、禁暗 slate 正文、viewBox=内容+30px、CJK 回退），`--bg` 可覆盖背景自动探测；exit 0 = 无错误（允许 warning），exit 1 = 有错误。
+- [ ] 自动检查已跑：`python3 $SKILL_ROOT/scripts/check_dark_svg.py <file.svg> [--bg HEX]` —— 按本文件 §2/§7/§8/§9 硬约束检查深色 SVG（7px 字号下限、正文对比度 ≥4.5:1、图形元素 ≥3:1、禁暗 slate 正文、viewBox=内容+30px、CJK 回退），`--bg` 可覆盖背景自动探测；exit 0 = 无错误（允许 warning），exit 1 = 有错误。

@@ -1,46 +1,46 @@
-# User Story Map
+# User Story Map（用户故事地图）
 
-**Best for:** the Jeff Patton user story map — it answers "what is the whole story, and where do we cut the first release?" Narrative order runs left to right; priority runs top to bottom. The **release cut** is the editorial point of the diagram: a map without one is just a backlog in a grid.
+**最适合：** Jeff Patton 式用户故事地图——它回答"完整的故事是什么，第一个 release 切在哪里？"叙事顺序从左到右；优先级从上到下。**release cut** 是这张图的编辑要点：没有切线的地图只是排进网格的 backlog。
 
-This is neither **Kanban** nor **User journey**, and the distinction is load-bearing:
+它既不是 **Kanban** 也不是 **User journey**，且这个区分是承重的：
 
-- **Kanban** shows *state* — columns are Todo/Doing/Done, there is no narrative order and nothing to slice.
-- **User journey** shows *one persona's feelings* across stages via a sentiment curve.
-- A **story map** has neither state nor sentiment. Its columns are **narrative order** and its rows are **release slices**. If you aren't slicing releases, use one of those two instead.
+- **Kanban** 表达*状态*——列是 Todo/Doing/Done，没有叙事顺序，也无从切片。
+- **User journey** 用情绪曲线表达*一个 persona 跨阶段的感受*。
+- **story map** 既无状态也无情绪曲线。它的列是**叙事顺序**，行是**release 切片**。如果你不切 release，改用上面两种类型。
 
-## Layout conventions
+## 布局约定
 
-Vertical stack, top to bottom:
+垂直堆叠，自上而下：
 
-1. **Backbone** — up to 5 activities in left-to-right narrative order, as wide header cards (200px, `rx=6`, `ink @ 0.05` fill, `muted` stroke). Each card: the activity name in Geist sans 12px weight 600, above a Geist Mono 8px uppercase tracked eyebrow (`ACTIVITY 1` … `ACTIVITY 5`). 24px gutters between cards.
-2. **Walking skeleton row** — directly under each activity, its user *steps* as smaller cards (`rx=4`, 32px tall, white fill, `ink` stroke), Geist sans 12px. One or two per activity; reserve room for two so every activity's row bottom aligns even when it only has one step.
-3. **Release slices** — horizontal bands below the skeleton row, each a full-width lane with a Geist Mono 8px uppercase tracked label (`MVP`, `RELEASE 2`, `LATER`) sitting in a 96px left margin. Band background alternates `ink @ 0.02` / none. Inside each band, story cards (`rx=4`, 48px tall) sit in their activity's column: story title in Geist sans 12px weight 600, plus a Geist Mono 9px estimate/ticket sublabel (e.g. `RPT-114 · 3pt`). Whenever any slice has a gap (an activity with no card in that row), add `rule` hairline column separators (0.8px, dashed `4,4`, 0.10 opacity) running from just under the backbone down to the bottom of the last slice, drawn before the cards — without them, a gappy grid reads as scattered rather than mapped to its activity.
-4. **The release cut line** — a full-width horizontal `accent` rule (1.5px) immediately under the MVP band, with a masked Geist Mono 8px label `RELEASE CUT` at its right end. This is accent element one.
-5. **Legend** — horizontal strip at the bottom per the global rule (hairline separator above): one swatch for the default story card, one for the highest-risk treatment, one for the release-cut line.
+1. **Backbone**——最多 5 个活动按叙事顺序从左到右，作为宽头部卡片（200px、`rx=6`、`ink @ 0.05` 填充、`muted` 描边）。每张卡片：活动名 Geist sans 12px weight 600，上方是 Geist Mono 8px 大写加字距 eyebrow（`ACTIVITY 1` … `ACTIVITY 5`）。卡片间 24px 槽距。
+2. **Walking skeleton 行**——每个活动正下方，把用户*步骤*放成更小的卡片（`rx=4`、高 32px、白填充、`ink` 描边），Geist sans 12px。每个活动一到两个；预留两个的位置，让每个活动行的底边对齐，即使它只有一个步骤。
+3. **Release 切片**——skeleton 行下方的水平条带，每条是全宽 lane，带一个 Geist Mono 8px 大写加字距标签（`MVP`、`RELEASE 2`、`LATER`）置于 96px 左边距内。条带背景交替 `ink @ 0.02` / 无。条带内故事卡片（`rx=4`、高 48px）落在所属活动的列中：故事标题 Geist sans 12px weight 600，加 Geist Mono 9px 估算/工单子标签（如 `RPT-114 · 3pt`）。任何切片出现空档（某活动在该行没有卡片）时，添加 `rule` 发丝列分隔线（0.8px、虚线 `4,4`、不透明度 0.10），从 backbone 正下方一直画到最后一个切片底部，且先于卡片绘制——没有它们，有空档的网格会被读成散乱，而不是对齐到活动。
+4. **Release 切线**——MVP 条带正下方的全宽水平 `accent` 线（1.5px），右端带遮罩的 Geist Mono 8px 标签 `RELEASE CUT`。这是第一个 accent 元素。
+5. **图例**——按全局规则置于底部水平条带（上方发丝分隔线）：默认故事卡片一个色样、最高风险处理一个色样、release 切线一个色样。
 
-## Focal rule
+## 焦点规则
 
-Exactly 2 accent elements: the release cut line with its `RELEASE CUT` label (counts as one), and the single riskiest story card — drawn with `accent @ 0.05` fill, `accent` dashed `4,4` stroke, and a small rectangular `RISK` tag (`rx=2`, matching the type-tag primitive) — counts as the other. Nothing else on the map is `accent`.
+恰好 2 个 accent 元素：release 切线及其 `RELEASE CUT` 标签（算一个），以及唯一风险最高的故事卡片——用 `accent @ 0.05` 填充、`accent` 虚线 `4,4` 描边和一个小矩形 `RISK` 标签（`rx=2`，与 type-tag primitive 一致）——算另一个。图上其他任何位置不得出现 `accent`。
 
-## Complexity budget
+## 复杂度预算
 
-- Max 5 activities, max 3 release slices, max 12 story cards total, max 4 cards per slice.
-- Max 2 accent elements (the release cut counts as one; the riskiest card counts as the other).
-- Over budget on a single activity or slice → split into one map per activity, or collapse a slice into a count card rather than listing every item.
+- 最多 5 个活动、最多 3 个 release 切片、故事卡片总数最多 12、每切片最多 4 张。
+- 最多 2 个 accent 元素（release 切线算一个；风险最高卡片算另一个）。
+- 单个活动或切片超预算 → 拆成每活动一张图，或把切片折叠成计数卡片，而不是逐项罗列。
 
-## Anti-patterns
+## 反模式
 
-- **No release cut.** A map with no cut line is a backlog in a grid, not a map — the cut is the whole point.
-- **Columns ordered by priority instead of narrative sequence.** The backbone is a story, left to right, in the order the user experiences it — not a ranked list.
-- **Story cards that are features, not user-visible outcomes.** "Add a chart" is a story; "Refactor the charting service" is not — it belongs in a backlog ticket, not the map.
-- **Slices named by date instead of by outcome.** `MVP` / `RELEASE 2` / `LATER` describe scope; `Q3` / `Q4` describe a calendar and drift the moment the schedule slips.
-- **More than 3 slices.** Beyond MVP, next, and later, nobody believes the ordering — collapse the tail into "Later."
-- **Mixing two personas in one map.** One map per persona, same as user journey.
-- **Adding state columns.** That turns it into a kanban board — this type has no state.
-- **Adding a sentiment curve.** That turns it into a user journey — this type has no feelings axis.
+- **没有 release cut。** 没有切线的地图是排进网格的 backlog，不是地图——切线才是全部意义。
+- **列按优先级而非叙事顺序排。** backbone 是故事，从左到右按用户体验的顺序——不是排行榜。
+- **故事卡片是功能而非用户可见结果。** "Add a chart" 是故事；"Refactor the charting service" 不是——它属于 backlog 工单，不属于地图。
+- **切片按日期而非结果命名。** `MVP` / `RELEASE 2` / `LATER` 描述范围；`Q3` / `Q4` 描述日历，排期一滑就失效。
+- **超过 3 个切片。** MVP、next、later 之外没人再相信排序——把尾部折叠成 "Later"。
+- **一张图混两个 persona。** 每个 persona 一张图，与 user journey 同规。
+- **添加状态列。** 那会把它变成看板——本类型没有状态。
+- **添加情绪曲线。** 那会把它变成 user journey——本类型没有感受轴。
 
-## Examples
+## 示例
 
-- minimal light. *Reporting, first release*: four activities (`Find the data`, `Build the report`, `Share it`, `Trust it`), MVP/Release 2/Later slices, release cut under MVP, `Row-level permissions` flagged as the riskiest story.
-- minimal dark, same data.
-- full editorial: container framing + 3 summary cards of varied widths + footer.
+- minimal light。*Reporting, first release*：四个活动（`Find the data`、`Build the report`、`Share it`、`Trust it`），MVP/Release 2/Later 切片，release 切线在 MVP 下方，`Row-level permissions` 标为风险最高的故事。
+- minimal dark，同数据。
+- full editorial：容器框 + 3 张不等宽 summary cards + 页脚。

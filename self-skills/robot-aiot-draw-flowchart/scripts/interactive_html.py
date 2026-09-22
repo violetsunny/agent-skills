@@ -122,8 +122,26 @@ ELEMENT_ATTRIBUTES = {
         "refy",
         "viewbox",
     },
-    "lineargradient": {"gradienttransform", "gradientunits", "spreadmethod", "x1", "x2", "y1", "y2"},
-    "radialgradient": {"cx", "cy", "fr", "fx", "fy", "gradienttransform", "gradientunits", "r", "spreadmethod"},
+    "lineargradient": {
+        "gradienttransform",
+        "gradientunits",
+        "spreadmethod",
+        "x1",
+        "x2",
+        "y1",
+        "y2",
+    },
+    "radialgradient": {
+        "cx",
+        "cy",
+        "fr",
+        "fx",
+        "fy",
+        "gradienttransform",
+        "gradientunits",
+        "r",
+        "spreadmethod",
+    },
     "stop": {"offset", "stop-color", "stop-opacity"},
     "pattern": {
         "height",
@@ -149,7 +167,16 @@ ELEMENT_ATTRIBUTES = {
     "fecolormatrix": {"in", "result", "type", "values"},
     "feblend": {"in", "in2", "mode", "result"},
 }
-LOCAL_URL_ATTRIBUTES = {"clip-path", "fill", "filter", "marker-end", "marker-mid", "marker-start", "mask", "stroke"}
+LOCAL_URL_ATTRIBUTES = {
+    "clip-path",
+    "fill",
+    "filter",
+    "marker-end",
+    "marker-mid",
+    "marker-start",
+    "mask",
+    "stroke",
+}
 LOCAL_URL_RE = re.compile(r"url\(\s*(['\"]?)#[A-Za-z_][\w:.-]*\1\s*\)\Z", re.IGNORECASE)
 ACTIVE_VALUE_RE = re.compile(r"(?:javascript\s*:|vbscript\s*:|data\s*:)", re.IGNORECASE)
 UNSAFE_CSS_RE = re.compile(
@@ -197,14 +224,24 @@ def sanitize_svg(svg_text: str) -> str:
             namespace = _namespace(raw_name)
             if namespace and not (namespace == XML_NAMESPACE and name == "space"):
                 raise ValueError(f"foreign attribute namespace is not allowed: {name}")
-            if name != "space" and name not in allowed_attributes and not name.startswith(("aria-", "data-")):
+            if (
+                name != "space"
+                and name not in allowed_attributes
+                and not name.startswith(("aria-", "data-"))
+            ):
                 raise ValueError(f"unsupported SVG attribute on <{tag}>: {name}")
-            if any(ord(character) < 32 and character not in "\t\n\r" for character in value):
-                raise ValueError(f"control character is not allowed in attribute: {name}")
+            if any(
+                ord(character) < 32 and character not in "\t\n\r" for character in value
+            ):
+                raise ValueError(
+                    f"control character is not allowed in attribute: {name}"
+                )
             if ACTIVE_VALUE_RE.search(value):
                 raise ValueError(f"active reference is not allowed: {name}")
             if "url(" in value.lower():
-                if name not in LOCAL_URL_ATTRIBUTES or not LOCAL_URL_RE.fullmatch(value):
+                if name not in LOCAL_URL_ATTRIBUTES or not LOCAL_URL_RE.fullmatch(
+                    value
+                ):
                     raise ValueError(f"external reference is not allowed: {value}")
     root.set("role", root.get("role", "img"))
     root.set("focusable", "false")
@@ -218,7 +255,9 @@ def build_interactive_html(
 ) -> str:
     safe_svg = sanitize_svg(svg_text)
     safe_title = html.escape(title, quote=True)
-    metadata_json = json.dumps(dict(metadata or {}), ensure_ascii=False, sort_keys=True).replace("<", "\\u003c")
+    metadata_json = json.dumps(
+        dict(metadata or {}), ensure_ascii=False, sort_keys=True
+    ).replace("<", "\\u003c")
     return f"""<!doctype html>
 <html lang="en" data-theme="dark">
 <head>
@@ -293,7 +332,7 @@ def build_interactive_html(
     const endDrag = () => {{ drag=null; stage.classList.remove('dragging'); }};
     stage.addEventListener('pointerup', endDrag); stage.addEventListener('pointercancel', endDrag);
     const source = () => new XMLSerializer().serializeToString(svg);
-    const saveBlob = (blob, extension) => {{ const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=`${{(metadata.slug||'fireworks-tech-graph')}}.${{extension}}`; a.click(); setTimeout(()=>URL.revokeObjectURL(a.href),1000); }};
+    const saveBlob = (blob, extension) => {{ const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=`${{(metadata.slug||'robot-aiot-tech-graph')}}.${{extension}}`; a.click(); setTimeout(()=>URL.revokeObjectURL(a.href),1000); }};
     const copySource = async () => {{
       const value=source();
       try {{ await navigator.clipboard.writeText(value); status.textContent='Copied'; return; }} catch {{}}
@@ -337,14 +376,16 @@ def parse_args(argv: Sequence[str] | None = None) -> argparse.Namespace:
     parser.add_argument("svg_file", type=Path)
     parser.add_argument("output_html", type=Path)
     parser.add_argument("--title")
-    parser.add_argument("--slug", default="fireworks-tech-graph")
+    parser.add_argument("--slug", default="robot-aiot-tech-graph")
     return parser.parse_args(argv)
 
 
 def main(argv: Sequence[str] | None = None) -> int:
     args = parse_args(argv)
     svg_text = args.svg_file.read_text(encoding="utf-8")
-    output = build_interactive_html(svg_text, args.title or args.svg_file.stem, {"slug": args.slug})
+    output = build_interactive_html(
+        svg_text, args.title or args.svg_file.stem, {"slug": args.slug}
+    )
     args.output_html.parent.mkdir(parents=True, exist_ok=True)
     args.output_html.write_text(output, encoding="utf-8")
     print(f"✓ Interactive HTML: {args.output_html}")

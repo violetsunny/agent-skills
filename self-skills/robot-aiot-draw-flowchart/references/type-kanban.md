@@ -1,49 +1,49 @@
-# Kanban Board
+# Kanban Board（看板）
 
-**Best for:** a snapshot of work-in-progress by state — what is queued, what is moving, what is stuck, and where the WIP limit is being breached. This is a *state census*, not a flow: a kanban board has **no connectors at all**. That is exactly what separates it from swimlane (lanes plus a flow crossing them, with handoffs as the load-bearing edges) and from process (ordered steps with directional handoffs). If the diagram needs an arrow anywhere, it isn't a kanban board anymore — reach for swimlane or process instead.
+**最适合：** 按状态呈现的进行中工作快照——什么在排队、什么在推进、什么被卡住、WIP 限制在哪里被突破。这是*状态普查*，不是流：看板**完全没有任何连线**。这正是它与 swimlane（泳道加穿越其中的流，交接是承重边）和 process（带方向交接的有序步骤）的区别。图中任何位置需要箭头，它就不再是看板——改用 swimlane 或 process。
 
-## Layout conventions
+## 布局约定
 
-- **Up to 5 vertical columns of equal width (240px), 32px gutters.** Column background is `ink @ 0.02`; no column border.
-- **Header band per column:** column name in Geist sans 12px weight 600, anchored left. A right-anchored **WIP chip** — a rectangular tag (`rx=2`, **never** a pill) holding `n/limit` in Geist Mono 8px — or bare `n` on a queue or terminal column, which carries no limit. Every in-process column states one. A hairline `rule` separator sits directly under the header band, full column width.
-- **Cards:** the §6 node-box pattern at `rx=6`, column width minus 16px padding on each side, 56px tall, 12px vertical gap between cards. Content: title in Geist sans 12px weight 600, and a Geist Mono 9px `muted` sublabel line for `TICKET-ID · owner` (e.g. `AVA-214 · nadia`).
-- **Drawing order:** background → column fills → header text + WIP chips → header rules → cards (each: box, then left accent bar if blocked, then title, then sublabel) → legend.
+- **最多 5 个等宽（240px）垂直列，列间距 32px。** 列背景 `ink @ 0.02`；列无边框。
+- **每列头部带：** 列名 Geist sans 12px 字重 600，左锚定。右锚定 **WIP chip**——矩形标签（`rx=2`，**绝非**胶囊形），Geist Mono 8px 写 `n/limit`——队列列或终端列不带限制，只写裸 `n`。每个进行中列都要写明限制。头部带正下方一条发丝 `rule` 分隔线，横跨整列宽。
+- **卡片：** §6 节点盒模式，`rx=6`，列宽减两侧各 16px 内边距，高 56px，卡片垂直间距 12px。内容：标题 Geist sans 12px 字重 600，子标签行 Geist Mono 9px `muted` 写 `TICKET-ID · owner`（如 `AVA-214 · nadia`）。
+- **绘制顺序：** 背景 → 列填充 → 头部文字 + WIP chip → 头部横线 → 卡片（每张：盒 → 被卡时的左侧 accent 条 → 标题 → 子标签）→ 图例。
 
-## Card states — the type's semantic vocabulary
+## 卡片状态——本类型的语义词汇
 
-Every card renders in exactly one of four states. Document and use all four when the board has enough cards to show them:
+每张卡片恰好渲染为四种状态之一。板上卡片足够展示时，四种状态都要记录并使用：
 
-| State | Fill | Stroke | Extra |
+| 状态 | 填充 | 描边 | 附加 |
 |---|---|---|---|
 | `default` | white | `ink` | — |
-| `blocked` | `accent @ 0.05` | `accent` (full opacity) dashed `4,4` | 4px `accent` bar on the card's left edge |
-| `waiting / external` | `ink @ 0.02` | `ink @ 0.20` dashed `4,3` | — |
+| `blocked` | `accent @ 0.05` | `accent`（全不透明度）虚线 `4,4` | 卡片左缘 4px `accent` 条 |
+| `waiting / external` | `ink @ 0.02` | `ink @ 0.20` 虚线 `4,3` | — |
 | `done` | `ink @ 0.05` | `muted` | — |
 
-These map directly onto the design-system.md §5 node-treatment table (`security` → blocked, `optional` → waiting/external, `store` → done) — the board reuses the system's existing semantic fills rather than inventing new ones.
+这些直接映射到 design-system.md §5 节点处理表（`security` → blocked、`optional` → waiting/external、`store` → done）——看板复用系统既有语义填充，不发明新的。
 
-## Over-limit column
+## 超限列
 
-When a column's card count `n` exceeds its stated `limit`, the WIP chip's stroke and text go `accent`. That plus one blocked card is the full 2-accent budget for the diagram — don't spend the budget anywhere else.
+列内卡片数 `n` 超过声明的 `limit` 时，WIP chip 的描边与文字变 `accent`。它加一张 blocked 卡片就是全图的完整 2 强调色预算——预算不花在别处。
 
-## Complexity budget
+## 复杂度预算
 
-- Max 5 columns, max 4 cards per column, max 12 cards total.
-- Max 2 accent elements (the over-limit chip counts as one; a blocked card counts as one).
-- Over budget on a single column → aggregate the backlog into one count card (`+14 more`) rather than listing every item.
+- 最多 5 列，每列最多 4 张卡片，总计最多 12 张。
+- 最多 2 个 accent 元素（超限 chip 计一个；blocked 卡片计一个）。
+- 单列超预算 → 把积压聚合为一张计数卡（`+14 more`），不逐项罗列。
 
-## Anti-patterns
+## 反模式
 
-- **Drawing arrows between cards.** A board shows state, not flow — if the flow itself needs to be visible, use swimlane or process instead.
-- **More than 4 cards in a column.** Aggregate into a count card; don't let a column scroll off the canvas.
-- **One card per person.** That's an org chart wearing a kanban skin.
-- **In-process columns without WIP limits.** The limit is half the point of the type — a column work flows *through* with no stated limit can't show that it's over budget. The entry queue and the terminal column are the exception: nothing is constrained by holding more done work, so they show a bare count.
-- **Accenting every blocked card.** One or two blocked cards read as signal; a column full of accent reads as noise and erases the focal rule.
-- **A "Done" column that grows without bound.** Cap it and note the archive point in the sublabel or a footnote — an unbounded Done column just becomes a second Backlog.
-- **Pill-shaped WIP tags.** The chip is a rectangle at `rx=2`, matching the type-tag primitive in §6 — pills read as status badges from an unrelated design language.
+- **在卡片之间画箭头。** 看板展示状态而非流——流本身需要可见时，改用 swimlane 或 process。
+- **单列超过 4 张卡片。** 聚合为计数卡；不要让列滚出画布。
+- **每人一张卡片。** 那是披着看板皮的 org chart。
+- **进行中列无 WIP 限制。** 限制是本类型意义的一半——工作流*经*的列不声明限制就无法展示超预算。入口队列与终端列是例外：多放已完成工作不构成约束，所以它们显示裸计数。
+- **强调每张 blocked 卡片。** 一两张 blocked 卡片读作信号；整列 accent 读作噪音并抹掉焦点规则。
+- **"Done" 列无界增长。** 设上限并在子标签或脚注注明归档点——无界的 Done 列只是第二个 Backlog。
+- **胶囊形 WIP 标签。** chip 是 `rx=2` 矩形，与 §6 的类型标签 primitive 一致——胶囊形读起来像另一套设计语言的状态徽章。
 
-## Examples
+## 示例
 
-- minimal light. Platform-team board: Backlog (3), In progress (4/3, over limit), Review (2/3), Done (2), one blocked card.
-- minimal dark, same data.
-- full editorial: container framing + 3 summary cards of varied widths + footer.
+- minimal light。平台团队看板：Backlog (3)、In progress (4/3，超限)、Review (2/3)、Done (2)，一张 blocked 卡片。
+- minimal dark，同数据。
+- full editorial：容器框 + 3 张不同宽度摘要卡 + 页脚。

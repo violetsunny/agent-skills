@@ -75,12 +75,12 @@ footer.bar      64px 固定底：左 .tag（页码+章名+场景），右 prev/n
 - 素材图：按页面相对输出目录的实际层级回退到 `<输出目录>/assets/`（多页形态 pages/ 下为 `../assets/`，test-run 参照目录按实际深度）+ `onerror` 缺图降级占位
 - 明细数据用 `<details>` 折叠，summary 蓝字 ▶ 前缀；折叠取舍口径：删掉该卡本页结论仍成立则折叠（补充细则、笔记章节展开、素材图参照），不成立则常驻（定义、职责表、代码示例）；全 deck 统一执行，不逐页临场改口径
 - 交互反馈（每页必带）：`a.btn`/`summary` 带 `transition:background .15s`；hover 态 `a.btn:not(.pri):hover,summary:hover{background:var(--band)}`、`a.btn.pri:hover{background:var(--pri-d)}`；键盘焦点 `a.btn:focus-visible,summary:focus-visible{outline:2px solid var(--pri);outline-offset:2px}`
-- 编写期依赖检查：委派 `robot-aiot-interactive-html-author` 写页前必须跑其执行前依赖检查（ui-ux-pro-max 齐备），并用其 search.py 检索设计数据资产核对风格/交互缺口；检索结果仅为数据建议，不得覆盖本文件 token 与硬约束
+- 编写期依赖检查：委派 `robot-aiot-interactive-html-author` 写页前必须跑其执行前依赖检查（ui-ux-pro-max 齐备），并用 ui-ux-pro-max 的 search.py 检索设计数据资产核对风格/交互缺口；检索结果仅为数据建议，不得覆盖本文件 token 与硬约束
 
 ## 7. 验收（批次必跑）
 
 1. `scripts/lint_deck_html.py` 逐页 FAIL=0（含 .notes 防泄漏检查 + 设计质量硬检查：#9 组件使用必有页内 CSS 定义、#10 平铺散文/长 li ul 禁（.notes 话术区豁免）、#11 :focus-visible 与 hover 反馈必在）
 2. `scripts/check_deck_batch.py <pages目录>`：stage 1920x1080 / footer.bar / h1 / fit / reduced-motion / data-enter>3 / --pri 在位 / DOM≤500 / lightbox 齐备 / 禁色零命中
-3. `scripts/shoot_anim.py <pages目录> <输出目录>`：virtual-time-budget 100 与 6000 双时间点截图，逐页字节须有差异；t6000 留作目检底图
+3. `scripts/shoot_anim.py <pages目录> <输出目录>`：virtual-time-budget 100 与 6000 双时间点截图，逐页字节须有差异；母稿登记的静态页以 `--static-pages` 传入 `check_deck_batch.py` 与 `shoot_anim.py` 豁免动画触发检查，字节无差异属合法；t6000 留作目检底图
 4. `scripts/check_notes_hidden.py <pages目录>`：iframe 加载后全量 `getComputedStyle(n).display==='none'` 且零泄漏
 5. 终态截图（t6000）逐页目检：内容全量可见、导航/禁用态正确、无话术泄漏

@@ -1,6 +1,6 @@
 # Flowchart Patterns Reference
 
-> **⚠️ 样式规范优先声明：** 本文件中的 XML 示例可能展示旧版样式值（如 arcSize=20、shadow=1、strokeWidth=2 等）。绘制时请以 `style-consistency.md`（统一样式规范）为唯一权威标准。当示例与本规范冲突时，以规范为准。
+> **⚠️ 样式规范优先声明：** 绘制时请以 `style-consistency.md`（统一样式规范）为唯一权威标准。当示例与本规范冲突时，以规范为准。
 
 ## 1. 线性流程图 (Linear Flow)
 
@@ -14,12 +14,12 @@
 **XML 模式:**
 ```xml
 <!-- 开始节点 -->
-<mxCell id="start" value="开始" style="ellipse;fillColor=#0078D4;fontColor=#FFFFFF;strokeColor=#005A9E;strokeWidth=2;shadow=1;" vertex="1" parent="1">
+<mxCell id="start" value="开始" style="ellipse;fillColor=#0078D4;fontColor=#FFFFFF;strokeColor=#005A9E;strokeWidth=2;shadow=0;" vertex="1" parent="1">
   <mxGeometry x="100" y="100" width="80" height="40" as="geometry" />
 </mxCell>
 
 <!-- 处理步骤 -->
-<mxCell id="step1" value="步骤1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E3F2FD;strokeColor=#0078D4;strokeWidth=2;arcSize=20;shadow=1;" vertex="1" parent="1">
+<mxCell id="step1" value="步骤1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E3F2FD;strokeColor=#0078D4;strokeWidth=2;arcSize=8;shadow=0;" vertex="1" parent="1">
   <mxGeometry x="220" y="90" width="120" height="60" as="geometry" />
 </mxCell>
 
@@ -50,17 +50,17 @@
 **XML 模式:**
 ```xml
 <!-- 决策节点 -->
-<mxCell id="decision" value="条件判断?" style="rhombus;whiteSpace=wrap;html=1;fillColor=#FFF2CC;strokeColor=#D6B656;strokeWidth=2;fontSize=11;shadow=1;" vertex="1" parent="1">
+<mxCell id="decision" value="条件判断?" style="rhombus;whiteSpace=wrap;html=1;fillColor=#FFF2CC;strokeColor=#D6B656;strokeWidth=2;fontSize=11;shadow=0;" vertex="1" parent="1">
   <mxGeometry x="200" y="100" width="120" height="80" as="geometry" />
 </mxCell>
 
 <!-- 是路径 -->
-<mxCell id="path_yes" value="路径A" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E8F5E9;strokeColor=#82B366;strokeWidth=2;arcSize=20;" vertex="1" parent="1">
+<mxCell id="path_yes" value="路径A" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E8F5E9;strokeColor=#82B366;strokeWidth=2;arcSize=8;" vertex="1" parent="1">
   <mxGeometry x="400" y="50" width="120" height="60" as="geometry" />
 </mxCell>
 
 <!-- 否路径 -->
-<mxCell id="path_no" value="路径B" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFEBEE;strokeColor=#B85450;strokeWidth=2;arcSize=20;" vertex="1" parent="1">
+<mxCell id="path_no" value="路径B" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFEBEE;strokeColor=#B85450;strokeWidth=2;arcSize=8;" vertex="1" parent="1">
   <mxGeometry x="400" y="150" width="120" height="60" as="geometry" />
 </mxCell>
 
@@ -96,7 +96,7 @@
 **XML 模式:**
 ```xml
 <!-- 循环体 -->
-<mxCell id="step1" value="执行操作" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E3F2FD;strokeColor=#0078D4;strokeWidth=2;arcSize=20;" vertex="1" parent="1">
+<mxCell id="step1" value="执行操作" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E3F2FD;strokeColor=#0078D4;strokeWidth=2;arcSize=8;" vertex="1" parent="1">
   <mxGeometry x="100" y="100" width="120" height="60" as="geometry" />
 </mxCell>
 
@@ -141,15 +141,15 @@
 </mxCell>
 
 <!-- 并行任务 -->
-<mxCell id="task_a" value="任务A" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E3F2FD;strokeColor=#0078D4;strokeWidth=2;arcSize=20;" vertex="1" parent="1">
+<mxCell id="task_a" value="任务A" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E3F2FD;strokeColor=#0078D4;strokeWidth=2;arcSize=8;" vertex="1" parent="1">
   <mxGeometry x="250" y="50" width="120" height="50" as="geometry" />
 </mxCell>
 
-<mxCell id="task_b" value="任务B" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E3F2FD;strokeColor=#0078D4;strokeWidth=2;arcSize=20;" vertex="1" parent="1">
+<mxCell id="task_b" value="任务B" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E3F2FD;strokeColor=#0078D4;strokeWidth=2;arcSize=8;" vertex="1" parent="1">
   <mxGeometry x="250" y="120" width="120" height="50" as="geometry" />
 </mxCell>
 
-<mxCell id="task_c" value="任务C" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E3F2FD;strokeColor=#0078D4;strokeWidth=2;arcSize=20;" vertex="1" parent="1">
+<mxCell id="task_c" value="任务C" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E3F2FD;strokeColor=#0078D4;strokeWidth=2;arcSize=8;" vertex="1" parent="1">
   <mxGeometry x="250" y="190" width="120" height="50" as="geometry" />
 </mxCell>
 
@@ -182,7 +182,7 @@
 **XML 模式:**
 ```xml
 <!-- 子流程引用（带双边框） -->
-<mxCell id="subprocess" value="子流程名称" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F3E5F5;strokeColor=#9673A6;strokeWidth=3;arcSize=20;shadow=1;" vertex="1" parent="1">
+<mxCell id="subprocess" value="子流程名称" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F3E5F5;strokeColor=#9673A6;strokeWidth=3;arcSize=8;shadow=0;" vertex="1" parent="1">
   <mxGeometry x="200" y="100" width="140" height="60" as="geometry" />
 </mxCell>
 
@@ -191,7 +191,7 @@
   <mxGeometry x="150" y="250" width="500" height="300" as="geometry" />
 </mxCell>
 
-<mxCell id="subprocess_title" value="子流程详情" style="text;html=1;fontSize=14;fontStyle=1;align=center;verticalAlign=middle;fillColor=#9673A6;fontColor=#FFFFFF;strokeColor=#6A4C7D;rounded=1;arcSize=20;" vertex="1" parent="1">
+<mxCell id="subprocess_title" value="子流程详情" style="text;html=1;fontSize=14;fontStyle=1;align=center;verticalAlign=middle;fillColor=#9673A6;fontColor=#FFFFFF;strokeColor=#6A4C7D;rounded=1;arcSize=8;" vertex="1" parent="1">
   <mxGeometry x="300" y="260" width="200" height="30" as="geometry" />
 </mxCell>
 ```

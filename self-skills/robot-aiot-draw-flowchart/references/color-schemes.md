@@ -1,198 +1,198 @@
-# Color Schemes Reference
+# 配色参考（Color Schemes）
 
 > **调色板谱系声明：** 通用图表节点与风格皮肤的默认主谱系是 `style-guide.md` / `design-system.md` §5 的语义 token（暖系编辑皮肤，机器人/IoT 场景优先把本文件主题色注入为品牌 token）。本文件的 `#0078D4` 科技蓝主题及其派生表为**辅助谱系**，仅适用于：① 机器人/IoT 设备本体与状态语义（联网、OTA、设备分组等）；② Azure/云厂商品牌语义；③ 用户明确要求蓝色系的场景。辅助谱系不得反向覆盖主谱系的语义 token。
 >
 > **draw.io Style Code 豁免声明：** 本文各节 `Style Code` 为 draw.io style 语法的色值登记示例，供 draw.io XML 路径直接使用，并作 SVG 直绘 / XML→HTML 桥接产物的色彩参考；SVG 渲染时按 `design-system.md` 换算（阴影禁令 §4、圆角上限 6–10 等），本文示例已按该权威对齐。
 
-## Primary Color Themes
+## 主色主题
 
-### Tech Blue (科技蓝)
-**Use for:** Normal state, connectivity, active processes
+### 科技蓝（Tech Blue）
+**适用于：** 正常状态、联网、活跃流程
 
-| Element | Color Code | Style |
+| 要素 | 色值 | 用途 |
 | --- | --- | --- |
-| Primary | `#0078D4` | Main robot body, primary buttons |
-| Secondary | `#4DA8DA` | LiDAR, highlights, accents |
-| Background | `#E3F2FD` | Status card backgrounds (layer/zone 背景请使用 `#E8F4FD`，见 Zone Background Colors) |
-| Border | `#005A9E` | Strokes, main flow arrows |
-| Text | `#003D6B` | Titles, important labels |
+| Primary | `#0078D4` | 机器人主体主色、主按钮 |
+| Secondary | `#4DA8DA` | 激光雷达、高亮、点缀 |
+| Background | `#E3F2FD` | 状态卡片背景（层/区域背景请用 `#E8F4FD`，见「区域背景色」） |
+| Border | `#005A9E` | 描边、主流程箭头 |
+| Text | `#003D6B` | 标题、重要标签 |
 
-**Style Code:**
+**Style Code：**
 ```
-ellipse;fillColor=#0078D4;strokeColor=#005A9E;strokeWidth=2;shadow=1;
+ellipse;fillColor=#0078D4;strokeColor=#005A9E;strokeWidth=2;
 ```
 
-### Dark Black (暗夜黑)
-**Use for:** Product appearance, hardware views, physical representation
+### 暗夜黑（Dark Black）
+**适用于：** 产品外观、硬件视图、物理形态表现
 
-| Element | Color Code | Style |
+| 要素 | 色值 | 用途 |
 | --- | --- | --- |
-| Primary | `#333333` | Robot body (realistic) |
-| Secondary | `#666666` | LiDAR, wheels, details |
-| Highlight | `#555555` | Subtle accents |
-| Border | `#1A1A1A` | Main strokes |
-| Shadow | `#222222` | Depth elements |
+| Primary | `#333333` | 机器人本体（写实） |
+| Secondary | `#666666` | 激光雷达、轮子、细节 |
+| Highlight | `#555555` | 微弱强调 |
+| Border | `#1A1A1A` | 主描边 |
+| Depth | `#222222` | 纵深暗部（轮底、底缘等明度差，非投影） |
 
-**Style Code:**
+**Style Code：**
 ```
-ellipse;fillColor=#333333;strokeColor=#1A1A1A;strokeWidth=2;shadow=1;
+ellipse;fillColor=#333333;strokeColor=#1A1A1A;strokeWidth=2;
 ```
 
-### Fresh Green (清新绿)
-**Use for:** Success state, cleaning complete, normal operation
+### 清新绿（Fresh Green）
+**适用于：** 成功状态、清扫完成、正常运行
 
-| Element | Color Code | Style |
+| 要素 | 色值 | 用途 |
 | --- | --- | --- |
-| Primary | `#00C853` | Success indicators, check marks |
-| Secondary | `#82B366` | Cleaning trails, progress |
-| Background | `#E8F5E9` | Success card backgrounds |
-| Border | `#009624` | Success borders |
-| Text | `#2E7D32` | Success messages |
+| Primary | `#00C853` | 成功指示、对勾 |
+| Secondary | `#82B366` | 清扫轨迹、进度 |
+| Background | `#E8F5E9` | 成功卡片背景 |
+| Border | `#009624` | 成功边框 |
+| Text | `#2E7D32` | 成功消息文字 |
 
-**Style Code:**
+**Style Code：**
 ```
-ellipse;fillColor=#00C853;strokeColor=#009624;strokeWidth=2;shadow=1;
+ellipse;fillColor=#00C853;strokeColor=#009624;strokeWidth=2;
 ```
 
-### Alert Red (告警红)
-**Use for:** Error state, blocked, fault conditions
+### 告警红（Alert Red）
+**适用于：** 错误状态、阻塞、故障
 
-| Element | Color Code | Style |
+| 要素 | 色值 | 用途 |
 | --- | --- | --- |
-| Primary | `#B85450` | Error indicators, warnings |
-| Secondary | `#F8CECC` | Error card backgrounds |
-| Border | `#8C2E2E` | Error borders, blocked arrows |
-| Text | `#8C2E2E` | Error messages |
+| Primary | `#B85450` | 错误指示、警告 |
+| Secondary | `#F8CECC` | 错误卡片背景 |
+| Border | `#8C2E2E` | 错误边框、阻塞箭头 |
+| Text | `#8C2E2E` | 错误消息文字 |
 
-**Style Code:**
+**Style Code：**
 ```
-ellipse;fillColor=#B85450;strokeColor=#8C2E2E;strokeWidth=2;shadow=1;
+ellipse;fillColor=#B85450;strokeColor=#8C2E2E;strokeWidth=2;
 ```
 
-### Upgrade Purple (升级紫)
-**Use for:** OTA upgrade in progress, firmware updates
+### 升级紫（Upgrade Purple）
+**适用于：** OTA 升级中、固件更新
 
-| Element | Color Code | Style |
+| 要素 | 色值 | 用途 |
 | --- | --- | --- |
-| Primary | `#9673A6` | Upgrade indicators |
-| Secondary | `#E1D5E7` | Upgrade card backgrounds |
-| Border | `#6A4C7D` | Upgrade borders |
-| Text | `#6A4C7D` | Upgrade messages |
+| Primary | `#9673A6` | 升级指示 |
+| Secondary | `#E1D5E7` | 升级卡片背景 |
+| Border | `#6A4C7D` | 升级边框 |
+| Text | `#6A4C7D` | 升级消息文字 |
 
-**Style Code:**
+**Style Code：**
 ```
-ellipse;fillColor=#9673A6;strokeColor=#6A4C7D;strokeWidth=2;shadow=1;
+ellipse;fillColor=#9673A6;strokeColor=#6A4C7D;strokeWidth=2;
 ```
 
-## Secondary Colors
+## 辅助色
 
-### Product Silver (产品银)
-**Use for:** Product-illustration style robot bodies (detailed top-view icons), hardware shells with light metallic look
+### 产品银（Product Silver）
+**适用于：** 产品插画风格机器人机身（详细俯视图标）、浅金属质感硬件外壳
 
-| Element | Color Code | Style |
+| 要素 | 色值 | 用途 |
 | --- | --- | --- |
-| Primary | `#D9D9D9` | Light metallic body fill |
-| Border | `#666666` | Body rim, seam lines |
-| Highlight | `#FFFFFF` | Inner disc, panels |
+| Primary | `#D9D9D9` | 浅金属机身填充 |
+| Border | `#666666` | 机身外圈、接缝线 |
+| Highlight | `#FFFFFF` | 内盘、面板 |
 
-**Style Code:**
+**Style Code：**
 ```
 ellipse;fillColor=#D9D9D9;strokeColor=#666666;strokeWidth=3;shadow=0;
 ```
 
-### Warning Yellow (警告黄)
-**Use for:** Charging, low battery, caution states
+### 警告黄（Warning Yellow）
+**适用于：** 充电、低电量、需注意状态
 
-| Element | Color Code | Style |
+| 要素 | 色值 | 用途 |
 | --- | --- | --- |
-| Primary | `#D6B656` | Warning indicators |
-| Secondary | `#FFF8E1` | Warning card backgrounds |
-| Border | `#B8960F` | Warning borders |
-| Text | `#B8960F` | Warning messages |
+| Primary | `#D6B656` | 警告指示 |
+| Secondary | `#FFF8E1` | 警告卡片背景 |
+| Border | `#B8960F` | 警告边框 |
+| Text | `#B8960F` | 警告消息文字 |
 
-### Side Brush Orange (边刷橙)
-**Use for:** Side brushes, mechanical action indicators
+### 边刷橙（Side Brush Orange）
+**适用于：** 边刷、机械动作指示
 
-| Element | Color Code | Style |
+| 要素 | 色值 | 用途 |
 | --- | --- | --- |
-| Primary | `#FF6B35` | Side brushes, action highlights |
-| Border | `#E55A2B` | Brush outlines |
+| Primary | `#FF6B35` | 边刷、动作高亮 |
+| Border | `#E55A2B` | 边刷轮廓 |
 
-**Style Code:**
+**Style Code：**
 ```
 shape=spiral;fillColor=none;strokeColor=#FF6B35;strokeWidth=2;
 ```
 
-## Arrow Colors by Purpose
+## 箭头颜色（按用途）
 
 > **统一样式规范：** 所有箭头 strokeWidth=3。虚线（dashed）仅用于反馈回路、循环回退，以及"隔离/断联/边界切断"类目（链路断开、组件下线、网络/信任边界切断）；演进/推进/错误路径一律实线。
 
-| Purpose | Color | Stroke Width | Style |
+| 用途 | 色值 | 线宽 | 样式 |
 | --- | --- | --- | --- |
-| Main flow | `#005A9E` | 3px | Solid |
-| Success path | `#82B366` | 3px | Solid |
-| Error/blocked | `#B85450` | 3px | Solid |
-| Feedback loop | `#0078D4` | 3px | Dashed |
-| Data reporting | `#82B366` | 3px | Solid |
-| Control signal | `#B85450` | 3px | Solid |
-| Cross-layer | target layer color | 3px | Solid |
+| 主流程 | `#005A9E` | 3px | 实线 |
+| 成功路径 | `#82B366` | 3px | 实线 |
+| 错误/阻塞 | `#B85450` | 3px | 实线 |
+| 反馈回路 | `#0078D4` | 3px | 虚线 |
+| 数据上报 | `#82B366` | 3px | 实线 |
+| 控制信号 | `#B85450` | 3px | 实线 |
+| 跨层 | 目标层颜色 | 3px | 实线 |
 
-## Status Card Backgrounds
+## 状态卡片背景
 
-| Status | Background Color | Border Color | Text Color |
+| 状态 | 背景色 | 边框色 | 文字色 |
 | --- | --- | --- | --- |
-| Normal | `#E8F5E9` | `#82B366` | `#2E7D32` |
-| Active | `#E3F2FD` | `#0078D4` | `#005A9E` |
-| Upgrading | `#F3E5F5` | `#9673A6` | `#6A4C7D` |
-| Error | `#FFEBEE` | `#B85450` | `#8C2E2E` |
-| Charging | `#FFF8E1` | `#D6B656` | `#B8960F` |
+| 正常 | `#E8F5E9` | `#82B366` | `#2E7D32` |
+| 活跃 | `#E3F2FD` | `#0078D4` | `#005A9E` |
+| 升级中 | `#F3E5F5` | `#9673A6` | `#6A4C7D` |
+| 错误 | `#FFEBEE` | `#B85450` | `#8C2E2E` |
+| 充电中 | `#FFF8E1` | `#D6B656` | `#B8960F` |
 
-**Card Style Code:**
+**卡片 Style Code：**
 ```
-rounded=1;fillColor=#E3F2FD;strokeColor=#0078D4;strokeWidth=2;arcSize=20;shadow=1;
+rounded=1;fillColor=#E3F2FD;strokeColor=#0078D4;strokeWidth=2;arcSize=8;
 ```
 
-## Regional/Device Group Colors
+## 区域/设备分组颜色
 
-| Region/Group | Fill Color | Border Color |
+| 区域/分组 | 填充色 | 边框色 |
 | --- | --- | --- |
-| China | `#D5E8D4` | `#82B366` |
-| Asia Pacific | `#D5E8D4` | `#82B366` |
-| Europe | `#D5E8D4` | `#82B366` |
-| North America | `#D5E8D4` | `#82B366` |
+| 中国 | `#D5E8D4` | `#82B366` |
+| 亚太 | `#D5E8D4` | `#82B366` |
+| 欧洲 | `#D5E8D4` | `#82B366` |
+| 北美 | `#D5E8D4` | `#82B366` |
 
-**Device Group Style Code:**
+**设备分组 Style Code：**
 ```
 shape=cylinder3;fillColor=#D5E8D4;strokeColor=#82B366;size=10;
 ```
 
-## Zone Background Colors
+## 区域背景色
 
-| Zone Type | Fill Color | Border Color | Opacity |
+| 区域类型 | 填充色 | 边框色 | 不透明度 |
 | --- | --- | --- | --- |
-| iFlow Platform | `#E8F4FD` | `#0078D4` | 60% |
-| OTA Service | `#F0F7FC` | `#005A9E` | 60% |
-| Global Devices | `#F5FBF5` | `#82B366` | 60% |
-| Admin Console | `#FDF5E6` | `#D6B656` | 60% |
+| iFlow 平台 | `#E8F4FD` | `#0078D4` | 60% |
+| OTA 服务 | `#F0F7FC` | `#005A9E` | 60% |
+| 全球设备 | `#F5FBF5` | `#82B366` | 60% |
+| 管理控制台 | `#FDF5E6` | `#D6B656` | 60% |
 
-**Zone Background Style Code:**
+**区域背景 Style Code：**
 ```
 rounded=1;fillColor=#E8F4FD;strokeColor=#0078D4;strokeWidth=2;dashed=1;arcSize=8;opacity=60;
 ```
 
-## Color Usage Rules
+## 颜色使用规则
 
-1. **One primary color per state** — Don't mix blue and green for the same status
-2. **Consistent meaning** — Red always means error, green always means success
-3. **Background opacity** — Zone backgrounds should be 60% opacity to avoid visual dominance
-4. **Text contrast** — Always ensure text is readable against background (use dark text on light backgrounds)
-5. **Border consistency** — Main elements use 2px borders, details use 1px, layer containers use 3px
-6. **Shadow usage** — Apply shadows only to key visual elements (robot bodies, core ellipses); regular nodes use shadow=0
-7. **Dashed for feedback only** — Use dashed lines exclusively for feedback loops and loop-back arrows; error paths and progression arrows are solid。虚线还可用于"隔离/断联/边界切断"类目（链路断开、组件下线、边界切断）；除此之外一律实线
-8. **Palette-only colors** — Only use colors defined in this file. Do NOT introduce off-palette colors (e.g., `#FFF3E0`/`#FF9800` are forbidden; use `#FFF8E1`/`#FFA000` for warning yellow instead)
-9. **Blue layer background** — Layer/zone backgrounds use `#E8F4FD`; `#E3F2FD` is reserved for status card backgrounds only
+1. **每状态一主色** — 同一状态不混用蓝与绿
+2. **语义一致** — 红恒为错误，绿恒为成功
+3. **背景不透明度** — 区域背景用 60% 不透明度，避免视觉主导
+4. **文字对比度** — 文字必须在背景上可读（浅底用深字）
+5. **边框一致性** — 主要元素 2px 边框，细节 1px，层容器 3px
+6. **阴影禁止** — 按 design-system.md §4，任何元素不加阴影；纵深一律用明度差与边框表现
+7. **虚线仅用于反馈** — 虚线只用于反馈回路与循环回退箭头；错误路径与演进箭头一律实线。虚线还可用于"隔离/断联/边界切断"类目（链路断开、组件下线、边界切断）；除此之外一律实线
+8. **调色板外颜色禁用** — 只使用本文件登记的颜色，禁止引入调色板外颜色（如 `#FFF3E0`/`#FF9800` 禁用；警告黄改用 `#FFF8E1`/`#FFA000`）
+9. **蓝色层背景** — 层/区域背景用 `#E8F4FD`；`#E3F2FD` 仅保留给状态卡片背景
 10. **中性工具色豁免** — `#CCCCCC` 一类中性工具色仅限非数据元素（分隔线、占位边框、禁用态、中性汇总容器边框），是色板规则的明确豁免，不与"数据系列禁灰"冲突；数据系列/状态语义仍禁止用灰色表达
-11. **箭头颜色双源裁决** — 同一箭头同时命中本表通用语义色（Main flow/Success/Error 等）与图表类型/层级配色规则（如分层图跨层箭头用目标层主题色）时，图表类型/层级规则优先
+11. **箭头颜色双源裁决** — 同一箭头同时命中本表通用语义色（主流程/成功/错误等）与图表类型/层级配色规则（如分层图跨层箭头用目标层主题色）时，图表类型/层级规则优先
 
 ## 静态交付产物场景配色对齐声明
 

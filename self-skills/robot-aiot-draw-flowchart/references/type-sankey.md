@@ -1,33 +1,33 @@
-# Sankey / Flow-Quantity
+# Sankey / Flow-Quantity（桑基图/流量图）
 
-**Best for:** showing where a *quantity* goes as it splits and merges across a small number of stages — CI compute budgets, funnel-adjacent volume flows, cost or headcount allocation. This is the one type where band **thickness carries data**; if the reader doesn't need to compare magnitudes, use process or pyramid instead.
+**最适合：** 展示一个*数量*在少量阶段间如何分流与汇合——CI 算力预算、贴近漏斗的体量流转、成本或人力分配。这是唯一**带宽承载数据**的类型；读者不需要比较量级时，改用 process 或 pyramid。
 
-## Layout conventions
+## 布局约定
 
-- **Exactly 3 stage columns**, left → right. No more, no less — above 3 stages, split into two linked diagrams.
-- **Nodes are vertical bars**, `width=12`, solid `ink` fill, no stroke. Height is proportional to the quantity passing through, rounded to the nearest 4px so it stays on-grid — the rounding is a rendering step, not a data change; the true value still prints in the quantity sublabel.
-- **Flows are filled ribbons**, not stroked lines: a single closed `<path>` per flow. Top edge is a cubic Bézier from the source node's top-offset to the target node's top-offset; bottom edge is the same curve run in reverse from target-bottom back to source-bottom. **Both** control points sit at the horizontal midpoint between the two columns, each at the y of the end it belongs to: `C midX,y0 midX,y1 targetX,y1`. That is what makes the band leave and arrive **horizontally**, so it plugs into each bar square-on. Putting the second control on the target's x instead (`C midX,y0 targetX,y1 targetX,y1`) collapses it onto the endpoint, the arrival tangent degenerates, and every ribbon meets its bar at a visible slant — it looks like the band is not attached.
-- **No arrowheads, ever.** Direction is implied by the left-to-right column order. This is a deliberate, explicit exemption from design-system.md §6's orthogonal-elbow-and-arrowhead rule: ribbons are area encodings, not connectors, and a marker on a filled band reads as clutter, not information.
-- **Ribbon fill:** `muted` at `0.18` opacity for ordinary flows. The one editorial focal path (see below) uses `accent` at `0.28` opacity. A focal path may span more than one ribbon segment (e.g. two flows that both feed the same downstream node as halves of one story) — accenting every ribbon that belongs to that single path still counts as **one** focal element, not one per ribbon. Never per-flow rainbow coloring — color is reserved for the one path that deserves attention.
-- **Node ordering minimizes crossings.** Order nodes within each column so that flows converging on (or diverging from) the same node stay in a consistent top-to-bottom sequence across columns. If two ribbons still cross more than once, reorder the nodes — don't let them tangle.
-- **Labels:** node name in Geist sans 12px 600, quantity directly under it in Geist Mono 9px `muted`. Placement is column-specific: column 1 sits outside the bar, `text-anchor="end"`; column 2 sits in the gutter above its bar, `text-anchor="middle"`, **vertically centred in that gutter** rather than flush to the top, or the cap line grazes the bar above; column 3 sits outside the bar, `text-anchor="start"`.
+- **恰好 3 个阶段列**，左 → 右。不多不少——超过 3 个阶段就拆成两张相连的图。
+- **节点是垂直条**，`width=12`，实心 `ink` 填充，无描边。高度与流经的数量成正比，向最近的 4px 取整以留在网格上——取整是渲染步骤，不是数据改动；真实值仍打印在数量子标签里。
+- **流是填充色带**，不是描边线：每条流一个闭合 `<path>`。上边缘是从源节点 top-offset 到目标节点 top-offset 的三次贝塞尔；下边缘是同一条曲线从 target-bottom 反向跑回 source-bottom。**两个**控制点都位于两列之间的水平中点，各自取所属端点的 y：`C midX,y0 midX,y1 targetX,y1`。这正是让色带**水平**离开与到达、从而正面插进每根条的原因。把第二个控制点放到目标的 x 上（`C midX,y0 targetX,y1 targetX,y1`）会让曲线塌到端点，到达切线退化，每条色带都以可见的斜角接上它的条——看起来像没有连住。
+- **永远不加箭头。** 方向由左到右的列序隐含。这是对 design-system.md §6 正交肘 + 箭头规则的刻意、显式豁免：色带是面积编码，不是连接线，填充带上的 marker 读起来是杂乱，不是信息。
+- **色带填充：** 普通流用 `muted`、不透明度 `0.18`。唯一的编辑焦点路径（见下）用 `accent`、不透明度 `0.28`。焦点路径可以跨越多段色带（如两条流作为同一故事的两半喂给同一个下游节点）——给属于这一条路径的每段色带上 accent 仍算**一个**焦点元素，不是每段一个。绝不做逐流彩虹配色——颜色保留给唯一值得关注的路径。
+- **节点排序最小化交叉。** 安排每列内节点的顺序，让汇入（或流出）同一节点的流在各列间保持一致的自上而下次序。若两条色带仍交叉超过一次，重排节点——不要让它们缠成一团。
+- **标签：** 节点名 Geist sans 12px 600，数量紧随其下 Geist Mono 9px `muted`。位置按列而定：第 1 列在条外侧，`text-anchor="end"`；第 2 列在条上方的槽内，`text-anchor="middle"`，**在槽内垂直居中**而不是贴顶，否则 cap line 会蹭到上方的条；第 3 列在条外侧，`text-anchor="start"`。
 
-  Centring the column-2 label in its gutter is what makes it legible: the gutter is the gap the bands themselves leave between two nodes, so a centred label sits on clean paper and needs no backing at all. Don't reach for a mask rect here — over a filled band it reads as a hole punched in the diagram, and if the label already sits on paper it is solving nothing. If a label genuinely has nowhere clear to sit, the column is over budget: drop a node or split the diagram.
-- **Column headers:** Geist Mono 8px, uppercase, tracked, centered above each column — "CI COMPUTE BUDGET / TEST STAGE / OUTCOME" style eyebrows, not full sentences.
-- **Drawing order:** background → column headers → ordinary ribbons → the accent path's ribbon(s) (painted last among ribbons so they read on top) → node bars → node labels → legend.
-- **Legend:** horizontal strip at the bottom per the global rule, viewBox extended ~60–100px to fit it (a Sankey's ribbons need more bottom clearance than a typical diagram because node stacks run tall). Swatches are 16×8 rectangles matching each ribbon treatment, plus an optional italic aside stating the editorial read.
+  第 2 列标签在槽内居中才可读：槽是色带自己在两个节点之间留出的空隙，居中的标签坐在干净纸面上，完全不需要衬底。不要在这里伸手去拿遮罩矩形——压在填充色带上它读起来像图上打了个洞，而标签若已坐在纸面上，它什么也没解决。如果一个标签确实找不到干净位置，说明该列超预算：删一个节点或拆图。
+- **列头：** Geist Mono 8px、大写、加字距，居中于每列上方——"CI COMPUTE BUDGET / TEST STAGE / OUTCOME" 式 eyebrow，不是完整句子。
+- **绘制顺序：** 背景 → 列头 → 普通色带 → accent 路径的色带（在色带中最后画，使其读在最上层）→ 节点条 → 节点标签 → 图例。
+- **图例：** 按全局规则置于底部水平条带，viewBox 扩展约 60–100px 以容纳（Sankey 的色带需要比典型图更多的底部净空，因为节点堆很高）。色样是 16×8 矩形，与各色带处理一致，外加可选的斜体旁注陈述编辑解读。
 
-## Scale rule
+## 比例规则
 
-Pick **one px-per-unit constant `k`** for the whole diagram and apply it to every node and ribbon thickness — never a different scale per column. Round each resulting thickness to the nearest 4px (grid compliance) and reconcile the rounding at the node level, not the flow level, so a node's outgoing ribbons still sum exactly to its (rounded) height.
+全图选**一个 px-per-unit 常数 `k`**，应用于每个节点与色带厚度——绝不每列一个比例。每个所得厚度向最近 4px 取整（网格合规），并在节点层面而非流层面调和取整，让一个节点的出向色带仍恰好加总为其（取整后的）高度。
 
-**When you control the numbers, choose ones that land on the grid.** At `k`, a 4px step is `4/k` units; pick quantities that are whole multiples of it and the drawn area is then exactly the printed number. Rounding is the fallback for real data you cannot choose, and it is a real cost: at `k = 0.02` a 4px step is 200 minutes, so a rounded bar can misstate its own label by up to 100. In a chart whose entire premise is that area encodes quantity, a bar that disagrees with the number printed beside it spends credibility to buy grid compliance. Never let the rounding exceed one 4px step, and never round a flow so far that a node's ribbons no longer sum to its bar.
+**数字由你定时，选落在网格上的。** 在 `k` 下，4px 一步是 `4/k` 个单位；选它的整数倍作数量，画出的面积就恰好等于打印的数字。取整是无法选择真实数据时的兜底，且是真实代价：`k = 0.02` 时 4px 一步是 200 分钟，取整后的条与自己的标签最多可差 100。在一张全部前提是"面积编码数量"的图里，一根与旁边打印数字不一致的条，是在花可信度买网格合规。绝不让取整超过一个 4px 步，也绝不把一条流取整到节点的色带加不回它自己的条高。
 
-**Minimum rendered ribbon thickness: 4px.** Anything that would round to less gets folded into an "other" band rather than drawn as an invisible hairline — a Sankey ribbon the reader can't see isn't communicating anything.
+**最小渲染色带厚度：4px。** 取整后不足 4px 的流并入 "other" 带，而不是画成看不见的发丝——读者看不见的 Sankey 色带什么也没传达。
 
-### Worked reference (k = 0.02 px/unit, budget = 12,000 CI minutes)
+### Worked reference（k = 0.02 px/unit，预算 = 12,000 CI 分钟）
 
-| Node | Quantity | Height (px) |
+| 节点 | 数量 | 高度（px） |
 |---|---|---|
 | CI minutes (col 1) | 12,000 | 240 |
 | Unit tests | 5,200 | 104 |
@@ -38,35 +38,35 @@ Pick **one px-per-unit constant `k`** for the whole diagram and apply it to ever
 | Failed | 1,600 | 32 |
 | Flaked | 1,000 | 20 |
 
-Each column's node heights sum to the same 240px total — that invariant (total-in equals total-out) is what makes the diagram trustworthy at a glance. If your columns don't sum to the same total, the data has a leak or the layout has a bug.
+每列的节点高度都加总为同一个 240px——这个不变量（总入 = 总出）正是让图一眼可信的原因。你的列若加不出同一总量，要么数据有泄漏，要么布局有 bug。
 
-## Complexity budget
+## 复杂度预算
 
-| Limit | Rule |
+| 限制 | 规则 |
 |---|---|
-| Max stage columns | 3 |
-| Max nodes | 8 |
-| Max flows (ribbons) | 12 |
-| Max accent elements | 2 (a focal path's ribbons count as one, regardless of how many segments it spans) |
+| 最大阶段列数 | 3 |
+| 最大节点数 | 8 |
+| 最大流数（色带） | 12 |
+| 最大 accent 元素数 | 2（焦点路径的色带算一个，无论跨多少段） |
 
-Over budget → split into two linked Sankeys (e.g. an overview stage-1→stage-2 diagram plus a detail stage-2→stage-3 diagram) rather than cramming a fourth column or a ninth node into one canvas.
+超预算 → 拆成两张相连的 Sankey（如一张总览 stage-1→stage-2 图加一张细节 stage-2→stage-3 图），而不是往一张画布里硬塞第四列或第九个节点。
 
-## Anti-patterns
+## 反模式
 
-- **Ribbons that meet the bar at a slant.** The single most common way to get this type wrong, and it is a control-point mistake, not a layout one: both controls belong on the midpoint x. A band arriving at an angle reads as detached from its node, which undermines the one thing the diagram is asserting — that this quantity flows into that node.
-- **An opaque mask rect behind a column-2 label.** Over a filled band it reads as a hole punched in the diagram, and it erases any bar it overlaps. Centre the label in the gutter instead, where it sits on clean paper and needs nothing behind it.
-- **Column-2 labels flush to the top of their gutter.** Centre them, or the cap line touches the bar above and the label looks like it belongs to the wrong node.
-- **A bar whose height disagrees with the number printed beside it.** See the scale rule: choose grid-friendly quantities when the data is yours to choose.
-- **Ribbons crossing more than once.** Reorder the nodes in the offending column; a Sankey with a tangle in the middle is unreadable.
-- **Ribbons thinner than 4px.** Merge them into an "other" band instead of drawing a sliver no one can see.
-- **Per-flow rainbow coloring.** One `muted` treatment for ordinary flows, one `accent` treatment for the flow that carries the editorial point — never a distinct hue per ribbon.
-- **Using Sankey for a simple funnel.** A single narrowing quantity with no splits or merges is a pyramid/funnel, not a Sankey.
-- **Using Sankey for a plain step sequence.** If nothing splits, merges, or varies in thickness, it's a process diagram — the whole point of Sankey is quantity that branches.
-- **Stacking two flows at the same node-edge offset.** Every flow gets its own offset range within the node's height, in a consistent top-to-bottom order — never two ribbons overlapping at the same attach point.
-- **Percentages or quantities that don't sum to the source total.** Every node's outgoing (or incoming) flows must sum to that node's own height. A Sankey that doesn't balance reads as an error, not a design choice.
+- **色带斜着接上条。** 本类型最常见的错误方式，且它是控制点错误，不是布局错误：两个控制点都属于中点 x。带角度到达的色带读起来与节点脱开，这恰好瓦解了图要断言的唯一一件事——这个数量流进那个节点。
+- **第 2 列标签后面垫不透明遮罩矩形。** 压在填充色带上读起来像图上打了个洞，还会抹掉它压住的任何条。把标签在槽内居中，坐在干净纸面上，什么都不用垫。
+- **第 2 列标签贴槽顶。** 居中，否则 cap line 碰到上方的条，标签看起来属于错误的节点。
+- **条高与旁边打印的数字不一致。** 见比例规则：数据由你选时，选网格友好的数量。
+- **色带交叉超过一次。** 重排出问题那一列的节点；中间缠团的 Sankey 不可读。
+- **薄于 4px 的色带。** 并入 "other" 带，而不是画一条没人看得见的碎片。
+- **逐流彩虹配色。** 普通流一种 `muted` 处理，承载编辑要点的流一种 `accent` 处理——绝不每段色带一个色相。
+- **用 Sankey 画简单漏斗。** 单一收窄、无分流无汇合的数量是 pyramid/funnel，不是 Sankey。
+- **用 Sankey 画平铺步骤序列。** 没有分流、汇合或厚度变化，就是 process 图——Sankey 的全部意义在于分叉的数量。
+- **两条流叠在节点边缘同一 offset。** 每条流在节点高度内拥有自己的 offset 区间，按一致的自上而下次序——绝不让两条色带在同一接入点重叠。
+- **百分比或数量加不回源总量。** 每个节点的出向（或入向）流必须加总为该节点自身的高度。不平衡的 Sankey 读起来是错误，不是设计选择。
 
-## Examples
+## 示例
 
-- minimal light. A month of CI compute (12,000 minutes) splitting into test/build/lint stages, merging into passed/failed/flaked outcomes; the flaky-rerun path is the one accent flow.
-- minimal dark, same data.
-- full editorial: container framing + 3 summary cards of varied widths + footer.
+- minimal light。一个月的 CI 算力（12,000 分钟）分流进 test/build/lint 阶段，汇合成 passed/failed/flaked 结果；flaky 重跑路径是唯一的 accent 流。
+- minimal dark，同数据。
+- full editorial：容器框 + 3 张不等宽 summary cards + 页脚。

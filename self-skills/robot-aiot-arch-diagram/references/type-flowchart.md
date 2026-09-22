@@ -1,23 +1,23 @@
-# Flowchart
+# Flowchart（流程图）
 
-**Best for:** decision logic, algorithms, user-facing branching flows ("Should I…?"), onboarding routing, support-triage trees.
+**最适合：** 决策逻辑、算法、面向用户的分支流程（"我该不该……？"）、onboarding 路由、支持分诊树。
 
-## Layout conventions
-- Shape carries type, not color:
-  - **Oval** (`rx=20`) — start / end
-  - **Rectangle** (`rx=6`) — step / action
-  - **Diamond** — decision (≤3 exits)
-  - **Small filled ink dot** (`r=4`) — merge point where branches rejoin
-- Flow runs top→down. From a diamond, conventional exits: Yes to the right, No below — but label every outgoing arrow regardless.
-- Use coral on the happy path *or* on the single most consequential decision — never on every decision.
-- If two arrows must cross, use a small arc jump on one so the crossing is readable.
+## 布局约定
+- 形状承载类型，而非颜色：
+  - **椭圆**（`rx=20`）——开始 / 结束
+  - **矩形**（`rx=6`）——步骤 / 动作
+  - **菱形**——决策（≤3 个出口）
+  - **实心 ink 小圆点**（`r=4`）——分支汇合点
+- 流向自上→下。菱形的惯例出口：Yes 向右，No 向下——但无论如何每条出边箭头都要标注。
+- 珊瑚色用在 happy path 上*或*唯一最关键的决策上——绝不用在每个决策上。
+- 两条箭头必须交叉时，在其中一条上用小弧跳跃，让交叉可读。
 
-## Anti-patterns
-- Using fill color to signal node type (shape does that).
-- Decision diamond with 4+ exits — refactor into nested diamonds.
-- Unlabeled decision branches.
+## 反模式
+- 用填充色标示节点类型（形状已承担该职责）。
+- 决策菱形有 4+ 个出口——重构为嵌套菱形。
+- 决策分支无标注。
 
-## Examples
+## 示例
 - minimal light
 - minimal dark
 - full editorial

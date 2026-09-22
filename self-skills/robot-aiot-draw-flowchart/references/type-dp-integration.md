@@ -1,14 +1,14 @@
-# DP integration
+# DP integration（数据平台集成拓扑图）
 
-**Best for:** the integration topology of a data platform — which source systems plug in, which consumer surfaces plug out, and which protocol each one speaks. Hub-and-spoke layout wrapped in an explicit **Data platform** layer; no time/phase axis.
+**最适合：** 数据平台的集成拓扑——哪些源系统接入、哪些消费面接出、各自说什么协议。Hub-and-spoke 布局包在一个显式的 **Data platform** 层里；无时间/阶段轴。
 
-Use when the question is *"what surfaces does this platform expose, and over what wire?"* rather than *"how does data move through phases?"*.
+当问题是*"这个平台暴露哪些面、走什么线？"*而不是*"数据如何流经各阶段？"*时使用。
 
-This type is **parametric** — like `type-high-level.md`, every coord is derived from a small inputs schema. Two generations from the same inputs must produce visually identical SVG.
+本类型是**参数化**的——与 `type-high-level.md` 一样，每个坐标都由一小组输入 schema 推导。相同输入的两次生成必须产出视觉完全相同的 SVG。
 
 ---
 
-## 1. Inputs — the parameter contract
+## 1. 输入——参数契约
 
 canonical 副本：`templates/type-dp-integration.yaml` — 参数化文档契约，复制后手工填参绘图；不是 generate-from-template.py 的输入（该脚本只接受 containers/nodes/arrows JSON），以 templates 为准
 ```yaml
@@ -62,21 +62,21 @@ focal_accent: "#eb6c36"             # one color for all focal components (defaul
 dark: false
 ```
 
-**Reserved `kind` values for `platform.rows`:**
-- `bar` — full-zone-width strip. Default height 44 px (focal bars get 56 px). Required fields: `name`, `icon`. Optional: `subtitle`, `role`, `color`, `focal`.
-- `row` — N nodes evenly spaced across zone width. Required: `nodes` list. Each node has `name`, `icon`, optional `role`, `subtitle`, `color`, `focal`.
+**`platform.rows` 的保留 `kind` 值：**
+- `bar`——横跨 zone 全宽的条带。默认高 44px（焦点 bar 为 56px）。必填字段：`name`、`icon`。可选：`subtitle`、`role`、`color`、`focal`。
+- `row`——N 个节点在 zone 宽度上均匀分布。必填：`nodes` 列表。每个节点有 `name`、`icon`，可选 `role`、`subtitle`、`color`、`focal`。
 
-**Source/consumer `type` values** → icon mapping (extends `references/primitive-icons.md`):
-- `db` → cylinder, `sftp` → folder-with-arrow, `mail` → envelope, `mainframe` → server-with-vents
-- `monitor` → desktop screen, `chart` → bar-chart, `globe` → globe, `api` → curly braces
-- `key` → key + ring (identity / IDP)
-- Any explicit icon name in `primitive-icons.md` is also accepted.
+**Source/consumer `type` 值** → icon 映射（扩展 `references/primitive-icons.md`）：
+- `db` → 圆柱体，`sftp` → 带箭头文件夹，`mail` → 信封，`mainframe` → 带散热孔服务器
+- `monitor` → 桌面屏幕，`chart` → 柱状图，`globe` → 地球，`api` → 花括号
+- `key` → 钥匙 + 环（identity / IDP）
+- `primitive-icons.md` 中的任意显式 icon 名也可接受。
 
-**Per-component `color: "#hex"`** is optional on any node, bar, or footer entry. See §4.
+**逐组件 `color: "#hex"`** 在任何 node、bar 或 footer 条目上均可选。见 §4。
 
 ---
 
-## 2. Layout formulas — deterministic geometry
+## 2. 布局公式——确定性几何
 
 ```
 # Canvas
@@ -125,9 +125,9 @@ row_h            = 72
 row_gap          = 16
 ```
 
-### 2.1 Row placement (cursor algorithm)
+### 2.1 行摆放（游标算法）
 
-Allocate each `platform.rows` entry top-to-bottom. The single `row` (or first row when N>1) anchors to side-column row 2 so its connectors stay horizontal:
+自上而下分配每个 `platform.rows` 条目。唯一的 `row`（或 N>1 时的第一个 row）锚定到侧列第 2 行，让其连接线保持水平：
 
 ```
 primary_row_idx  = index of first kind=row in platform.rows
@@ -157,9 +157,9 @@ for entry in platform.rows[primary_row_idx+1:]:
 # Constraint: y <= zone_y + zone_h
 ```
 
-This produces the canonical layout for the standard shape (top bar / 3-node row / bottom bar): Trino at `y=104 h=56`, primary row at `y=176 h=72`, Airflow at `y=324 h=44`. Bottom anchor of Airflow at y=368 (40-px clear from zone bottom at y=408). **Note**: with the canonical layout there's a 76-px gap between the primary row's bottom (y=248) and Airflow's top (y=324). That gap is intentional — Airflow visually sits at the same y-band as source/consumer row 4 (cy=388), so it reads as a sibling of the bottom side-column row.
+对标准形态（顶 bar / 3 节点 row / 底 bar）这产生 canonical 布局：Trino 在 `y=104 h=56`，主 row 在 `y=176 h=72`，Airflow 在 `y=324 h=44`。Airflow 底部锚在 y=368（距 zone 底 y=408 有 40px 净空）。**注意**：canonical 布局中主 row 底部（y=248）与 Airflow 顶部（y=324）之间有 76px 间隙。该间隙是刻意的——Airflow 在视觉上与 source/consumer 第 4 行（cy=388）处于同一 y 带，读作侧列底行的同级。
 
-### 2.2 Node placement inside a `row` entry
+### 2.2 `row` 条目内的节点摆放
 
 ```
 N            = len(row.nodes)
@@ -168,9 +168,9 @@ node_x(j)    = zone_x + zone_pad_x + j * (node_w + 16)
 node_cx(j)   = node_x(j) + node_w/2
 ```
 
-For the canonical 3-node row: `node_w = (696 - 32 - 32) / 3 = 210.67`. The shipped example uses fixed `node_w=160` with custom x positions (`288, 480, 672`) chosen so each node's `cx` aligns to the column for connector convenience: 368, 560, 752. **Both layouts are valid**; the formula above is the default for new diagrams. Document any deviation in the rendered SVG with a comment.
+canonical 3 节点 row：`node_w = (696 - 32 - 32) / 3 = 210.67`。既有示例用固定 `node_w=160` 加自定义 x 位置（`288, 480, 672`），让每个节点的 `cx` 对齐到列（368、560、752）以方便连接线。**两种布局都合法**；上面的公式是新图的默认。任何偏离都要在渲染的 SVG 中用注释记录。
 
-### 2.3 Bar (full-zone-width) placement
+### 2.3 Bar（zone 全宽）摆放
 
 ```
 bar_x      = zone_x + zone_pad_x         # 276
@@ -178,9 +178,9 @@ bar_w      = zone_w - 2*zone_pad_x       # 664
 bar_cx     = zone_cx                     # 608
 ```
 
-Bars span the full zone width minus 16-px padding on each side. Bars marked `focal: true` use `bar_h_focal=56` and accent styling (fill `rgba(focal_accent, 0.08)`, stroke `focal_accent`). Non-focal bars use `bar_h_default=44` with muted styling (fill `rgba(45,49,66,0.05)`, stroke `rgba(45,49,66,0.32)`).
+Bar 横跨 zone 全宽减去两侧各 16px 内边距。标记 `focal: true` 的 bar 用 `bar_h_focal=56` 与 accent 样式（填充 `rgba(focal_accent, 0.08)`、描边 `focal_accent`）。非焦点 bar 用 `bar_h_default=44` 与 muted 样式（填充 `rgba(45,49,66,0.05)`、描边 `rgba(45,49,66,0.32)`）。
 
-### 2.4 Source / consumer placement (side columns)
+### 2.4 Source / consumer 摆放（侧列）
 
 ```
 source_y(k)       = col_top + k * 88            # 92, 180, 268, 356, …
@@ -189,23 +189,23 @@ consumer_y(k)     = source_y(k)                 # mirrored
 consumer_cy(k)    = source_cy(k)
 ```
 
-All side-column nodes use fixed `w=160 h=64`. Same fill / stroke pattern: fill `rgba(79,93,117,0.06)`, stroke `#7a8399`, stroke-width 1.
+所有侧列节点用固定 `w=160 h=64`。相同的填充 / 描边模式：填充 `rgba(79,93,117,0.06)`、描边 `#7a8399`、stroke-width 1。
 
 ---
 
-## 3. Connector rules (mandatory)
+## 3. 连接线规则（强制）
 
-Five styles, bound to topology. Don't let user override style on focal-touching, bar-originating, or Trino → consumer edges — those are fixed by rule.
+五种样式，绑定拓扑。不允许用户在接触焦点、从 bar 出发或 Trino → consumer 的边上覆盖样式——这些由规则固定。
 
-| `style` | Stroke | Width | Dash | Marker | When required |
+| `style` | 描边 | 宽度 | 虚线 | Marker | 何时必须 |
 |---|---|---|---|---|---|
-| `primary` | `#eb6c36` (focal_accent) | 1.4 | — | `arrow-accent` | Every edge whose endpoint is a `focal: true` component. Also every Trino → consumer edge (serve-flow rule). |
-| `secondary` | `#4f5d75` (muted) | 1.2 | — | `arrow` | Default for internal platform-component edges and source → platform edges that don't touch focal. |
-| `federated` | `#2e5aa8` (link-blue) | 1.0 | `4,3` | `arrow-link` | Federation queries (e.g., source DB → Trino). |
-| `trigger` | `#4f5d75` (muted) | 1.0 | `4,3` | `arrow` | Every edge originating from a `kind: bar` component (Airflow drops). Unlabelled. |
-| `auth` | `#eb6c36` | 1.2 | `5,4` | `arrow-accent` | Every edge from a footer node up to the zone bottom edge. **Never to a specific component.** |
+| `primary` | `#eb6c36`（focal_accent） | 1.4 | — | `arrow-accent` | 每条以 `focal: true` 组件为端点的边。以及每条 Trino → consumer 边（serve-flow 规则）。 |
+| `secondary` | `#4f5d75`（muted） | 1.2 | — | `arrow` | 平台组件内部边与不接触焦点的 source → platform 边的默认样式。 |
+| `federated` | `#2e5aa8`（link-blue） | 1.0 | `4,3` | `arrow-link` | 联邦查询（如 source DB → Trino）。 |
+| `trigger` | `#4f5d75`（muted） | 1.0 | `4,3` | `arrow` | 每条从 `kind: bar` 组件出发的边（Airflow 垂降）。无标签。 |
+| `auth` | `#eb6c36` | 1.2 | `5,4` | `arrow-accent` | 每条从 footer 节点向上到 zone 底边的边。**绝不指向特定组件。** |
 
-**Defs block** (required, five markers — exactly):
+**Defs 块**（必需，恰好五个 marker）：
 
 ```svg
 <defs>
@@ -217,195 +217,195 @@ Five styles, bound to topology. Don't let user override style on focal-touching,
 </defs>
 ```
 
-### 3.1 Exit / entry sides (non-negotiable)
+### 3.1 出边 / 入边（不可协商）
 
-| Edge kind | Exit side of source | Entry side of target |
+| 边类型 | 源的出边 | 目标的入边 |
 |---|---|---|
-| Source → platform component | **right** of source | **left** of target |
-| Platform → platform (same row) | **right** | **left** |
-| Bar → row node (vertical drop) | **bottom** of bar at `node_cx(target)` | **top** of target |
-| Platform → consumer | **right** of source platform component | **left** of consumer |
-| Footer → zone | **top** of footer (at `footer_auth_x(k)`) | zone bottom edge `y = zone_y + zone_h` |
-| Footer → component (any specific one) | **forbidden** |
+| Source → 平台组件 | source **右侧** | 目标**左侧** |
+| Platform → platform（同行） | **右侧** | **左侧** |
+| Bar → row 节点（垂直垂降） | bar **底边**、位于 `node_cx(target)` | 目标**顶边** |
+| Platform → consumer | 源平台组件**右侧** | consumer **左侧** |
+| Footer → zone | footer **顶边**（在 `footer_auth_x(k)` 处） | zone 底边 `y = zone_y + zone_h` |
+| Footer → 组件（任何特定组件） | **禁止** |
 
-### 3.2 Routing
+### 3.2 路由
 
-- Orthogonal elbows with at most two bends; Q-bezier `r=8` at every corner.
-- **Fan-out staggering:** when one node fans out to N targets on the same side, stagger the exit y by ±4 px per index so arrows don't overlap (e.g., Trino → 4 consumers exits at y=124, 132, 140, 148). The vertical segments run in the corridor between the zone edge and the consumer column, also y-staggered.
-- **Z-order:** all connectors drawn **before** any rect (so node fills mask the line ends).
-- **Markers:** exactly one `marker-end` per `<line>` / `<path>`. Never `marker-start`.
-- **Labels:** every `primary`, `secondary`, `federated`, `auth` edge gets a protocol label (Geist Mono 8 px, paper-filled rect mask with 6–10 px clear gap above the stroke). `trigger` edges are unlabelled.
+- 正交折线，至多两个弯折；每个拐角 Q-bezier `r=8`。
+- **Fan-out 错位：** 一个节点向同侧 N 个目标扇出时，出点 y 按索引错开 ±4px，避免箭头重叠（如 Trino → 4 个 consumer 的出点为 y=124、132、140、148）。纵向段走在 zone 边缘与 consumer 列之间的走廊里，同样按 y 错开。
+- **Z 序：** 所有连接线画在任何 rect **之前**（让节点填充遮住线端）。
+- **Markers：** 每条 `<line>` / `<path>` 恰好一个 `marker-end`。绝不用 `marker-start`。
+- **标签：** 每条 `primary`、`secondary`、`federated`、`auth` 边都带协议标签（Geist Mono 8px，paper 填充矩形遮罩，距描边上方 6–10px 净空）。`trigger` 边无标签。
 
-### 3.3 Footer → zone trunk
+### 3.3 Footer → zone 干线
 
-When N=1 footer: single vertical line at `x = zone_cx` from `footer_y(0)` to `zone_y + zone_h`.
+N=1 条 footer 时：单条垂直线在 `x = zone_cx`，从 `footer_y(0)` 到 `zone_y + zone_h`。
 
-When N≥2 footers: stagger AUTH lines so they don't overlap stacked footers. For footer index `k`:
+N≥2 条 footer 时：错开 AUTH 线，避免与堆叠的 footer 重叠。footer 索引 `k`：
 
 ```
 footer_auth_x(k) = zone_cx + (k - (N-1)/2) * 32     # 32-px stride per footer
 ```
 
-Examples:
+示例：
 - N=1 → 560
 - N=2 → 544, 576
 - N=3 → 528, 560, 592
 
-Each AUTH line goes from `(footer_auth_x(k), footer_y(k))` up to `(footer_auth_x(k), zone_y + zone_h)`. AUTH labels sit just above the arrowhead at the zone bottom edge.
+每条 AUTH 线从 `(footer_auth_x(k), footer_y(k))` 向上到 `(footer_auth_x(k), zone_y + zone_h)`。AUTH 标签紧贴在 zone 底边的箭头上方。
 
-### 3.4 Crossings
+### 3.4 交叉
 
-Avoid. Re-route via the corridor x positions before accepting a crossing. If unavoidable, the path drawn second carries a 6-px arc hop over the first.
+避免。先经走廊 x 位置重新路由，再考虑接受交叉。无法避免时，后画的路径在先画的路径上方带一个 6px 弧形跳跃。
 
 ---
 
-## 4. Component color override (mirrors `type-high-level.md` §3.4)
+## 4. 组件颜色覆盖（镜像 `type-high-level.md` §3.4）
 
-Any source, consumer, platform component (node or bar), or footer node accepts an optional `color: "#hex"`. Mirrors high-level so the rule reads identically across types.
+任何 source、consumer、平台组件（node 或 bar）或 footer 节点都接受可选的 `color: "#hex"`。镜像 high-level，让规则在各类型间读起来一致。
 
-**Where the color is applied** (`C = color`):
+**颜色应用位置**（`C = color`）：
 
-| Element | Light | Dark |
+| 元素 | Light | Dark |
 |---|---|---|
-| Container fill (`rect` body) | `rgba(C, 0.06)` | `rgba(C_light, 0.10)` |
-| Container stroke | `rgba(C, 0.35)` (`stroke-width=1` for nodes, `0.8` for bars) | `rgba(C_light, 0.45)` |
-| Role badge stroke | `rgba(C, 0.40)` | `rgba(C_light, 0.55)` |
-| Role badge text | `rgba(C, 0.85)` | `rgba(C_light, 1.0)` |
-| Icon stroke / fill | `C` | `C_light` |
-| Name text | `C` | `C_light` |
-| Subtitle text | **unchanged** (muted) | **unchanged** (muted) |
-| Connectors touching this component | **unchanged** — topology-driven | **unchanged** |
+| 容器填充（`rect` 主体） | `rgba(C, 0.06)` | `rgba(C_light, 0.10)` |
+| 容器描边 | `rgba(C, 0.35)`（节点 `stroke-width=1`，bar `0.8`） | `rgba(C_light, 0.45)` |
+| 角色徽章描边 | `rgba(C, 0.40)` | `rgba(C_light, 0.55)` |
+| 角色徽章文字 | `rgba(C, 0.85)` | `rgba(C_light, 1.0)` |
+| Icon 描边 / 填充 | `C` | `C_light` |
+| 名称文字 | `C` | `C_light` |
+| 副标题文字 | **不变**（muted） | **不变**（muted） |
+| 接触该组件的连接线 | **不变**——由拓扑驱动 | **不变** |
 
-`C_light` = the same hex lightened ~15% for dark-mode contrast (e.g., `#b85450` → `#d97a78`).
+`C_light` = 同一 hex 提亮约 15%，用于深色模式对比度（如 `#b85450` → `#d97a78`）。
 
-**Rules:**
+**规则：**
 
-- **Never on focal components.** `focal_accent` always wins — a `color` on a focal component is ignored.
-- **Never on connectors.** If you want a colored edge, pick a different `style` from §3, not a color override.
-- **Cap at 2 custom-colored components** per diagram (in addition to the focal pair).
+- **绝不用于焦点组件。** `focal_accent` 永远优先——焦点组件上的 `color` 被忽略。
+- **绝不用于连接线。** 想要带色的边，从 §3 选一个不同的 `style`，而不是颜色覆盖。
+- 每图自定义颜色组件**上限 2 个**（焦点对之外）。
 
-**Semantic palette** (use these unless brand demands otherwise):
-- `#b85450` rust-red — Security / Identity (AD, Keycloak, Vault)
-- `#5a7d9a` slate-blue — Observability (Prometheus, Datadog, OpenTelemetry)
-- `#7a8c47` olive-green — Governance / Lineage (OpenMetadata, DataHub)
-- `#8c6d3f` warm-brown — Backup / DR (Velero, Restic)
-
----
-
-## 5. Focal rule
-
-**Exactly two focal components.** Default: the storage hub (MinIO / S3 / similar) and the federation engine (Trino / Dremio / similar). These two surfaces distinguish a "platform" from a pile of tools. Everything else (NiFi, Jupyter, Airflow, AD, all sources, all consumers) stays ink / muted.
-
-- Mark with `focal: true` on the component entry.
-- A focal `kind: bar` uses `bar_h_focal=56` (taller) and accent styling.
-- A focal `kind: row` node keeps `row_h=72` but uses accent styling.
-- The **Trino → all consumers** edges are always `primary` (accent), regardless of focal flag on each consumer — this is the serve-flow rule.
-- If fewer than 2 or more than 2 components are marked `focal: true`, halt and ask the user.
+**语义调色板**（除非品牌另有要求，使用这些）：
+- `#b85450` rust-red——安全 / 身份（AD、Keycloak、Vault）
+- `#5a7d9a` slate-blue——可观测（Prometheus、Datadog、OpenTelemetry）
+- `#7a8c47` olive-green——治理 / 血缘（OpenMetadata、DataHub）
+- `#8c6d3f` warm-brown——备份 / DR（Velero、Restic）
 
 ---
 
-## 6. Dark mode
+## 5. 焦点规则
+
+**恰好两个焦点组件。** 默认：存储 hub（MinIO / S3 / 同类）与联邦查询引擎（Trino / Dremio / 同类）。这两个面把"平台"与一堆工具区分开。其余一切（NiFi、Jupyter、Airflow、AD、所有 source、所有 consumer）保持 ink / muted。
+
+- 在组件条目上用 `focal: true` 标记。
+- 焦点 `kind: bar` 用 `bar_h_focal=56`（更高）与 accent 样式。
+- 焦点 `kind: row` 节点保持 `row_h=72`，但用 accent 样式。
+- **Trino → 所有 consumer** 的边始终为 `primary`（accent），与每个 consumer 自身的焦点标志无关——这是 serve-flow 规则。
+- 标记 `focal: true` 的组件少于 2 个或多于 2 个时，停下来询问用户。
+
+---
+
+## 6. 深色模式
 
 | Token | Light | Dark |
 |---|---|---|
-| Page paper | `#f5f5f5` | `#2d3142` |
-| Ink | `#2d3142` | `#f5f5f5` |
+| 页面 paper | `#f5f5f5` | `#2d3142` |
+| 墨色 | `#2d3142` | `#f5f5f5` |
 | Muted | `#4f5d75` | `#bfc0c0` |
 | Accent | `#eb6c36` | `#f08a59` |
-| Link (federated) | `#2e5aa8` | `#6a95d8` |
-| Side-column fill | `rgba(79,93,117,0.06)` | `rgba(245,245,245,0.06)` |
-| Side-column stroke | `#7a8399` | `rgba(245,245,245,0.30)` |
-| Zone fill | `rgba(45,49,66,0.025)` | `rgba(245,245,245,0.04)` |
-| Zone stroke | `rgba(45,49,66,0.32)` | `rgba(245,245,245,0.30)` |
-| Non-focal bar fill | `rgba(45,49,66,0.05)` | `rgba(245,245,245,0.06)` |
-| Focal fill | `rgba(235,108,54,0.08)` | `rgba(240,138,89,0.12)` |
-| Focal stroke | `#eb6c36` | `#f08a59` |
-| Custom component colors | `C` | `C_light` (lighten ~15%) |
+| Link（federated） | `#2e5aa8` | `#6a95d8` |
+| 侧列填充 | `rgba(79,93,117,0.06)` | `rgba(245,245,245,0.06)` |
+| 侧列描边 | `#7a8399` | `rgba(245,245,245,0.30)` |
+| Zone 填充 | `rgba(45,49,66,0.025)` | `rgba(245,245,245,0.04)` |
+| Zone 描边 | `rgba(45,49,66,0.32)` | `rgba(245,245,245,0.30)` |
+| 非焦点 bar 填充 | `rgba(45,49,66,0.05)` | `rgba(245,245,245,0.06)` |
+| 焦点填充 | `rgba(235,108,54,0.08)` | `rgba(240,138,89,0.12)` |
+| 焦点描边 | `#eb6c36` | `#f08a59` |
+| 自定义组件颜色 | `C` | `C_light`（提亮约 15%） |
 
 ---
 
-## 7. Reproducibility checklist (taste gate)
+## 7. 可复现性检查清单（品味门）
 
-Before emitting SVG, verify **every** item:
+输出 SVG 前，逐项核对**每一**条：
 
-1. `viewBox = "0 0 1200 {viewBox_h}"` where `viewBox_h = max(600, footer_bottom + 84)`.
-2. Platform zone at `x=260 y=72 w=696 h=col_h`. Zone label paper-masked across top border at `y=zone_y+3`.
-3. Left column at `x=40..200`, right column at `x=1000..1160` — both 160 wide.
-4. Source / consumer rows top at `y=92`, stride 88 px.
-5. `platform.rows` entries stack inside zone via the §2.1 cursor algorithm; total y-span ≤ `zone_h`.
-6. Inside each `kind: row`, node x-centers are evenly spaced across zone width (§2.2).
-7. **Exactly 2** focal components (`focal: true`).
-8. Every edge originating from a `kind: bar` component uses `style: trigger` (dashed, unlabelled).
-9. Every Trino → consumer edge uses `style: primary` (the serve-flow rule).
-10. Footer nodes connect only to the zone bottom edge via `auth` style. **No** edge from a footer to a specific component.
-11. Custom component colors ≤ 2 (in addition to the focal pair). Connectors never recolored by component `color`.
-12. All connectors emitted before any node rect (z-order rule).
-
----
-
-## 8. Sources and consumers — icon library
-
-Define each icon as `<g id="ico-…">` in `<defs>`, drawn at translate(cx, cy) with `stroke="currentColor"` so it inherits the surrounding text color. Common icons:
-
-- `ico-db` (cylinder) — relational sources
-- `ico-sftp` (folder with down arrow) — file drops
-- `ico-mail` (envelope) — email pulls
-- `ico-mainframe` (server with vents) — legacy systems
-- `ico-monitor` — desktop analytics tools
-- `ico-chart` (bars) — BI / report tools
-- `ico-globe` — public websites
-- `ico-api` (brackets `{}`) — gateways and 3rd-party clients
-- `ico-key` — identity / IDP
-- `ico-monitoring` (chart-line) — observability stack
-
-If you need more icons, browse `assets/icons.html` and define matching `<symbol>` blocks.
+1. `viewBox = "0 0 1200 {viewBox_h}"`，其中 `viewBox_h = max(600, footer_bottom + 84)`。
+2. 平台 zone 在 `x=260 y=72 w=696 h=col_h`。Zone 标签以 paper 遮罩压在顶边 `y=zone_y+3` 处。
+3. 左列在 `x=40..200`，右列在 `x=1000..1160`——都是 160 宽。
+4. Source / consumer 行顶在 `y=92`，步幅 88px。
+5. `platform.rows` 条目经 §2.1 游标算法在 zone 内堆叠；y 总跨度 ≤ `zone_h`。
+6. 每个 `kind: row` 内，节点 x 中心在 zone 宽度上均匀分布（§2.2）。
+7. **恰好 2 个**焦点组件（`focal: true`）。
+8. 每条从 `kind: bar` 组件出发的边用 `style: trigger`（虚线、无标签）。
+9. 每条 Trino → consumer 边用 `style: primary`（serve-flow 规则）。
+10. Footer 节点只经 `auth` 样式连接到 zone 底边。**没有**从 footer 到特定组件的边。
+11. 自定义组件颜色 ≤ 2（焦点对之外）。连接线绝不因组件 `color` 重染。
+12. 所有连接线在任何节点 rect 之前输出（z 序规则）。
 
 ---
 
-## 9. Identity, common services → connect to the layer, not to components
+## 8. Sources 与 consumers——icon 库
 
-**Active Directory** (or Keycloak, IAM, OPA, any cross-cutting identity / policy / secrets store) authenticates *every* component in the platform. Wiring it to one specific tool would understate the trust scope. Connect it instead with a single arrow to the bottom edge of the platform zone, labeled `AUTH` (§3.3).
+每个 icon 定义为 `<defs>` 中的 `<g id="ico-…">`，以 translate(cx, cy) 绘制并带 `stroke="currentColor"`，继承周围文字颜色。常用 icon：
 
-The same rule applies to any other layer-wide service: centralized logging, secrets vault, observability stack, audit sink, mTLS root. Each goes in the `footer` list, each gets its own row, each gets its own AUTH line up to the zone bottom edge (staggered by index per §3.3). The visual reading is "the platform layer delegates to all of these," which is the architectural truth.
+- `ico-db`（圆柱体）——关系型源
+- `ico-sftp`（带下箭头文件夹）——文件投递
+- `ico-mail`（信封）——email 拉取
+- `ico-mainframe`（带散热孔服务器）——遗留系统
+- `ico-monitor`——桌面分析工具
+- `ico-chart`（柱状）——BI / 报表工具
+- `ico-globe`——公共网站
+- `ico-api`（花括号 `{}`）——网关与第三方客户端
+- `ico-key`——身份 / IDP
+- `ico-monitoring`（折线图）——可观测栈
 
----
-
-## 10. Budget — this type exceeds the default
-
-This is the one type where the default 9-node / 12-arrow budget is intentionally exceeded. A realistic platform integration shows:
-
-- 4–6 source nodes
-- 5 platform components
-- 4–6 consumer nodes
-- 1–3 footer nodes (identity, observability, backup, …)
-
-That's **14–20 nodes**. The complexity is the point — the diagram is making a claim about the *number of distinct integration surfaces*. Compressing them collapses the claim.
-
-When this gets unwieldy:
-- Combine clearly-identical source rows (e.g., four MariaDB databases → one `Databases` node with sublabel `4 × MariaDB`)
-- Split into two diagrams (one per integration plane: data vs. identity vs. observability)
+需要更多 icon 时，浏览 `assets/icons.html` 并定义匹配的 `<symbol>` 块。
 
 ---
 
-## 11. Anti-patterns
+## 9. 身份、公共服务 → 连到层，不连到组件
 
-- **Sources or consumers as a single collapsed node** when ≥3 distinct items exist — defeats the whole point of this type. Use Architecture or High-level if you want collapsing.
-- **One bus arrow from "sources" to "the platform"** — every wire is labeled with its protocol; this is how integration teams read the diagram.
-- **Per-tool color coding** (teal-NiFi, magenta-MinIO, yellow-Jupyter) inside the zone — collapses hierarchy; only the two focal accents earn coral, plus up to 2 custom colors on cross-cutting components (§4 cap).
-- **More than 2 focal components** — focal exists to distinguish "platform" from "pile of tools"; >2 erases the signal (same rule as design-system.md §1).
-- **`color` override on a focal component** — ignored. Focal_accent always wins.
-- **Footer wired to one specific tool** (e.g., AD → Airflow only) — wrong unless that service truly only protects one tool. The default is the layer-wide connection.
-- **Footer or identity inside the zone** — identity gates the layer from outside. Drawing it inside misrepresents the trust model.
-- **Phase chevrons across the top** — those belong on `high-level`.
-- **Custom-colored connectors** — connectors are topology-driven. Style picks the color; `color` on a component never spreads to its edges.
+**Active Directory**（或 Keycloak、IAM、OPA、任何横切的身份 / 策略 / 密钥存储）为平台中的*每个*组件做认证。把它连到某一个具体工具会低估信任范围。正确做法是用一条箭头连到平台 zone 的底边，标记 `AUTH`（§3.3）。
+
+同一规则适用于任何其他层级全域服务：集中日志、密钥 vault、可观测栈、审计 sink、mTLS 根。每个都放进 `footer` 列表，各占一行，各有自己的 AUTH 线向上连到 zone 底边（按索引错开，见 §3.3）。视觉读法是"平台层委托给所有这些服务"，这正是架构事实。
 
 ---
 
-## 12. Examples
+## 10. 预算——本类型超出默认值
 
-- minimal light (1 footer = AD). Gallery default.
-- same, dark skin.
-- same, editorial-card frame.
-- exercises §4 color override + multi-footer: AD in rust-red, Observability (Prometheus/Grafana/Loki) in slate-blue. Canvas height grown to fit 2 footer rows.
-- extended pattern, dark skin.
-- extended pattern, editorial-card frame.
+这是唯一一个刻意超出默认 9 节点 / 12 箭头预算的类型。一个真实的平台集成会展示：
+
+- 4–6 个 source 节点
+- 5 个平台组件
+- 4–6 个 consumer 节点
+- 1–3 个 footer 节点（identity、observability、backup、…）
+
+合计 **14–20 个节点**。复杂度正是重点——图形在就*不同集成面的数量*作出声明。压缩它们就压垮了这个声明。
+
+难以驾驭时：
+- 合并明显相同的 source 行（如四个 MariaDB 数据库 → 一个 `Databases` 节点，子标签 `4 × MariaDB`）
+- 拆成两张图（每个集成平面一张：数据 vs 身份 vs 可观测）
+
+---
+
+## 11. 反模式
+
+- **存在 ≥3 个不同条目时把 sources 或 consumers 折叠成单个节点**——违背本类型的全部意义。想要折叠就用 Architecture 或 High-level。
+- **一条从"sources"到"the platform"的总线箭头**——每根线都要标注协议；集成团队就是这样读图的。
+- **zone 内逐工具配色**（teal-NiFi、magenta-MinIO、yellow-Jupyter）——压垮层级；只有两个焦点 accent 配得上 coral，外加横切组件至多 2 个自定义颜色（§4 上限）。
+- **多于 2 个焦点组件**——焦点的存在是为了区分"平台"与"一堆工具"；>2 会抹掉信号（与 design-system.md §1 同一规则）。
+- **焦点组件上的 `color` 覆盖**——被忽略。Focal_accent 永远优先。
+- **Footer 连到一个具体工具**（如 AD → 仅 Airflow）——除非该服务真的只保护一个工具，否则是错的。默认是层级全域连接。
+- **Footer 或 identity 画在 zone 内**——identity 从外部为整个层把关。画在里面会歪曲信任模型。
+- **顶部横跨阶段 chevron**——那属于 `high-level`。
+- **自定义颜色的连接线**——连接线由拓扑驱动。样式决定颜色；组件上的 `color` 绝不扩散到它的边。
+
+---
+
+## 12. 示例
+
+- 极简 light 版（1 条 footer = AD）。画廊默认。
+- 同上，dark 皮肤。
+- 同上，editorial-card 外框。
+- 演练 §4 颜色覆盖 + 多 footer：AD 用 rust-red，Observability（Prometheus/Grafana/Loki）用 slate-blue。画布高度增大以容纳 2 行 footer。
+- 扩展模式，dark 皮肤。
+- 扩展模式，editorial-card 外框。

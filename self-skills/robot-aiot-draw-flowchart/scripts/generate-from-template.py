@@ -30,7 +30,7 @@ if SCRIPT_DIR not in sys.path:
     sys.path.insert(0, SCRIPT_DIR)
 
 import composition_quality as quality  # noqa: E402
-import fireworks_geometry as geometry  # noqa: E402
+import diagram_geometry as geometry  # noqa: E402
 from diagram_ir import normalize_diagram  # noqa: E402
 from semantic_contracts import STYLE_NAMES, resolve_style_index  # noqa: E402
 
@@ -3241,18 +3241,12 @@ def render_arrow(
     critical_path_id = str(arrow.get("critical_path_id", ""))
     critical = "true" if arrow.get("critical") else "false"
     flow = str(arrow.get("flow", ""))
-    motion_role = str(arrow.get("motion_role", ""))
-    motion_stage = str(arrow.get("motion_stage", ""))
-    motion_order = str(arrow.get("motion_order", ""))
     critical_hop = str(arrow.get("critical_hop", ""))
     critical_hops = str(arrow.get("critical_hops", ""))
     shared_attributes = (
         f'data-edge-id="{normalize_attribute(edge_id)}" data-source="{source_id}" data-target="{target_id}" '
         f'data-edge-kind="{normalize_attribute(edge_kind)}" data-topic-id="{normalize_attribute(topic_id)}" '
         f'data-flow="{normalize_attribute(flow)}" '
-        f'data-motion-role="{normalize_attribute(motion_role)}" '
-        f'data-motion-stage="{normalize_attribute(motion_stage)}" '
-        f'data-motion-order="{normalize_attribute(motion_order)}" '
         f'data-protocol="{normalize_attribute(protocol)}" data-via="{normalize_attribute(via)}" '
         f'data-critical-path-id="{normalize_attribute(critical_path_id)}" '
         f'data-critical-hop="{normalize_attribute(critical_hop)}" '
@@ -3637,14 +3631,12 @@ def build_svg_with_report(
     visual_theme = STYLE_NAMES[style_index]
     semantic_profile = str(diagram.semantic_report.get("profile", "generic"))
     diagram_type = str(source_data.get("diagram_type", mode))
-    motion_scene = str(source_data.get("motion_scene", ""))
     lines = [
         f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {int(width)} {int(height)}" '
-        f'width="{int(width)}" height="{int(height)}" data-generator="fireworks-tech-graph" '
+        f'width="{int(width)}" height="{int(height)}" data-generator="robot-aiot-tech-graph" '
         f'data-schema-version="1" data-text-metrics="heuristic-v1" '
         f'data-style-id="{style_index}" data-visual-theme="{normalize_attribute(visual_theme)}" '
         f'data-diagram-type="{normalize_attribute(diagram_type)}" '
-        f'data-motion-scene="{normalize_attribute(motion_scene)}" '
         f'data-semantic-profile="{normalize_attribute(semantic_profile)}" data-semantic-valid="true" '
         f'data-quality-profile="{normalize_attribute(composition_contract.profile)}" '
         f'data-max-bends-per-edge="{contract_data["max_bends_per_edge"]}" '
@@ -3717,9 +3709,6 @@ def build_svg_with_report(
             f'  <g id="{normalize_attribute(node_id)}" data-graph-role="node" '
             f'data-node-id="{normalize_attribute(node.node_id)}" '
             f'data-semantic-role="{normalize_attribute(semantic_role)}" '
-            f'data-motion-role="{normalize_attribute(node_data.get("motion_role", ""))}" '
-            f'data-motion-stage="{normalize_attribute(node_data.get("motion_stage", ""))}" '
-            f'data-motion-order="{normalize_attribute(node_data.get("motion_order", ""))}" '
             f'data-parent="{normalize_attribute(node_data.get("parent", ""))}" '
             f'data-deployment-id="{normalize_attribute(node_data.get("deployment_id", ""))}" '
             f'data-topic-id="{normalize_attribute(node_data.get("topic_id", ""))}" '

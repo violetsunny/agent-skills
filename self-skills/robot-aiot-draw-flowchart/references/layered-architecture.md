@@ -1,4 +1,4 @@
-# Layered Architecture Diagram Pattern
+# 分层架构图模式
 
 > **⚠️ 路径声明：** 本文 draw.io mxGraphModel XML 用于「生成工作流 · draw.io XML」路径的可编辑交付与布局结构参考；SVG 直绘与 XML→HTML 桥接产物按同一布局结构渲染为 SVG。无论哪条路径，样式数值（圆角/字号/间距/颜色语义）以 `design-system.md` 为唯一权威，arcSize 一律取 §7 允许集 {4, 6, 8}。
 

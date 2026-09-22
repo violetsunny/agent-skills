@@ -41,7 +41,7 @@
 ```
 
 ### 3. 箭头标签摆放
-- **遮罩常驻**：每个箭头标签都必须有不透明遮罩矩形（`design-system.md` §6"Arrow labels — always mask, always with margin"），不是碰撞后才加的兜底
+- **遮罩常驻**：每个箭头标签都必须有不透明遮罩矩形（`design-system.md` §6"箭头标签 — 永远遮罩、永远留间距"），不是碰撞后才加的兜底
 - **可见间距**：遮罩矩形底边与连线 stroke 之间强制 6–10px 可见间隙，标签永不压线
 - **遮罩填充**：与背景色一致（默认 `#f5f5f5`），内边距水平 4px、垂直 2px 起步，按文本实际尺寸放大
 - **安全距离**：距任何组件边缘 ≥15px；遮罩不得压住后绘节点（§6 规则 6）
@@ -120,7 +120,7 @@
 - `<defs>`：arrow marker、渐变、filter、clip path
 - 文本：字号取 `design-system.md` §7 允许集 {8, 12, 16, 20, 24, 28, 32, 40}；角色分工按 §5 Typography（节点名 12px sans 600、技术子标签 9px mono、箭头标签 8px mono、页面标题按 style-guide）
 - 所有箭头：`<marker>` 配 `markerEnd`，尺寸按 `design-system.md` §6 动态标准 —— `markerWidth` = 画布 viewBox 宽 × 0.9375%，`markerHeight` = markerWidth × 0.7，`markerUnits="userSpaceOnUse"`（960 宽 → 9.0×6.3；1000 → 9.4×6.6；1200 → 11.2×7.9），全图一个尺寸
-- 阴影：禁止（`design-system.md` §4"Shadows are out. Borders are in."）；唯一例外是已登记的 style-6 官方风格
+- 阴影：禁止（`design-system.md` §4"阴影出局，边框进场"）；唯一例外是已登记的 style-6 官方风格
 - 曲线路径：循环/反馈箭头用 `M x1,y1 C cx1,cy1 cx2,cy2 x2,y2` 三次贝塞尔
 - 内容裁切：文本可能溢出节点框时用 `<clipPath>`
 - Filter 边界安全：每个带 `filter="url(...)"` 的元素距 viewBox 边缘至少 `max(元素尺寸 20%, 阴影模糊半径 × 3)`，否则靠边一侧 stroke 被裁掉（边框单边消失）
@@ -131,7 +131,7 @@
 
 可用的箭头覆盖字段（按推荐使用顺序）：
 
-| Field | Type | When to Use |
+| 字段 | 类型 | 何时使用 |
 |-------|------|-------------|
 | `source_port` / `target_port` | `"left"` / `"right"` / `"top"` / `"bottom"` | 箭头出/入边不对 |
 | `corridor_x` | `[x, ...]` | 提示垂直段走该 x 通道（软偏好） |
@@ -215,7 +215,7 @@ EOF
 - ❌ `fill=#fff` → ✅ `fill="#ffffff"`
 - ❌ `marker-end=` → ✅ `marker-end="url(#arrow)"`
 - ❌ `L 29450` → ✅ `L 290,220`
-- ❌ Missing `</svg>` at end
+- ❌ 末尾缺少 `</svg>`
 
 **校验**（生成后运行）：
 

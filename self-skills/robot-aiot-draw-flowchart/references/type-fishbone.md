@@ -1,75 +1,75 @@
-# Fishbone / Ishikawa (root-cause)
+# Fishbone / 石川图（根因分析）
 
-**Best for:** structured root-cause analysis. One observed effect, causes grouped by category, sub-causes hanging off each category. The standard artefact of an incident post-mortem — use it when a reader needs to see *what was investigated*, not just the conclusion.
+**最适合：** 结构化根因分析。一个观察到的结果，原因按类别分组，子原因挂在各类别下。事故复盘的标准产物——当读者需要看到*调查了什么*而不只是结论时使用。
 
-## Layout conventions
+## 布局约定
 
-- **Spine.** A horizontal line (`ink`, 1.2px) runs left→right at the vertical centre `CY`, terminating with an arrowhead into an **effect box** at the right head — the node-box pattern from design-system.md §6, the observed-effect statement inside.
-- **Bones.** Category lines are straight diagonals at a fixed **60°** to the spine, alternating above and below, evenly spaced along it. Each bone carries its category name at the outer end in a small tag-style box (`rx=4`, not a pill) — Geist sans 12px weight 600.
-- **Sub-causes.** Short horizontal ticks (32px, `soft`) branch off each bone at fixed points along its length, each with a sub-cause label in Geist Mono 9px sitting past the open end of the tick.
-- **Diagonal exemption.** design-system.md §6 rule 1 (mandatory rounded right-angle elbows) does not apply to the 60° bones — they are this type's defining grammar. The exemption covers **bones and sub-cause ticks only**; any other connector in a fishbone diagram (e.g. a callout leader, a cross-reference arrow) still uses rounded right-angle elbows.
-- **Focal rule.** Exactly one bone is the confirmed root cause: its line is `accent`, and its category tag uses `accent-tint` fill + `accent` stroke. The effect box is styled the same way (`accent-tint` fill, `accent` stroke) since it's the diagram's headline. That pair — root-cause bone and effect box — is the full 2-accent budget; every other bone, tag, and tick stays `ink` / `muted` / `soft`.
-- **Drawing order:** background → spine → bones → sub-cause ticks → category tag boxes → effect box → legend. Lines before boxes, so box fills cap the line ends cleanly.
+- **主骨（Spine）。** 一条水平线（`ink`，1.2px）在垂直中心 `CY` 处从左→右延伸，末端以箭头接入右侧头部的**结果盒**——采用 design-system.md §6 的节点盒模式，盒内写观察到的结果陈述。
+- **大骨（Bones）。** 类别线是与主骨成固定 **60°** 的直线斜线，上下交替，沿主骨均匀分布。每根大骨在外端携带类别名，用小 tag 样式盒（`rx=4`，不是胶囊形）——Geist sans 12px 字重 600。
+- **子原因。** 短水平刻线（32px，`soft`）在大骨长度方向的固定点分叉，每条刻线的开放端外侧配 Geist Mono 9px 子原因标签。
+- **斜线豁免。** design-system.md §6 规则 1（强制圆角直角肘）不适用于 60° 大骨——它们是本类型的定义性语法。豁免**仅覆盖大骨与子原因刻线**；鱼骨图中的其他任何连线（如 callout 引线、交叉引用箭头）仍使用圆角直角肘。
+- **焦点规则。** 恰好一根大骨是确认的根因：其线为 `accent`，类别 tag 用 `accent-tint` 填充 + `accent` 描边。结果盒同样处理（`accent-tint` 填充、`accent` 描边），因为它是全图标题。这一对——根因大骨与结果盒——就是完整的 2 强调色预算；其余所有大骨、tag、刻线保持 `ink` / `muted` / `soft`。
+- **绘制顺序：** 背景 → 主骨 → 大骨 → 子原因刻线 → 类别 tag 盒 → 结果盒 → 图例。先线后盒，盒填充干净地盖住线端。
 
-## Math
+## 数学
 
-For a spine at `y = CY` with the effect box's left edge at `x = HEAD`, bone `k` (1-indexed, k = 1..6) attaches to the spine at:
+主骨位于 `y = CY`、结果盒左边缘在 `x = HEAD` 时，大骨 `k`（1 起始，k = 1..6）接在主骨的：
 
 ```
 attach_x(k) = HEAD - 160 - k * 160
 ```
 
-Bones alternate above (`k` odd) and below (`k` even) the spine. A bone's far endpoint — where the category tag sits — is the integer-rounded 60° offset from its attach point:
+大骨在主骨上下交替（`k` 奇数在上，偶数在下）。大骨远端点——类别 tag 所在处——是接点按 60° 偏移后取整的坐标：
 
 ```
 dx = -96
-dy = ∓168        (minus = above, plus = below)
+dy = ∓168        (负 = 上方，正 = 下方)
 far_x(k) = attach_x(k) + dx
 far_y(k) = CY ∓ 168
 ```
 
-### Pre-computed reference (5-bone layout, HEAD=1200, CY=320)
+### 预计算参考（5 大骨布局，HEAD=1200，CY=320）
 
-| Bone `k` | Category slot | Side | `attach_x` | `far_x, far_y` |
+| 大骨 `k` | 类别槽位 | 侧 | `attach_x` | `far_x, far_y` |
 |---|---|---|---|---|
-| 1 | first | above | 880 | 784, 152 |
-| 2 | second | below | 720 | 624, 488 |
-| 3 | third | above | 560 | 464, 152 |
-| 4 | fourth | below | 400 | 304, 488 |
-| 5 | fifth | above | 240 | 144, 152 |
+| 1 | 第一 | 上 | 880 | 784, 152 |
+| 2 | 第二 | 下 | 720 | 624, 488 |
+| 3 | 第三 | 上 | 560 | 464, 152 |
+| 4 | 第四 | 下 | 400 | 304, 488 |
+| 5 | 第五 | 上 | 240 | 144, 152 |
 
-A 6th bone (below) would attach at `x=80`, far endpoint `(-16, 488)`, and its category tag would run from `x=-76` to `x=44` against a viewBox that starts at `x=-40`. It clips. **Five is the ceiling at `HEAD=1200`**: to draw a 6th, widen `HEAD` *and* the viewBox width by at least 160 each, keeping the viewBox origin at `-40`. Both have to move together — widening `HEAD` alone pushes the 200px effect box to `1360..1560` past the `1440` right edge, trading a clipped tag on the left for a clipped effect on the right. Or drop a category.
+第 6 根大骨（下方）会接在 `x=80`，远端点 `(-16, 488)`，其类别 tag 将从 `x=-76` 延伸到 `x=44`，而 viewBox 从 `x=-40` 开始。会被裁切。**`HEAD=1200` 时 5 根是上限**：要画第 6 根，`HEAD` 与 viewBox 宽度须各加宽至少 160，viewBox 原点保持 `-40`。两者必须同步移动——只加宽 `HEAD` 会把 200px 结果盒推到 `1360..1560`，越过 `1440` 右边缘，等于把左侧裁切的 tag 换成右侧裁切的结果盒。或者删掉一个类别。
 
-**Sub-cause ticks** sit at fractions `m/6` along the bone (`m = 2, 4` for two ticks; `m = 3` for one), so their coordinates stay on the 4px grid:
+**子原因刻线**位于大骨的 `m/6` 分数处（两条刻线取 `m = 2, 4`；一条取 `m = 3`），坐标保持在 4px 网格上：
 
 ```
 tick_x(k, m) = attach_x(k) - 16 * m
 tick_y(k, m) = CY ∓ 28 * m
 ```
 
-The tick itself is a 32px horizontal line from `(tick_x, tick_y)` to `(tick_x - 32, tick_y)`; the label sits past its open end, `text-anchor="end"` at `x = tick_x - 36`, `y = tick_y - 4` (above-bones) or `tick_y + 12` (below-bones).
+刻线本身是从 `(tick_x, tick_y)` 到 `(tick_x - 32, tick_y)` 的 32px 水平线；标签在开放端外侧，`text-anchor="end"`，位于 `x = tick_x - 36`、`y = tick_y - 4`（上方大骨）或 `tick_y + 12`（下方大骨）。
 
-## Complexity budget
+## 复杂度预算
 
-| Limit | Rule |
+| 上限 | 规则 |
 |---|---|
-| Max categories (bones) | 5 at `HEAD=1200`. A 6th requires a widened canvas — see Geometry |
-| Max sub-causes per bone | 3 |
-| Max sub-causes total | 18 |
-| Max accent elements | 2 (root-cause bone+tag, effect box) |
+| 最大类别数（大骨） | `HEAD=1200` 时 5 根。第 6 根需要加宽画布——见数学节 |
+| 每根大骨最大子原因 | 3 |
+| 子原因总数上限 | 18 |
+| 最大强调元素 | 2（根因大骨+tag、结果盒） |
 
-## Anti-patterns
+## 反模式
 
-- **More than 5 bones on the default canvas.** The 6th tag clips the viewBox. Widen `HEAD` and the viewBox width together and deliberately, or split by subsystem into two fishbones.
-- **Sub-causes that restate the category.** A "Deploy" bone with a sub-cause labeled "deployment issue" adds a node without adding information.
-- **A bone with zero sub-causes.** An empty category is a placeholder, not a finding — delete the bone or don't draw it until there's something under it.
-- **Accenting more than one root cause.** If two categories are both confirmed, that's two diagrams (or a merged cause) — not two accent bones. The 2-accent budget is load-bearing for the "this is the answer" signal.
-- **Using fishbone for a sequence of failures.** A chain of things that happened in order is a timeline or sequence diagram — fishbone is for causes of *one* effect, not a chronology.
-- **Pasting in the classic 6M template (Man/Machine/Material/Method/Measurement/Environment) with empty categories.** Name categories from the actual investigation, not a generic checklist waiting to be filled in later.
-- **Effect box phrased as a solution.** "Add a p99 alert" is a fix, not an observed effect. The box states what was seen — a symptom, a measurement, an incident — never the remedy.
+- **默认画布上超过 5 根大骨。** 第 6 个 tag 会裁切 viewBox。要么有意地同步加宽 `HEAD` 与 viewBox 宽度，要么按子系统拆成两张鱼骨图。
+- **子原因复述类别。** "Deploy" 大骨配 "deployment issue" 子原因只增加节点不增加信息。
+- **零子原因的大骨。** 空类别是占位符不是发现——删掉该大骨，或有内容前不画。
+- **强调多于一根根因。** 两个类别都确认时，那是两张图（或一个合并原因）——不是两根强调大骨。2 强调色预算承载着"这就是答案"的信号。
+- **用鱼骨图画失败序列。** 按顺序发生的事件链是 timeline 或 sequence 图——鱼骨图针对*一个*结果的原因，不是编年史。
+- **粘贴经典 6M 模板（人/机/料/法/测/环）且类别为空。** 类别名来自实际调查，不是等着以后填的通用清单。
+- **结果盒写成解决方案。** "Add a p99 alert" 是修复措施，不是观察到的结果。盒内写看到了什么——症状、测量值、事故——绝不写补救方案。
 
-## Examples
+## 示例
 
-- minimal light. Checkout p99 latency incident, 5 categories, Data confirmed as root cause.
-- minimal dark, same data.
-- full editorial: container framing + 3 summary cards of varied widths + footer.
+- minimal light。Checkout p99 延迟事故，5 个类别，Data 确认为根因。
+- minimal dark，同数据。
+- full editorial：容器框 + 3 张不同宽度摘要卡 + 页脚。

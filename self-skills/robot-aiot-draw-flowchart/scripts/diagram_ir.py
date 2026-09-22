@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Typed, backwards-compatible input model for Fireworks Tech Graph.
+"""Typed, backwards-compatible input model for the Tech Graph renderer.
 
 The renderer keeps accepting the historical JSON shape. This module gives
 that shape a versioned semantic boundary before any layout code runs.

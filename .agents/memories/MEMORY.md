@@ -16,6 +16,7 @@
 - agent-skills 仓库 self-skills/robot-aiot-arch-diagram 是 ~/.agents/skills 安装副本的源，改安装副本后须镜像回仓库（_mideameta.json 仅安装侧有）。
 - 用户裁决 r4-anim-p01-p10 为 deck 风格真源且主题严格单色系（全 light 或全 dark，禁页级翻面；2026-09-22 裁决 A 重申，页内组件级 accent 色块反转允许）
 - 2026-09-21 裁决：两演示 workflow 统一为 源文件→反问(页数/对象/范围)→母稿G1→图表G2→回写母稿→生成；PPT母稿禁动效标注，Web母稿每页必带动效备注节。
+- 2026-09-22 裁决：draw-flowchart 无动画无 GIF（v6.0.0 删动画/GIF 链 10 文件，动画+GIF 能力仅 arch-diagram 与 interactive-html-author）；A 侧 fireworks_geometry.py 改名 diagram_geometry.py（纯静态几何库保留），data-generator 标记 fireworks-tech-graph→robot-aiot-tech-graph；deck 壳翻页入场动画属交互预览非动图，保留。
 
 ## 踩坑记录
 

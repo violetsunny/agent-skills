@@ -1,102 +1,102 @@
-# Line Chart
+# Line Chart（折线图）
 
-**Best for:** continuous trends over time or a sequential index — signups over weeks, revenue by month, latency over releases. Use when the direction and rate of change between points is the primary message.
+**最适合：** 时间或顺序索引上的连续趋势——按周的注册数、按月的营收、按版本的延迟。当点与点之间的变化方向与速率是主要信息时使用。
 
-## Layout conventions
+## 布局约定
 
-- **Plot area margins:** left 80px, bottom 60px, top 40px, right 40px — inside `0 0 1000 500` viewBox.
-- **Points:** 4–12 data points. Fewer → consider a summary stat; more → aggregate into periods.
-- **X-axis:** evenly spaced time/index labels below the plot. Use Geist Mono 8px, centered on each point x.
-- **Y-axis gridlines:** 4–6 horizontals at regular intervals. Same faint treatment as bar chart.
-- **Lines:** `<polyline>` with `fill="none"`. Focal series `stroke-width="1.8"`, others `"1.2"`.
-- **Vertex dots:** only on the focal series (`r=4`, filled). Other series: line only.
-- **Area fill (optional):** `<polygon>` closing back to `y=420` (x-axis baseline) at 0.08 opacity. Use for the focal series only when the area meaning is important.
-- **Multi-series:** up to 5 series. Focal = `accent`. Others = `series-1`, `series-2`, `series-3`, `series-4` from style-guide.md. Apply series palette in order — don't skip.
-- **Legend:** horizontal strip at the bottom. Swatch = 16×8px rect with the series fill/stroke. One entry per series. Exception — the slopegraph variant uses a 24px line segment plus its endpoint dot as the legend key (see Slopegraph § Layout conventions), because stroke weight is what marks the focal series there.
+- **绘图区边距：** 左 80px、下 60px、上 40px、右 40px——在 `0 0 1000 500` viewBox 内。
+- **数据点：** 4–12 个。更少 → 考虑用摘要统计；更多 → 按时段聚合。
+- **X 轴：** 绘图区下方等间隔的时间/索引标签。Geist Mono 8px，在每个点的 x 上居中。
+- **Y 轴网格线：** 4–6 条等间隔水平线。与柱状图同样的淡色处理。
+- **线：** `<polyline>` 配 `fill="none"`。焦点系列 `stroke-width="1.8"`，其余 `"1.2"`。
+- **顶点圆点：** 只在焦点系列上（`r=4`，实心）。其他系列：只有线。
+- **面积填充（可选）：** `<polygon>` 闭合回 `y=420`（x 轴基线），不透明度 0.08。仅当面积含义重要时用于焦点系列。
+- **多系列：** 最多 5 个系列。焦点 = `accent`。其余 = style-guide.md 的 `series-1`、`series-2`、`series-3`、`series-4`。按顺序应用系列色板——不跳号。
+- **图例：** 底部水平条。色样 = 16×8px 矩形，用系列的填充/描边。每系列一个条目。例外——slopegraph 变体用 24px 线段加其端点圆点作为图例键（见 Slopegraph § 布局约定），因为那里标记焦点系列的是线宽。
 
-### Polyline pattern
+### Polyline 模式
 
 ```svg
-<!-- Focal series -->
+<!-- 焦点系列 -->
 <polyline points="x0,y0 x1,y1 x2,y2 ..."
           fill="none" stroke="#eb6c36" stroke-width="1.8" stroke-linejoin="round"/>
-<!-- Dots at each point (focal only) -->
+<!-- 每个点上的圆点（仅焦点系列） -->
 <circle cx="x0" cy="y0" r="4" fill="#eb6c36"/>
 
-<!-- Non-focal series -->
+<!-- 非焦点系列 -->
 <polyline points="x0,y0 x1,y1 ..."
           fill="none" stroke="#7c8f6f" stroke-width="1.2" stroke-linejoin="round"/>
 ```
 
-## Anti-patterns
+## 反模式
 
-- More than 5 series (visual mush — reduce or split).
-- Lines that don't start at a shared zero baseline unless explicitly annotated.
-- Smoothed/spline curves when the underlying data is sampled — polyline is honest.
-- Dots on every series when there are 4+ series (only focal gets dots).
-- Y-axis that doesn't include zero when the absolute magnitude matters.
-- Connecting discontinuous data segments without a visual gap.
+- 超过 5 个系列（视觉糊团——精简或拆分）。
+- 线不始于共享零基线且未明确标注。
+- 底层数据是采样值却画平滑/样条曲线——polyline 才诚实。
+- 4+ 个系列时每个系列都画圆点（只有焦点系列有圆点）。
+- 绝对量级重要时 Y 轴不包含零。
+- 连接不连续的数据段而无视觉断口。
 
-## Variants
+## 变体
 
-- **Slopegraph:** exactly two states, several series, read as slope and rank change. Full spec below.
-- **Ridgeline:** one distribution per series, stacked with deliberate overlap on one shared amplitude. Full spec below.
-- **Bump chart:** rank movement across 3–6 ordered snapshots, position only. Full spec below.
+- **Slopegraph：** 恰好两个状态、多个系列，读作斜率与排名变化。完整规范见下文。
+- **Ridgeline：** 每系列一个分布，以刻意重叠堆叠在共享振幅上。完整规范见下文。
+- **Bump chart：** 3–6 个有序快照间的排名移动，只看位置。完整规范见下文。
 
 ### Slopegraph
 
-**Best for:** change between exactly **two** comparable states across several series — two years, before and after, two cohorts, two scenarios. The reading is threefold and no other type gives all three at once: direction (up or down), steepness (how fast), and **crossings** (who overtook whom). Tufte's original (*The Visual Display of Quantitative Information*, 1983) is a table whose rows have been given an angle — every number is still printed, which is why both endpoints keep their labels here.
+**最适合：** 恰好**两个**可比状态之间、跨多个系列的变化——两年、前后、两个群组、两个场景。读法有三重，没有其他类型能同时给出全部三种：方向（升或降）、陡峭度（多快）、**交叉**（谁超过了谁）。Tufte 的原版（*The Visual Display of Quantitative Information*，1983）是一张行被赋予了角度的表格——每个数字仍然印出来，这也是这里两个端点都保留标签的原因。
 
-Not for: three or more states (that is the **line chart** above, or a bump chart); a single series (write the sentence instead); ranking at one moment with no change (use a **bar chart**); or two variables measured in different units (use a **scatter plot** — a slope between unlike units means nothing).
+不适用于：三个或更多状态（那是上文的**折线图**或 bump chart）；单一系列（直接写一句话）；单一时点的排名且无变化（用**柱状图**）；两个不同单位的变量（用**散点图**——不同单位之间的斜率没有意义）。
 
-#### Layout conventions
+#### 布局约定
 
-- **Two vertical axis rules**, `y` 40 → 420 inside a `0 0 1000 500` viewBox, at `x` 320 and `x` 680. The plot sits inside `x` 40 → 956 with the rotated value-axis caption at `x=24`, as in the parent chart, and the legend keeps the house rhythm (rule at `y=462`, `LEGEND` at `478`, key swatches at `492` with their text at `496`), so a reader of bar, line or treemap finds it where they expect.
-- **Keep the run narrower than the plot is tall.** The 360px run against a 380px height puts the steepest shipped slope at 35° and the flattest at 4° — the spread you need before "halved" and "barely moved" look like different claims. Widening the run flattens every slope toward horizontal and throws away the comparison the type exists to make; the leftover width belongs to the label gutters, which need it.
-- **Label gutters:** on the left, names right-aligned ending at `x=272` and values right-aligned ending at `x=304`; mirrored on the right from `x=696` (values) and `x=728` (names). Size the gutter to the longest name — a name that collides with the axis is the one thing here you cannot fix by moving a coordinate.
-- **State captions** in Geist Mono 9px, centred under each axis at `y=440`, tracked `0.14em`.
-- **Series count:** 4–10 — deliberately more than the parent chart's cap of 5. That cap exists because eight-vertex polylines tangle in mid-plot; a slopegraph has no mid-plot, so what sets the ceiling here is endpoint labels colliding, not the lines. Below 4 a sentence or a pair of bars says it better.
-- **No gridlines.** Every endpoint prints its own value, so a gridline carries nothing the figure has not already said; the two axis rules *are* the scale. This is a real departure from the parent line chart, where the gridlines do the reading.
-- **Domain:** pick round bounds that contain the data and state them in the source line. The shipped example runs 100–550ms over `y` 420 → 40, i.e. 0.84px per millisecond. The parent chart's include-zero rule does not bind here: a slope is unchanged by moving the origin, provided *both* axes move together. What a tight domain does do is magnify every slope equally, so state the bounds and let the reader calibrate.
-- **Legend keys are a 24px line plus its dot**, not the parent chart's 16×8 rect — the parent § Layout conventions registers this as the slopegraph exception. A slopegraph key has to show stroke weight, because weight is what marks the focal series.
-- **Dots at both endpoints** — `r=3` non-focal, `r=4` focal. Also a departure: the line chart puts dots on the focal series only, because it has eight vertices per series and dots everywhere would be mush. A slopegraph has exactly two per series and both are where a value is read.
-- **4px grid** applies to the designed constants — axis positions, gutter edges, state-caption baselines. Endpoint `y` values are data-scaled and exempt; snapping them would move the data. Two inherited constants are also off-grid and stay that way: the legend rule at `y=462` and the `LEGEND`/source baseline at `478`, which every chart type in `assets/` shares. Matching the house rhythm beats matching the grid here — moving them 4px would misalign this variant against bar, line, scatter and treemap to satisfy a rule none of them satisfies either.
+- **两条垂直轴线**，在 `0 0 1000 500` viewBox 内 `y` 40 → 420，位于 `x` 320 与 `x` 680。绘图区在 `x` 40 → 956 内，旋转的值轴标题在 `x=24`，与父图表一致；图例保持家族节奏（横线在 `y=462`，`LEGEND` 在 `478`，键色样在 `492`、文字在 `496`），让读过 bar、line 或 treemap 的读者在预期位置找到它。
+- **横向行程要窄于绘图区高度。** 360px 行程对 380px 高度让最陡的已交付斜率为 35°、最平的为 4°——这是让"减半"与"几乎没动"看起来像不同主张所需的展开度。加宽行程会把每条斜率压平趋向水平，扔掉本类型存在的比较意义；多余宽度属于标签槽，它们需要这些空间。
+- **标签槽：** 左侧名称右对齐止于 `x=272`、数值右对齐止于 `x=304`；右侧从 `x=696`（数值）与 `x=728`（名称）镜像。槽宽按最长名称定——名称撞上轴线是这里唯一不能靠移动坐标修复的问题。
+- **状态标题**用 Geist Mono 9px，在每条轴下方 `y=440` 居中，字距 `0.14em`。
+- **系列数：** 4–10——刻意高于父图表的 5 上限。那个上限存在是因为八顶点 polyline 会在绘图区中部缠结；slopegraph 没有中部，这里的天花板由端点标签碰撞决定，不是线。低于 4 时一句话或一对柱子说得更好。
+- **无网格线。** 每个端点印出自己的值，网格线不携带图未说过的信息；两条轴线*就是*刻度。这是与父折线图的真实差异，那里由网格线承担读数。
+- **值域：** 选包含数据的整数边界并在来源行写明。已交付示例在 `y` 420 → 40 上跑 100–550ms，即每毫秒 0.84px。父图表的含零规则在这里不约束：斜率不因移动原点而改变，前提是*两条*轴一起移动。紧值域的实际效果是等比放大每条斜率，所以写明边界让读者自行校准。
+- **图例键是 24px 线段加其圆点**，不是父图表的 16×8 矩形——父级 § 布局约定把它登记为 slopegraph 例外。slopegraph 的键必须展示线宽，因为线宽才是焦点系列的标记。
+- **两个端点都有圆点**——非焦点 `r=3`，焦点 `r=4`。也是差异点：折线图只在焦点系列画点，因为它每系列八个顶点、处处画点会糊。slopegraph 每系列恰好两个点，且都是读值的位置。
+- **4px 网格**适用于设计常量——轴位置、槽边缘、状态标题基线。端点 `y` 值按数据缩放，豁免；吸附它们等于移动数据。两个继承常量也在网格外并保持原样：图例横线 `y=462` 与 `LEGEND`/来源基线 `478`，`assets/` 中每种图表类型都共享它们。这里匹配家族节奏优先于匹配网格——把它们移动 4px 会让本变体与 bar、line、scatter、treemap 错位，只为满足一条它们谁也不满足的规则。
 
-#### Colour
+#### 颜色
 
-- **One accent, and an `ink` opacity ramp for everything else** — not the series palette. In a line chart hue is the only way to follow a series across eight x-positions, so `series-1`…`series-4` earn their place. Here every series is named at both ends, so hue would be a second encoding of something the labels already carry, and it would spend the one-accent rule for nothing.
-- **The ramp runs 0.80 → 0.62**, ordered by the left-hand value. The hard floor is **0.53** — that is where an `ink` stroke crosses 3:1 against light paper (0.53 measures 3.03:1, 0.52 measures 2.95:1), and every line in this figure is data, not decoration. The shipped ramp bottoms out at 0.62 (3.84:1) rather than hugging the floor, because a ramp whose lightest member is only just legible has no room left to add a series.
-- **Note what the ramp does not buy you.** It separates the ends of the range, not adjacent members — 0.80 and 0.74 are not distinguishable at 1.2px, as the shipped example shows. It is there to help trace one line through a crossing. It must never be the only way to tell two series apart; that is the labels' job.
-- **The accent marks the editorially focal series, not the best or the biggest.** In the shipped example it marks the one service that got *worse*.
-- **Focus is carried by stroke weight, not tone** — 2.4px focal against 1.2px. Check the token you actually ship: `accent` measures **2.86:1 on light paper** and 5.21:1 on dark, so on light paper the focal line has *less* contrast than the ink ramp it is meant to dominate, and weight is the only cue that survives both skins and greyscale.
-- **Be honest about what that leaves.** 2.86:1 is below WCAG 1.4.11's 3:1 floor for a graphical object, and a heavier stroke does not raise a contrast ratio — it only makes the mark easier to find. The focal line clears the bar on redundancy rather than on contrast: its position and its two endpoint labels (`ink` at 11.8:1, `muted` at 6.1:1) carry the data, and its accent adds only *which series is focal*, which the legend states in words and the stroke weight repeats. Nothing here rests on the accent alone. This is a property of the skin's accent token on light paper, not of this variant — the focal bar, the focal line and the focal treemap cell inherit it too, so fixing it properly means changing `accent` in style-guide.md.
-- **Labels stay `ink` (names) and `muted` (values) on every series, including the focal one.** Accent text at 9–11px misses AA on light paper at that same 2.86:1. A focal value label in accent is the most common way to make a slopegraph fail contrast while looking deliberate.
-- **Legend wording must be skin-neutral: "strongest tone", never "darkest".** The ramp is ink-at-opacity, so the top of it is the darkest line on light paper and the *lightest* on dark. A legend that says "darker is higher" ships false in one of the two variants — and it renders perfectly in both, so only reading the dark file catches it.
+- **一个 accent，其余全部用 `ink` 不透明度梯度**——不用系列色板。折线图中色相是跨八个 x 位置追踪一个系列的唯一手段，所以 `series-1`…`series-4` 有其位置。这里每个系列两端都有名称，色相会成为标签已承载信息的第二重编码，还会白白花掉单 accent 规则。
+- **梯度从 0.80 → 0.62**，按左端值排序。硬下限是 **0.53**——那是 `ink` 描边在浅色纸上跨过 3:1 的位置（0.53 实测 3.03:1，0.52 实测 2.95:1），而这张图里每条线都是数据不是装饰。已交付梯度最低到 0.62（3.84:1）而非贴下限，因为最浅成员勉强可读的梯度没有再加系列的余地。
+- **注意梯度买不到什么。** 它区分的是值域两端，不是相邻成员——0.80 与 0.74 在 1.2px 下不可分辨，已交付示例即如此。它的作用是帮助在交叉中追踪一条线。它绝不能是区分两个系列的唯一手段；那是标签的职责。
+- **accent 标记编辑焦点系列，不是最好或最大的。** 已交付示例中它标记的是那个变*差*的服务。
+- **焦点由线宽承载，不由色调**——焦点 2.4px 对 1.2px。检查你实际交付的 token：`accent` 在浅色纸上实测 **2.86:1**、深色下 5.21:1，所以浅色纸上焦点线的对比度*低于*它本应压过的 ink 梯度，线宽是唯一在两种皮肤与灰度下都成立的线索。
+- **对留下什么要诚实。** 2.86:1 低于 WCAG 1.4.11 对图形对象的 3:1 下限，更粗的描边不提高对比度——它只让标记更容易被找到。焦点线靠冗余而非对比度过线：它的位置与两个端点标签（`ink` 11.8:1、`muted` 6.1:1）承载数据，它的 accent 只补充*哪个系列是焦点*，而这一点图例用文字声明、线宽再重复一次。这里没有任何东西只依赖 accent。这是皮肤的 accent token 在浅色纸上的属性，不是本变体的——焦点柱、焦点线、焦点 treemap 单元格同样继承它，所以真正的修复意味着改 style-guide.md 里的 `accent`。
+- **每个系列（含焦点系列）的标签都保持 `ink`（名称）与 `muted`（数值）。** 9–11px 的 accent 文字在浅色纸上以同样的 2.86:1 未达 AA。焦点值标签用 accent 是让 slopegraph 对比度失败还显得刻意的最常见方式。
+- **图例措辞必须皮肤中性："strongest tone"，绝不用 "darkest"。** 梯度是 ink-at-opacity，所以它在浅色纸上是暗线、在深色上是*最浅*线。写 "darker is higher" 的图例在两个变体之一中是假的——而且两边渲染都完美，只有读深色文件才能发现。
 
-#### Honest-data rule
+#### 诚实数据规则
 
-**Both axes must carry the same scale and the same units.** That is the entire claim of the type: if the scales differ, the angle of every line is fiction. `scripts/verify-slopegraph.py` gates it.
+**两条轴必须携带相同刻度与相同单位。** 这是本类型的全部主张：刻度不同时，每条线的角度都是虚构。`scripts/verify-slopegraph.py` 把关。
 
-- **The two axes must never differ from each other** — not in scale, not in origin, not in transform. A shared *origin* matters as much as a shared scale: shifting one axis tilts every slope by the same amount, so the series still rank correctly against each other while every rate is wrong. That is the harder version to spot by eye, which is why the checker tests slope and origin separately.
-- **A domain tighter than zero is fine; an undisclosed one is not.** Both axes sharing a 100–550 window is legitimate, because moving the origin leaves every slope unchanged when both axes move together — this is exactly where a slopegraph differs from a bar chart, whose truncated baseline distorts the ratio between bars. What a tight window does do is magnify all slopes equally, so the bounds go in the source line and the reader calibrates. Log-scaling is a different matter and stays out: it makes the angle mean nothing.
-- **Label both endpoints with actual values.** A slope with no magnitudes is a mood.
-- **Round once, then draw from the rounded number**, so the printed label, the declared metadata and the drawn `y` are three statements of one number rather than three chances to disagree.
-- **If a series is missing an endpoint, drop it and say so.** Never interpolate to complete a line.
-- **Crowded endpoint labels are data.** When two series sit a few tenths apart their labels crowd *because the values are close*. Moving a point to open up space converts a legibility problem into a false statement — and it is invisible afterwards, because the label you moved it for now sits comfortably beside the wrong position. This is the specific defect the gate exists for.
-- **Two series that coincide at both endpoints cannot be separated at all.** Merge them into one labelled line, or drop one and name the omission in the source line. What you must not do is nudge them apart, which is the same defect as above wearing a better excuse.
-- **The straight line is a connector, not a trajectory.** Two endpoints say nothing about the path between them: the underlying series may have dipped, spiked, or crossed three times. So never read an intermediate value off a slope, and never annotate a crossing with a date. In the shipped example one service regresses while four improve, so its line crosses three others; none of the three crossings is annotated, and the card beside the figure says why.
+- **两轴绝不允许彼此不同**——刻度、原点、变换都不行。共享*原点*与共享刻度同样重要：平移一条轴会让每条斜率倾斜相同量，系列间排名仍然正确而每个速率都是错的。这是肉眼更难发现的版本，所以检查器分别测试斜率与原点。
+- **比零紧的值域没问题；不披露的值域有问题。** 两轴共享 100–550 窗口是合法的，因为两轴一起移动时原点移动不改变任何斜率——这正是 slopegraph 与柱状图的区别，后者截断基线会扭曲柱间比例。紧窗口的实际效果是等比放大所有斜率，所以边界写进来源行让读者校准。对数缩放是另一回事，排除在外：它让角度失去意义。
+- **两个端点都标注真实值。** 没有量级的斜率只是一种情绪。
+- **取整一次，然后按取整后的数绘制**，让印出的标签、声明的元数据与绘制的 `y` 是同一个数的三次陈述，而不是三次不一致的机会。
+- **系列缺端点时删掉它并说明。** 绝不插值补全一条线。
+- **拥挤的端点标签本身就是数据。** 两个系列相差零点几时，标签拥挤是*因为值接近*。移动点来腾空间把可读性问题变成假陈述——而且事后不可见，因为你为它腾空间的标签现在舒服地坐在错误位置旁边。这正是这道门存在要防的缺陷。
+- **两端都重合的两个系列完全无法分离。** 把它们合并为一条带标签的线，或删掉一个并在来源行写明省略。绝不允许把它们稍微挪开，那是同一缺陷换了个更好的借口。
+- **直线是连接线，不是轨迹。** 两个端点对它们之间的路径什么都没说：底层系列可能下探、尖峰或交叉过三次。所以绝不从斜率上读中间值，绝不给交叉标注日期。已交付示例中一个服务变差而四个变好，它的线穿过另外三条；三个交叉都没有标注，图旁的卡片说明了原因。
 
-#### Declaring the values
+#### 声明数值
 
-**Every visible string that carries meaning is bound to an attribute stating the same thing.** That is the whole contract, and it exists because each unbound string is a place the figure can be made to lie while every geometric check stays green.
+**每个携带含义的可见字符串都绑定到一个声明同一事实的属性。** 这就是全部契约，它存在是因为每个未绑定的字符串都是图可以在所有几何检查保持绿色时说谎的位置。
 
 ```svg
-<!-- State captions: data-axis names the axis, data-state binds the text -->
+<!-- 状态标题：data-axis 命名轴，data-state 绑定文本 -->
 <text data-axis="from" data-state="BEFORE" x="320" y="440" fill="#4f5d75" font-size="9" font-family="'Geist Mono', monospace" letter-spacing="0.14em" text-anchor="middle">BEFORE</text>
 <text data-axis="to" data-state="AFTER" x="680" y="440" fill="#4f5d75" font-size="9" font-family="'Geist Mono', monospace" letter-spacing="0.14em" text-anchor="middle">AFTER</text>
 
-<!-- A series: the line declares its two values, and each of its four labels
-     declares which series and which end it belongs to -->
+<!-- 一个系列：线声明它的两个值，它的四个标签各自声明
+     所属系列与所属端 -->
 <line data-series="Recommender" data-from="238" data-to="431"
       x1="320" y1="303.5" x2="680" y2="140.5" stroke="#eb6c36" stroke-width="2.4"/>
 <circle cx="320" cy="303.5" r="4" fill="#eb6c36"/>
@@ -107,77 +107,77 @@ Not for: three or more states (that is the **line chart** above, or a bump chart
 <text data-series="Recommender" data-end="to" data-role="name" x="728" y="144" fill="#2d3142" font-size="11" font-weight="600" font-family="'Geist', sans-serif">Recommender</text>
 ```
 
-Non-focal series: `stroke="rgba(45,49,66,0.68)"` at `stroke-width="1.2"`, dots `r=3`, names at `font-weight="500"`.
+非焦点系列：`stroke="rgba(45,49,66,0.68)"`、`stroke-width="1.2"`，圆点 `r=3`，名称 `font-weight="500"`。
 
-What each binding buys, and what it costs to omit:
+每个绑定买到什么、省略它付出什么：
 
-| Binding | Without it |
+| 绑定 | 没有它 |
 |---|---|
-| `data-from` / `data-to` on the line | The checker would have to read the labels, and a series whose label went missing would drop silently out of the verified set — the exact hole that let a treemap cell ship 50% oversized. |
-| `data-end` on a value label | A printed number could not be cross-checked against the value it claims to state. |
-| `data-role="name"` on a name label | Two series names could be exchanged between rows, renaming both lines, with every number still correct in isolation. |
-| `data-axis` on a state caption | The captions could be swapped, reversing the direction every slope is read in. |
-| `data-state` on a state caption | Swapping just the two visible strings leaves both captions in place and reverses the figure anyway. |
+| 线上的 `data-from` / `data-to` | 检查器只能去读标签，标签丢失的系列会静默掉出被验证集合——正是那个让一个 treemap 单元格超大 50% 还交付出去的洞。 |
+| 值标签上的 `data-end` | 印出的数字无法与它声称陈述的值交叉核对。 |
+| 名称标签上的 `data-role="name"` | 两个系列名可以在行间互换，重命名两条线，而每个数字孤立看仍然正确。 |
+| 状态标题上的 `data-axis` | 标题可以互换，反转每条斜率的读取方向。 |
+| 状态标题上的 `data-state` | 只交换两个可见字符串，两个标题留在原位而图照样被反转。 |
 
-`scripts/verify-slopegraph.py` requires all of them, cross-checks each visible string against its binding, and reports any label drawn nearer another series' endpoint than its own — a label on the wrong row renames the line.
+`scripts/verify-slopegraph.py` 要求全部绑定，把每个可见字符串与其绑定交叉核对，并报告任何画得离别的系列端点比离自己端点更近的标签——落错行的标签会重命名那条线。
 
-**No `transform` on any of it.** The checker reads raw `x`/`y` attributes, so a `transform` on a series line, on a bound label, on an ancestor `<g>`, or in a CSS rule moves the rendered mark away from the number that was verified — `transform="translate(0 80)"` on one line slid its endpoint 80px past every green check. Transforms are rejected rather than resolved: a partial implementation of the SVG transform stack looks like coverage without being it. Bake the offset into the coordinates. The rotated value-axis caption is fine — it is neither verified geometry nor a bound label.
+**任何元素上都不许有 `transform`。** 检查器读原始 `x`/`y` 属性，所以系列线、绑定标签、祖先 `<g>` 或 CSS 规则上的 `transform` 会把渲染标记移离被验证的数字——一条线上的 `transform="translate(0 80)"` 曾把它的端点滑过 80px 而所有绿色检查照常通过。Transform 被拒绝而非被解析：SVG transform 栈的部分实现看起来像覆盖实际不是。把偏移烘焙进坐标。旋转的值轴标题没问题——它既不是被验证几何也不是绑定标签。
 
-**Print one complete number per value label.** A unit suffix is fine (`208ms`); a thousands separator that changes the value is not, and neither is a second number in the same label. Reading only the first numeric fragment let the label `512,000` agree with metadata that said `512`.
+**每个值标签印一个完整数字。** 单位后缀可以（`208ms`）；改变数值的千分位分隔符不行，同一标签里的第二个数字也不行。只读第一个数字片段曾让标签 `512,000` 与写着 `512` 的元数据"一致"。
 
-#### Anti-patterns
+#### 反模式
 
-- Different scales, different units, or different origins on the two axes — the type's one unforgivable error.
-- A value axis whose two halves disagree, or a tight domain the source line never states.
-- Moving an endpoint to make room for its label.
-- More than 10 series (labels collide) or fewer than 4 (a sentence is shorter).
-- Three or more state columns — that is the parent line chart, or a bump chart, not this.
-- One hue per series instead of the ink ramp plus a single accent.
-- A value label in `accent`, or any text in `soft` (3.48:1 on paper).
-- Gridlines, or a value axis that repeats numbers the endpoints already print.
-- Annotating the crossing with a date, or reading any intermediate value off a slope.
-- A `transform` on a series line, a bound label, an ancestor group, or in CSS — it moves the mark away from the checked coordinate.
-- An unbound visible string: a name, a value or a state caption with no attribute stating the same thing.
-- Curving the connector. There is nothing between the two points to curve through.
+- 两轴刻度不同、单位不同或原点不同——本类型唯一不可饶恕的错误。
+- 值轴两半不一致，或来源行从未声明的紧值域。
+- 移动端点为其标签腾空间。
+- 超过 10 个系列（标签碰撞）或少于 4 个（一句话更短）。
+- 三个或更多状态列——那是父折线图或 bump chart，不是这个。
+- 每系列一个色相，而不是 ink 梯度加单一 accent。
+- 值标签用 `accent`，或任何文字用 `soft`（纸上 3.48:1）。
+- 网格线，或值轴重复端点已印出的数字。
+- 给交叉标注日期，或从斜率上读任何中间值。
+- 系列线、绑定标签、祖先组或 CSS 上的 `transform`——它把标记移离被检查的坐标。
+- 未绑定的可见字符串：名称、数值或状态标题没有声明同一事实的属性。
+- 把连接线画弯。两点之间没有东西可以穿过。
 
 ### Ridgeline
 
-**Best for:** one **distribution** per series, stacked at a fixed pitch with deliberate overlap, when the shape of each distribution is the story and the series are directly comparable — request latency per service, build duration per pipeline, session length per cohort. The line chart above plots one value per x; a ridgeline plots a whole distribution per row, and the reading is the silhouette: where the mass sits, how tight it is, whether there is a second peak. A p50/p99 pair cannot show a bimodal service, and a box plot flattens it to a rectangle.
+**最适合：** 每系列一个**分布**，以固定行距堆叠并刻意重叠，当每个分布的形状就是故事且系列可直接比较时——每服务的请求延迟、每流水线的构建时长、每群组的会话时长。上文折线图每个 x 画一个值；ridgeline 每行画一个完整分布，读法是轮廓：质量集中在哪、有多紧、有没有第二个峰。p50/p99 对无法展示双峰服务，箱线图把它压扁成矩形。
 
-Not for: a single distribution (that is a histogram — one ridge is a ridgeline with the comparison removed); series measured in different units or on different x-ranges, which cannot share the one x-scale the type requires; time series, where each row is one value per moment rather than one distribution; or distributions so similar that the ridges are five copies of one shape, which a table of percentiles says shorter.
+不适用于：单一分布（那是直方图——一条脊就是去掉比较的 ridgeline）；不同单位或不同 x 范围的系列，它们无法共享本类型要求的单一 x 刻度；时间序列，那里每行是每时刻一个值而非一个分布；或相似到五条脊是同一形状五份拷贝的分布——一张百分位表格说得更短。
 
-#### Layout conventions
+#### 布局约定
 
-- **One baseline per ridge at a fixed pitch**, inside the `0 0 1000 500` viewBox the other Line variants use. The shipped example runs five baselines at `y` 152/208/264/320/376, a 56px pitch.
-- **The x-run is the slopegraph's**, `x` 320 → 680, sampled at 13 bins 30px apart. The gutters are symmetric about it: names right-aligned ending at `x=304`, ranges starting at `x=696`, both 16px clear of the plot.
-- **Name left of the baseline, range right of it**, each on its ridge's own row (`y = baseline + 3.5`). The range is the span of the ridge's nonzero mass in x-axis units, which is the number a silhouette cannot give you.
-- **Bin ticks** in Geist Mono 9px at `y=400`, centred on bin positions and tracked `0.14em`, with the x-axis caption at `y=424`. The rotated amplitude caption sits at `x=24`, as in the parent chart.
-- **Ridge count 3–12, bins 8–40.** Below three ridges there is no family of shapes to compare and two distributions are a pair of small multiples; past twelve the stack is taller than a reader can hold one silhouette in mind across. Below eight bins the outline is a histogram wearing a curve's clothes; past forty the bins are narrower than the noise in them.
-- **Straight segments between bins, closed with `Z`.** Not splines: the source line states the drawing is unsmoothed, and a curve through binned counts puts extrema between bins that the sample never measured. The draft this variant came from permits Catmull-Rom with vertices on true values; the shipped grammar does not use it, because unsmoothed bins need no footnote about what the curve is allowed to invent.
-- **No gridlines.** The baselines are the rules, and every ridge prints its own range.
+- **每条脊一条基线、固定行距**，在其他 Line 变体使用的 `0 0 1000 500` viewBox 内。已交付示例跑五条基线于 `y` 152/208/264/320/376，行距 56px。
+- **x 行程沿用 slopegraph 的**，`x` 320 → 680，以 13 个 bin、间距 30px 采样。标签槽关于它对称：名称右对齐止于 `x=304`，范围从 `x=696` 开始，都距绘图区 16px。
+- **名称在基线左侧，范围在右侧**，各在其脊自己的行上（`y = baseline + 3.5`）。范围是该脊非零质量在 x 轴单位下的跨度，这是轮廓给不出的数字。
+- **Bin 刻度**用 Geist Mono 9px 于 `y=400`，在 bin 位置上居中、字距 `0.14em`，x 轴标题在 `y=424`。旋转的振幅标题在 `x=24`，与父图表一致。
+- **脊数 3–12，bin 数 8–40。** 少于三条脊没有形状家族可比，两个分布是一对 small multiples；超过十二条，堆叠高度超出读者能在脑中保持一个轮廓的范围。少于 8 个 bin，轮廓是穿着曲线外衣的直方图；超过 40 个，bin 比其中的噪音还窄。
+- **bin 之间直线段，以 `Z` 闭合。** 不用样条：来源行声明图形未平滑，而穿过 bin 计数的曲线会把极值放在样本从未测量的 bin 之间。本变体来源的草稿允许顶点在真值上的 Catmull-Rom；已交付语法不用它，因为未平滑的 bin 不需要关于曲线被允许发明什么的脚注。
+- **无网格线。** 基线就是横线，每条脊印出自己的范围。
 
-#### Colour
+#### 颜色
 
-The slopegraph's colour section holds here unchanged, with one addition for the fill. One accent on the editorially focal ridge (stroke `accent`, fill the accent at `0.16`), an `ink` opacity ramp for the rest (`0.80 → 0.62`, floor `0.53`) ordered top row to bottom, and focus carried by stroke weight — 2.4px against 1.2px — rather than tone. Labels stay `ink` (names) and `muted` (ranges) on every ridge including the focal one.
+slopegraph 的颜色节在这里原样成立，只加一条填充规则。编辑焦点脊用一个 accent（描边 `accent`，填充 accent @ `0.16`），其余用 `ink` 不透明度梯度（`0.80 → 0.62`，下限 `0.53`）按顶行到底行排序，焦点由线宽承载——2.4px 对 1.2px——而非色调。每条脊（含焦点脊）的标签保持 `ink`（名称）与 `muted`（范围）。
 
-- **Fill `ink` at `0.12` on every non-focal ridge**, low enough that two overlapping ridges read as depth rather than as a third tone. This is the one place the type needs a fill at all: the outline alone does not say which side of the curve is mass.
-- **Legend wording stays skin-neutral** — "strongest tone", never "darkest". The ramp is ink-at-opacity, so its top is the darkest line on light paper and the lightest on dark, and a legend that says "darker" ships false in one of the two skins while rendering perfectly in both.
-- **The accent marks the ridge the story is about, not the worst performer.** In the shipped example it marks the service whose *shape* is unusual, not the slowest one.
+- **每条非焦点脊填充 `ink` @ `0.12`**，低到两条重叠的脊读作纵深而非第三种色调。这是本类型唯一需要填充的地方：只有轮廓说不出曲线哪一侧是质量。
+- **图例措辞保持皮肤中性**——"strongest tone"，绝不用 "darkest"。梯度是 ink-at-opacity，顶端在浅色纸上是暗线、在深色上是最浅线，写 "darker" 的图例在两种皮肤之一中是假的而两边渲染都完美。
+- **accent 标记故事所关于的脊，不是表现最差的。** 已交付示例中它标记的是*形状*异常的服务，不是最慢的。
 
-#### Honest-data rule
+#### 诚实数据规则
 
-**One amplitude on every ridge, stated in the source line.** That is the entire claim of the type: the ridges are stacked so their silhouettes can be compared, and per-ridge normalisation destroys exactly that while rendering beautifully — a rare, flat distribution given its own scale wears the same shape as a tight one. `scripts/verify-ridgeline.py` derives the figure's single amplitude and holds every vertex of every ridge to it.
+**每条脊一个振幅，写进来源行。** 这是本类型的全部主张：脊堆叠是为了轮廓可比，逐脊归一化恰恰毁掉这一点而渲染依然漂亮——一个罕见、平坦的分布拿到自己的刻度后与一个紧分布形状相同。`scripts/verify-ridgeline.py` 推导图形的单一振幅并让每条脊的每个顶点服从它。
 
-- **The baseline never lies.** Each ridge declares the row it rises from, and that row must sit on the stack's fixed pitch with its rule drawn across the full bin run. A baseline nudged up to give one ridge headroom is the same falsification as a private amplitude, told with different arithmetic — and it is the harder one to see, because the silhouette above it is untouched.
-- **Every ridge shares one x-scale.** A peak at one x means one latency on every row, or the column comparison the type exists for is fiction.
-- **State the overlap, and keep it overlap.** Ridges are meant to intrude on the row above — that is how the stack reads as depth. A peak that reaches the row *two* above is occluded by the peaks it passes, and the fix is more pitch, never a smaller amplitude on one ridge. The checker enforces the ceiling; the source line states the amplitude so the reader can convert a height back into a number.
-- **A ridge starts and ends on its own baseline.** The first and last bins are zero, so the outline closes along the baseline. A distribution clipped mid-mass draws a cliff, and a cliff reads as data.
-- **No smoothing beyond what the footnote states.** The shipped grammar smooths nothing at all. If a figure ever does smooth, the footnote names the method and the vertices stay on true values — a spline that invents a second peak is indistinguishable, on the page, from a service that has one.
-- **Height is share, not volume.** Each ridge is normalised to its own series' count before the shared amplitude is applied, so the tallest ridge is the most concentrated, not the busiest. Say so in the source line; a reader who assumes height is traffic reads the figure exactly backwards.
+- **基线绝不说谎。** 每条脊声明它升起的行，该行必须坐在堆叠的固定行距上、横线画满整个 bin 行程。为给一条脊腾头部空间而上移的基线，与私有振幅是同一种造假，只是换了算术——而且更难看见，因为它上方的轮廓原封不动。
+- **每条脊共享一个 x 刻度。** 一个 x 处的峰在每行都意味着同一个延迟，否则本类型存在的列比较是虚构。
+- **声明重叠，并保持它是重叠。** 脊就是要侵入上一行——堆叠由此读作纵深。伸到*上两行*的峰会被它穿过的峰遮挡，修复方式是加大行距，绝不是缩小某条脊的振幅。检查器强制上限；来源行声明振幅让读者能把高度换算回数字。
+- **脊在自己的基线上开始和结束。** 首尾 bin 为零，轮廓沿基线闭合。在质量中间被裁切的分布画出悬崖，而悬崖会被读作数据。
+- **平滑不超过脚注声明。** 已交付语法完全不平滑。若某图确实平滑，脚注写明方法且顶点保持在真值上——发明出第二个峰的样条，在纸面上与真有第二个峰的服务无法区分。
+- **高度是份额，不是量。** 每条脊在应用共享振幅前先按自己系列的计数归一化，所以最高的脊是最集中的，不是最繁忙的。在来源行写明；假设高度是流量的读者会把图读反。
 
-#### Declaring the values
+#### 声明数值
 
-The binding contract is the slopegraph's, applied to areas: the outline declares its bins and its baseline, and every visible string is bound to what it describes.
+绑定契约沿用 slopegraph 的，应用到面积上：轮廓声明它的 bin 与基线，每个可见字符串绑定到它描述的对象。
 
 ```svg
 <line data-ridge="checkout-api" data-role="baseline" x1="320" y1="320" x2="680" y2="320" stroke="rgba(45,49,66,0.25)" stroke-width="1"/>
@@ -187,55 +187,55 @@ The binding contract is the slopegraph's, applied to areas: the outline declares
 <text data-tick="2" data-bin="240" x="500" y="400" fill="#4f5d75" font-size="9" font-family="'Geist Mono', monospace" letter-spacing="0.14em" text-anchor="middle">240</text>
 ```
 
-`data-bins` is the basis of every geometric check, and it is this contract's own vocabulary: the slopegraph above binds `data-series` on a `<line>`, this variant binds `data-bins` on a `<path>`, and neither gate reads the other's attribute, so neither claims the other's file. Any further Line variant should take its own attribute for the same reason — a shared name means two checkers holding one figure to two contracts, and the one that loses rejects it for lacking elements it never said it had. `data-baseline` is what makes a moved row detectable; without it the checker would have to infer the zero from the drawing, which is the very thing being falsified. The printed range is cross-checked against the first and last nonzero bin through the figure's own tick scale, so a range widened by a word is a finding. `scripts/verify-ridgeline.py` covers the amplitude, the pitch, the baseline rules, the shared bins, the segment grammar, the overlap ceiling, the focus pairing and every label binding; `scripts/test-verify-ridgeline.py` proves each check in both polarities and pins the scope treaty with the sibling gates.
+`data-bins` 是所有几何检查的基础，也是本契约自己的词汇：上文 slopegraph 在 `<line>` 上绑定 `data-series`，本变体在 `<path>` 上绑定 `data-bins`，两道门互不读对方的属性，所以互不声称对方的文件。任何后续 Line 变体都应出于同样原因取自己的属性——共享名称意味着两个检查器用两份契约约束同一张图，输的那个会以缺少从未声明过的元素为由拒绝它。`data-baseline` 让被移动的行可检测；没有它检查器只能从图形推断零点，而那正是被造假的东西。印出的范围通过图形自己的刻度尺与首尾非零 bin 交叉核对，所以被一个词放宽的范围就是一个 finding。`scripts/verify-ridgeline.py` 覆盖振幅、行距、基线规则、共享 bin、段语法、重叠上限、焦点配对与每个标签绑定；`scripts/test-verify-ridgeline.py` 对每项检查证明两种极性，并钉住与兄弟门的范围条约。
 
-**No `transform` on any of it**, for the reason the slopegraph section gives: the checker reads raw coordinates, so a transform on an outline, a baseline rule, a bound label, an ancestor `<g>` or a CSS rule moves the rendered mark away from the bin that was verified. The rotated amplitude caption is fine — it is neither verified geometry nor a bound label.
+**任何元素上都不许有 `transform`**，理由 slopegraph 节已给出：检查器读原始坐标，所以轮廓、基线横线、绑定标签、祖先 `<g>` 或 CSS 规则上的 transform 会把渲染标记移离被验证的 bin。旋转的振幅标题没问题——它既不是被验证几何也不是绑定标签。
 
-#### Anti-patterns
+#### 反模式
 
-- Per-ridge normalisation, or any second amplitude anywhere in the figure — the type's one unforgivable error.
-- A baseline moved off the pitch to buy one ridge headroom, or a baseline rule drawn somewhere other than the row its ridge declares.
-- Ridges sampled on different x-ranges, or an x-scale that is not printed at all.
-- Smoothing that puts a peak between two bins, and any spline in a figure whose footnote says the drawing is unsmoothed.
-- A ridge clipped mid-mass so the outline closes as a cliff.
-- Pitch so tight that peaks hide behind peaks — increase the pitch, never shrink one ridge.
-- One hue per ridge instead of the ink ramp plus a single accent.
-- A legend that says "darker is faster", which is false on one of the two skins.
-- Fewer than 3 ridges (that is a histogram or a pair of small multiples) or more than 12.
-- Reading traffic off ridge height, or shipping a figure whose source line lets a reader do so.
+- 逐脊归一化，或图中任何位置出现第二个振幅——本类型唯一不可饶恕的错误。
+- 基线被移出行距为一条脊腾头部空间，或基线横线画在其脊声明的行之外。
+- 脊在不同 x 范围上采样，或 x 刻度根本没印出来。
+- 把峰放在两个 bin 之间的平滑，以及脚注声明未平滑的图中出现任何样条。
+- 脊在质量中间被裁切导致轮廓闭合成悬崖。
+- 行距紧到峰藏在峰后——加大行距，绝不缩小某条脊。
+- 每脊一个色相，而不是 ink 梯度加单一 accent。
+- 图例写 "darker is faster"，这在两种皮肤之一中是假的。
+- 少于 3 条脊（那是直方图或一对 small multiples）或多于 12 条。
+- 从脊高读流量，或交付一张来源行允许读者这么读的图。
 
 ### Bump chart
 
-**Best for:** rank movement across **3–6 ordered snapshots** when position, not magnitude, is the story — package popularity by quarter, team standings by sprint, top queries by month. The slopegraph above shows two moments and keeps magnitude; a bump chart trades magnitude away entirely to show *several* moments of pure position. That trade is the type: the vertical axis is rank, every row is one rank apart, and a flat line means "nothing displaced it", not "nothing changed".
+**最适合：** **3–6 个有序快照**间的排名移动，当位置而非量级是故事时——按季度的包流行度、按冲刺的团队排名、按月的热门查询。上文 slopegraph 展示两个时刻并保留量级；bump chart 把量级完全换掉，展示*多个*时刻的纯位置。这个交换就是本类型：纵轴是排名，每行相差一个名次，平坦的线意味着"没有东西取代它"，不是"没有变化"。
 
-Not for: exactly two snapshots (that is the **slopegraph** above); magnitude stories — a series whose downloads doubled while its rank held draws a flat line, and if that surprise matters the reader needed a **line chart**; fewer than 4 series (a sentence is shorter) or more than 8 (spaghetti with a legend).
+不适用于：恰好两个快照（那是上文 **slopegraph**）；量级故事——下载量翻倍而排名不变的系列画出一条平线，那个意外重要时读者需要的是**折线图**；少于 4 个系列（一句话更短）或多于 8 个（带图例的意大利面）。
 
-#### Layout conventions
+#### 布局约定
 
-- **One vertical axis rule per snapshot**, evenly pitched inside the plot, with the label gutters of the slopegraph: names right-aligned ending at `x=272` and first ranks at `x=304` on the left, mirrored from `x=696` (ranks) and `x=728` (names) on the right. The shipped example runs four axes at `x` 320/440/560/680 — the same 360px run as the slopegraph, spent in three segments instead of one.
-- **Rank rows on a fixed pitch.** The shipped grid is `y = 88 + 56 × (rank − 1)`. Rank is ordinal, so — unlike the slopegraph, whose endpoint `y` values are data-scaled and grid-exempt — **every vertex lands exactly on the 4px grid**, and `scripts/verify-bump.py` enforces the row placement with no tolerance at all. There is no honest reason for a vertex to sit off its row.
-- **Straight segments between adjacent snapshots, dots at every vertex** (`r=3`, focal `r=4`). Never splines: a curve between two quarterly snapshots draws a trajectory nobody measured. The draft this variant came from calls them subway curves and bans them outright.
-- **Labels at first and last appearance** — name and rank (`#1`…`#6`, the sigil keeps a rank from reading as a magnitude) at both ends, each on its own series' row **and in the gutter outboard of the end it names**. Both coordinates are required and both are checked: the row says which series a label belongs to, the column says which *end* of it, and neither implies the other. A first-end label slid along its row into the plot prints every rank correctly and reads against the wrong snapshot.
-- **Snapshot captions** in Geist Mono 9px, centred under each axis, bound with `data-axis` / `data-state` exactly as the slopegraph binds its two.
-- **Series count 4–8, snapshots 3–6.** Two snapshots are a slopegraph; past six the columns compress until rank changes cannot be followed.
-- **No gridlines.** The dots are the readable positions and the axis rules are the columns.
+- **每个快照一条垂直轴线**，在绘图区内等距，配 slopegraph 的标签槽：左侧名称右对齐止于 `x=272`、首位排名在 `x=304`，右侧从 `x=696`（排名）与 `x=728`（名称）镜像。已交付示例跑四条轴于 `x` 320/440/560/680——与 slopegraph 相同的 360px 行程，分三段花掉而非一段。
+- **排名行固定行距。** 已交付网格是 `y = 88 + 56 × (rank − 1)`。排名是序数，所以——不同于端点 `y` 按数据缩放且豁免网格的 slopegraph——**每个顶点恰好落在 4px 网格上**，`scripts/verify-bump.py` 以零容差强制行位置。顶点离开自己的行没有任何诚实理由。
+- **相邻快照间直线段，每个顶点画圆点**（`r=3`，焦点 `r=4`）。绝不用样条：两个季度快照之间的曲线画出无人测量过的轨迹。本变体来源的草稿称之为 subway curves 并完全禁止。
+- **标签在首次与末次出现处**——两端都放名称与排名（`#1`…`#6`，sigil 防止排名被读作量级），各在其系列自己的行上**且在所命名端的外侧槽内**。两个坐标都必需且都被检查：行说明标签属于哪个系列，列说明属于它的哪一*端*，两者互不蕴含。首端标签沿自己的行滑进绘图区，会把每个排名都印对而对着错误的快照被读取。
+- **快照标题**用 Geist Mono 9px，在每条轴下方居中，与 slopegraph 绑定其两个标题的方式完全一致地用 `data-axis` / `data-state` 绑定。
+- **系列数 4–8，快照数 3–6。** 两个快照是 slopegraph；超过六个，列被压缩到排名变化无法追踪。
+- **无网格线。** 圆点是可读位置，轴线是列。
 
-#### Colour
+#### 颜色
 
-Everything the slopegraph's colour section says holds here unchanged: one accent on the editorially focal series, an `ink` opacity ramp (`0.80 → 0.62`, floor 0.53) for the rest — ordered by first-snapshot rank, so the legend can say "strongest tone was highest-ranked", skin-neutrally — focus carried by stroke weight (2.4px against 1.2px) and dot size rather than tone, and labels in `ink`/`muted` on every series including the focal one. The accent marks the series the story is about, never the winner: the shipped example spends it on the package that *fell*.
+slopegraph 颜色节说的一切在这里原样成立：编辑焦点系列用一个 accent，其余用 `ink` 不透明度梯度（`0.80 → 0.62`，下限 0.53）——按首快照排名排序，让图例可以皮肤中性地说 "strongest tone was highest-ranked"——焦点由线宽（2.4px 对 1.2px）与圆点尺寸承载而非色调，每个系列（含焦点系列）的标签用 `ink`/`muted`。accent 标记故事所关于的系列，绝不是赢家：已交付示例把它花在*下跌*的包上。
 
-#### Honest-data rule
+#### 诚实数据规则
 
-**State the ranking key and the tie-break in the source line.** Rank hides magnitude by design, so the footnote is where a reader learns what "first" means and why no two series ever share a row. `scripts/verify-bump.py` gates the geometry half: every snapshot's ranks must be a permutation of 1..N — a duplicated rank is a tie the stated tie-break cannot produce, and a skipped rank is an empty row the reader fills with a series that is not there.
+**在来源行写明排名键与并列裁决规则。** 排名按设计隐藏量级，所以脚注是读者了解"第一"意味着什么、为什么没有两个系列共享一行的地方。`scripts/verify-bump.py` 把关几何一半：每个快照的排名必须是 1..N 的排列——重复的排名是声明的裁决规则产生不了的并列，跳过的排名是读者会用不存在的系列填补的空行。
 
-- **If the ranking measure changed definition between snapshots, the chart is invalid** — ranks under different measures are not comparable, and no drawing convention repairs that.
-- **A series that enters late or leaves early starts or stops.** A real gap is drawn as absence, never interpolated across. The shipped grammar has no way to *declare* a gap yet, so `verify-bump.py` requires every series to visit every snapshot — a series with fewer vertices than columns is a finding until a gap declaration exists, because widening the rule without one would let a truncated series pass as a deliberate exit.
-- **Never smooth a tie into a crossing.** The tie-break decides the order; drawing anything else invents a rank.
-- **Never nudge a vertex off its row** to dodge a label collision — it reads as a rank between two ranks, and the checker treats it as the lie it is.
+- **排名度量在快照之间换了定义，图即无效**——不同度量下的排名不可比，没有绘制惯例能修复。
+- **晚进入或早离开的系列就起始或终止。** 真实缺口画为缺席，绝不跨缺口插值。已交付语法还没有*声明*缺口的手段，所以 `verify-bump.py` 要求每个系列访问每个快照——顶点数少于列数的系列在缺口声明存在之前就是 finding，因为没有声明就放宽规则会让被截断的系列冒充刻意退出。
+- **绝不把并列平滑成交叉。** 裁决规则决定顺序；画成别的等于发明排名。
+- **绝不为躲标签碰撞把顶点挪离自己的行**——它会被读作两个排名之间的排名，检查器把它当作它本是的谎言处理。
 
-#### Declaring the values
+#### 声明数值
 
-The binding contract is the slopegraph's, one level up: the path declares its ranks, and every visible string is bound to what it describes.
+绑定契约沿用 slopegraph 的，上移一层：路径声明它的排名，每个可见字符串绑定到它描述的对象。
 
 ```svg
 <path data-series="legacy-http" data-ranks="1,2,4,6" d="M320,88 L440,144 L560,256 L680,368" fill="none" stroke="#eb6c36" stroke-width="2.4"/>
@@ -244,9 +244,9 @@ The binding contract is the slopegraph's, one level up: the path declares its ra
 <text data-axis="0" data-state="Q1" x="320" y="416" fill="#4f5d75" font-size="9" font-family="'Geist Mono', monospace" letter-spacing="0.14em" text-anchor="middle">Q1</text>
 ```
 
-`data-ranks` is the basis of every geometric check, so a series whose labels go missing stays in the verified set and the missing label is itself reported. `scripts/verify-bump.py` covers the grid, the permutations, the segments, the dots, the focus pairing, the label bindings, label placement on both axes and the captions; `scripts/test-verify-bump.py` proves each check in both polarities. The gutter x is read off the figure — every label sharing an end and a role must agree on one column — so a resized plot needs no constant changed here.
+`data-ranks` 是所有几何检查的基础，所以标签丢失的系列仍留在被验证集合中，丢失的标签本身会被报告。`scripts/verify-bump.py` 覆盖网格、排列、线段、圆点、焦点配对、标签绑定、两轴上的标签位置与标题；`scripts/test-verify-bump.py` 对每项检查证明两种极性。槽 x 从图形读出——共享端与角色的每个标签必须同意同一列——所以调整绘图区大小不需要改这里的常量。
 
-## Examples
+## 示例
 
 - minimal light
 - minimal dark

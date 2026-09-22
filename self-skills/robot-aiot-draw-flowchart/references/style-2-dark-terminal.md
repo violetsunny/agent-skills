@@ -1,8 +1,8 @@
-# Style 2: Dark Terminal
+# Style 2: Dark Terminal（深色终端）
 
-Neon-on-dark hacker aesthetic. 与宿主 agent 规范中的标准技术图风格一致。
+深底霓虹的黑客美学，标准技术图风格。本文件字号（15/13/11px）为风格锁定值，豁免 4px 网格（例外清单登记在 design-system.md §7）。
 
-## Colors
+## 颜色
 
 ```
 Background:     #0f0f1a  (near-black)
@@ -25,7 +25,7 @@ Accent palette (use per theme/layer):
 Arrow colors: match accent of the source node's theme
 ```
 
-## Background Gradient
+## 背景渐变
 
 ```xml
 <defs>
@@ -37,7 +37,7 @@ Arrow colors: match accent of the source node's theme
 <rect width="960" height="600" fill="url(#bg-grad)"/>
 ```
 
-## Typography
+## 排版
 
 ```
 font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', 'Courier New', 'Microsoft YaHei', 'SimHei', monospace
@@ -46,7 +46,7 @@ font-weight: 400 normal, 700 bold for section headers
 letter-spacing: 0.02em for labels
 ```
 
-## Box Styles
+## 盒样式
 
 ```xml
 <!-- Standard panel -->
@@ -60,7 +60,7 @@ letter-spacing: 0.02em for labels
 <!-- #1e3a5f / #3b82f6 for network/gateway nodes -->
 ```
 
-## Glow Effect (optional, for key nodes)
+## 辉光效果（可选，关键节点用）
 
 ```xml
 <defs>
@@ -72,7 +72,7 @@ letter-spacing: 0.02em for labels
 <rect filter="url(#glow-purple)" stroke="#a855f7" .../>
 ```
 
-## Arrows
+## 箭头
 
 ```xml
 <defs>
@@ -85,7 +85,7 @@ letter-spacing: 0.02em for labels
       fill="none" marker-end="url(#arrow-purple)"/>
 ```
 
-## SVG Template
+## SVG 模板
 
 ```xml
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 600"
@@ -106,6 +106,6 @@ letter-spacing: 0.02em for labels
 </svg>
 ```
 
-## See Also
+## 另见
 
-[dark-svg-techniques.md](dark-svg-techniques.md) for dark-canvas techniques this skin does not cover: background grid, semi-transparent fill + opaque mask double-rect, z-order, contrast hard floors, the dark semantic rgba palette, per-type dark recipes (architecture / flowchart / sequence / mind map / structural), and the standalone `.svg` output spec.
+[dark-svg-techniques.md](dark-svg-techniques.md)——本皮肤未覆盖的深色画布技法：背景网格、半透明填充+不透明遮罩双矩形、z-order、对比度硬下限、深色语义 rgba 调色板、分类型深色配方（架构/流程/时序/思维导图/结构），以及独立 `.svg` 输出规格。

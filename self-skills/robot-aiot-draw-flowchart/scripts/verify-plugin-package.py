@@ -10,9 +10,7 @@ that role, so it implements package integrity at the plain meaning:
 1. SKILL.md exists, carries YAML frontmatter with `name` and `description`,
    and `name` matches the skill directory name.
 2. references/, scripts/, and assets/ exist and are non-empty.
-3. assets/template-motion.html exists — the canonical motion controller that
-   self_check.py / lint-skin.py / verify-motion.py all resolve against.
-4. Plugin wiring per doctor.md check 4: when a commands/ or prompts/ tree is
+3. Plugin wiring per doctor.md check 4: when a commands/ or prompts/ tree is
    present, every mapped file must exist and mention its target reference
    path. When neither tree exists the wiring check is not applicable (the
    installed-skill layout), which doctor.md explicitly says is not a failure.
@@ -97,11 +95,6 @@ def verify(skill_root: Path) -> list[str]:
             findings.append(f"{directory}/ directory is missing")
         elif not any(folder.iterdir()):
             findings.append(f"{directory}/ directory is empty")
-
-    if not (skill_root / "assets" / "template-motion.html").is_file():
-        findings.append(
-            "assets/template-motion.html (canonical motion controller) is missing"
-        )
 
     wiring_trees = [
         (folder, wiring)

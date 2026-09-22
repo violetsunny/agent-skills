@@ -72,7 +72,7 @@
 
 样式一致性必检：
 
-1. 普通节点 `fontSize=12`、`strokeWidth=2`、`arcSize=15`、`shadow=0`、`fillColor=#FFFFFF`
+1. 普通节点 `fontSize=12`、`strokeWidth=2`、`arcSize=6–8`、`shadow=0`、`fillColor=#FFFFFF`
 2. 分层容器 `strokeWidth=3`，层标签 `fontSize=16`
 3. 所有箭头 `strokeWidth=3`
 4. 虚线只用于反馈/循环

@@ -101,13 +101,15 @@ Type-specific anti-patterns live in each type reference.
 - **Arrow label** — Geist Mono, 8px — annotation on arrows
 - **Editorial aside** — Instrument Serif *italic*, 14px — callouts only
 
-**Korean labels** — Geist and Instrument Serif carry no Hangul. Extend the family on that `<text>`, budget 1em per Unicode wide or full-width character and the Latin advance for every other, and never set Hangul below 12px. Full rules in [`style-guide.md`](style-guide.md#korean-labels).
+**Korean labels** — Geist and Instrument Serif carry no Hangul. Extend the family on that `<text>`, budget 1em per Unicode wide or full-width character and the Latin advance for every other, and never set Hangul below 12px. Full rules in [`style-guide.md`](style-guide.md#韩文标签).
 
 **Mono is for technical content only** — never as a blanket "dev" font, and never JetBrains Mono.
 
 ```html
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500;600&family=Noto+Sans+KR:wght@400;500;600&family=Noto+Serif+KR:wght@400&display=swap" rel="stylesheet">
 ```
+
+**模板默认零外链**：`assets/` 下全部模板已内置系统字体栈、不含任何外链。上方 link 仅在**联网发布场景**（在线文章、允许网络访问的单文件 HTML）且需要品牌 webfont 时手动加入；`self_check.py` 的 Google Fonts allowlist 只约束这类场景（有外链时仅接受 `fonts.googleapis.com/css2`）。**零外部请求交付物**（图表包装 HTML、离线演示页、robot-aiot 工作流产物、任何调用方声明零外链）禁止加入该 link，一律系统字体栈；SVG 内 `font-family` 写品牌字体名时无外链会自动回退系统字体，可接受。
 
 ---
 
@@ -119,7 +121,6 @@ Universal building blocks. Type-specialized primitives (lifeline, activation bar
 - Hand-drawn variant → [primitive-sketchy.md](primitive-sketchy.md)
 - Icon set (laptop, server, DB, K8s, Docker, AWS, …) → [primitive-icons.md](primitive-icons.md). Browse the gallery at `assets/icons.html`.
 - Terminal / CLI-window variant → [primitive-terminal.md](primitive-terminal.md)
-- Optional explanatory motion → [animation.md](animation.md)
 
 ### Background
 
@@ -193,7 +194,7 @@ These six rules are **non-negotiable**. Run the pre-output checklist (§9) to ve
 
    When in doubt, reroute. The exception exists for the narrow case where rerouting is geometrically impossible, not as a shortcut to avoid layout work.
 
-6. **A label mask must not overlap a node drawn after it.** Rule 2 keeps the label off its own connector; this one keeps it off the boxes. Because nodes are painted after labels, a mask that lands partly inside a node is covered by the node fill and the text renders as a fragment sitting on the node border. Place the label on a segment of the connector that runs through open canvas — for a connector leaving a node's right edge, that means clearing the node's `x + width` before the mask starts. A mask fully *inside* a node is a badge chip and is fine; a mask overlapping a zone container is fine too, since zones are painted first. From a repository checkout, verify with `python3 <repo-root>/scripts/verify-geometry.py <file>`.
+6. **A label mask must not overlap a node drawn after it.** Rule 2 keeps the label off its own connector; this one keeps it off the boxes. Because nodes are painted after labels, a mask that lands partly inside a node is covered by the node fill and the text renders as a fragment sitting on the node border. Place the label on a segment of the connector that runs through open canvas — for a connector leaving a node's right edge, that means clearing the node's `x + width` before the mask starts. A mask fully *inside* a node is a badge chip and is fine; a mask overlapping a zone container is fine too, since zones are painted first. Verify with `python3 scripts/validate_svg.py <file>`（几何检查：碰撞、边界、边布线）.
 
 ### Node box — full pattern
 
@@ -268,7 +269,7 @@ Expand SVG `viewBox` height by ~60px.
 Exempt: stroke widths (0.8, 1, 1.2), opacity values, and the 22×22 dot-pattern.
 
 **全局字号例外清单（风格锁定值，豁免 4px 网格与字号集）：**
-- 风格皮肤 1–8 的锁定字号（如 Style 6 的 16/14/13px、Style 8 的 21/14/13/11/10/9px），见各 `style-N-*.md`
+- 风格皮肤 1–8 的锁定字号（如 Style 6 的 16/14/13px），见各 `style-N-*.md` 头部"风格锁定值豁免"声明
 - 参数化图表类型的 11 / 10 / 9 / 6.5px 刻度与注记字号
 - `dark-svg-techniques.md` 的 7–16px 深色字号阶梯
 - `primitive-annotation.md` 的 14px 斜体 callout
@@ -320,11 +321,12 @@ Quick check: if a coordinate ends in 1, 2, 3, 5, 6, 7, 9 — fix it.
 | Max activities / slices / cards (story map) | 5 / 3 / 12 |
 | Max tables / columns / FKs (db schema) | 5 / 8 shown / 6 |
 | Max annotation callouts | 2 |
-| Max motion (optional) | 8 steps, 12 marked items, 2 simultaneous items — see [animation.md](animation.md) |
 
 If you exceed, split into two diagrams (overview + detail).
 
 分层架构图例外：层容器内的能力卡不计入通用节点预算（节点总数不受 ≤9 限制）；箭头预算同样豁免——按连通分量分组计预算，每个独立连通分量（如一个独立垂直栈/烟囱，各含自身层间箭头）内箭头仍受 ≤12 约束，多个互不相连的分量的箭头总数不受单图 12 条上限判定。
+
+> **类型索引导航：** 39 类视觉类型完整清单（含 IT current-state `type-it-state.md`、Loop `type-loop.md`、Fishbone `type-fishbone.md`、Venn `type-venn.md`、Pyramid `type-pyramid.md`、Scatter `type-scatter.md`、Story map `type-story-map.md`、Wardley map `type-wardley.md` 等）见 SKILL.md「图表类型选择」；各类型布局规则与类型专属预算在对应 `references/type-*.md`。
 
 自动化自检（§7 4px 网格与复杂度预算）：`python3 scripts/check_design_geometry.py <file.svg>` — 校验坐标/尺寸 4px 整除与节点 ≤9、箭头 ≤12、强调 ≤2 预算（依赖 `data-graph-role="node"` 标注，缺标注时报 SKIP 不猜测）；exit 0 = 无 error（允许 warning/note），1 = 有 error。
 
@@ -400,16 +402,15 @@ Run before producing any diagram.
 - [ ] **No two connectors overlap, share a stroke path, or run on top of each other? Crossings use the bridge/hop primitive?**
 - [ ] **When several connectors enter or exit the same edge of a box, each has its own attach point (≥12px apart)? No connector hides another?**
 - [ ] **No connector passes behind a non-endpoint box, except the unavoidable-intervening-box case (§6 rule 5) — and in that case, the stroke is dashed and the label sits at the visible end?**
-- [ ] **No label mask overlaps a node drawn after it? (Node fill would clip the text — §6 rule 6. From a repository checkout, run `python3 <repo-root>/scripts/verify-geometry.py <file>`.)**
+- [ ] **No label mask overlaps a node drawn after it? (Node fill would clip the text — §6 rule 6. Run `python3 scripts/validate_svg.py <file>`.)**
 - [ ] Every arrow label has an opaque `fill="#f5f5f5"` rect behind it?
 - [ ] Legend is a horizontal bottom strip, not floating?
 - [ ] No vertical `writing-mode` text?
 - [ ] `viewBox` expanded for the legend strip (~60px)?
 - [ ] Every font size, coord, width, height, gap divisible by 4?
-- [ ] From the installed skill directory, did `python3 scripts/self_check.py <file>` pass? (Accessible-SVG contract, single-file safety, motion basics; ships with the skill.)
-- [ ] If animated, does the complete static/no-JS frame work, does reduced motion hide/disable playback, and is the controller copied verbatim from `assets/template-motion.html`? From a repository checkout, also run `python3 <repo-root>/scripts/verify-motion.py path/to/generated.html` plus the skin linter; from an installed skill, manually check print and static-query states on top of the self-check.
+- [ ] From the installed skill directory, did `python3 scripts/self_check.py <file>` pass? (Accessible-SVG contract, single-file safety; ships with the skill.)
 
-> 适用范围说明：`self_check.py` / `lint-skin.py` 交付门仅约束 template/motion 包装页产物（`assets/template*.html` 系）。`scripts/interactive_html.py` 与 `fireworks.py export-html` 产出的交互 viewer 使用 canonical viewer 脚本生成，结构与包装页不同，豁免该门（对其跑 self_check 必然 FAIL，属预期，不代表产物有缺陷）。
+> 适用范围说明：`self_check.py` 交付门仅约束 template 包装页产物（`assets/template*.html` 系）。`scripts/interactive_html.py` 产出的交互 viewer 使用 canonical viewer 脚本生成，结构与包装页不同，豁免该门（对其跑 self_check 必然 FAIL，属预期，不代表产物有缺陷）。
 
 **Typography:**
 
@@ -419,6 +420,14 @@ Run before producing any diagram.
 - [ ] Page title in Instrument Serif?
 - [ ] Annotation callouts (if any) in *italic* Instrument Serif? (see [primitive-annotation.md](primitive-annotation.md))
 - [ ] No JetBrains Mono anywhere?
+
+### 无障碍 SVG 契约
+
+上面的技术清单验证机制；这些编辑规则是机制服务的目标：
+
+- `<title>` 是主题的短名称——大致相当于页面 `<h1>`，约 60 字符以内。
+- `<desc>` 是一句话，用读者在没有图像时需要的术语陈述图表内容。描述内容而不是几何："Org chart showing a command center routing work to specialist agents and escalation owners"，而不是"A box at the top with five boxes below it"。逐形状复述比没有有用的描述更糟。
+- 纯装饰 SVG（如 `assets/icons.html` 中的样例字形）带 `aria-hidden="true"` 而不是 `<title>` / `<desc>`。
 
 ---
 
@@ -436,12 +445,9 @@ Every diagram ships in three variants (see `assets/`):
 
 **Terminal variant** (optional, replaces any of the above) — see [primitive-terminal.md](primitive-terminal.md). Start from `assets/template-terminal.html`. Charcoal CLI-window chrome, monospace, one red-orange accent. Good for dev-tool posts; not brand-tokenized, so skip it for onboarded output.
 
-**Animation** (optional presentation layer) — see [animation.md](animation.md). Modes are `none` (default), `reveal`, `step`, and `loop`; motion never changes the static meaning or raises the complexity budget.
-
 ### To create a new diagram
 
-1. Copy the variant closest to what you want (`assets/template.html` for minimal, `assets/template-full.html` for cards, `assets/template-motion.html` only when motion is requested).
+1. Copy the variant closest to what you want (`assets/template.html` for minimal, `assets/template-full.html` for cards).
 2. If behavior is load-bearing, choose a semantic pattern; then load the matching type reference.
 3. Replace the eyebrow, h1, and SVG body. Replace `[diagram-slug]` with the file slug and fill `<title>` / `<desc>`.
-4. If motion is requested, load `animation.md`; otherwise keep mode `none` and no script.
-5. Run the §9 taste gate.
+4. Run the §9 taste gate.

@@ -1,39 +1,39 @@
-# Wardley Map
+# Wardley Map（沃德利地图）
 
-**Best for:** positioning the components of a value chain against how evolved (commoditised) each one is, so a reader can see what to build, what to buy, and what is about to move. A strategy artefact, not an architecture diagram — it says nothing about how components connect at runtime, only where each one sits on the genesis-to-commodity curve.
+**最适合：** 把价值链各组件按其演化（商品化）程度铺开，让读者看清什么该自建、什么该购买、什么即将移动。这是战略图，不是架构图——它不说明组件在运行时如何连接，只回答每个组件处于 genesis-to-commodity 曲线的哪个位置。
 
-## Layout conventions
+## 布局约定
 
-- **Y axis — value chain.** `Visible to the user` at the top, down to `Invisible` at the bottom. Label the axis as stacked separate `<text>` lines flanking the axis endpoints — **never `writing-mode`** to rotate a label vertically. Axis line `rule-solid` at `0.20` opacity.
-- **X axis — evolution.** Four bands separated by three vertical hairlines: `Genesis | Custom-built | Product | Commodity`. Band separators are `rule` at `0.10` opacity, dashed `4,4`. Band labels sit along the bottom axis: Geist Mono 8px, uppercase, tracked, `muted`. Axis line `rule-solid` at `0.20` opacity.
-- **Components** are a small circle `r=6`, filled `paper` with an `ink` 1px stroke. Label in Geist sans 12px weight 600, placed 12px above the dot, `text-anchor="middle"`. An optional Geist Mono 9px `muted` sublabel can sit under the dot for a technical qualifier — use sparingly.
-- **Dependency links** are thin `muted` 0.8px straight lines from a component down to the component it depends on. **These are the one documented exemption from §6 rule 1 (mandatory orthogonal elbows) — dependency links only.** A component's y/x position on this map *is* the data; forcing it onto an axis to make an elbow route work would misplace it. No arrowhead — the line itself states the dependency.
-- **Movement** — a component that is evolving carries a short right-pointing arrow: `accent`, dashed `5,4`, `marker-end="url(#arrow-accent)"`, running from the dot's edge toward the next band. The arrow needs no on-arrow text label: the legend's "Evolving" swatch (accent dot + dashed accent arrow) already names what accent + dashes mean, and since arrows on this map can only ever point right (see Anti-patterns — a left-pointing movement arrow is a contradiction, not a design choice), the direction itself already says "toward commodity." A bare word like `COMMODITISING` restates what shape and color already signal — apply §1's remove test: can I remove this label, does color or shape already carry it? Here it does, so the label is the thing that goes, not its position.
-  An on-arrow label is legitimate only when it qualifies something the arrow *can't* express on its own — a timeframe (`BY Q3`), a driver (`VENDOR LOCK-IN`) — never a restatement of direction. If you add one, mask it Geist Mono 8px, 6–10px clear of the stroke, same masking rule as any arrow label (§6 rule 2), and confirm there's runway for the mask first: the space directly around a component's dot is usually the most congested spot on the map, because that's also where its own dependency links fan out. Worked example（输入契约示例，示例文件不随本 skill 分发）— the moving component sits at `(420,156)` with links fanning to `(620,220)` and `(680,252)`; at the mandatory 6–10px gap band below the arrow (`y=164–176`), those two lines cross at `x=441.7–482.5` and `x=445–482.5` respectively — almost the full width of the arrow's own span (`x=428–504`), leaving no clear pocket wide enough for a label. Above the dot is no better: the component's own name label already occupies that band per the 12px-above-dot convention. Check both bands for interference before adding a movement label; if neither is clear, don't add one — the legend already covers it.
-- **Focal rule:** the 2 accent elements on this type are the moving component's dot (`accent-tint` fill, `accent` stroke) and its movement arrow — or two moving components sharing those 2 accent slots with no other accent anywhere else on the map.
-- **Legend:** horizontal strip at the bottom, hairline separator above it, viewBox extended ~60px — same as every other type.
+- **Y 轴——价值链。** 顶部 `Visible to the user`，向下到底部 `Invisible`。轴标签用多个独立 `<text>` 行堆叠在轴端点旁——**绝不用 `writing-mode`** 旋转竖排。轴线 `rule-solid`、不透明度 `0.20`。
+- **X 轴——演化。** 四个带区由三条垂直发丝线分隔：`Genesis | Custom-built | Product | Commodity`。带区分隔线为 `rule`、不透明度 `0.10`、虚线 `4,4`。带区标签沿底部轴排布：Geist Mono 8px、大写、加字距、`muted`。轴线 `rule-solid`、不透明度 `0.20`。
+- **组件**是小圆 `r=6`，`paper` 填充、`ink` 1px 描边。标签 Geist sans 12px weight 600，置于点上方 12px，`text-anchor="middle"`。可选 Geist Mono 9px `muted` 子标签放在点下方作技术限定——少用。
+- **依赖连线**是细 `muted` 0.8px 直线，从组件连到它所依赖的组件。**这是 §6 规则 1（强制正交肘形）唯一的成文豁免——仅限依赖连线。** 组件在图上的 y/x 位置*就是*数据；为了走出肘形路由而把它硬挪到轴线上等于篡改位置。不加箭头——线本身就陈述了依赖。
+- **移动**——正在演化的组件带一个短右向箭头：`accent`、虚线 `5,4`、`marker-end="url(#arrow-accent)"`，从点边缘指向下一个带区。箭头不需要线上文字标签：图例的 "Evolving" 色样（accent 点 + accent 虚线箭头）已经说明了 accent + 虚线的含义，而且此图上箭头只可能向右（见反模式——左向移动箭头是自相矛盾，不是设计选择），方向本身已经表达"趋向商品化"。`COMMODITISING` 这类裸词只是复述形状与颜色已表达的信息——应用 §1 的移除测试：这个标签能删吗，颜色或形状是否已承载它？这里已承载，所以该删的是标签，而不是挪它的位置。
+  线上标签只有在限定箭头自身*无法*表达的信息时才正当——时间框（`BY Q3`）、驱动因素（`VENDOR LOCK-IN`）——绝不是方向的复述。如果要加，用 Geist Mono 8px 加遮罩、距描边 6–10px，遵循与任何箭头标签相同的遮罩规则（§6 规则 2），并先确认有放置遮罩的空间：组件点正周围通常是全图最拥挤的位置，因为它自己的依赖连线也从那里扇出。Worked example（输入契约示例，示例文件不随本 skill 分发）——一个移动组件位于 `(420,156)`，依赖连线扇向 `(620,220)` 与 `(680,252)`；在箭头下方强制的 6–10px 间隙带（`y=164–176`）内，这两条线分别在 `x=441.7–482.5` 与 `x=445–482.5` 穿过——几乎覆盖箭头自身跨度（`x=428–504`）的全宽，留不出足够宽的干净位置放标签。点上方同样不行：按 12px-above-dot 约定，组件自己的名称标签已占据那一带。添加移动标签前先检查上下两个带的干扰；都不干净就别加——图例已经覆盖了。
+- **焦点规则：** 本类型的 2 个 accent 元素是移动组件的点（`accent-tint` 填充、`accent` 描边）及其移动箭头——或者两个移动组件共享这 2 个 accent 名额，图上其他任何位置不再出现 accent。
+- **图例：** 底部水平条带，上方发丝分隔线，viewBox 扩展约 60px——与其他所有类型一致。
 
-## Complexity budget
+## 复杂度预算
 
-| Limit | Rule |
+| 限制 | 规则 |
 |---|---|
-| Max components | 9 |
-| Max dependency links | 12 |
-| Max movement arrows | 2 |
-| Max accent elements | 2 |
+| 最大组件数 | 9 |
+| 最大依赖连线数 | 12 |
+| 最大移动箭头数 | 2 |
+| 最大 accent 元素数 | 2 |
 
-## Anti-patterns
+## 反模式
 
-- **Treating the x axis as a maturity score.** Evolution is four qualitative bands (genesis / custom-built / product / commodity), not a 0–10 slider. Don't plot a component at "6.5" — place it in a band.
-- **A component with no dependency link.** If nothing in the value chain depends on it and it depends on nothing, it isn't part of the chain — delete it or wire it in.
-- **Arrows drawn right-to-left.** Evolution only moves toward commodity. A left-pointing movement arrow is a contradiction, not a design choice.
-- **Using the map as an architecture diagram.** No request/response direction, no protocols, no runtime topology — that's the architecture type. This type answers "what's worth building vs. buying," not "how does traffic flow."
-- **Numbering the y axis.** Value-chain visibility is ordinal (more visible to the user, less visible), not a quantity. Numeric ticks imply a measurement that doesn't exist.
-- **More than 2 movement arrows.** Beyond that the map stops making a single point and turns into a forecast nobody can act on.
-- **`writing-mode` vertical axis text.** Stack the words as separate horizontal `<text>` lines instead — see Layout conventions above.
+- **把 x 轴当成熟度分数。** 演化是四个定性带区（genesis / custom-built / product / commodity），不是 0–10 滑块。不要把组件标在"6.5"——把它放进某个带区。
+- **没有依赖连线的组件。** 价值链中没有任何东西依赖它、它也不依赖任何东西，它就不属于这条链——删掉它，或把它接进来。
+- **从右向左的箭头。** 演化只朝商品化方向移动。左向移动箭头是自相矛盾，不是设计选择。
+- **把此图当架构图用。** 没有请求/响应方向、没有协议、没有运行时拓扑——那是 architecture 类型的事。本类型回答"什么值得自建 vs 购买"，不回答"流量怎么走"。
+- **给 y 轴加刻度数字。** 价值链可见性是序数（更可见、更不可见），不是数量。数字刻度暗示了一个不存在的度量。
+- **超过 2 个移动箭头。** 再多，图就不再表达单一观点，沦为无人能据以行动的预测。
+- **`writing-mode` 竖排轴文字。** 把词堆叠成多行水平 `<text>`——见上方布局约定。
 
-## Examples
+## 示例
 
-- minimal light. AI assistant product, agent orchestration commoditising toward Product.
-- minimal dark, same map.
-- full editorial: framed container + 3 varied-width cards (the moving component, a genesis-stage build, and the commodity base).
+- minimal light。AI 助手产品，agent orchestration 正商品化趋向 Product。
+- minimal dark，同一张图。
+- full editorial：带框容器 + 3 张不等宽卡片（移动组件、genesis 阶段自建项、商品化基座）。

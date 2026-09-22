@@ -1,139 +1,139 @@
-# Semantic patterns
+# 语义模式
 
-Semantic patterns describe **what a system does**; the 40 visual types describe **how information is arranged**. Choose a pattern first when behavior, state, enforcement, or risk is load-bearing, then use its nearest visual type as the layout grammar. If no pattern matches, choose a visual type directly.
+语义模式描述**系统做什么**；40 种视觉类型描述**信息如何排布**。当行为、状态、执行点或风险是表达重点时，先选语义模式，再用其最接近的视觉类型作为布局语法。没有匹配的模式时，直接选视觉类型。
 
-Use one primary pattern per figure. A second pattern may supply at most one supporting primitive; if both need full treatment, split overview and detail. Labels and outcomes must remain complete in a static frame.
+每张图只用一个主模式。第二个模式至多提供一个辅助基元；两者都需要完整处理时，拆成总览与细节两张图。标签与结果在静态帧中必须完整。
 
-## Routing table
+## 路由表
 
-| The reader must understand… | Semantic pattern | Nearest visual type |
+| 读者必须理解…… | 语义模式 | 最接近的视觉类型 |
 |---|---|---|
-| Many arrivals competing for finite service capacity | **Fan-in queue / bottleneck** | Data flow |
-| Repeated questions, inputs, controls, and outputs across stages | **Stage framework with semantic slots** | Process |
-| A loose conversation becoming a durable structured record | **Unstructured input → structured artifact** | Data flow |
-| Why two policy decisions differ and where they first diverge | **Paired policy-evaluation traces** | Flowchart |
-| Which routes cross a trust boundary and which routes are blocked | **Secure paved road** | Architecture |
-| Which controls apply at each enforcement surface | **Governance / control catalog** | Layer stack |
-| How defenses reduce risk and what risk remains | **Compensating security layers** | Layer stack |
-| Which sub-elements a system decomposes into, each independently citable and traced to its implementation | **Traceable block decomposition** | Tree |
+| 大量到达者竞争有限服务容量 | **扇入队列 / 瓶颈** | 数据流图 |
+| 各阶段重复出现的问题、输入、治理与输出 | **带语义槽位的阶段框架** | 流程图（Process） |
+| 松散对话如何变成持久结构化记录 | **非结构化输入 → 结构化工件** | 数据流图 |
+| 两个策略决策为何不同、在哪里首次分歧 | **成对策略评估 trace** | 流程图 |
+| 哪些路径跨越信任边界、哪些路径被阻断 | **安全铺装道路** | 架构图 |
+| 每个执行面上适用哪些控制 | **治理 / 控制目录** | 分层堆叠图 |
+| 防御如何降低风险、还剩什么风险 | **补偿式安全层** | 分层堆叠图 |
+| 系统分解为哪些子元素、每个可独立引用并追溯到实现 | **可追溯 block 分解（Traceable block decomposition）** | 树图 |
 
-## 1. Fan-in queue / bottleneck
+## 1. 扇入队列 / 瓶颈（Fan-in queue / bottleneck）
 
-**Selection triggers:** Several producers converge on one reviewer, service, gate, or constrained resource; the story depends on arrival rate, queue depth, wait, capacity, or backpressure.
+**选择触发：** 多个生产者汇聚到一个评审者、服务、闸门或受限资源；故事取决于到达率、队列深度、等待、容量或背压。
 
-**Required primitives:** Distinct sources; fanned ingress; an ordered queue with visible slots and count; a capacity/service-rate label; one constrained service point; admitted and deferred/rejected outcomes. Label units (`8/hour`, `3 slots`), not just “high.”
+**必需基元：** 可区分的来源；扇形入口；带可见槽位与计数的有序队列；容量/服务率标签；一个受限服务点；准入与延迟/拒绝两种结果。标注单位（`8/hour`、`3 slots`），不能只写"高"。
 
-**Complexity budget:** ≤5 sources, ≤5 queue slots, one bottleneck, two outcomes, and ≤9 primary nodes. Aggregate excess sources as a named cohort.
+**复杂度预算：** ≤5 个来源、≤5 个队列槽位、1 个瓶颈、2 种结果、≤9 个主节点。超出的来源聚合为一个命名群组。
 
-**Anti-patterns:** Equal-width pipeline that hides contention; arrows merged before they can be traced; capacity implied only by box size; decorative pile-up; animation that changes item order; red alone meaning overloaded.
+**反模式：** 等宽流水线掩盖竞争；箭头在可被追踪前就合并；容量只靠盒子大小暗示；装饰性堆积；改变条目顺序的动画；红色单独表示过载。
 
-**Static fallback:** Show the representative final queue, numeric count/capacity, bottleneck label, and both outcome paths. A still must reveal why work waits.
+**静态回退：** 显示代表性的最终队列、数字计数/容量、瓶颈标签与两条结果路径。静帧也必须揭示工作为何等待。
 
-**Nearest visual type:** **Data flow** by default; use **Process** when service stages, rather than sources, dominate.
+**最接近的视觉类型：** 默认**数据流图**；当服务阶段而非来源占主导时用**流程图（Process）**。
 
-## 2. Stage framework with semantic slots
+## 2. 带语义槽位的阶段框架（Stage framework with semantic slots）
 
-**Selection triggers:** A lifecycle or operating model repeats the same semantic questions across stages, commonly Question, Input, Governance, and Output. Cross-stage comparability matters more than message timing.
+**选择触发：** 生命周期或运营模型在各阶段重复相同的语义问题，常见为 Question、Input、Governance、Output。跨阶段可比性比消息时序更重要。
 
-**Required primitives:** Ordered stage headers; a consistent slot grid; explicit empty/not-applicable slots; stage-to-stage handoff; stable slot labels; one primary output per stage. Preserve slot order in every stage.
+**必需基元：** 有序阶段页眉；一致的槽位网格；显式的空/不适用槽位；阶段间交接；稳定的槽位标签；每阶段一个主输出。每个阶段的槽位顺序保持一致。
 
-**Complexity budget:** 3–6 stages, 3–4 slot kinds, ≤20 populated cells, ≤2 lines per cell. Split detail when a cell needs prose.
+**复杂度预算：** 3–6 个阶段、3–4 种槽位、≤20 个填充单元、每单元 ≤2 行。单元需要散文时拆分细节图。
 
-**Anti-patterns:** Each stage invents a different internal layout; slot meaning encoded by position with no labels; fake precision from dozens of cells; confusing stage order with ownership lanes; shrinking text to keep one canvas.
+**反模式：** 每个阶段自造不同的内部布局；槽位含义只靠位置编码而无标签；几十个单元制造假精度；把阶段顺序与职责泳道混为一谈；为保住单画布缩小文字。
 
-**Static fallback:** Render the full stage × slot matrix with handoffs and explicit `—` or `Not applicable` entries. Do not depend on staged reveal to teach the schema.
+**静态回退：** 渲染完整的阶段 × 槽位矩阵，含交接与显式的 `—` 或 `Not applicable` 条目。不要依赖分步揭示来教结构。
 
-**Nearest visual type:** **Process**; use **Swimlane** only when the repeated rows represent owners rather than semantic slots.
+**最接近的视觉类型：** **流程图（Process）**；仅当重复的行代表职责人而非语义槽位时用**泳道图**。
 
-## 3. Unstructured input → structured artifact
+## 3. 非结构化输入 → 结构化工件（Unstructured input → structured artifact）
 
-**Selection triggers:** Dialogue, notes, prompts, or a rambling request are elicited, normalized, and written into a durable brief, ticket, record, schema, or other structured artifact.
+**选择触发：** 对话、笔记、提示词或冗长请求被引导、规范化，并写入持久的 brief、工单、记录、schema 或其他结构化工件。
 
-**Required primitives:** Source utterance(s); clarifying questions; extracted field/value pairs; a named transformation; the durable artifact boundary; provenance links from representative statements to fields; missing/unknown state.
+**必需基元：** 源话语；澄清问题；提取的字段/值对；一个命名转换；持久工件边界；从代表性语句到字段的溯源链接；缺失/未知状态。
 
-**Complexity budget:** ≤4 exchanges, ≤6 artifact fields, one transformation, and ≤3 provenance links. Show representative content, not a transcript.
+**复杂度预算：** ≤4 轮交换、≤6 个工件字段、1 个转换、≤3 条溯源链接。展示代表性内容，不是完整转录。
 
-**Anti-patterns:** “AI magic” sparkle between two boxes; artifact shown as another chat bubble; fields appearing without sources; inventing certainty for missing facts; typing animation as the only readable copy.
+**反模式：** 两个盒子之间的"AI 魔法"闪光；工件画成又一个聊天气泡；字段无来源凭空出现；为缺失事实发明确定性；打字动画是唯一可读副本。
 
-**Static fallback:** Show a short source excerpt beside the completed labeled artifact, with at least one provenance mapping and any unknown fields visible.
+**静态回退：** 在完成的带标签工件旁显示简短源摘录，至少一条溯源映射，未知字段可见。
 
-**Nearest visual type:** **Data flow**; use **Process** when elicitation has several ordered gates.
+**最接近的视觉类型：** **数据流图**；引导过程有多个有序关卡时用**流程图（Process）**。
 
-## 4. Paired policy-evaluation traces
+## 4. 成对策略评估 trace（Paired policy-evaluation traces）
 
-**Selection triggers:** Two otherwise similar requests reach different outcomes; the reader needs rule-by-rule `PASS`, `FAIL`, `SKIPPED`, or `NOT REACHED` state and the first divergence.
+**选择触发：** 两个本应相似的请求得到不同结果；读者需要逐规则的 `PASS`、`FAIL`、`SKIPPED` 或 `NOT REACHED` 状态与首次分歧点。
 
-**Required primitives:** The same ordered rules on both traces; explicit status text plus symbol/shape; inputs that differ; final outcomes; a labeled first-divergence marker; a distinction between `SKIPPED` (applicable flow intentionally bypassed) and `NOT REACHED` (evaluation stopped earlier).
+**必需基元：** 两条 trace 上相同的有序规则；显式状态文本加符号/形状；不同的输入；最终结果；带标签的首次分歧标记；区分 `SKIPPED`（有意绕过适用流程）与 `NOT REACHED`（评估在更早处停止）。
 
-**Complexity budget:** Exactly 2 traces, 3–6 rules, one first divergence, ≤12 status cells, and one outcome per trace. Move rule prose to notes if labels exceed one line.
+**复杂度预算：** 恰好 2 条 trace、3–6 条规则、1 个首次分歧、≤12 个状态单元、每条 trace 一个结果。标签超过一行时把规则散文移入注释。
 
-**Anti-patterns:** Comparing two independently ordered flows; green/red dots without words; treating skipped and not-reached as synonyms; highlighting every difference; continuing a denied trace as if downstream rules ran.
+**反模式：** 对比两条独立排序的流程；只有绿/红点没有文字；把 skipped 与 not-reached 当同义词；高亮每一处差异；被拒 trace 继续画下去仿佛下游规则执行过。
 
-**Static fallback:** Show all rule states and both outcomes at once; use a persistent bracket/line and label for the first divergence.
+**静态回退：** 一次显示全部规则状态与两个结果；首次分歧用持久的括线/标线加标签。
 
-**Nearest visual type:** **Flowchart** for ordered decision logic; use **Sequence** only when messages between actors and time are also load-bearing.
+**最接近的视觉类型：** 有序决策逻辑用**流程图**；仅当参与者间的消息与时间也是重点时用**时序图**。
 
-## 5. Secure paved road
+## 5. 安全铺装道路（Secure paved road）
 
-**Selection triggers:** A supported architecture creates a bounded route from intake/build to deployment; trust boundaries, privileged moments, permitted ingress, forbidden ingress, and approved versus blocked deploy paths are the point.
+**选择触发：** 一个受支持的架构从接入/构建到部署形成有界路径；信任边界、特权时刻、允许入口、禁止入口、批准与阻断的部署路径就是表达重点。
 
-**Required primitives:** Labeled trust boundaries; actors and identities; permitted ingress with a positive text label; forbidden ingress terminating at the boundary; approved deployment path; blocked bypass path; privileged gate; isolated runtime; audit destination. Use different line styles and stop symbols in addition to color.
+**必需基元：** 带标签的信任边界；参与者与身份；带肯定文本标签的允许入口；终止于边界的禁止入口；批准的部署路径；被阻断的绕行路径；特权闸门；隔离运行时；审计目的地。除颜色外还要用不同线型与停止符号。
 
-**Complexity budget:** ≤3 trust zones, ≤8 components, ≤10 paths, ≤2 forbidden paths, and one privileged gate. Split control detail into a catalog figure.
+**复杂度预算：** ≤3 个信任区、≤8 个组件、≤10 条路径、≤2 条禁止路径、1 个特权闸门。控制细节拆成目录图。
 
-**Anti-patterns:** Dashed box called “security” with no route semantics; forbidden arrow crossing into the protected zone; secrets or identity implied but unlabeled; every component styled as trusted; a bypass path that visually rejoins the approved route.
+**反模式：** 一个虚线框叫"security"却无路径语义；禁止箭头穿入受保护区；密钥或身份被暗示却无标签；每个组件都画成可信；绕行路径在视觉上重新汇入批准路径。
 
-**Static fallback:** Render every boundary and both permitted/forbidden routes. Blocked paths must visibly stop before entry or deployment.
+**静态回退：** 渲染每条边界与允许/禁止两类路径。被阻断路径必须在入口或部署前可见地停止。
 
-**Nearest visual type:** **Architecture**.
+**最接近的视觉类型：** **架构图**。
 
-## 6. Governance / control catalog
+## 6. 治理 / 控制目录（Governance / control catalog）
 
-**Selection triggers:** A control inventory must be understood by where it is enforced: authoring, workspace, merge/CI, deploy/runtime, or another named surface. A single checklist would hide those enforcement points.
+**选择触发：** 一份控制清单必须按执行位置来理解：编写、工作区、merge/CI、部署/运行时或其他命名执行面。单一清单会掩盖这些执行点。
 
-**Required primitives:** Enforcement-surface groups; named controls; enforcement actor (`code`, `platform`, `human`); timing (`write`, `merge`, `deploy`, `run`); bypassability or exception route; coverage/gap notation.
+**必需基元：** 执行面分组；命名控制；执行主体（`code`、`platform`、`human`）；时机（`write`、`merge`、`deploy`、`run`）；可绕过性或例外路径；覆盖/缺口标记。
 
-**Complexity budget:** 3–5 surfaces, 3–7 controls per surface, ≤24 controls total, and ≤3 attributes per control. Summarize counts only when the item list exists elsewhere.
+**复杂度预算：** 3–5 个执行面、每面 3–7 个控制、总计 ≤24 个控制、每个控制 ≤3 个属性。仅当条目清单存在于别处时才只报计数。
 
-**Anti-patterns:** 35 tiny pills; grouping by vague themes instead of enforcement point; mixing aspirations with enforced controls; icons without control names; claiming defense-in-depth without showing surface coverage.
+**反模式：** 35 个小药丸；按模糊主题而非执行点分组；把愿望与已强制执行的控制混在一起；只有图标没有控制名；声称纵深防御却不展示执行面覆盖。
 
-**Static fallback:** Show the complete grouped catalog with surface headers and text labels for actor and enforcement timing; preserve gaps and exceptions.
+**静态回退：** 显示完整的分组目录，带执行面页眉、执行主体与时机的文本标签；保留缺口与例外。
 
-**Nearest visual type:** **Layer stack**; use **DP security matrix** when role permissions, not enforcement surfaces, are the dominant comparison.
+**最接近的视觉类型：** **分层堆叠图**；当角色权限而非执行面是主要对比时用 **DP security matrix**。
 
-## 7. Compensating security layers
+## 7. 补偿式安全层（Compensating security layers）
 
-**Selection triggers:** No layer is perfect; each defense covers a failure left by the previous layer, and residual risk must visibly narrow, transfer, or remain through the stack.
+**选择触发：** 没有一层是完美的；每层防御弥补上一层留下的失效，剩余风险必须可见地收窄、转移或留存穿过整个栈。
 
-**Required primitives:** Ordered threat/risk input; named defensive layers; each layer's mitigation; explicit limitation or escape; residual-risk carrier between layers; final residual risk and consequence/response. Use labels or decreasing measures, never area alone.
+**必需基元：** 有序的威胁/风险输入；命名防御层；每层的缓解措施；显式的局限或逃逸；层间剩余风险载体；最终剩余风险与后果/响应。用标签或递减的量度，绝不仅靠面积。
 
-**Complexity budget:** 3–5 layers, one primary risk thread, ≤2 mitigations per layer, and one final residual-risk statement. Split multiple unrelated threats into separate figures.
+**复杂度预算：** 3–5 层、1 条主风险线、每层 ≤2 个缓解措施、1 条最终剩余风险陈述。多个不相关威胁拆成多张图。
 
-**Anti-patterns:** Implying the final layer makes risk zero; equal opaque slabs with no propagation; treating audit as prevention; shrinking shapes without numeric or verbal meaning; reversing prevention/detection/recovery order without explanation.
+**反模式：** 暗示最后一层让风险归零；等大的不透明板块无传播关系；把审计当预防；缩小形状却无数值或文字含义；无解释地颠倒预防/检测/恢复顺序。
 
-**Static fallback:** Show the complete propagation chain: initial risk → mitigation → escaped risk at every layer → final residual risk and response.
+**静态回退：** 显示完整传播链：初始风险 → 缓解 → 每层逃逸风险 → 最终剩余风险与响应。
 
-**Nearest visual type:** **Layer stack**; use **Nested** when containment boundaries, rather than ordered compensation, carry the meaning.
+**最接近的视觉类型：** **分层堆叠图**；当包含边界而非有序补偿承载含义时用**嵌套图**。
 
-## 8. Traceable block decomposition
+## 8. 可追溯 block 分解（Traceable block decomposition）
 
-**Selection triggers:** A system or product must decompose into addressable, individually citable sub-elements — each with a stable identifier a reader (or a compliance, audit, or IP record) can point at directly, not a name alone. The reader needs to trace a specific block to its parent, to what it consumes and produces, and to the code that implements it. This describes *structure* (what the system is made of), not a process — for a sequence of actions, choose a pattern that routes to Flowchart or Swimlane instead.
+**选择触发：** 系统或产品必须分解为可寻址、可单独引用的子元素——每个元素带有稳定标识符，读者（或合规、审计、IP 记录）可以直接指向它，而不只是一个名字。读者需要把特定 block 追溯到它的父级、它消费与产出的内容、以及实现它的代码。这描述的是*结构*（系统由什么组成），不是过程——动作序列请改选路由到流程图或泳道图的模式。
 
-**Required primitives:** A stable dotted ID per block (e.g. `PAY-001-02`), shown as a compact badge using the existing node-box type-tag chip (design-system.md §6 "Node box — full pattern") — never as a separate connector-adjacent label. A noun-phrase block name — the structural element itself ("Fraud Screening"), not an action performed on it — in the node's existing name slot. Parent-child structure is Tree's own elbow connector; this pattern adds no new connector semantics or connector labels. At most one short inbound and one short outbound flow-port label per block, in the existing Geist Mono sublabel slot, shown only when both fit without crowding the name — omit by default. Every block's full record — inputs, outputs, constraints, assumptions, and an implementation path — lives in `data-block-*` attributes on the node (`data-block-id`, `data-block-parent`, `data-block-name`, and terse `data-block-input` / `-output` / `-constraint` / `-assumption` / `-impl` values) and, for anything longer than a short phrase, in the sidecar registry (see [`export-registry.md`](export-registry.md)) — never as additional visible diagram text.
+**必需基元：** 每个 block 一个稳定的点分 ID（如 `PAY-001-02`），以紧凑徽章形式使用既有的节点框类型标签 chip 呈现（design-system.md §6「Node box — full pattern」）——绝不作为贴着连线的独立标签。名词短语的 block 名——结构元素本身（"Fraud Screening"），不是对它执行的动作——放在节点既有的名称槽位。父子结构用树图自身的 elbow 连线；本模式不新增连线语义或连线标签。每个 block 至多一个简短的入向与一个简短的出向流端口标签，放在既有的 Geist Mono 子标签槽位，仅当两者都能放下且不挤压名称时才显示——默认省略。每个 block 的完整记录——输入、输出、约束、假设与实现路径——存放在节点的 `data-block-*` 属性上（`data-block-id`、`data-block-parent`、`data-block-name`，以及精简的 `data-block-input` / `-output` / `-constraint` / `-assumption` / `-impl` 值），超过短语长度的内容放在 sidecar 注册表（见 [`export-registry.md`](export-registry.md)）——绝不作为额外的可见图内文本。
 
-**Complexity budget:** Tree's own root+3-tier / 5-per-level caps and the global 9-node ceiling apply as-is — this pattern does not raise them. A hierarchy that needs more splits into a linked set of diagrams, one per subsystem, each independently traceable; the sidecar registry is the layer that reassembles the full graph across files. At most one in/out port-label pair per block when shown at all; constraints and assumptions are never rendered as visible text, only carried in metadata.
+**复杂度预算：** 树图自身的根+3 层 / 每层 5 个上限与全局 9 节点上限原样适用——本模式不提高它们。需要更多的层级拆成一组相互链接的图，每个子系统一张，各自独立可追溯；sidecar 注册表是跨文件重组完整图的那一层。显示时每个 block 至多一对入/出端口标签；约束与假设绝不渲染为可见文本，只在元数据中携带。
 
-**Anti-patterns:** Four-sided ICOM boxes with Input/Control/Output/Mechanism arrows on every side — that is IDEF0's grammar, not this pattern's, and it does not fit Tree's connector rules. Drawing input/output arrows between siblings or cousins — that is a dependency graph's job; route to that type instead if cross-block flow must be drawn. Verb-phrase block names — name the structural element, not an action; if a block is genuinely an activity, it likely belongs in a companion Flowchart or Swimlane diagram, not this tree. An ID badge with no matching `data-block-id`, or a rename not mirrored in the registry. Treating the visible diagram as the complete record — it is a bounded view; the registry is the source of truth for anything not drawn. Labeling the tree connector itself with an ID or name — Tree has no connector-label convention today and this pattern must not invent one.
+**反模式：** 四边 ICOM 盒子、每边都有 Input/Control/Output/Mechanism 箭头——那是 IDEF0 的语法，不是本模式的，也不符合树图的连线规则。在兄弟或堂系节点间画输入/输出箭头——那是依赖图的职责；必须画跨 block 流时改路由到该类型。动词短语的 block 名——命名结构元素，不是动作；如果一个 block 确实是活动，它多半属于配套的流程图或泳道图，不是这棵树。ID 徽章没有对应的 `data-block-id`，或改名未同步到注册表。把可见图当作完整记录——它是有界视图；未画出的一切以注册表为准。给树图连线本身标 ID 或名称——树图今天没有连线标签约定，本模式不得发明一个。
 
-**Static fallback:** This pattern has no animated form — it is always static; bespoke interaction (click-to-expand, filter-by-ID) is out of this skill's scope entirely. Every ID badge, block name, and any shown port label must be legible in the single rendered frame.
+**静态回退：** 本模式没有动画形态——它永远是静态的；定制交互（点击展开、按 ID 过滤）完全超出本 skill 的范围。每个 ID 徽章、block 名与任何显示的端口标签必须在单一渲染帧中清晰可读。
 
-**Nearest visual type:** **Tree** — Nested's single-chain containment cannot show two children of one parent; Dependency graph permits multi-parent nodes and cycles this pattern must forbid; Architecture's zones are flat, capped at 3, and explicitly route overflow to Swimlane, not to nested grouping.
+**最接近的视觉类型：** **树图**——嵌套图的单链包含无法展示一个父级的两个孩子；依赖图允许多父节点与环，本模式必须禁止；架构图的区域是扁平的、上限 3 个，且明确把溢出路由到泳道图而非嵌套分组。
 
-**A note on provenance, not a claim of compliance:** "block," noun-phrase naming, and "flow port" are SysML Block Definition Diagram vocabulary, used because this pattern documents structure, the thing SysML's naming convention is for (IDEF0's verb-phrase convention documents *functions* instead — the wrong fit here). This is SysML-*informed* vocabulary applied to Tree's existing layout grammar, not a claim of SysML compliance: no OCL constraints, no XMI interchange, no tool-certified conformance, and no IDEF0 compliance either.
+**关于术语来源的说明，不是合规声明：** "block"、名词短语命名与 "flow port" 是 SysML Block Definition Diagram 词汇，之所以采用，是因为本模式记录的是结构——SysML 命名约定正是为此而生（IDEF0 的动词短语约定记录的是*功能*——在这里不合适）。这是 SysML *启发*的词汇应用于树图既有布局语法，不是 SysML 合规声明：无 OCL 约束、无 XMI 交换、无工具认证的一致性，也不符合 IDEF0。
 
-## Composition rules
+## 组合规则
 
-- The semantic pattern may specialize status, boundary, queue, or propagation primitives; the selected type still owns page axis, connector grammar, spacing, and type-specific limits.
-- Apply the stricter of the pattern budget and visual-type budget. Semantic cells/statuses are not permission to exceed the nine-node overview target.
-- Use stable text for states and outcomes. Color, motion, and position reinforce meaning but never carry it alone.
-- Optional animation is a presentation layer, not another pattern. Load [`animation.md`](animation.md) only when motion is requested or materially clarifies ordered change.
+- 语义模式可以特化状态、边界、队列或传播基元；所选视觉类型仍然拥有页面轴线、连线语法、间距与类型专属限制。
+- 模式预算与视觉类型预算取更严者。语义单元/状态不是超出九节点总览目标的许可。
+- 状态与结果用稳定文本。颜色、动效、位置只强化含义，绝不单独承载含义。
+- 可选动画是呈现层，不是又一个模式。仅当动效被要求或能实质澄清有序变化时才加载 [`animation.md`](animation.md)。

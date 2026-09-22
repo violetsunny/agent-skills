@@ -21,7 +21,7 @@ if str(SCRIPT_DIR) not in sys.path:
     sys.path.insert(0, str(SCRIPT_DIR))
 
 import composition_quality as quality  # noqa: E402
-import fireworks_geometry as geometry  # noqa: E402
+import diagram_geometry as geometry  # noqa: E402
 
 NUMBER_RE = re.compile(r"[-+]?(?:\d*\.\d+|\d+\.?)(?:[eE][-+]?\d+)?")
 PATH_TOKEN_RE = re.compile(
@@ -819,7 +819,7 @@ def geometry_check(root: ET.Element) -> list[str]:
             if len(route) >= 2
         ):
             details.append(f"canvas_clip: {edge_name} exceeds viewBox")
-        if root.get("data-generator") == "fireworks-tech-graph" and not all(
+        if root.get("data-generator") == "robot-aiot-tech-graph" and not all(
             geometry.route_is_orthogonal(route) for route in routes if len(route) >= 2
         ):
             details.append(f"non_orthogonal: {edge_name}")
@@ -890,7 +890,7 @@ def geometry_check(root: ET.Element) -> list[str]:
                     and second_mask.matrix == second_context.matrix
                 )
                 # Backwards compatibility for authored SVGs predating bridge masks.
-                if root.get("data-generator") != "fireworks-tech-graph":
+                if root.get("data-generator") != "robot-aiot-tech-graph":
                     first_valid = first_valid or geometry.bridge_declared(
                         point, first_bridges
                     )
@@ -962,7 +962,7 @@ def geometry_check(root: ET.Element) -> list[str]:
         if (
             bridges
             and owner not in bridge_masks
-            and root.get("data-generator") == "fireworks-tech-graph"
+            and root.get("data-generator") == "robot-aiot-tech-graph"
         ):
             details.append(f"bridge_mask_missing: {describe_element(edge)}")
         for bridge in bridges:

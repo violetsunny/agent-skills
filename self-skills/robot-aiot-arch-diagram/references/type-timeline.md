@@ -1,20 +1,20 @@
-# Timeline
+# Timeline（时间线）
 
-**Best for:** release history, project milestones, incident timelines, roadmaps, changelog visualizations.
+**最适合：** 发布历史、项目里程碑、事故时间线、路线图、changelog 可视化。
 
-## Layout conventions
-- Horizontal hairline baseline across the middle (`stroke-width=1`).
-- Tick marks at time boundaries (quarters, months, sprints) with date labels below in Geist Mono.
-- Events: small filled circles (`r=4`) on the baseline. Labels alternate above and below to prevent collision, connected to the circle with a 1px hairline drop.
-- Major milestones: coral circle (`r=6`) + bold Geist label.
-- Time scale must be honest: if intervals are non-equal, space the circles non-equally. Don't fake linear spacing for aesthetics. Break the axis visibly if a region is too dense.
+## 布局约定
+- 水平发丝基线横贯中部（`stroke-width=1`）。
+- 时间边界（季度、月份、冲刺）处设刻度，下方用 Geist Mono 标日期。
+- 事件：基线上的小实心圆（`r=4`）。标签上下交替防碰撞，用 1px 发丝垂线连到圆点。
+- 重大里程碑：coral 圆（`r=6`）+ Geist 加粗标签。
+- 时间刻度必须诚实：间隔不等时，圆点间距也不等。不要为美观伪造线性等距。某区域过密时显式断轴。
 
-## Anti-patterns
-- Equal-spacing events that aren't equally spaced in time.
-- Missing axis labels ("what unit is this?").
-- Crowded labels without vertical offset — illegible.
+## 反模式
+- 时间上不等距的事件被等距摆放。
+- 缺轴标签（"这是什么单位？"）。
+- 标签拥挤且无垂直错位——不可读。
 
-## Examples
+## 示例
 - minimal light
 - minimal dark
 - full editorial

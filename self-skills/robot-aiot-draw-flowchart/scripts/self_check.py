@@ -8,9 +8,7 @@ Ships inside the skill so an installed agent can verify its own output:
 Checks the accessible-SVG contract, the single-file safety rules (no remote
 assets beyond the approved Google Fonts stylesheet, no executable attributes,
 no scripts other than the one canonical motion controller), and — when motion
-markup is present — the structural motion contract. This is a distilled
-subset of the repository gates (`lint-skin.py`, `verify-motion.py`), which
-remain the authority for contributions to the repository itself.
+markup is present — the structural motion contract.
 """
 
 from __future__ import annotations
@@ -28,7 +26,15 @@ MOTION_TEMPLATE = SKILL_DIR / "assets" / "template-motion.html"
 MODES = {"none", "reveal", "step", "loop"}
 ACTIONS = {"play", "pause", "replay", "prev", "next"}
 ASCII_DECIMAL_RE = re.compile(r"^[0-9]+$")
-REFERENCE_ATTRS = {"src", "href", "xlink:href", "poster", "srcset", "action", "formaction"}
+REFERENCE_ATTRS = {
+    "src",
+    "href",
+    "xlink:href",
+    "poster",
+    "srcset",
+    "action",
+    "formaction",
+}
 
 
 class DiagramParser(HTMLParser):
@@ -219,7 +225,9 @@ def check_svgs(parser: DiagramParser, errors: list[str]) -> None:
         and str(svg["attrs"].get("aria-hidden", "")).casefold() != "true"
     ]
     if not checkable:
-        errors.append("diagram file needs at least one accessible (non-aria-hidden) SVG")
+        errors.append(
+            "diagram file needs at least one accessible (non-aria-hidden) SVG"
+        )
     for number, svg in enumerate(checkable, 1):
         attrs = svg["attrs"]
         assert isinstance(attrs, dict)
@@ -234,12 +242,17 @@ def check_svgs(parser: DiagramParser, errors: list[str]) -> None:
         assert isinstance(title_attrs, dict) and isinstance(desc_attrs, dict)
         if svg["first"] != "title":
             errors.append(f"svg {number} title must be its first child")
-        if not str(title.get("text", "")).strip() or not str(desc.get("text", "")).strip():
+        if (
+            not str(title.get("text", "")).strip()
+            or not str(desc.get("text", "")).strip()
+        ):
             errors.append(f"svg {number} needs non-empty title and desc")
         title_id = title_attrs.get("id", "")
         desc_id = desc_attrs.get("id", "")
         if title_id in {"", "title"} or desc_id in {"", "desc"}:
-            errors.append(f"svg {number} title/desc IDs must be diagram-prefixed, never bare")
+            errors.append(
+                f"svg {number} title/desc IDs must be diagram-prefixed, never bare"
+            )
         if labelled != [title_id, desc_id]:
             errors.append(f"svg {number} aria-labelledby must name title then desc")
 
@@ -253,15 +266,26 @@ def check_scripts(parser: DiagramParser, errors: list[str]) -> None:
         attrs = script["attrs"]
         attr_names = script["attr_names"]
         body = script["body"]
-        assert isinstance(attrs, dict) and isinstance(attr_names, list) and isinstance(body, list)
+        assert (
+            isinstance(attrs, dict)
+            and isinstance(attr_names, list)
+            and isinstance(body, list)
+        )
         if not script["closed"]:
             errors.append(f"script {number} must have a closing script tag")
-        if attr_names != ["data-diagram-controls"] or attrs.get("data-diagram-controls") != "":
-            errors.append(f"script {number} must carry only the canonical data-diagram-controls attribute")
+        if (
+            attr_names != ["data-diagram-controls"]
+            or attrs.get("data-diagram-controls") != ""
+        ):
+            errors.append(
+                f"script {number} must carry only the canonical data-diagram-controls attribute"
+            )
             continue
         try:
             if normalized_controller("".join(body)) != canonical_controller():
-                errors.append(f"script {number} must exactly match the controller in template-motion.html")
+                errors.append(
+                    f"script {number} must exactly match the controller in template-motion.html"
+                )
         except RuntimeError as exc:
             errors.append(str(exc))
 
@@ -271,7 +295,9 @@ def check_motion(parser: DiagramParser, source: str, errors: list[str]) -> None:
     if not has_motion_markup:
         return
     if len(parser.roots) != 1:
-        errors.append(f"expected exactly one data-motion-root; found {len(parser.roots)}")
+        errors.append(
+            f"expected exactly one data-motion-root; found {len(parser.roots)}"
+        )
         return
     root = parser.roots[0]
     mode = root.get("data-motion-mode", "")
@@ -300,31 +326,50 @@ def check_motion(parser: DiagramParser, source: str, errors: list[str]) -> None:
         if not decorative:
             semantic_steps.append(step)
             if not item.get("aria-label", "").strip():
-                errors.append(f"semantic motion item {index} needs a non-color aria-label")
+                errors.append(
+                    f"semantic motion item {index} needs a non-color aria-label"
+                )
         elif item.get("aria-hidden") != "true" or item.get("focusable") != "false":
-            errors.append(f"decorative motion item {index} needs aria-hidden=true and focusable=false")
+            errors.append(
+                f"decorative motion item {index} needs aria-hidden=true and focusable=false"
+            )
         inline = item.get("style", "").replace(" ", "").lower()
-        if any(token in inline for token in ("display:none", "visibility:hidden", "opacity:0")):
-            errors.append(f"motion item {index} is hidden in source; the fallback must be visible")
+        if any(
+            token in inline
+            for token in ("display:none", "visibility:hidden", "opacity:0")
+        ):
+            errors.append(
+                f"motion item {index} is hidden in source; the fallback must be visible"
+            )
 
     expected = set(range(1, count + 1)) if count > 0 else set()
     if set(semantic_steps) != expected:
-        errors.append(f"semantic steps must be contiguous 1..{count}; found {sorted(set(semantic_steps))}")
+        errors.append(
+            f"semantic steps must be contiguous 1..{count}; found {sorted(set(semantic_steps))}"
+        )
     crowded = {step: n for step, n in Counter(semantic_steps).items() if n > 2}
     if crowded:
-        errors.append(f"no more than two semantic items may share a step; found {crowded}")
+        errors.append(
+            f"no more than two semantic items may share a step; found {crowded}"
+        )
 
     if mode in {"none", "loop"} and parser.scripts:
         errors.append(f"{mode} mode must be script-free")
-    if mode in {"none", "loop"} and (parser.controls or parser.actions or parser.statuses):
+    if mode in {"none", "loop"} and (
+        parser.controls or parser.actions or parser.statuses
+    ):
         errors.append(f"{mode} mode must not expose playback controls or live status")
     controlled = mode == "step" or (mode == "reveal" and bool(parser.scripts))
     if controlled:
         if parser.controls != 1:
-            errors.append(f"controlled mode needs one in-root control group; found {parser.controls}")
+            errors.append(
+                f"controlled mode needs one in-root control group; found {parser.controls}"
+            )
         missing = ACTIONS - parser.actions
         if missing:
-            errors.append(f"controlled mode is missing actions: {', '.join(sorted(missing))}")
+            errors.append(
+                f"controlled mode is missing actions: {', '.join(sorted(missing))}"
+            )
         if not parser.statuses:
             errors.append("controlled mode needs data-motion-status")
         else:
@@ -334,7 +379,9 @@ def check_motion(parser: DiagramParser, source: str, errors: list[str]) -> None:
                 or status.get("aria-live") != "polite"
                 or status.get("aria-atomic") != "true"
             ):
-                errors.append("motion status needs role=status, aria-live=polite, aria-atomic=true")
+                errors.append(
+                    "motion status needs role=status, aria-live=polite, aria-atomic=true"
+                )
             if parser.statuses_in_controls:
                 errors.append("motion status must sit outside data-motion-controls")
         if not parser.scripts:
@@ -342,12 +389,21 @@ def check_motion(parser: DiagramParser, source: str, errors: list[str]) -> None:
 
     style_source = "".join(parser.styles)
     if parser.scripts:
-        if re.search(r"prefers-reduced-motion\s*:\s*reduce", style_source, re.IGNORECASE) is None:
-            errors.append("missing reduced-motion CSS fallback (prefers-reduced-motion)")
+        if (
+            re.search(
+                r"prefers-reduced-motion\s*:\s*reduce", style_source, re.IGNORECASE
+            )
+            is None
+        ):
+            errors.append(
+                "missing reduced-motion CSS fallback (prefers-reduced-motion)"
+            )
         if re.search(r"@media\s+print\b", style_source, re.IGNORECASE) is None:
             errors.append("missing print CSS fallback (@media print)")
         if "<noscript" not in source.casefold():
-            errors.append("motion file needs a <noscript> explanation of the complete static frame")
+            errors.append(
+                "motion file needs a <noscript> explanation of the complete static frame"
+            )
 
 
 def verify(path: Path) -> list[str]:

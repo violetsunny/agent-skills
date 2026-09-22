@@ -92,7 +92,7 @@ letter-spacing: 0.05em
       fill="#00b4d8" font-size="13" font-weight="700">DIAGRAM TITLE</text>
 ```
 
-## SVG Template
+## SVG 模板
 
 ```xml
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 600"

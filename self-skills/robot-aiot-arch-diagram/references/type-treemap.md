@@ -1,37 +1,37 @@
-# Treemap
+# Treemap（矩形树图）
 
-**Best for:** part-of-whole where the *relative sizes are the story* — disk and bundle usage, budget or spend breakdowns, market share, population, time allocation. Use when a single total decomposes into parts and the reader's question is "what dominates, and by how much?"
+**最适合：** 部分与整体、且*相对大小就是故事*——磁盘与 bundle 占用、预算或支出分解、市场份额、人口、时间分配。当单一总量分解为若干部分、读者的问题是"什么占主导，占多少？"时使用。
 
-Not for: ranked lists where exact values matter more than proportion (use a **bar chart**), containment or scope relationships with no quantity (use **nested**), or a hierarchy you need to trace parent-to-child (use a **tree**).
+不适用于：精确值比占比更重要的排行（用 **bar chart**）、无数量含义的包含或范围关系（用 **nested**）、需要沿父到子追踪的层级（用 **tree**）。
 
-## Layout conventions
+## 布局约定
 
-- **Plot area:** `x` 40 → 956, `y` 40 → 420 inside a `0 0 1000 500` viewBox — the same vertical rhythm as bar, line and scatter, so the legend block sits where a reader of those types already expects it (rule at `y=462`, `LEGEND` at `478`, keys at `488`).
-- **Squarified layout** (Bruls et al., 2000): sort descending, lay each row against the *shorter* side of the remaining rectangle. Aspect ratios stay near 1, which is what makes two areas comparable by eye. Never lay cells out in simple stripes — long thin cells cannot be compared.
-- **Cell count:** 4–8. Past 8, the tail becomes unlabelable slivers — group the tail into a single explicit "Other" cell and name what it contains in the source line.
-- **4px grid:** cell edges snap to the grid like everything else, with a 4px gutter between cells. Snapping and gutters both move area, so check the result — and check it as **relative** error (`(drawn − true) ÷ true`), not percentage points. A 0.1pp slip is nothing on a 59% cell and a quarter of a 0.5% cell; absolute error hides exactly the mistake you need to catch. Keep every cell within a few percent of its true share — the shipped example is within 2.7%, its worst case being the sliver, where the grid cannot do better — and state the encoding in the source line (`AREA = POPULATION`). `scripts/verify-treemap.py` gates this.
-- **Fill:** a rank-ordered `ink` opacity ramp (e.g. `0.16 → 0.04`), so the non-focal order survives greyscale printing and colour-blind readers. One accent cell only — the editorially focal one, not automatically the largest. Note what this does *not* buy you: the focal cell is painted off-ramp, so in greyscale it lands wherever its tint happens to fall, not at its rank. Identify it by the accent stroke, and never let tone carry meaning the area doesn't already carry. `ink` is a role, not a colour: it resolves near-black on light paper and near-white on dark, so one ramp of opacities composites *darker* as it strengthens in the light skin and *lighter* in the dark one. The opacities are identical in both; only their lightness flips.
-- **Stroke:** 1px `ink @ 0.30` hairline on every cell; the focal cell takes a 1.5px `accent` stroke.
-- **Labels sit inside the cell**, top-left, 16px in from the edge: name in Geist 12–14px 600, value in Geist Mono 9px on the next line. Three tiers by cell size:
-  - large — name + value + share (`4.78B · 59% of world`)
-  - medium — name + value
-  - small — a 3-letter mono abbreviation, if one reads honestly
-  - sliver — **no text.** When the cell is at least 12×12px, use a filled `ink` disc, `r=5`, centred in the cell, carrying a paper-coloured `i`, with the cell's name and share spelled out in the legend. Below 12px on either axis, omit the in-cell mark and identify the sliver by position in the legend; a fixed-size disc must never cross the cell boundary. `scripts/verify-treemap.py` checks marker containment. Resist rotating a label to make it fit: a single sideways word among five upright ones reads as a mistake before it reads as data, and its centring is a trap — `text-anchor="middle"` centres along the *baseline*, which a quarter-turn maps to the cell's long axis, leaving nothing centring the cap-height band across the narrow one.
-  - Never shrink a cell to fit its label. The cell size is the data; the label is commentary.
-- **Contrast:** compute the ceiling against the token you actually ship. The 9px value line is `muted`, not `ink`, and `muted` needs a lighter cell than `ink` does: measured against the composited fill, the top of the ramp can go to **0.16 on light paper and 0.14 on dark** before it drops under 4.5:1. (`ink` would tolerate 0.20 — which is exactly the number you will write down if you check the wrong token.) A mid-tone fill — solid accent, or 50% ink — fails against both light and dark text; use the tint-plus-stroke pattern instead. The source line takes `muted` too: `soft` measures 3.48:1 on paper and never reaches AA anywhere on this ramp.
-- **Legend:** the house block (rule, `LEGEND`, keys), naming the focal cell, the direction of the ink ramp, and any cell carrying an info mark. **Name that direction by contrast against the paper — `stronger contrast is larger` — never by lightness.** `darker is larger` is true only on light paper; ship it in the dark variant and the legend states the opposite of what the reader sees, because the ramp's lightness inverts with the skin while its opacity does not. Named by contrast, one sentence serves all three variants and cannot rot apart. `scripts/verify-skin-polarity.py` gates this, checking every directional tone claim against the ramp composited on that file's own paper. The source line rides the same row as `LEGEND`, right-aligned in mono 8px, stating what area encodes plus the dataset and its date.
+- **绘图区：** `0 0 1000 500` viewBox 内 `x` 40 → 956、`y` 40 → 420——与 bar、line、scatter 相同的纵向节奏，让图例块落在读过那些类型的读者已经预期的位置（rule 在 `y=462`，`LEGEND` 在 `478`，色样在 `488`）。
+- **Squarified 布局**（Bruls et al., 2000）：降序排序，每一行贴着剩余矩形的*较短*边铺。长宽比保持在 1 附近，这正是两块面积能被肉眼比较的前提。绝不用简单条纹铺格——细长格子无法比较。
+- **格子数：** 4–8。超过 8 个，尾部会变成无法标注的碎片——把尾部合并为一个显式的 "Other" 格子，并在 source line 里写明它包含什么。
+- **4px 网格：** 格子边缘与其他一切一样吸附到网格，格子间留 4px 槽。吸附与槽都会移动面积，所以要检查结果——并按**相对**误差检查（`(drawn − true) ÷ true`），不是百分点。0.1pp 的偏差在 59% 的格子上无足轻重，在 0.5% 的格子上却是四分之一；绝对误差恰好会掩盖你需要抓住的错误。让每个格子与真实份额的偏差保持在几个百分点内——交付示例的偏差在 2.7% 以内，最坏情况是那个碎片格，网格在那里已无能为力——并在 source line 里声明编码（`AREA = POPULATION`）。`scripts/verify-treemap.py` 对此把关。
+- **填充：** 按排名的 `ink` 不透明度渐变（如 `0.16 → 0.04`），让非焦点的排序在灰度打印和色盲读者面前依然成立。只用一个 accent 格子——编辑意图上的焦点，不自动等于最大者。注意这*不*保证什么：焦点格子脱离了渐变序列，灰度下它落在其 tint 碰巧落到的位置，而不是它的排名位置。用 accent 描边识别它，且绝不让色调承载面积未承载的含义。`ink` 是角色不是颜色：它在浅色纸上解析为近黑、在深色纸上近白，所以同一条不透明度渐变在浅色皮肤里越强化越*深*、在深色皮肤里越强化越*浅*。两侧的不透明度完全相同；变的只是明暗。
+- **描边：** 每个格子 1px `ink @ 0.30` 发丝线；焦点格子用 1.5px `accent` 描边。
+- **标签放在格子内部**，左上角，距边 16px：名称 Geist 12–14px 600，数值 Geist Mono 9px 在下一行。按格子大小分三档：
+  - 大——名称 + 数值 + 份额（`4.78B · 59% of world`）
+  - 中——名称 + 数值
+  - 小——3 字母 mono 缩写，前提是缩写诚实可读
+  - 碎片——**不放文字。** 格子至少 12×12px 时，用实心 `ink` 圆盘（`r=5`）居中放置，盘内一个 paper 色 `i`，格子名称与份额写进图例。任一轴低于 12px 时，省略盘内标记，靠图例中的位置标识碎片；固定尺寸的圆盘绝不可越出格子边界。`scripts/verify-treemap.py` 检查标记的包含关系。不要为了塞下标签而旋转它：五个正立词中间一个横躺的词，先被读成失误、后才被读成数据，而且它的居中是个陷阱——`text-anchor="middle"` 沿*基线*居中，旋转四分之一圈后基线映射到格子长轴，没有任何东西让 cap-height 带在短轴方向居中。
+  - 绝不为塞下标签而缩小格子。格子大小是数据；标签是注释。
+- **对比度：** 按实际交付的 token 计算上限。9px 数值行用 `muted` 而非 `ink`，而 `muted` 需要比 `ink` 更浅的格子底色：相对合成后的填充色测量，渐变顶端在**浅色纸上可到 0.16、深色纸上 0.14**，再深就跌破 4.5:1。（`ink` 能容忍 0.20——如果你查错了 token，写下来的就正是这个数。）中间调填充——实心 accent 或 50% ink——对浅色和深色文字都失败；改用 tint + 描边模式。source line 也用 `muted`：`soft` 在 paper 上实测 3.48:1，在这条渐变的任何位置都到不了 AA。
+- **图例：** 标准块（rule、`LEGEND`、色样），写明焦点格子、ink 渐变的方向、以及任何带 info 标记的格子。**方向要用相对纸面的对比度命名——`stronger contrast is larger`——绝不用明暗命名。** `darker is larger` 只在浅色纸上成立；交付深色变体时图例说的就与读者看到的相反，因为渐变的明暗随皮肤反转而不透明度不变。用对比度命名，一句话服务全部三种变体且不会各自腐烂。`scripts/verify-skin-polarity.py` 对此把关，把每条方向性色调声明对照该文件自身 paper 上合成的渐变来检查。source line 与 `LEGEND` 同行，右对齐 mono 8px，写明面积编码的内容、数据集及其日期。
 
-### Declaring the share
+### 声明份额
 
-**Every cell carries `data-share` — including cells too small to label.** It is the cell's percentage of the whole, and it is what makes the area checkable:
+**每个格子都携带 `data-share`——包括小到无法标注的格子。** 它是该格子占整体的百分比，也是面积可被校验的依据：
 
 ```svg
 <rect x="X" y="Y" width="W" height="H" rx="2" data-share="18.29" fill="…" stroke="…"/>
 ```
 
-Without it, a verifier has to infer the intended share from the text inside the cell, which quietly exempts the one cell that has no text — and that is the sliver, the cell the 4px grid distorts most. A shipped treemap once had its smallest cell drawn 50% oversized with every gate green for exactly this reason. `scripts/verify-treemap.py` now fails closed on any cell without it, and cross-checks `data-share` against the percentage the label prints, because a label and the metadata are two statements of one fact.
+没有它，校验器只能从格子内的文字推断预期份额，这会悄悄豁免唯一没有文字的那个格子——而那正是碎片格，被 4px 网格扭曲最厉害的格子。曾有一个交付的 treemap 最小格子被画大了 50%，所有门禁全绿，原因正是这个。`scripts/verify-treemap.py` 现在对任何缺失它的格子 fail closed，并把 `data-share` 与标签打印的百分比交叉核对，因为标签与元数据是同一事实的两次陈述。
 
-### Cell element pattern
+### 格子元素模式
 
 ```svg
 <!-- Opaque paper mask prevents the dot pattern showing through the tint -->
@@ -42,24 +42,24 @@ Without it, a verifier has to infer the intended share from the text inside the 
 <text x="X+16" y="Y+46" fill="#4f5d75" font-size="9" font-family="'Geist Mono', monospace">VALUE · SHARE</text>
 ```
 
-Focal cell: replace the fill with `rgba(235,108,54,0.16)` and the stroke with `#eb6c36` at 1.5px.
+焦点格子：填充替换为 `rgba(235,108,54,0.16)`，描边替换为 `#eb6c36`、1.5px。
 
-## Honest-data rule
+## 诚实数据规则
 
-**Area is the only encoding.** Never clip, floor, or log-scale a cell to make it visible, and never drop a cell because it is small — a treemap claims to show a whole, so an omitted part makes the picture a lie. A part too small to label gets a legend entry and, only when the cell can contain it, an info mark; parts too small to draw get merged into one honest, named "Other". If several cells are invisible at the target size, the data wants a bar chart.
+**面积是唯一编码。** 绝不为了可见而裁剪、设下限或对数化格子，也绝不因为格子小就丢掉它——treemap 声称展示整体，缺失的部分让整张图变成谎言。小到无法标注的部分获得图例条目，且仅当格子装得下时才加 info 标记；小到无法绘制的部分合并为一个诚实、具名的 "Other"。若多个格子在目标尺寸下不可见，这份数据想要的是 bar chart。
 
-Watch the smallest cell hardest: it is the one that grid snapping and gutters distort most, and the one nobody checks. Beware, too, the rounding you *display*: six values each rounded up can sum past the total you printed underneath them. Either carry enough precision that the parts reconcile, or say plainly in the source line that they don't (`PARTS ROUNDED, MAY NOT SUM`).
+盯紧最小的格子：它被网格吸附与槽扭曲得最厉害，又没人检查。也要当心你*显示*的舍入：六个各自向上舍入的值，加起来可能超过你印在下面的总量。要么保留足够精度让部分与总量对账，要么在 source line 里直说对不上（`PARTS ROUNDED, MAY NOT SUM`）。
 
-## Anti-patterns
+## 反模式
 
-- More than 8 cells without an "Other" bucket (unlabelable slivers).
-- A stated total the cells contradict by more than display rounding — or rounding that is never disclosed. Rounded parts that miss the total by a hair are honest once the source line says so; silently printing figures that don't reconcile is not.
-- Stripe layout instead of squarified — defeats area comparison.
-- Rainbow fills: one hue per cell destroys the rank reading and the one-accent rule.
-- Nesting more than two levels deep in a static diagram; a second level needs a heavier border and its own label tier, and a third is unreadable without interaction.
-- 3-D or shadowed cells — area is already the message.
+- 超过 8 个格子却没有 "Other" 桶（无法标注的碎片）。
+- 声明的总量与格子矛盾超出显示舍入范围——或舍入从不披露。舍入后的部分与总量差一点点，只要 source line 说了就是诚实的；默默打印对不上账的数字不是。
+- 用条纹布局替代 squarified——面积比较失效。
+- 彩虹填充：每格一个色相会摧毁排序阅读与单 accent 规则。
+- 静态图内嵌套超过两层；第二层需要更重的边框和自己的标签档位，第三层没有交互就不可读。
+- 3-D 或带阴影的格子——面积本身已经是信息。
 
-## Examples
+## 示例
 
 - minimal light
 - minimal dark

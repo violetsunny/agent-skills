@@ -1,14 +1,14 @@
-# IT current-state
+# IT current-state（IT 现状图）
 
-**Best for:** documenting the *before* picture of a modernization proposal — the legacy IT landscape grouped by phase or department (Collection → Processing → Dissemination, or Frontend / Backend / Storage, or Survey → Analysts → Reports), with pain-points flagged, file-based hand-offs labelled (CSV / Excel / Email / Copy), and pre-platform tooling visible. The companion to `type-dp-integration.md`: this type shows the gap that a data-platform proposal is going to close.
+**最适合：** 记录现代化方案的*改造前*图景——按阶段或部门分组的遗留 IT 全景（Collection → Processing → Dissemination，或 Frontend / Backend / Storage，或 Survey → Analysts → Reports），标出痛点、给基于文件的交接打标（CSV / Excel / Email / Copy）、并呈现平台化之前的工具链。与 `type-dp-integration.md` 互为配套：本类型展示数据平台方案将要弥合的差距。
 
-Use when stakeholders need to see the friction in the current setup — siloed scripts, manual file shuffles, missing version control, single-points-of-failure — and the path from those to a target platform topology.
+当干系人需要看清现状中的摩擦——孤岛脚本、人工文件搬运、缺失版本控制、单点故障——以及从这些到目标平台拓扑的路径时使用。
 
-This type is **parametric** — the inputs schema in §1 drives every coordinate via the formulas in §2. The rule shape mirrors `type-dp-integration.md` (zones + cross-cutting footer bars), `type-process.md` (rounded right-angle connectors), and `type-medallion.md` (per-element `color` override) so the focal rule, color override, dark mode, and reproducibility checklist read identically across types.
+本类型是**参数化**的——§1 的输入 schema 通过 §2 的公式驱动每个坐标。规则结构镜像 `type-dp-integration.md`（zone + 横切 footer 条）、`type-process.md`（圆角直角连接线）与 `type-medallion.md`（逐元素 `color` 覆盖），让焦点规则、颜色覆盖、深色模式与可复现性检查清单在各类型间读起来一致。
 
 ---
 
-## 1. Inputs — the parameter contract
+## 1. 输入——参数契约
 
 ```yaml
 title:    "Current IT Landscape"
@@ -61,27 +61,27 @@ legend:                       # auto-generated from styles used; user can overri
 dark: false
 ```
 
-**Reserved field semantics:**
+**保留字段语义：**
 
-- `orientation` — `horizontal` (zones run L→R, components stack vertically inside each zone) or `vertical` (zones stack T→B, components run L→R inside each zone).
-- `zones[i].name` — uppercase short label (≤ 14 chars). Rendered at the top-left of the zone box in the `eyebrow` role with letter-spacing 0.14em, on a paper-masked break in the zone border.
-- `components[i][k].id` — globally unique slug; referenced by `connectors[].from/to`.
-- `components[i][k].name` — `node-name` role (the human-readable label).
-- `components[i][k].sub` — `sublabel` role at 10px in muted (the technical sub-label; up to 2 lines via auto-wrap when component height grows to 72).
-- `components[i][k].icon` — any id from `references/primitive-icons.md`. If missing → no icon, the name shifts left. (Catalog has 87 icons; `mail` is currently missing — use `icon: file` as fallback for email hand-offs.)
-- `components[i][k].kind` — `standard | focal | external`. `focal` triggers the accent palette (§5); `external` switches to a 4-2 dashed stroke and muted ink to signal "this is outside our scope."
-- `components[i][k].color` — optional per-component color override (§4). Ignored on `kind: focal` (accent wins).
-- `connectors[k].from` / `connectors[k].to` — refer to a component `id`. Cross-zone, cross-row, same-zone vertical, and same-zone horizontal all legal; routing chosen by §3.
-- `connectors[k].label` — uppercase short text (≤ 8 chars). `arrow-label` role at 9px, weight 600.
-- `connectors[k].icon` — optional inline icon to the left of the text. Same catalog as component icons.
-- `connectors[k].style` — `neutral | link | accent`. Drives stroke color + marker.
-- `connectors[k].dashed` — `true | false`.
-- `footer[k]` — optional cross-cutting bar. Spans full canvas width minus margins. No connectors drawn from a footer.
-- `legend[k].swatch` — `link | accent | dashed | focal | neutral`. Auto-curated based on what the diagram actually uses; user can re-order or rename.
+- `orientation`——`horizontal`（zone 从左到右排列，组件在每个 zone 内纵向堆叠）或 `vertical`（zone 从上到下堆叠，组件在每个 zone 内从左到右排列）。
+- `zones[i].name`——大写短标签（≤ 14 字符）。以 `eyebrow` 角色、0.14em 字距渲染在 zone 框左上角，压在 zone 边框的 paper 遮罩断口上。
+- `components[i][k].id`——全局唯一 slug；被 `connectors[].from/to` 引用。
+- `components[i][k].name`——`node-name` 角色（人类可读标签）。
+- `components[i][k].sub`——`sublabel` 角色，10px muted（技术子标签；组件高度增至 72 时可自动换行至 2 行）。
+- `components[i][k].icon`——`references/primitive-icons.md` 中的任意 id。缺失 → 不放 icon，名称左移。（目录共 87 个 icon；`mail` 目前缺失——email 交接用 `icon: file` 兜底。）
+- `components[i][k].kind`——`standard | focal | external`。`focal` 触发 accent 调色板（§5）；`external` 切换为 4-2 虚线描边加 muted 墨色，表示"这在我们的范围之外"。
+- `components[i][k].color`——可选的逐组件颜色覆盖（§4）。在 `kind: focal` 上被忽略（accent 优先）。
+- `connectors[k].from` / `connectors[k].to`——指向组件 `id`。跨 zone、跨行、同 zone 纵向、同 zone 横向均合法；路由由 §3 选定。
+- `connectors[k].label`——大写短文本（≤ 8 字符）。`arrow-label` 角色，9px，字重 600。
+- `connectors[k].icon`——可选的内联 icon，位于文本左侧。与组件 icon 同一目录。
+- `connectors[k].style`——`neutral | link | accent`。驱动描边颜色 + marker。
+- `connectors[k].dashed`——`true | false`。
+- `footer[k]`——可选的横切条。横跨画布全宽减去边距。不从 footer 画出任何连接线。
+- `legend[k].swatch`——`link | accent | dashed | focal | neutral`。按图中实际用到的样式自动编排；用户可重排或改名。
 
 ---
 
-## 2. Layout formulas — deterministic geometry
+## 2. 布局公式——确定性几何
 
 ```
 # Horizontal orientation (default)
@@ -123,9 +123,9 @@ content_bottom  = N_footer > 0 ? footer_bottom : zone_y + zone_h
 viewBox_h       = content_bottom + legend_block_h + 24
 ```
 
-### 2.1 Background and zone frame
+### 2.1 背景与 zone 框
 
-Solid paper fill across `viewBox`. No dot pattern. Each zone box:
+整个 `viewBox` 铺 paper 实色填充。无点阵图案。每个 zone 框：
 
 ```svg
 <rect x="zone_x(i)" y="zone_y" width="zone_w(i)" height="zone_h"
@@ -136,17 +136,17 @@ Solid paper fill across `viewBox`. No dot pattern. Each zone box:
       font-family="{eyebrow}" letter-spacing="0.14em">{name}</text>
 ```
 
-### 2.2 Component box
+### 2.2 组件框
 
-Three visual kinds:
+三种视觉 kind：
 
-| `kind` | Fill | Stroke | Stroke width | Stroke dash | Name ink | Sub ink |
+| `kind` | 填充 | 描边 | 描边宽度 | 描边虚线 | 名称墨色 | 子标签墨色 |
 | --- | --- | --- | --- | --- | --- | --- |
 | `standard` | `#FFFFFF` | `ink` | 1 | — | `ink` | `muted` |
-| `focal` | `accent @ 0.07` | `accent` | 1.4 | — | `ink` | `accent` (line 1) + `muted` (line 2) |
+| `focal` | `accent @ 0.07` | `accent` | 1.4 | — | `ink` | `accent`（第 1 行）+ `muted`（第 2 行） |
 | `external` | `#FFFFFF` | `muted` | 1 | `4,3` | `ink` | `muted` |
 
-**Icon placement** (24×24, monochrome via `currentColor` — see `references/primitive-icons.md`):
+**Icon 摆放**（24×24，经 `currentColor` 单色化——见 `references/primitive-icons.md`）：
 
 ```svg
 <g transform="translate(comp_x + 12, comp_y + (comp_h - 24)/2)" color="{ink_for_kind}">
@@ -154,9 +154,9 @@ Three visual kinds:
 </g>
 ```
 
-Icon takes 24 × 24 → 36-px total horizontal footprint with the 12-px left pad. Name and sub-label baseline shifts right by 40 px.
+Icon 占 24 × 24 → 加 12px 左内边距后水平总占位 36px。名称与子标签基线右移 40px。
 
-**Name + sub baselines** (left-aligned, with icon to the left):
+**名称 + 子标签基线**（左对齐，icon 在左侧）：
 
 ```
 name_x = comp_x + 44
@@ -164,7 +164,7 @@ name_y = comp_y + (comp_h/2) - 2
 sub_y  = comp_y + (comp_h/2) + 14
 ```
 
-### 2.3 Connector geometry (§3 holds the routing rules)
+### 2.3 连接线几何（路由规则见 §3）
 
 ```
 src_right  = comp_x(i_src) + comp_w(i_src)
@@ -184,7 +184,7 @@ dst_cy     = dst_top + comp_h_dst/2
 corridor_x = dst_cx                            # land arrow on dst horizontal center, enter via top/bot
 ```
 
-### 2.4 Footer bar
+### 2.4 Footer 条
 
 ```svg
 <rect x="left_pad" y="footer_y(k)" width="viewBox_w - 2*left_pad" height="footer_bar_h"
@@ -196,19 +196,19 @@ corridor_x = dst_cx                            # land arrow on dst horizontal ce
 <text x="left_pad + 56" y="footer_y(k) + 40" font-family="{sublabel}" font-size="12" fill="{muted}">{sub}</text>
 ```
 
-Footer bars are layer-wide services. **No connectors emerge from them.** They sit visually below the zones and let the reader see the cross-cutting concerns at a glance.
+Footer 条是层级全域服务。**不从它们引出任何连接线。** 它们在视觉上位于 zone 下方，让读者一眼看到横切关注点。
 
-### 2.5 Legend strip
+### 2.5 图例条带
 
-Hairline divider at `y = content_bottom + 16`, then a row of swatches + labels at `y = content_bottom + 36`. Only the styles actually used by `connectors[]` (plus `focal` and `external` if those component kinds are present) appear in the legend.
+发丝分隔线在 `y = content_bottom + 16`，随后一行色样 + 标签在 `y = content_bottom + 36`。图例只出现 `connectors[]` 实际用到的样式（若存在对应组件 kind，再加 `focal` 与 `external`）。
 
 ---
 
-## 3. Connector rules (mandatory)
+## 3. 连接线规则（强制）
 
-### 3.1 Path shape — rounded right-angle Q-bezier, r = 8
+### 3.1 路径形状——圆角直角 Q-bezier，r = 8
 
-Reused verbatim from `type-process.md` §3.1. No diagonals — ever.
+逐字复用 `type-process.md` §3.1。禁止斜线——任何时候。
 
 ```svg
 <!-- Same zone, adjacent component (same vertical column): single vertical line -->
@@ -220,35 +220,35 @@ Reused verbatim from `type-process.md` §3.1. No diagonals — ever.
       fill="none" stroke="…" stroke-width="…" marker-end="…"/>
 ```
 
-- Use `{src_cy + 8}` and `V {dst_top}` when destination lies BELOW source.
-- Use `{src_cy − 8}` and `V {dst_bottom}` when destination lies ABOVE source.
+- 目标在源**下方**时用 `{src_cy + 8}` 与 `V {dst_top}`。
+- 目标在源**上方**时用 `{src_cy − 8}` 与 `V {dst_bottom}`。
 
-### 3.2 Exit / entry sides (configurable; defaults below)
+### 3.2 出边 / 入边（可配置；默认如下）
 
-| Topology | Default exit side of source | Default entry side of destination |
+| 拓扑 | 源的默认出边 | 目标的默认入边 |
 | --- | --- | --- |
-| Same zone, dst below | bottom | top |
-| Same zone, dst above | top | bottom |
-| Cross-zone, horizontal flow | right | top (or bottom, whichever is closer to src_cy) |
-| Vertical-orientation diagram | bottom | top |
+| 同 zone，目标在下 | bottom | top |
+| 同 zone，目标在上 | top | bottom |
+| 跨 zone，横向流 | right | top（或 bottom，取离 src_cy 更近者） |
+| vertical 方向的图 | bottom | top |
 
-A connector can override via `connectors[k].from_side` / `connectors[k].to_side` (`top | right | bottom | left`). **Backward references** (right→left in horizontal orientation, up in vertical orientation) are permitted only when at least one endpoint has `kind: external`, and must be `dashed: true`.
+连接线可通过 `connectors[k].from_side` / `connectors[k].to_side`（`top | right | bottom | left`）覆盖。**反向引用**（horizontal 方向下右→左、vertical 方向下向上）仅当至少一个端点为 `kind: external` 时允许，且必须 `dashed: true`。
 
-### 3.3 Markers MUST touch the destination rectangle
+### 3.3 Marker 必须接触目标矩形
 
-The path's last command ends at the destination's rectangle edge (`V {dst_top}` or `H {dst_left}`), **not** at the centroid. After applying `refX=7` on the marker, the triangle sits flush against the border. Stopping the line short of the edge — or sending it to the centroid and burying the arrowhead inside the rect — is a hard fail.
+路径的最后一条命令止于目标矩形边缘（`V {dst_top}` 或 `H {dst_left}`），**不是**质心。marker 应用 `refX=7` 后，三角形紧贴边框。线在边缘前截断——或画到质心把箭头埋进矩形内——都是硬性不合格。
 
-### 3.4 Style → stroke + marker
+### 3.4 Style → 描边 + marker
 
-| `style` | Stroke color | Stroke width | Marker |
+| `style` | 描边颜色 | 描边宽度 | Marker |
 | --- | --- | --- | --- |
 | `neutral` | `muted` | 1.0 | `url(#arrow)` |
 | `link` | `link` | 1.2 | `url(#arrow-link)` |
 | `accent` | `accent` | 1.4 | `url(#arrow-accent)` |
 
-Add `stroke-dasharray="4 3"` when `dashed: true`.
+`dashed: true` 时加 `stroke-dasharray="4 3"`。
 
-**Defs block** (always emit all three):
+**Defs 块**（三个始终全部输出）：
 
 ```svg
 <defs>
@@ -258,9 +258,9 @@ Add `stroke-dasharray="4 3"` when `dashed: true`.
 </defs>
 ```
 
-### 3.5 Connector label = inline icon + text, placed at the START of the connector with a perpendicular margin
+### 3.5 连接线标签 = 内联 icon + 文字，放在连接线起点并带垂直于线的偏移
 
-The label sits **near the source end** of the connector (not at the mid-segment) and is **offset perpendicular to the line** so it never overlaps the stroke. Icon (when `icon:` is set) sits inside the label's paper-fill mask, to the left of the text.
+标签位于连接线**靠近源端**处（不在线段中部），并**垂直于线偏移**，绝不与描边重叠。Icon（设置了 `icon:` 时）位于标签的 paper 填充遮罩内、文字左侧。
 
 ```svg
 <g transform="translate({label_cx}, {label_cy})">
@@ -272,138 +272,138 @@ The label sits **near the source end** of the connector (not at the mid-segment)
 </g>
 ```
 
-**Placement formulas** (label box is 18px tall × `w` wide; centered on `{label_cx, label_cy}`):
+**摆放公式**（标签框高 18px × 宽 `w`；以 `{label_cx, label_cy}` 为中心）：
 
-| Segment exiting source | `label_cx` | `label_cy` | Effect |
+| 离开源的线段 | `label_cx` | `label_cy` | 效果 |
 | --- | --- | --- | --- |
-| Horizontal (right exit) | `src_right + 6 + w/2` | `src_cy − 14` | Label sits 6 px past the source, 5 px above the line |
-| Horizontal (left exit, backward) | `src_left − 6 − w/2` | `src_cy − 14` | Label sits 6 px before the source, 5 px above the line |
-| Vertical (bottom exit) | `src_cx + 6 + w/2` | `src_bot + 14` | Label sits 6 px right of the line, 5 px below the source edge |
-| Vertical (top exit, backward) | `src_cx + 6 + w/2` | `src_top − 14` | Label sits 6 px right of the line, 5 px above the source edge |
+| 横向（右出） | `src_right + 6 + w/2` | `src_cy − 14` | 标签在源右侧 6px、线上方 5px |
+| 横向（左出，反向） | `src_left − 6 − w/2` | `src_cy − 14` | 标签在源左侧 6px、线上方 5px |
+| 纵向（下出） | `src_cx + 6 + w/2` | `src_bot + 14` | 标签在线右侧 6px、源边缘下方 5px |
+| 纵向（上出，反向） | `src_cx + 6 + w/2` | `src_top − 14` | 标签在线右侧 6px、源边缘上方 5px |
 
-For cross-zone H+Q+V routes the label binds to the **horizontal** segment, since that segment is anchored at the source. Place the label early on that horizontal run — never on the Q-bend or the vertical tail.
+跨 zone 的 H+Q+V 路由，标签绑定在**横向**线段上，因为该线段锚定在源端。标签放在这段横向行程的靠前处——绝不放在 Q 弯折或纵向尾段上。
 
-- `w = text_w + (icon ? 30 : 12)` — auto-fit.
-- Mask `fill` resolves to `paper` in light mode and `ink` in dark mode. The mask is kept as a safety pad — even though the label no longer sits on the line, it can graze zone backgrounds and component fills, and the mask preserves contrast.
-- `stroke_color` follows §3.4 (text + icon inherit the connector's accent / link / neutral color).
+- `w = text_w + (icon ? 30 : 12)`——自适应。
+- 遮罩 `fill` 在 light 模式解析为 `paper`、dark 模式解析为 `ink`。遮罩作为安全垫保留——即使标签不再压在线上，它仍可能蹭到 zone 背景与组件填充，遮罩保住对比度。
+- `stroke_color` 遵循 §3.4（文字 + icon 继承连接线的 accent / link / neutral 颜色）。
 
-### 3.6 Z-order
+### 3.6 Z 序
 
-All connectors (paths + lines + labels) emit BEFORE any component rect, so node fills mask the line ends. The connector label is the exception — it draws AFTER its line so the mask sits on top.
+所有连接线（path + line + 标签）在任何组件矩形之前输出，节点填充因此遮住线端。连接线标签是例外——它画在自己的线之后，让遮罩位于最上层。
 
 ---
 
-## 4. Component color override (per-component `color: "#hex"`)
+## 4. 组件颜色覆盖（逐组件 `color: "#hex"`）
 
-Per-component, same shape as every other parametric type in this skill.
+逐组件生效，与本 skill 其他所有参数化类型同一形态。
 
-| Element | Light | Dark |
+| 元素 | Light | Dark |
 | --- | --- | --- |
-| Container fill | `rgba(C, 0.06)` | `rgba(C_light, 0.10)` |
-| Container stroke | `rgba(C, 0.45)` (width 1) | `rgba(C_light, 0.55)` |
-| Component name text | `C` | `C_light` |
-| Icon glyph | inherits ink via `currentColor` (unchanged) | inherits ink (unchanged) |
-| Sub-label | muted (unchanged) | muted (unchanged) |
-| Connectors touching this component | **unchanged** — topology-driven | **unchanged** |
+| 容器填充 | `rgba(C, 0.06)` | `rgba(C_light, 0.10)` |
+| 容器描边 | `rgba(C, 0.45)`（宽 1） | `rgba(C_light, 0.55)` |
+| 组件名称文字 | `C` | `C_light` |
+| Icon 字形 | 经 `currentColor` 继承墨色（不变） | 继承墨色（不变） |
+| 子标签 | muted（不变） | muted（不变） |
+| 接触该组件的连接线 | **不变**——由拓扑驱动 | **不变** |
 
-`C_light` = the same hex lightened ~15 % for dark-mode contrast (e.g., `#7a8c47` → `#9aac67`, `#b85450` → `#d97a78`).
+`C_light` = 同一 hex 提亮约 15%，用于深色模式对比度（如 `#7a8c47` → `#9aac67`、`#b85450` → `#d97a78`）。
 
-**Rules:**
-- **Never on focal components.** `kind: focal` always renders accent; `color` is silently ignored.
-- **Never on connectors.** Connector style is topology-driven; if you want a colored edge, pick `style: accent` / `link` / `neutral`, not a component color.
-- **Cap: ≤ 3 custom-colored components per diagram** (in addition to focal components). Above 3 the visual signal fragments.
+**规则：**
+- **绝不用于焦点组件。** `kind: focal` 始终渲染 accent；`color` 被静默忽略。
+- **绝不用于连接线。** 连接线样式由拓扑驱动；想要带色的边，选 `style: accent` / `link` / `neutral`，而不是组件颜色。
+- **上限：每图 ≤ 3 个自定义颜色组件**（焦点组件之外）。超过 3 个视觉信号开始碎片化。
 
-**Recommended cross-type palette** (same as `type-medallion.md` / `type-process.md` / `type-dp-integration.md` / `type-dp-security-matrix.md`):
+**推荐跨类型调色板**（与 `type-medallion.md` / `type-process.md` / `type-dp-integration.md` / `type-dp-security-matrix.md` 相同）：
 
-- `#b85450` rust-red — security / governance / pain-point that isn't focal
-- `#5a7d9a` slate-blue — observability / quality / monitoring gate
-- `#7a8c47` olive-green — survivor system (the one tool the new platform keeps)
-- `#c9a23a` warm yellow — sandbox / dev / scratch
-- `#8c6d3f` warm-brown — archive / cold / DR
-
----
-
-## 5. Focal rule
-
-- `kind: focal` components: **≤ 2 per diagram** (zero is also valid for diagrams without a single dominant pain-point).
-- Auto-styling: accent stroke 1.4, accent-tinted fill 7 %, ink-bold `node-name`, accent line-1 `sublabel`.
-- Any connector with a focal endpoint automatically renders in `style: accent`; the YAML `style:` is ignored.
-- Custom `color: "#hex"` on a focal component is silently ignored — accent always wins.
-
-If your diagram needs more than 2 focal components, you've collapsed two narratives. Split: one "collection pain-points" diagram + one "dissemination pain-points" diagram.
+- `#b85450` rust-red——安全 / 治理 / 非焦点的痛点
+- `#5a7d9a` slate-blue——可观测 / 质量 / 监控门
+- `#7a8c47` olive-green——幸存系统（新平台保留的那个工具）
+- `#c9a23a` warm yellow——沙箱 / 开发 / 临时区
+- `#8c6d3f` warm-brown——归档 / 冷数据 / DR
 
 ---
 
-## 6. Dark mode
+## 5. 焦点规则
 
-| Role | Light | Dark |
+- `kind: focal` 组件：**每图 ≤ 2 个**（没有单一主导痛点的图，取零也合法）。
+- 自动样式：accent 描边 1.4、accent 7% tint 填充、ink 加粗 `node-name`、第 1 行 `sublabel` 用 accent。
+- 任一端点为焦点的连接线自动以 `style: accent` 渲染；YAML 里的 `style:` 被忽略。
+- 焦点组件上的自定义 `color: "#hex"` 被静默忽略——accent 永远优先。
+
+如果你的图需要超过 2 个焦点组件，说明你把两条叙事压在了一起。拆开：一张"采集痛点"图 + 一张"发布痛点"图。
+
+---
+
+## 6. 深色模式
+
+| 角色 | Light | Dark |
 | --- | --- | --- |
 | paper | `paper` | `ink` |
 | ink | `ink` | `paper` |
 | muted | `muted` | `muted` |
 | accent | `accent` | `accent` |
 | link | `link` | `link` |
-| zone background | `ink @ 0.02` | `paper @ 0.04` |
-| zone border | `ink @ 0.10` | `paper @ 0.14` |
-| standard component fill | `#FFFFFF` | `paper @ 0.04` |
-| standard component stroke | `ink` | `paper @ 0.32` |
-| focal fill | `accent @ 0.07` | `accent @ 0.12` |
-| focal stroke | `accent` | `accent` |
-| external stroke | `muted` (dashed) | `muted` (dashed) |
-| footer fill | `ink @ 0.03` | `paper @ 0.05` |
-| footer stroke | `ink @ 0.18` | `paper @ 0.20` |
-| label mask fill | `paper` | `ink` |
-| custom-color components | `C` | `C_light` (≈ +15 %) |
+| zone 背景 | `ink @ 0.02` | `paper @ 0.04` |
+| zone 边框 | `ink @ 0.10` | `paper @ 0.14` |
+| 标准组件填充 | `#FFFFFF` | `paper @ 0.04` |
+| 标准组件描边 | `ink` | `paper @ 0.32` |
+| 焦点填充 | `accent @ 0.07` | `accent @ 0.12` |
+| 焦点描边 | `accent` | `accent` |
+| external 描边 | `muted`（虚线） | `muted`（虚线） |
+| footer 填充 | `ink @ 0.03` | `paper @ 0.05` |
+| footer 描边 | `ink @ 0.18` | `paper @ 0.20` |
+| 标签遮罩填充 | `paper` | `ink` |
+| 自定义颜色组件 | `C` | `C_light`（≈ +15%） |
 
 ---
 
-## 7. Reproducibility checklist (taste gate)
+## 7. 可复现性检查清单（品味门）
 
-Before emitting SVG, verify **every** item:
+输出 SVG 前，逐项核对**每一**条：
 
-1. Eyebrow + title + subtitle present at canonical y-positions (24 / 36 / 52); body padding 32 px.
-2. 2..4 zones; each has its uppercase label at the top-left of its zone box, on a paper-masked break in the border.
-3. Every component has `id`, `name`. `sub`, `icon`, `kind`, `color` are optional.
-4. ≤ 2 components with `kind: focal`; focal styling auto-applied (accent fill 7 %, accent stroke 1.4, italic line-1 sub).
-5. Every connector exits the right (or bottom) of source and enters the top (or left) of destination; rounded right-angle Q-bezier `r=8` at every bend; marker triangle visibly touches the destination rectangle edge.
-6. Connector labels sit at the **start** of the connector (not mid-segment) and are offset **perpendicular** to the line (5 px gap above for horizontal segments, 6 px gap to the right for vertical segments) — never overlapping the stroke. Paper-fill mask kept behind text; icon (when `icon:` is set) sits left of text inside the same mask.
-7. ≤ 3 custom-colored components; none on focal.
-8. ≤ 3 footer bars; each spans `viewBox_w − 2*left_pad`; no connectors emerge from any footer.
-9. Legend at bottom: hairline separator + one swatch per style actually used.
-10. `arrow-label` for connector labels, `eyebrow` for the page eyebrow and zone labels, `title` for the page title, `node-name` for the subtitle and component names, and `sublabel` for technical sub-labels.
-11. Markers `#arrow` / `#arrow-link` / `#arrow-accent` defined once in `<defs>`; no inline marker definitions.
-12. Dark variant: resolve every semantic token through its dark-mode value; custom colors are lightened ~15 %.
-
----
-
-## 8. Anti-patterns
-
-- **Diagonal arrows.** The NatStat replication has one (analyst → LegacyPortal). The new type forbids it — always rounded right-angle Q-bezier.
-- **Marker not touching the target.** Path ends at the centroid or stops short of the border.
-- **Inline `text` connector labels without a mask rect.** The connector line can bleed through the text and it becomes unreadable.
-- **Labels sitting on top of the connector line, mid-segment.** Labels belong at the *start* of the connector with a perpendicular margin (see §3.5) — burying them in the middle of the line hides the source-to-destination direction and forces the reader's eye to fight the mask.
-- **Tiny text badges as icons.** The source uses 7-px `DB` / `APP` / `EXT` badges; this type uses real 24-px catalog icons. Text badges are only acceptable as the label text, not as the component "icon."
-- **Custom color on a focal component.** Focal always wins; user-set `color` silently ignored on `kind: focal`.
-- **Footer bar wired to one component.** Footer = cross-cutting layer-wide concern; a connector from a footer to a specific component is a category error (use `type-dp-integration.md`'s AUTH-line pattern only when the footer service truly authenticates *all* components, and even then the line lands at the zone bottom edge, not at a specific tool).
-- **> 16 total components or > 5 per zone.** Density cap; split into two diagrams.
-- **Mixing orientations within one diagram.** Pick one — `horizontal` or `vertical` — and apply it to every zone.
-- **Using `kind: focal` to flag every painful thing.** Focal exists for ≤ 2 narrative pain-points; for "this is bad but not headline-bad", use `color: "#b85450"` rust-red instead.
+1. Eyebrow + 标题 + 副标题位于 canonical y 位置（24 / 36 / 52）；正文边距 32px。
+2. 2..4 个 zone；每个 zone 框左上角有大写标签，压在边框的 paper 遮罩断口上。
+3. 每个组件都有 `id`、`name`。`sub`、`icon`、`kind`、`color` 可选。
+4. `kind: focal` 组件 ≤ 2 个；焦点样式自动应用（accent 填充 7%、accent 描边 1.4、第 1 行子标签斜体）。
+5. 每条连接线从源的右边（或下边）出发，进入目标的顶边（或左边）；每个弯折都是圆角直角 Q-bezier `r=8`；marker 三角形肉眼可见地接触目标矩形边缘。
+6. 连接线标签位于连接线**起点**（不在线段中部），并**垂直**于线偏移（横向线段上方留 5px、纵向线段右侧留 6px）——绝不与描边重叠。文字后面保留 paper 填充遮罩；icon（设置了 `icon:` 时）在同一遮罩内、文字左侧。
+7. 自定义颜色组件 ≤ 3 个；焦点组件上没有。
+8. footer 条 ≤ 3 条；每条横跨 `viewBox_w − 2*left_pad`；任何 footer 都不引出连接线。
+9. 底部图例：发丝分隔线 + 每个实际用到的样式一个色样。
+10. 连接线标签用 `arrow-label`，页 eyebrow 与 zone 标签用 `eyebrow`，页标题用 `title`，副标题与组件名称用 `node-name`，技术子标签用 `sublabel`。
+11. Marker `#arrow` / `#arrow-link` / `#arrow-accent` 在 `<defs>` 中定义一次；无内联 marker 定义。
+12. 深色变体：每个语义 token 都解析为其深色模式值；自定义颜色提亮约 15%。
 
 ---
 
-## 9. Examples
+## 8. 反模式
 
-- minimal light (NatStat canonical: 3 zones, 9 components, 8 connectors, 0 footer bars, SQL Server tinted olive). Gallery default.
-- same, dark skin.
-- same, editorial-card frame with summary cards.
-- exercises §4 color override + footer bars: 2 footer bars (Identity Manager + Observability) below the zones, third custom color on Analyst Machines (slate-blue, data-quality concern).
-- extended pattern, dark skin.
+- **斜线箭头。** NatStat 复刻版里有一条（analyst → LegacyPortal）。本类型禁止——一律圆角直角 Q-bezier。
+- **Marker 不接触目标。** 路径止于质心或在边框前截断。
+- **无遮罩矩形的内联 `text` 连接线标签。** 连接线会从文字中透出来，导致不可读。
+- **标签压在线段中部的连接线上。** 标签应放在连接线*起点*并带垂直偏移（见 §3.5）——埋在线中间会掩盖源到目标的方向，还迫使读者的视线与遮罩搏斗。
+- **用微型文字徽章当 icon。** 源图用 7px 的 `DB` / `APP` / `EXT` 徽章；本类型用真正的 24px 目录 icon。文字徽章只能作为标签文本，不能作为组件的"icon"。
+- **焦点组件上的自定义颜色。** 焦点永远优先；`kind: focal` 上用户设置的 `color` 被静默忽略。
+- **Footer 条连到单个组件。** Footer = 横切的层级全域关注点；从 footer 到特定组件的连接线是范畴错误（仅当 footer 服务确实为*所有*组件做认证时才用 `type-dp-integration.md` 的 AUTH 线模式，即便如此线也落在 zone 底边，而不是某个具体工具上）。
+- **组件总数 > 16 或每 zone > 5。** 密度上限；拆成两张图。
+- **一张图内混用方向。** 选定一个——`horizontal` 或 `vertical`——并应用到每个 zone。
+- **用 `kind: focal` 标记所有糟糕的东西。** Focal 只为 ≤ 2 个叙事级痛点存在；"很糟但算不上头条级糟"的情况，改用 `color: "#b85450"` rust-red。
+
+---
+
+## 9. 示例
+
+- 极简 light 版（NatStat canonical：3 zone、9 组件、8 连接线、0 条 footer 条、SQL Server 着 olive 色）。画廊默认。
+- 同上，dark 皮肤。
+- 同上，editorial-card 外框加摘要卡片。
+- 演练 §4 颜色覆盖 + footer 条：zone 下方 2 条 footer 条（Identity Manager + Observability），第三个自定义颜色落在 Analyst Machines（slate-blue，数据质量关注点）。
+- 扩展模式，dark 皮肤。
 
 ---
 
 ## 10. Worked YAML — 输入契约示例（示例文件不随本 skill 分发）
 
-The complete inputs of the canonical worked example. Every coordinate in the generated SVG is derivable from §2 applied to these inputs.
+canonical 工作示例的完整输入。生成 SVG 中的每个坐标都可由 §2 公式作用于这些输入推导得出。
 
 canonical 副本：`templates/type-it-state.yaml` — 参数化文档契约，复制后手工填参绘图；不是 generate-from-template.py 的输入（该脚本只接受 containers/nodes/arrows JSON），以 templates 为准
 ```yaml
@@ -443,29 +443,29 @@ connectors:
 dark: false
 ```
 
-### 10.1 What this YAML proves
+### 10.1 这份 YAML 证明了什么
 
-- `n_zones = 3`, components per zone `= [3, 3, 3]`, custom color count = 1 (SQL Server), focal count = 2 (Shared Drive, LegacyPortal), external count = 2 (Civil Registry, Ministry Partners).
-- Zone widths in canonical: 256 / 360 / 272 ⇒ `viewBox_w = 16 + 256 + 20 + 360 + 20 + 272 + 16 = 960` ✓
-- `viewBox_h = 52 + 360 + 40 + 24 = 500` (no footer bars) ✓
-- Shared Drive (focal) at zone 2, row 0: `x = 340, y = 80, w = 264, h = 68` (focal stretches to 68 to fit 2-line sub) ✓
-- LegacyPortal (focal) at zone 3, row 0: `x = 704, y = 80, w = 208, h = 60` ✓
-- SQL Server (custom olive) at zone 2, row 2: container fill `rgba(122,140,71,0.06)`, stroke `rgba(122,140,71,0.45)`, name text `#7a8c47` ✓
-- Connectors 4, 5 (within zone 2) and 7, 8 (within zone 3) are simple vertical `<line>` elements. Cross-zone connectors take rule-compliant routes (see design-system.md §6 rules 4 & 5):
-  - **All three Survey-side → Shared Drive connectors (C1 / C2 / C3) enter Shared Drive's LEFT edge.** A top-edge entry would push the marker body (7 px back along travel, given `refX = 7`) *inside* the destination box, where the box's paper-fill mask hides it — only a 1-pixel tip would peek above the stroke. Entering the left edge with a right-going path keeps the body outside the box and the arrow visible (~7 px shown to the left of the box edge). The three left-edge attach points are fanned at **y = 108 / 124 / 140** (16-px spacing, well above the 12 px rule-4 minimum).
-  - **C1** (Survey → Shared Drive) source y matches landing y: single horizontal `M 252,108 H 340`. No bends needed.
-  - **C2** (ASP.NET → Shared Drive) detours up through zone-2 background — vertical at `x = 316` (clear of Shared Drive's left edge at `x = 340`): `H 308 Q 316,196 316,188 V 132 Q 316,124 324,124 H 340`. Lands at `(340, 124)`.
-  - **C3** (Civil Registry → Shared Drive) detours up through zone-2 background — vertical at `x = 332` (clear of Analyst Machines, which starts at `x = 340`): `H 324 Q 332,284 332,276 V 148 Q 332,140 340,140`. Lands at `(340, 140)` via a final Q-bend (no trailing H needed).
-  - **C6** (Analyst Machines → LegacyPortal) cannot use a direct H+Q+V into LegacyPortal's left edge — Analyst Machines and LegacyPortal are in different rows, and the direct horizontal at `y = 268` would cross NatStat Website. It detours through the zone gap and **over** LegacyPortal: `H 654 Q 662,268 662,260 V 72 Q 662,64 670,64 H 800 Q 808,64 808,72 V 80` — vertical at `x = 662` (in zone gap), horizontal at `y = 64` (above LegacyPortal top), then down into LegacyPortal's top center. The path enters LegacyPortal from **above** going down, so the arrow body lives above the box (visible) and only the 1-px tip enters the box.
+- `n_zones = 3`，每 zone 组件数 `= [3, 3, 3]`，自定义颜色数 = 1（SQL Server），焦点数 = 2（Shared Drive、LegacyPortal），external 数 = 2（Civil Registry、Ministry Partners）。
+- canonical 中的 zone 宽度：256 / 360 / 272 ⇒ `viewBox_w = 16 + 256 + 20 + 360 + 20 + 272 + 16 = 960` ✓
+- `viewBox_h = 52 + 360 + 40 + 24 = 500`（无 footer 条）✓
+- Shared Drive（焦点）在 zone 2 第 0 行：`x = 340, y = 80, w = 264, h = 68`（焦点拉伸到 68 以容纳 2 行子标签）✓
+- LegacyPortal（焦点）在 zone 3 第 0 行：`x = 704, y = 80, w = 208, h = 60` ✓
+- SQL Server（自定义 olive）在 zone 2 第 2 行：容器填充 `rgba(122,140,71,0.06)`、描边 `rgba(122,140,71,0.45)`、名称文字 `#7a8c47` ✓
+- 连接线 4、5（zone 2 内）与 7、8（zone 3 内）是简单的纵向 `<line>` 元素。跨 zone 连接线走合规路由（见 design-system.md §6 规则 4 与 5）：
+  - **Survey 侧 → Shared Drive 的三条连接线（C1 / C2 / C3）全部进入 Shared Drive 的左边。** 从顶边进入会把 marker 主体（`refX = 7`，沿行进方向回退 7px）推进目标框*内部*，被框的 paper 填充遮罩挡住——只剩 1 像素的尖端露在描边上方。以向右的路径进入左边，主体留在框外、箭头可见（框边缘左侧露出约 7px）。三个左边附着点呈扇形分布在 **y = 108 / 124 / 140**（间距 16px，远高于规则 4 的 12px 下限）。
+  - **C1**（Survey → Shared Drive）源 y 与落点 y 相同：单条横向 `M 252,108 H 340`。无需弯折。
+  - **C2**（ASP.NET → Shared Drive）经 zone 2 背景向上绕行——纵向走 `x = 316`（避开 Shared Drive 左边 `x = 340`）：`H 308 Q 316,196 316,188 V 132 Q 316,124 324,124 H 340`。落在 `(340, 124)`。
+  - **C3**（Civil Registry → Shared Drive）经 zone 2 背景向上绕行——纵向走 `x = 332`（避开起点在 `x = 340` 的 Analyst Machines）：`H 324 Q 332,284 332,276 V 148 Q 332,140 340,140`。经末端 Q 弯折落在 `(340, 140)`（无需收尾 H 段）。
+  - **C6**（Analyst Machines → LegacyPortal）不能直接 H+Q+V 进入 LegacyPortal 左边——Analyst Machines 与 LegacyPortal 不在同一行，`y = 268` 的直接横线会穿过 NatStat Website。它经 zone 间隙、从 LegacyPortal **上方**绕行：`H 654 Q 662,268 662,260 V 72 Q 662,64 670,64 H 800 Q 808,64 808,72 V 80`——纵向走 `x = 662`（zone 间隙内），横向走 `y = 64`（LegacyPortal 顶边上方），再向下进入 LegacyPortal 顶部中心。路径从**上方**向下进入 LegacyPortal，箭头主体留在框上方（可见），只有 1px 尖端进入框内。
 
-**Marker-visibility rule of thumb:** with the standard arrow marker (`markerWidth = 8`, `refX = 7`), the arrow body extends 7 px *backwards* along the path direction from the endpoint. For the arrow to remain visible, that 7-px tail must sit *outside* the destination box. Translation:
-- Entering a **TOP edge going UP** (path direction up, box below) → body inside box, **only 1 px visible. Avoid this.**
-- Entering a **TOP edge going DOWN** (path direction down, box below) → body above box, ~7 px visible. ✓
-- Entering a **LEFT edge going RIGHT** → body to the left of box, ~7 px visible. ✓
-- Entering a **RIGHT edge going LEFT** → body to the right of box, ~7 px visible. ✓
-- Entering a **BOTTOM edge going DOWN** (box above) → body inside box, **only 1 px visible. Avoid this.**
-- Entering a **BOTTOM edge going UP** (box above) → body below box, ~7 px visible. ✓
+**Marker 可见性经验法则：** 标准箭头 marker（`markerWidth = 8`、`refX = 7`）下，箭头主体从端点沿路径方向*向后*延伸 7px。箭头要保持可见，这 7px 尾巴必须位于目标框*之外*。换算如下：
+- 向**上**进入**顶边**（路径方向朝上，框在下方）→ 主体在框内，**只露 1px。避免。**
+- 向**下**进入**顶边**（路径方向朝下，框在下方）→ 主体在框上方，露出约 7px。✓
+- 向**右**进入**左边** → 主体在框左侧，露出约 7px。✓
+- 向**左**进入**右边** → 主体在框右侧，露出约 7px。✓
+- 向**下**进入**底边**（框在上方）→ 主体在框内，**只露 1px。避免。**
+- 向**上**进入**底边**（框在上方）→ 主体在框下方，露出约 7px。✓
 
-When the source row matches the destination row's y range (e.g., Survey at y=108 with Shared Drive at y=80–148), prefer **side-edge** entry — a single horizontal path with a fully visible arrow. When the source row is offset, detour through the destination's nearest zone background to enter a side edge rather than approaching a top/bottom edge from the wrong side.
+源行与目标行的 y 范围重合时（如 Survey 在 y=108、Shared Drive 在 y=80–148），优先**侧边**进入——单条横向路径，箭头完整可见。源行错开时，经目标最近的 zone 背景绕行进入侧边，而不是从错误一侧逼近顶/底边。
 
-The extended example (§9 line 4) demonstrates footer bars + a third custom color and proves `viewBox_h` grows correctly when `N_footer > 0`.
+扩展示例（§9 第 4 条）演示 footer 条 + 第三个自定义颜色，并证明 `N_footer > 0` 时 `viewBox_h` 正确增长。

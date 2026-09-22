@@ -1,25 +1,25 @@
-# ER / Data Model
+# ER / 数据模型
 
-**Best for:** conceptual and logical data models, API resource relationships, domain models — anything where the story is *entities and cardinality*.
+**最适合：** 概念与逻辑数据模型、API 资源关系、领域模型——凡是核心信息为*实体与基数*的场景。
 
-**Not for the physical schema.** ER is entity-level: relationship lines join *boxes* and carry cardinality at each end. When the point is real tables with SQL types, constraint chips, indexes, and foreign keys that anchor **column to column**, use [`type-db-schema.md`](type-db-schema.md) instead.
+**不适用于物理 schema。** ER 是实体级的：关系线连接*盒子*并在两端携带基数。当重点是带 SQL 类型、约束 chip、索引以及**列到列**锚定外键的真实表时，改用 [`type-db-schema.md`](type-db-schema.md)。
 
-## Layout conventions
-- Each entity is a two-section box:
-  - **Header**: type tag (`ENTITY`) + entity name in Geist.
-  - **Body**: field list in Geist Mono, one per line. PK prefixed with `#`, FK prefixed with `→`.
-- Relationships: lines between entities with cardinality at each end:
-  - `1`, `N`, `0..1`, `1..*` in Geist Mono, 8px, placed 10–12px from the entity edge.
-  - Optional relationship label ("has", "belongs to") centered on the line.
-- Group related entities close; lay out so most relationships are straight lines, not tangles.
-- Coral on the aggregate root or central entity of the model.
+## 布局约定
+- 每个实体是一个两段式盒子：
+  - **头部**：类型标签（`ENTITY`）+ Geist 实体名。
+  - **主体**：Geist Mono 字段列表，每行一个。PK 前缀 `#`，FK 前缀 `→`。
+- 关系：实体之间的连线，两端带基数：
+  - `1`、`N`、`0..1`、`1..*` 用 Geist Mono 8px，距实体边缘 10–12px。
+  - 可选的关系标签（"has"、"belongs to"）居中放在线上。
+- 相关实体就近分组；布局时让大多数关系为直线，避免缠绕。
+- 珊瑚色用在聚合根或模型的中心实体上。
 
-## Anti-patterns
-- Drawing an arrow for every FK on a model with dozens — lay out by cluster instead.
-- Inconsistent cardinality notation between ends of the same relationship.
-- Fields padded to equal-height boxes — natural height by content is fine.
+## 反模式
+- 在含数十个 FK 的模型上为每个 FK 画箭头——改按簇布局。
+- 同一关系两端的基数记法不一致。
+- 用填充字段把盒子补齐到等高——按内容自然高度即可。
 
-## Examples
+## 示例
 - minimal light
 - minimal dark
 - full editorial

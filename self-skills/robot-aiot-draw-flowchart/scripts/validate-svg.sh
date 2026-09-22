@@ -88,7 +88,7 @@ echo -n "Running render validation... "
 RENDER_OK=false
 RENDER_TOOL=""
 RENDER_ERR=""
-RENDER_OUTPUT=$(mktemp "${TMPDIR:-/tmp}/fireworks-tech-graph.XXXXXX")
+RENDER_OUTPUT=$(mktemp "${TMPDIR:-/tmp}/robot-aiot-tech-graph.XXXXXX")
 trap 'rm -f "$RENDER_OUTPUT"' EXIT
 
 if python3 -c "import cairosvg" 2>/dev/null; then

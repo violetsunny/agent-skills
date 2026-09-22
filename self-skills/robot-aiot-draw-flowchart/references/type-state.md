@@ -1,22 +1,22 @@
-# State Machine
+# State Machine（状态机）
 
-**Best for:** finite state logic — order status, auth state, connection lifecycle, form wizard, job queue status.
+**最适合：** 有限状态逻辑——订单状态、认证状态、连接生命周期、表单向导、作业队列状态。
 
-## Layout conventions
-- States are rounded rectangles (`rx=8`), labeled in Geist.
-- **Start**: filled ink dot (`r=6`). **End**: ringed dot (outer `r=8` outline, inner filled `r=5`).
-- Transitions: curved arrows labeled in Geist Mono as `event [guard] / action` (omit sections you don't need).
-- Self-loops curve above the state.
-- Composite states: double-border rounded rectangle (outer border = composite boundary, substates nested inside).
-- Orient along the dominant flow direction (left→right or top→down); rearrange before crossing transitions.
-- Coral on the state the reader should notice — typically the error state, or "happy completion".
+## 布局约定
+- 状态为圆角矩形（`rx=8`），标签用 Geist。
+- **Start**：实心 ink 圆点（`r=6`）。**End**：带环圆点（外圈 `r=8` 轮廓，内部实心 `r=5`）。
+- 转移：曲线箭头，用 Geist Mono 按 `event [guard] / action` 标注（不需要的段落可省略）。
+- 自环在状态上方弯曲。
+- 复合状态：双边框圆角矩形（外边框 = 复合边界，子状态嵌套在内）。
+- 沿主导流向排布（左→右或上→下）；交叉转移出现前先重排布局。
+- coral 用在读者应注意的状态上——典型是错误状态或"happy completion"。
 
-## Anti-patterns
-- More transitions than states × 2 → likely two state machines.
-- "From any state" transitions drawn from every state — use a single annotation (`* → Error on timeout`) instead.
-- Unlabeled transitions (the whole point is *what triggers this*).
+## 反模式
+- 转移数多于状态数 × 2 → 很可能是两台状态机。
+- "从任意状态"的转移从每个状态都画出来——改用单条注记（`* → Error on timeout`）。
+- 无标签的转移（状态机的全部意义就在*什么触发转移*）。
 
-## Examples
+## 示例
 - minimal light
 - minimal dark
 - full editorial

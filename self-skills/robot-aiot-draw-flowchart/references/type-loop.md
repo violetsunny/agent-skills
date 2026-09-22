@@ -1,25 +1,25 @@
-# Loop
+# Loop（循环图）
 
-**Best for:** reinforcing cycles, flywheels, feedback loops, and operating loops — anything where the last step feeds the first and a shared hub accumulates state. Use Loop when the reader must see both motions at once: work advances clockwise around the ring, while each pass writes durable state back to one common center.
+**最适合：** 强化循环、飞轮、反馈回路与运营回路——凡是最后一步喂给第一步、且一个共享 hub 累积状态的场景。当读者必须同时看到两种运动时用 Loop：工作沿环顺时针推进，每一圈把持久状态写回同一个中心。
 
-Prefer **Flowchart** when the path ends, branches toward an outcome, or never truly returns to its first step. Prefer **Cycle** when the center does not accumulate shared state. The dashed write-back spokes are the defining signal here: remove them and the figure is only a circular process.
+路径会结束、向某个结果分支、或从不真正回到第一步时，优先用 **Flowchart**。中心不累积共享状态时，优先用 **Cycle**。虚线写回辐条是这里的定义性信号：去掉它们，图形只是一个圆形流程。
 
-This type is **parametric**. The inputs in §1 determine station count, angles, edge intersections, connector paths, and viewBox bounds. Identical inputs should produce identical geometry.
+本类型是**参数化**的。§1 的输入决定站数、角度、边交点、连线路径与 viewBox 边界。相同输入应产生相同几何。
 
 ---
 
-## 1. Inputs — the parameter contract
+## 1. 输入——参数契约
 
 canonical 副本：`templates/type-loop.yaml` — 参数化文档契约，复制后手工填参绘图；不是 generate-from-template.py 的输入（该脚本只接受 containers/nodes/arrows JSON），以 templates 为准
 ```yaml
 title: "The self-improving loop"
 subtitle: "Every pass improves the shared operating record"
 
-hub:                                  # exactly one
+hub:                                  # 恰好一个
   name: "Shared memory"
   sublabel: "one record, every loop"
 
-stations:                             # 5..8, clockwise from top
+stations:                             # 5..8，从顶部顺时针
   - { name: "Capture",  sublabel: "signals in",       spoke_label: "SIGNALS" }
   - { name: "Research", sublabel: "evidence pulled" }
   - { name: "Decide",   sublabel: "human approves",   focal: true }
@@ -36,19 +36,19 @@ margin: 64
 dark: false
 ```
 
-**Budget (hard):** **5–8 stations plus exactly one hub.** Above 8 stations, split the subject into an overview Loop and one or more detail diagrams. Exactly one hub — a loop with two hubs is two diagrams. At most one station may set `focal: true`; zero is allowed when no editorial gate deserves emphasis.
+**预算（硬性）：** **5–8 个站加恰好一个 hub。** 超过 8 站时，把主题拆成一张总览 Loop 加一张或多张细节图。恰好一个 hub——有两个 hub 的循环是两张图。最多一个站可设 `focal: true`；没有值得强调的编辑关口时允许为零。
 
-Station order is semantic. `stations[0]` is the top station, then entries proceed clockwise. The last station always connects back to station 0; if that return would be false, use a Flowchart instead.
+站序有语义。`stations[0]` 是顶部站，之后条目顺时针排列。最后一站总是连回站 0；若这个回返不成立，改用 Flowchart。
 
 ---
 
-## 2. Layout math — deterministic geometry
+## 2. 布局数学——确定性几何
 
-Use SVG coordinates, where positive y points downward. Let the hub center be `C = (cx, cy)`, station count be `N`, station ring radius be `R`, station half-size be `a = station_w/2`, `b = station_h/2`, and hub half-size be `A = hub_w/2`, `B = hub_h/2`.
+使用 SVG 坐标系，y 正向向下。设 hub 中心为 `C = (cx, cy)`，站数为 `N`，站环半径为 `R`，站半尺寸为 `a = station_w/2`、`b = station_h/2`，hub 半尺寸为 `A = hub_w/2`、`B = hub_h/2`。
 
-### 2.1 Station centers
+### 2.1 站中心
 
-For zero-indexed station `k`:
+对零起始的站 `k`：
 
 ```text
 theta_k = -90deg + k * (360deg / N)
@@ -61,32 +61,32 @@ station_x(k)        = station_center_x(k) - station_w/2
 station_y(k)        = station_center_y(k) - station_h/2
 ```
 
-Thus station 1 sits at the top, and increasing `k` moves clockwise. Round station rectangles to the nearest 4px grid point after computing the ideal geometry; preserve symmetry when rounding paired stations. Keep ring-circle intersection points to three decimal places so every arc remains on the same circle.
+因此站 1 位于顶部，`k` 递增沿顺时针移动。算出理想几何后把站矩形取整到最近的 4px 网格点；成对的站取整时保持对称。环圆交点保留三位小数，让每条弧留在同一个圆上。
 
-### 2.2 Solid ring-flow endpoints
+### 2.2 实线环流端点
 
-Ring connectors travel from station `k` to station `j = (k + 1) mod N` as circular SVG arcs on the station circle itself. Every segment uses the same center `C`, radius `R`, and clockwise sweep. The station boxes interrupt the circle; connectors begin at the circle's clockwise exit from the source box and end just before its counterclockwise entry into the destination box, so the marker tip lands on the destination stroke.
+环连线从站 `k` 走到站 `j = (k + 1) mod N`，以站圆自身的圆形 SVG 弧绘制。每段使用相同的中心 `C`、半径 `R` 与顺时针 sweep。站盒打断圆；连线从圆的顺时针方向离开源盒处开始，在逆时针进入目标盒之前结束，让 marker 尖端落在目标描边上。
 
-Find the circle/rectangle intersections against all four edges of station `k`. For vertical edge `x = x_e`:
+对站 `k` 的四条边求圆/矩形交点。垂直边 `x = x_e`：
 
 ```text
 y = cy +/- sqrt(R^2 - (x_e - cx)^2)
 ```
 
-Keep only candidates whose `y` lies within the edge. For horizontal edge `y = y_e`:
+只保留 `y` 落在该边范围内的候选。水平边 `y = y_e`：
 
 ```text
 x = cx +/- sqrt(R^2 - (y_e - cy)^2)
 ```
 
-Keep only candidates whose `x` lies within the edge. The two surviving points are classified by their normalized polar angles around `C`:
+只保留 `x` 落在该边范围内的候选。幸存的两个点按围绕 `C` 的归一化极角分类：
 
 ```text
-q_entry(k) = circle/box intersection immediately before theta_k clockwise
-q_exit(k)  = circle/box intersection immediately after  theta_k clockwise
+q_entry(k) = theta_k 顺时针方向紧邻其前的圆/盒交点
+q_exit(k)  = theta_k 顺时针方向紧邻其后的圆/盒交点
 ```
 
-Compensate for the marker tip before emitting the destination endpoint. With the canonical marker (`refX=7`, polygon tip at `x=8`) and ring stroke width `1.2`, `marker_overhang = 1.2`:
+输出目标端点前补偿 marker 尖端。canonical marker（`refX=7`，polygon 尖端在 `x=8`）与环线宽 `1.2` 下，`marker_overhang = 1.2`：
 
 ```text
 phi_entry = atan2(q_entry(j).y - cy, q_entry(j).x - cx)
@@ -97,34 +97,34 @@ M q_exit(k).x q_exit(k).y
 A R R 0 0 1 q_end.x q_end.y
 ```
 
-The large-arc flag is `0` because adjacent-station gaps are less than 180 degrees; the sweep flag is always `1` for clockwise motion in SVG coordinates. The arrowhead overhang completes the final 1.2px to `q_entry(j)`, landing on the box edge without crossing its stroke. The closing connector from station `N-1` to station 0 uses the identical formula.
+large-arc 标志为 `0`，因为相邻站间隙小于 180 度；SVG 坐标下顺时针运动的 sweep 标志恒为 `1`。箭头伸出部分补足到 `q_entry(j)` 的最后 1.2px，落在盒边上而不穿过其描边。站 `N-1` 到站 0 的闭合连线使用完全相同的公式。
 
-Loop's circular ring arcs are a documented type-specific exception to design-system.md §6 rule 1, following the same precedent as Medallion's promotion arcs. A Loop never mixes cubic, straight, or rounded-orthogonal segments into its ring: the visible gaps between stations (gap 数=站数，站数按预算 5–8) must read as pieces of one continuous circle.
+Loop 的圆环弧是 design-system.md §6 规则 1 的已记录类型特定例外，沿用 Medallion 晋升弧的同一先例。Loop 绝不把 cubic、直线或圆角正交段混进它的环：站间可见间隙（gap 数=站数，站数按预算 5–8）必须读作一个连续圆的片段。
 
-### 2.3 Dashed write-back spoke endpoints
+### 2.3 虚线写回辐条端点
 
-Each spoke runs inward from the station edge toward the hub. Use the same ray/box intersection formula, now on the radial vector `u_k`:
+每条辐条从站边缘向内指向 hub。使用同样的射线/盒交点公式，作用于径向向量 `u_k`：
 
 ```text
 box_distance(v, half_w, half_h) = min(half_w / abs(v.x), half_h / abs(v.y))
-                                        # ignore a term whose denominator is zero
+                                        # 分母为零的项忽略
 
 d_station = box_distance(u_k, a, b)
 d_hub     = box_distance(u_k, A, B)
-marker_gap = 6                         # 4..8px; 6px canonical
+marker_gap = 6                         # 4..8px；canonical 为 6px
 
 spoke_start(k) = P_k - d_station * u_k
 hub_edge(k)    = C   + d_hub     * u_k
 spoke_end(k)   = C   + (d_hub + marker_gap) * u_k
 ```
 
-Because the arrow travels from the station toward `C`, adding `marker_gap` leaves the endpoint just outside the hub boundary. The lighter arrowhead stops before the hub stroke instead of colliding with it. Radial spokes are the type-specific exception to the general ban on slanted straight connectors; they must remain true radii, must not cross one another, and may touch only their source station and the hub.
+因为箭头从站走向 `C`，加上 `marker_gap` 让端点停在 hub 边界外一点。较轻的箭头停在 hub 描边之前而不是撞上它。径向辐条是"禁止斜直线连线"总规则的类型特定例外；它们必须保持真正的半径、互不交叉，且只可接触其源站与 hub。
 
-Labels are optional when the station sublabel already names the write-back. When used, they follow the `arrow-label` role, stay to one side of the spoke, and receive an opaque `paper` mask with a visible 6–10px gap from the stroke. Label a curated subset rather than forcing six labels into the hub halo.
+站子标签已写明写回内容时标签可选。使用时遵循 `arrow-label` 角色，留在辐条一侧，配不透明 `paper` 遮罩并与描边保持可见的 6–10px 间隙。标注精选子集，不要把六个标签硬塞进 hub 光晕。
 
-### 2.4 ViewBox sizing
+### 2.4 ViewBox 尺寸
 
-The viewBox must include the full station rectangles, outer ring curves, arrowheads, and at least `margin` breathing room:
+viewBox 必须包含完整站矩形、外环曲线、箭头，以及至少 `margin` 的呼吸空间：
 
 ```text
 left   <= cx - R - station_w/2 - margin
@@ -136,89 +136,89 @@ viewBox_w = right - left
 viewBox_h = bottom - top
 ```
 
-Include the full circle extrema `cx +/- R`, `cy +/- R` plus station bounds and marker clearance when checking these limits. Never shrink the canvas until a station stroke, marker, or ring arc clips. For the six-station canonical example, `viewBox="0 0 1040 680"`, `C=(520,340)`, `R=240`, station size `160×64`, and hub size `200×104` leave generous outer clearance.
+检查这些界限时包含完整圆极值 `cx +/- R`、`cy +/- R` 加站边界与 marker 余量。绝不把画布缩到站描边、marker 或环弧被裁切。六站 canonical 示例中，`viewBox="0 0 1040 680"`、`C=(520,340)`、`R=240`、站尺寸 `160×64`、hub 尺寸 `200×104` 留有充裕的外侧余量。
 
 ---
 
-## 3. Visual grammar
+## 3. 视觉语法
 
-| Element | Treatment |
+| 元素 | 处理 |
 |---|---|
-| Station | Standard node: `paper` fill, `ink` stroke, `radius-md`; name in `node-name`, sublabel in `sublabel` |
-| Hub | The one dark element: `ink` fill, `paper` text; slightly larger than a station |
-| Focal station | At most one: `accent-tint` fill, `accent` stroke; station name may use `accent` |
-| Ring flow | Circular `A R R 0 0 1` arcs on the station circle, solid `muted` stroke, default arrowhead at the destination; clockwise only |
-| Write-back spoke | Dashed `soft` stroke at reduced emphasis, `stroke-dasharray="5,4"`, with a `soft` arrowhead |
-| Spoke label | `arrow-label` role, `soft`, uppercase, paper mask, 6–10px clear of the connector |
+| 站 | 标准节点：`paper` 填充、`ink` 描边、`radius-md`；名称用 `node-name`，子标签用 `sublabel` |
+| Hub | 唯一的深色元素：`ink` 填充、`paper` 文字；略大于站 |
+| 焦点站 | 最多一个：`accent-tint` 填充、`accent` 描边；站名可用 `accent` |
+| 环流 | 站圆上的圆形 `A R R 0 0 1` 弧，实线 `muted` 描边，目标端默认箭头；仅顺时针 |
+| 写回辐条 | 虚线 `soft` 描边、降低强调，`stroke-dasharray="5,4"`，配 `soft` 箭头 |
+| 辐条标签 | `arrow-label` 角色、`soft`、大写、paper 遮罩、距连线 6–10px |
 
-Draw in this order: paper or optional dot grid → ring arrows → dashed spokes → spoke-label masks and labels → station boxes → hub → text. The nodes mask microscopic connector overshoot, while every intended endpoint still lands on an edge.
+按此顺序绘制：paper 或可选点阵 → 环箭头 → 虚线辐条 → 辐条标签遮罩与标签 → 站盒 → hub → 文字。节点遮住连线的微小过冲，同时每个预期端点仍落在边缘上。
 
-The hub is not a seventh process step. It is accumulated state: memory, standards, evidence, policy, or a shared operating record. Keep its copy to one name plus one short sublabel.
-
----
-
-## 4. Connector rules (mandatory)
-
-design-system.md §6 applies in full except for the two Loop-specific connector primitives: circular ring arcs (§2.2) and straight radial spokes (§2.3). Like Medallion's promotion arcs, these replace §6 rule 1 for this diagram type:
-
-- Ring arrows are same-radius circular arcs, solid, and clockwise. Every path uses `A R R 0 0 1`; destination markers land on station edges and no connector ends at a center point.
-- Spokes are dashed and point inward. A solid spoke destroys the visual distinction between operating flow and write-back.
-- Labels use opaque masks and maintain a visible 6–10px connector gap. Never place text on the stroke.
-- No ring connector or spoke may overlap another connector. Ring paths remain outside the hub; spokes occupy distinct radial routes.
-- When two spokes must leave the same station edge, fan their attach points by the §6 formula with at least 12px separation. The normal Loop has one spoke per station; use a second only when the semantics cannot be merged.
-- If a ring route would cross the hub, increase `R` or split the diagram. Do not thread flow through shared state or substitute an orthogonal route.
+Hub 不是第七个流程步骤。它是累积状态：记忆、标准、证据、策略或共享运营记录。文案保持一个名称加一条短子标签。
 
 ---
 
-## 5. Dark variant — token swap
+## 4. 连线规则（强制）
 
-Apply the style-guide inversion rule; do not invent a second palette.
+design-system.md §6 完整适用，除两个 Loop 特定连线 primitive：圆环弧（§2.2）与直线径向辐条（§2.3）。与 Medallion 的晋升弧一样，它们在本图表类型中替代 §6 规则 1：
 
-| Role | Light | Dark |
+- 环箭头是同半径圆弧、实线、顺时针。每条路径用 `A R R 0 0 1`；目标 marker 落在站边缘上，没有连线终止于中心点。
+- 辐条是虚线且指向内侧。实线辐条会毁掉运营流与写回之间的视觉区分。
+- 标签用不透明遮罩并保持可见的 6–10px 连线间隙。绝不把文字放在描边上。
+- 环连线或辐条不得与另一条连线重叠。环路径保持在 hub 之外；辐条各占不同的径向路线。
+- 两条辐条必须离开同一站边缘时，按 §6 公式扇形展开锚点、间距至少 12px。常规 Loop 每站一条辐条；仅在语义无法合并时用第二条。
+- 环路线会穿过 hub 时，加大 `R` 或拆分图形。不要把流穿过共享状态，也不要改用正交路线。
+
+---
+
+## 5. 深色变体——token 互换
+
+应用 style-guide 的反转规则；不要发明第二套色板。
+
+| 角色 | 浅色 | 深色 |
 |---|---|---|
-| Canvas and station fill | `paper` | dark `paper` |
-| Primary text and station stroke | `ink` | inverted `ink` |
-| Hub fill / hub text | `ink` / `paper` | inverted `ink` / dark `paper` |
-| Ring flow | `muted` | dark `muted` |
-| Write-back spokes and labels | `soft` | dark `soft` |
-| Focal fill / stroke | `accent-tint` / `accent` | dark `accent-tint` / brighter dark `accent` |
-| Rule and dot grid | `rule` | inverted `rule` at the same opacity |
+| 画布与站填充 | `paper` | 深色 `paper` |
+| 主文字与站描边 | `ink` | 反转 `ink` |
+| Hub 填充 / hub 文字 | `ink` / `paper` | 反转 `ink` / 深色 `paper` |
+| 环流 | `muted` | 深色 `muted` |
+| 写回辐条与标签 | `soft` | 深色 `soft` |
+| 焦点填充 / 描边 | `accent-tint` / `accent` | 深色 `accent-tint` / 更亮的深色 `accent` |
+| 横线与点阵 | `rule` | 同不透明度的反转 `rule` |
 
-The semantic relationship stays unchanged in dark mode: one `ink`-filled hub, one optional `accent` station, neutral solid ring arrows, and lighter dashed write-backs.
-
----
-
-## 6. Reproducibility checklist
-
-1. Station count is 5–8 and hub count is exactly one.
-2. Station 0 is at `-90deg`; all others use equal `360/N` steps clockwise.
-3. Every solid ring arrow connects adjacent stations with `A R R 0 0 1`, using the same `R`; the last returns to the first.
-4. Every ring marker lands on a station edge, not its center.
-5. Every dashed spoke begins on a station's inner edge and stops `marker_gap` before the hub stroke.
-6. Ring connectors stay outside the hub; spokes do not cross or overlap.
-7. At most one station uses `accent-tint` + `accent`; the hub alone uses the dark `ink` fill.
-8. Spoke labels, if present, use `arrow-label`, an opaque mask, and a 6–10px gap.
-9. The viewBox includes station boxes, strokes, curves, markers, and margins without clipping.
+深色模式下语义关系保持不变：一个 `ink` 填充的 hub、一个可选 `accent` 站、中性实线环箭头、更轻的虚线写回。
 
 ---
 
-## 7. Anti-patterns
+## 6. 可复现性检查清单
 
-| Anti-pattern | Why it fails / correction |
+1. 站数 5–8，hub 数恰好一个。
+2. 站 0 在 `-90deg`；其余全部按相等的 `360/N` 步长顺时针排布。
+3. 每条实线环箭头以 `A R R 0 0 1` 连接相邻站、使用相同 `R`；最后一条回到第一条。
+4. 每个环 marker 落在站边缘上，不是其中心。
+5. 每条虚线辐条起于站内侧边缘，停在 hub 描边前 `marker_gap` 处。
+6. 环连线保持在 hub 外；辐条不交叉不重叠。
+7. 最多一个站用 `accent-tint` + `accent`；只有 hub 用深色 `ink` 填充。
+8. 辐条标签若存在，用 `arrow-label`、不透明遮罩与 6–10px 间隙。
+9. viewBox 包含站盒、描边、曲线、marker 与边距且无裁切。
+
+---
+
+## 7. 反模式
+
+| 反模式 | 为什么失败 / 纠正 |
 |---|---|
-| Two hubs | Two accumulated states create two systems. Draw two diagrams. |
-| Solid spokes | They look like primary flow and kill the dashed return signal. Use dashed `soft` write-backs. |
-| Stations at uneven angles without reason | The ring stops reading as one operating cadence. Use equal `360/N` spacing unless a documented phase grouping requires a deliberate gap. |
-| Mixed arc + orthogonal ring segments | The ring becomes a rounded rectangle. Every segment must be a circular arc of the same radius so the ring reads as one continuous circle. |
-| Connectors crossing the hub | Flow becomes confused with state. Route the ring outside or enlarge the radius. |
-| Accent on multiple stations | The editorial gate disappears. Keep one focal station at most. |
-| More than 8 stations | Labels and spokes crowd the hub. Split into overview + detail. |
-| A cycle that never actually returns | That is a Flowchart arranged in a circle. Use Flowchart and show the real endpoint. |
+| 两个 hub | 两个累积状态就是两个系统。画两张图。 |
+| 实线辐条 | 它们看起来像主流，毁掉虚线回返信号。用虚线 `soft` 写回。 |
+| 站角度不均且无理由 | 环不再读作一个运营节奏。用相等的 `360/N` 间距，除非有记录的阶段分组需要刻意留隙。 |
+| 弧线与正交段混合成环 | 环变成圆角矩形。每段必须是同半径圆弧，让环读作一个连续圆。 |
+| 连线穿过 hub | 流与状态混淆。环路线走外侧或加大半径。 |
+| 多个站用 accent | 编辑关口消失。最多保留一个焦点站。 |
+| 超过 8 个站 | 标签与辐条挤爆 hub。拆成总览 + 细节。 |
+| 从不真正回返的循环 | 那是排成圆形的 Flowchart。用 Flowchart 并展示真实终点。 |
 
 ---
 
-## 8. Examples
+## 8. 示例
 
-- minimal light: six-station self-improving operating loop.
-- the same geometry under the dark token inversion.
-- editorial page with the flagship loop, three summary cards, and colophon.
+- minimal light：六站自我改进运营循环。
+- 同一几何在深色 token 反转下。
+- editorial 页面：旗舰循环、三张摘要卡与 colophon。

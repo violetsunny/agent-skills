@@ -1,4 +1,4 @@
-# Style 11: Event Transit
+# Style 11: Event Transit（事件地铁图）
 
 事件驱动系统的交通地图隐喻。Topic 是轨道，处理步骤是站点，声明的 junction 是分支点，死信走一条视觉上分离的路线。
 

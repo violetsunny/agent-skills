@@ -1,24 +1,24 @@
-# Tree / Hierarchy
+# Tree / Hierarchy（树形/层级图）
 
-**Best for:** org charts, dependency trees, taxonomy, file trees, decision breakdowns, skill trees.
+**最适合：** 组织架构、依赖树、分类体系、文件树、决策分解、技能树。
 
-## Layout conventions
-- Root at top, children fan out below (or root at left, children to right).
-- Nodes are small labeled rectangles (`rx=6`), Geist 12px 600 name + optional Geist Mono 9px sublabel. Width 120–180px, height 40–52px.
-- **Connectors are orthogonal (elbow-style), never diagonal.** Parent drops a short vertical line, then a horizontal bus connects siblings, then each child has a short vertical drop into its top edge. 1px muted stroke.
-- Leaf indicator: thinner stroke (0.8) or different fill — OR let terminal position do the work.
-- Max depth: 4 (root + 3 tiers). Max breadth per level: 5.
-- Coral on **one** node: root OR critical leaf. Not both.
-- Draw connectors before nodes.
+## 布局约定
+- 根在顶部，子节点向下展开（或根在左侧，子节点向右）。
+- 节点为带标签的小矩形（`rx=6`），Geist 12px 600 名称 + 可选 Geist Mono 9px 子标签。宽 120–180px，高 40–52px。
+- **连接线必须正交（肘形），绝不用斜线。** 父节点向下引一段短垂直线，再由水平总线连接兄弟节点，然后每个子节点从总线垂直下探到其顶边。1px muted 描边。
+- 叶子标识：更细的描边（0.8）或不同填充——或者直接让末端位置自己说话。
+- 最大深度：4（根 + 3 层）。每层最大宽度：5。
+- coral 只用于**一个**节点：根节点或关键叶子。不可两者都用。
+- 先画连接线，再画节点。
 
-## Anti-patterns
-- Tree 5+ levels deep on a single page (illegible — split).
-- Nodes of wildly varying widths — pick 2 widths max.
-- Diagonal connector lines.
-- Skipped levels (parent connected to grandchild with no middle).
-- Coral on root AND a leaf.
+## 反模式
+- 单页 5 层以上的树（不可读——拆分）。
+- 节点宽度差异过大——最多两种宽度。
+- 斜向连接线。
+- 跳层（父节点直连孙节点，中间层缺失）。
+- 根节点和叶子都上 coral。
 
-## Examples
+## 示例
 - minimal light
 - minimal dark
 - full editorial

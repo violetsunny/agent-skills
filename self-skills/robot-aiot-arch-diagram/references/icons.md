@@ -1,16 +1,16 @@
-# Icon Reference
+# 图标参考
 
-## Rules for Renderer Compatibility (cairosvg / rsvg-convert)
+## 渲染器兼容规则（cairosvg / rsvg-convert）
 
-**Never use** `@import url()` for icon fonts — neither cairosvg nor rsvg-convert fetches external resources.
-**Always use** inline SVG `<path>`, `<circle>`, `<rect>`, `<text>` combinations.
-**Font fallback**: embed font-family in `<style>` using system fonts only.
+**绝不**用 `@import url()` 加载图标字体——cairosvg 与 rsvg-convert 都不拉取外部资源。
+**始终**用内联 SVG `<path>`、`<circle>`、`<rect>`、`<text>` 组合。
+**字体回退**：在 `<style>` 中内嵌 font-family，只用系统字体。
 
 ---
 
-## Generic Semantic Shapes (No product — use these first)
+## 通用语义形状（非产品——优先使用）
 
-### Database / Vector Store (cylinder)
+### 数据库 / 向量存储（圆柱）
 ```xml
 <!-- cx=center-x, top=top-y, w=width, h=height -->
 <!-- Typical: w=80, h=70 -->
@@ -24,7 +24,7 @@
 <ellipse cx="cx" cy="top+h" rx="w/2" ry="w/6" fill="fill-dark" stroke="stroke" stroke-width="1.5"/>
 ```
 
-### LLM / Model Node (rounded rect with spark)
+### LLM / 模型节点（带 spark 的圆角矩形）
 ```xml
 <!-- Rounded rect with double border = "intelligent" signal -->
 <rect x="x" y="y" width="w" height="h" rx="10" fill="fill" stroke="stroke-outer" stroke-width="2.5"/>
@@ -34,7 +34,7 @@
 <text x="cx" y="cy+10" text-anchor="middle" fill="text-color" font-size="13" font-weight="600">GPT-4o</text>
 ```
 
-### Agent / Orchestrator (hexagon)
+### Agent / 编排器（六边形）
 ```xml
 <!-- r = circumradius, cx/cy = center -->
 <!-- For r=36: points at 36,0  18,31.2  -18,31.2  -36,0  -18,-31.2  18,-31.2 -->
@@ -43,7 +43,7 @@
 <text x="cx" y="cy+5" text-anchor="middle" fill="text" font-size="12" font-weight="600">Agent</text>
 ```
 
-### Memory Node (short-term, dashed border)
+### 记忆节点（短期、虚线边框）
 ```xml
 <rect x="x" y="y" width="w" height="h" rx="8"
       fill="fill" stroke="stroke" stroke-width="1.5" stroke-dasharray="6,3"/>
@@ -51,7 +51,7 @@
 <text x="cx" y="cy+8" text-anchor="middle" fill="text" font-size="13">Short-term</text>
 ```
 
-### Tool / Function Call (rect with gear symbol)
+### 工具 / 函数调用（带齿轮符号的矩形）
 ```xml
 <rect x="x" y="y" width="w" height="h" rx="6" fill="fill" stroke="stroke" stroke-width="1.5"/>
 <!-- Gear: simplified as ⚙ unicode or small circle with lines -->
@@ -59,7 +59,7 @@
 <text x="cx" y="cy+12" text-anchor="middle" fill="text" font-size="12">Tool Name</text>
 ```
 
-### Queue / Stream (horizontal pipe)
+### 队列 / 流（水平管道）
 ```xml
 <!-- Pipe tube: left cap ellipse + body + right cap ellipse -->
 <ellipse cx="x1" cy="cy" rx="ry*0.6" ry="ry" fill="fill-dark" stroke="stroke" stroke-width="1.5"/>
@@ -69,7 +69,7 @@
 <ellipse cx="x2" cy="cy" rx="ry*0.6" ry="ry" fill="fill-light" stroke="stroke" stroke-width="1.5"/>
 ```
 
-### User / Human Actor
+### 用户 / 人类角色
 ```xml
 <!-- Head -->
 <circle cx="cx" cy="cy-18" r="10" fill="fill" stroke="stroke" stroke-width="1.2"/>
@@ -79,14 +79,14 @@
 <text x="cx" y="cy+30" text-anchor="middle" fill="text" font-size="12">User</text>
 ```
 
-### API Gateway (hexagon, single border, smaller)
+### API 网关（六边形、单边框、较小）
 ```xml
 <polygon points="cx,cy-28  cx+24,cy-14  cx+24,cy+14  cx,cy+28  cx-24,cy+14  cx-24,cy-14"
          fill="fill" stroke="stroke" stroke-width="1.5"/>
 <text x="cx" y="cy+5" text-anchor="middle" fill="text" font-size="11">API</text>
 ```
 
-### Browser / Web Client
+### 浏览器 / Web 客户端
 ```xml
 <rect x="x" y="y" width="w" height="h" rx="6" fill="fill" stroke="stroke" stroke-width="1.5"/>
 <!-- Title bar -->
@@ -98,7 +98,7 @@
 <circle cx="x+36" cy="y+10" r="4" fill="#10b981" opacity="0.8"/>
 ```
 
-### Document / File
+### 文档 / 文件
 ```xml
 <!-- Folded corner rectangle -->
 <path d="M x,y L x+w-12,y L x+w,y+12 L x+w,y+h L x,y+h Z"
@@ -111,7 +111,7 @@
 <line x1="x+8" y1="y+h*0.75" x2="x+w-16" y2="y+h*0.75" stroke="stroke" stroke-width="1" opacity="0.5"/>
 ```
 
-### Decision Diamond (flowcharts)
+### 决策菱形（流程图）
 ```xml
 <!-- cx/cy = center, hw = half-width, hh = half-height -->
 <polygon points="cx,cy-hh  cx+hw,cy  cx,cy+hh  cx-hw,cy"
@@ -119,7 +119,7 @@
 <text x="cx" y="cy+5" text-anchor="middle" fill="text" font-size="12">Condition?</text>
 ```
 
-### Swim Lane Container
+### 泳道容器
 ```xml
 <!-- Background band for a layer/group -->
 <rect x="x" y="y" width="w" height="h" rx="6"
@@ -130,13 +130,13 @@
 
 ---
 
-## Product Icons (Brand Colors + Inline SVG)
+## 产品图标（品牌色 + 内联 SVG）
 
-All use circle badge + text abbreviation pattern. Replace `cx`, `cy` with actual coordinates.
+全部采用圆形徽章 + 文本缩写模式。把 `cx`、`cy` 替换为实际坐标。
 
 canonical 数据：`assets/brand-colors.json` — 以 json 为准（105 条，字段 product/category/hex/badge/note，覆盖原全部分类及 Azure 服务色）。前 10 行示例：
 
-| Product | Color | Badge |
+| 产品 | 颜色 | 徽章 |
 |---|---|---|
 | OpenAI / ChatGPT | `#10A37F` | `OAI` |
 | Anthropic / Claude | `#D97757` | `Claude` |
@@ -147,9 +147,9 @@ canonical 数据：`assets/brand-colors.json` — 以 json 为准（105 条，�
 | Groq | `#F55036` | `Groq` |
 | Together AI | `#6366F1` | `Together` |
 | Replicate | `#191919` | `Rep` |
-| Hugging Face | `#FFD21E` (text dark) | `HF` |
+| Hugging Face | `#FFD21E`（文本用深色） | `HF` |
 
-**Badge template (circle + text):**
+**徽章模板（圆 + 文本）：**
 ```xml
 <circle cx="cx" cy="cy" r="22" fill="BRAND_COLOR"/>
 <text x="cx" y="cy+5" text-anchor="middle" fill="white"
@@ -158,7 +158,7 @@ canonical 数据：`assets/brand-colors.json` — 以 json 为准（105 条，�
 <circle cx="cx" cy="cy" r="24" fill="none" stroke="BRAND_COLOR" stroke-width="1" opacity="0.4"/>
 ```
 
-**Vector DB template (cylinder + badge):**
+**向量 DB 模板（圆柱 + 徽章）：**
 ```xml
 <!-- Cylinder shape -->
 <ellipse cx="cx" cy="top" rx="40" ry="12" fill="FILL" stroke="STROKE" stroke-width="1.5"/>
@@ -173,15 +173,13 @@ canonical 数据：`assets/brand-colors.json` — 以 json 为准（105 条，�
 
 ---
 
-## Azure Service Icons
+## Azure 服务图标
 
-Azure brand colour: `#0089D6` (top tile / outer ring).
-Service-specific accents come from Microsoft's Azure icon set; use them
-as the inner badge fill so a glance still tells you "this is Azure".
+Azure 品牌色：`#0089D6`（顶层 tile / 外环）。服务级 accent 色来自 Microsoft 的 Azure 图标集；用它们作内层徽章填充色，一眼仍能看出"这是 Azure"。
 
 各服务 Service Color 与 Badge 表：`assets/brand-colors.json`（category 以 `Azure` 开头的 51 条）— 以 json 为准。
 
-**Template (Azure tile):**
+**模板（Azure tile）：**
 ```xml
 <!-- Azure tile: outer rounded square in Azure blue, inner badge for the service. -->
 <rect x="cx-22" y="cy-22" width="44" height="44" rx="6"
@@ -192,11 +190,9 @@ as the inner badge fill so a glance still tells you "this is Azure".
       font-size="9" font-weight="700" font-family="Helvetica">BADGE</text>
 ```
 
-### Azure-specific shapes
+### Azure 专用形状
 
-For diagrams that need a recognisable "Azure" visual without a service
-badge — e.g. a region container or a subscription boundary — use a
-dashed Azure-blue outline:
+需要可识别的"Azure"视觉但没有服务徽章的图——例如区域容器或订阅边界——用虚线 Azure 蓝轮廓：
 
 ```xml
 <!-- Azure region/subscription container -->
@@ -209,16 +205,16 @@ dashed Azure-blue outline:
 
 ---
 
-## Icon Sizing Guide
+## 图标尺寸指南
 
-| Context | Recommended Size | Padding |
+| 场景 | 推荐尺寸 | 内边距 |
 |---------|-----------------|---------|
-| Node badge (inside box) | 28×28px circle | 10px |
-| Standalone icon node | 40×40px | 16px |
-| Hero / central node | 56×56px | 20px |
-| Small inline indicator | 16×16px | 6px |
+| 节点徽章（盒内） | 28×28px 圆形 | 10px |
+| 独立图标节点 | 40×40px | 16px |
+| 主视觉 / 中心节点 | 56×56px | 20px |
+| 小型内联指示器 | 16×16px | 6px |
 
-## Arrow Marker Templates
+## 箭头 marker 模板
 
 ```xml
 <defs>

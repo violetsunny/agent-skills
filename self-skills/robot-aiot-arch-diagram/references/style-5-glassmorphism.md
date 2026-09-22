@@ -105,7 +105,7 @@ font-weight: 400 normal, 600 semi-bold, 700 bold titles
       opacity="0.8" marker-end="url(#arrow-blue)"/>
 ```
 
-## SVG Template
+## SVG 模板
 
 ```xml
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 600"

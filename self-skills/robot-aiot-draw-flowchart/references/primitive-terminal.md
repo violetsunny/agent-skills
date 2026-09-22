@@ -2,7 +2,7 @@
 
 可选的整页皮肤，把任意图表包进一个仿终端窗口——带三个圆点的标题栏、一行 `$` 提示符、全局等宽字体。用于开发工具发布、CLI 产品文章与技术社交卡片：截图需要读作"终端"而不是"编辑风文档"的场合。
 
-这是**第二套固定皮肤**——token 表见 [style-guide.md § Terminal skin](style-guide.md#terminal-skin-opt-in-alternate)。它不继承 `onboarding.md` 的品牌 token，也不参与 light/dark 反色规则；无论宿主站点品牌如何，所有 terminal 示例都用同一组九个 token。
+这是**第二套固定皮肤**——token 表见 [style-guide.md § Terminal 皮肤](style-guide.md#terminal-皮肤opt-in-备选)。它不继承 `onboarding.md` 的品牌 token，也不参与 light/dark 反色规则；无论宿主站点品牌如何，所有 terminal 示例都用同一组九个 token。
 
 ## 语法
 
