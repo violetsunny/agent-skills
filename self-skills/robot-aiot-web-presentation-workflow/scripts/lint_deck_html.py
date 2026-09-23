@@ -293,7 +293,8 @@ def lint(path):
         open_tag = body[m.start() : m.start() + body[m.start() :].index(">") + 1]
         if re.search(r'class="[^"]*(note|mut|bad|good|key)', open_tag):
             continue
-        txt = STRIP_TAG_RE.sub("", m.group(1)).strip()
+        inner = re.sub(r"<br\b[^>]*>", "。", m.group(1))
+        txt = STRIP_TAG_RE.sub("", inner).strip()
         if len(txt) > 60 and txt.count("。") + txt.count("；") >= 2:
             p.fails.append(
                 f"{path}:0: 平铺散文: <p> {len(txt)} 字 ≥2 句无组件承载，"
