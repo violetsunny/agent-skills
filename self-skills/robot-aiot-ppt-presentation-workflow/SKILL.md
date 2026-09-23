@@ -96,7 +96,7 @@ Phase 4: 回写+页面    → 图表产物路径与确认状态回写母稿对�
 Phase 5: PPT生成      → 调用 ppt-master，读取逐页 HTML/MD 生成最终 PPTX
 ```
 
-每个阶段产出是下一阶段的输入，逐级收敛；G1/G2 是阻塞门，未确认不得推进。
+每个阶段产出是下一阶段的输入，逐级收敛；G1/G2 是阻塞门，未确认不得推进。每个环节结束后除确认门外，还须跑 `scripts/check_phase_handoff.py <输出目录> --phase N --write` 做交接（handoff）校验并落盘 `_gen/handoff-phaseN.md`：校验本环节产物存在、确认门状态已记录、下一环节输入齐备；FAIL 阻塞，不得进入下一环节。Phase 5 的交接即移交 ppt-master 前的 `scripts/precheck_handoff.py`（已有），不另设 --phase 5。
 
 建议执行方式：每个阶段先由 sub agent 在干净上下文中完成本阶段分析/起草/审查，再回到主线程做统一落盘和阶段阻塞检查，避免 Phase 1-5 信息互相污染。
 
@@ -117,6 +117,8 @@ Phase 5: PPT生成      → 调用 ppt-master，读取逐页 HTML/MD 生成最�
 
 阻塞条件：源文件未指定、或反问清单未获用户回答（可推断项已标注假设除外）时，不得进入 Phase 2。
 
+交接（handoff）：本环节结束跑 `scripts/check_phase_handoff.py <输出目录> --phase 1 --write`，校验数据池 MD 存在并落盘 `_gen/handoff-phase1.md`；FAIL 阻塞，不得进入 Phase 2。
+
 ---
 
 ## Phase 2: PPT演示母稿 — 产出与确认门 G1
@@ -136,6 +138,8 @@ Phase 5: PPT生成      → 调用 ppt-master，读取逐页 HTML/MD 生成最�
 4. **【确认门 G1，阻塞】**：母稿落盘后向用户出示完整母稿，用户确认"不需要调整"后才能进入 Phase 3；用户提出修改 → 修订母稿重新送审；G1 未过就绘图按阻塞项处理
 5. G1 确认后母稿冻结为图表与页面的唯一内容源；后续任何内容变更走重生链（`references/governance-and-iteration.md`），不得只改下游
 
+交接（handoff）：G1 通过、母稿冻结后，主线程把母稿头部「确认状态」字段更新为「G1 已通过（日期）」，再跑 `scripts/check_phase_handoff.py <输出目录> --phase 2 --write`，校验母稿存在 + G1 已通过 + 图表需求总表存在，落盘 `_gen/handoff-phase2.md`；FAIL 阻塞，不得进入 Phase 3。
+
 ---
 
 ## Phase 3 / 3.5: 图表生成、桥接转换与确认门 G2
@@ -152,6 +156,10 @@ Phase 5: PPT生成      → 调用 ppt-master，读取逐页 HTML/MD 生成最�
 6. 允许在 Phase 3.5 和 Phase 4 做轻量 Material 3 规范化，但只能整理 token、字体层级、间距和容器语义，不能改图表结构和数据语义
 7. 数据统计图表（饼图/箱线图/热力图/网络拓扑等）与 Mermaid 源导入重绘（含 pie/mindmap/timeline 等扩展类型）按 `robot-aiot-draw-flowchart` 的数据图表与导入规则路由；需要可编辑 `.excalidraw` 三件套产物时走其导出规则
 8. 委派前置落盘：Phase 3 调用 `robot-aiot-draw-flowchart` 前跑其 `scripts/precheck_deps.sh`，输出存产出目录 `_gen/precheck-robot-aiot-draw-flowchart.txt`；exit≠0 中止；批次无记录视同未执行前置检查
+
+交接（handoff）：
+- Phase 3 结束跑 `scripts/check_phase_handoff.py <输出目录> --phase 3 --write`，校验 flow/ XML 真源存在，落盘 `_gen/handoff-phase3.md`；FAIL 阻塞，不得进入 Phase 3.5。
+- Phase 3.5 G2 通过后，主线程把母稿头部「确认状态」字段更新为「G2 已通过（日期）」，再跑 `scripts/check_phase_handoff.py <输出目录> --phase 3.5 --write`，校验 flow/ XML↔HTML 配对 + G2 已通过，落盘 `_gen/handoff-phase3.5.md`；FAIL 阻塞，不得进入 Phase 4。
 
 ---
 
@@ -194,6 +202,8 @@ Phase 5: PPT生成      → 调用 ppt-master，读取逐页 HTML/MD 生成最�
 7. `robot-aiot-draw-flowchart` 的布局审查清单 10 项全部通过，才允许进入 Phase 5
 8. 页面允许做轻量语义化规范化，但不得破坏首页图表确立的主色语义与图表 HTML 的冻结约束
 
+交接（handoff）：showcase 门通过后主线程把风格基准写入母稿头部、图表回写完成后，跑 `scripts/check_phase_handoff.py <输出目录> --phase 4 --write`，校验母稿回写完整 + pages/ 逐页 HTML 存在 + showcase 门已过（风格基准已锁定），落盘 `_gen/handoff-phase4.md`；FAIL 阻塞，不得进入 Phase 5。页数对齐/零宽字符/表格 GFM/logo 等移交前深度校验由 Phase 5 的 `precheck_handoff.py` 承担。
+
 ---
 
 ## Phase 5: PPT生成 — 调用 ppt-master
@@ -207,6 +217,8 @@ Phase 5: PPT生成      → 调用 ppt-master，读取逐页 HTML/MD 生成最�
 3. 若采用轻量语义化规范化，必须贯穿图表 HTML 与页面 HTML，而不是只在某几页单独套新风格
 4. **PPTX 必须可编辑**：文字=原生文本框、图形=原生形状；PICTURE 仅限素材照片与 flow 图表渲染图；禁止整页光栅贴图（任何超尺寸整页 PICTURE 判交付失败）；交付前必须用 python-pptx 递归展开做形状构成验证，细则见 `references/phase5-ppt-delivery.md`
 5. **过程产物目录**：PPT 生成的一切工作区/脚本/中间产物放本次交付目录下 `projects/`，禁止写入 `~/.agents/projects` 等全局目录
+
+交接（handoff）：Phase 5 的交接即移交 ppt-master 前的最终校验，跑 `scripts/precheck_handoff.py <输出目录>`（零宽字符/表格 GFM/flow 配对/页数对齐/logo/输入清单）；FAIL 阻塞，不得调用 ppt-master。本环节不再另跑 check_phase_handoff.py。
 
 ---
 
@@ -228,7 +240,8 @@ Phase 5: PPT生成      → 调用 ppt-master，读取逐页 HTML/MD 生成最�
 
 ### 治理
 9. 需要交叉校验/重生链/协作关系时，读 `references/governance-and-iteration.md`
-10. 需要目录结构与路径登记（输出/生成/验证/读取/临时）时，读 `env-config.md`（唯一真源）
+10. 每个环节结束做交接（handoff）校验、落盘 `_gen/handoff-phaseN.md` 时，跑 `scripts/check_phase_handoff.py --phase N`（Phase 5 交接走 `scripts/precheck_handoff.py`）
+11. 需要目录结构与路径登记（输出/生成/验证/读取/临时）时，读 `env-config.md`（唯一真源）
 
 ## 治理与迭代
 

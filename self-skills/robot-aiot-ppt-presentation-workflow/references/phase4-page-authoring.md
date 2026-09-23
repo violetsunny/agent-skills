@@ -72,3 +72,13 @@ Phase 4 页面编写时，改为读取：
 1. `~/.agents/skills/robot-aiot-draw-flowchart/SKILL.md`（静态页面 HTML 能力部分）
 2. `~/.agents/skills/robot-aiot-draw-flowchart/references/slide-page-authoring.md`
 3. `~/.agents/skills/robot-aiot-draw-flowchart/references/slide-page-template.md`
+
+## 交接（handoff）
+
+Phase 4 结束、进入 Phase 5 前执行交接：
+
+- 本环节产物：母稿图表回写完整（图表需求总表产物路径+确认状态）+ pages/ 逐页 HTML（`doc-ppt/pages/*.html`）+ showcase 门已过（风格基准写入母稿头部）
+- showcase 确认动作：两页 showcase 经用户确认后，主线程把风格基准（风格名/基调/主色/字体配对/密度档位）写入母稿头部「风格基准」字段，替换「待锁定」
+- 下一环节输入：pages/ 逐页 HTML 作 ppt-master 直接视觉源；母稿 MD 作语义源；flow/ XML 作图表真源追溯
+- 交接校验：`scripts/check_phase_handoff.py doc-ppt --phase 4 --write` → 校验母稿回写完整 + pages/ 存在 + showcase 门已过，落盘 `_gen/handoff-phase4.md`；FAIL 阻塞，不得进入 Phase 5
+- 移交前深度校验（页数对齐/零宽字符/表格 GFM/logo/输入清单）由 Phase 5 的 `precheck_handoff.py` 承担，本环节 handoff 不重复

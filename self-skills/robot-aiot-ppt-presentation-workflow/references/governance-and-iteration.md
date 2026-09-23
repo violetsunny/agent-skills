@@ -48,6 +48,21 @@
 3. 图表真源没改却只改图表 HTML
 4. G1/G2 未过就推进下游（绘图/回写/页面 HTML/PPT 生成）
 
+## 交接（handoff）治理
+
+每个环节结束后，除确认门外还须做交接校验，确保「本环节产物存在 + 确认门状态已记录 + 下一环节输入齐备」三件事同时成立，FAIL 阻塞不得推进：
+
+1. 校验命令：`scripts/check_phase_handoff.py doc-ppt --phase N --write`（N ∈ 1/2/3/3.5/4），落盘 `_gen/handoff-phaseN.md` 交接记录；Phase 5 的交接走 `scripts/precheck_handoff.py`（移交 ppt-master 前最终校验），不另设 --phase 5
+2. 确认门状态更新动作（主线程负责，机检只读不写）：
+   - G1 通过后把母稿头部「确认状态」字段更新为「G1 已通过（日期）」
+   - G2 通过后把母稿头部「确认状态」字段更新为「G2 已通过（日期）」
+   - showcase 门通过后把母稿头部「风格基准」字段从「待锁定」回填为锁定基准
+   - 字段含尖括号占位符视为未填充，机检判门未通过
+3. 机检口径：只校验确认状态/风格基准字段已标记，不替代用户语义确认（与确认门「用户确认不需要调整/图表无误」、precheck_handoff.py「语义项仍需人工」口径一致）
+4. handoff 不替代深度校验：Phase 4 的 handoff 校验回写完整+pages存在+showcase门；页数对齐/零宽字符/表格 GFM/logo/输入清单由 Phase 5 的 precheck_handoff.py 承担
+5. 重生链触发后，受影响环节及其下游的 handoff 须重跑（如母稿改动重过 G1 后，Phase 2/3/3.5/4 的 handoff 依次重校验）
+6. 交接记录 `_gen/handoff-phaseN.md` 的「遗留风险 / 待办」节由主线程补充，无则写「无」
+
 ## Sub Agent 控制面
 
 1. Phase 1-5 中，非 trivial 工作默认先交给 fresh sub agent，保持每阶段上下文独立干净
@@ -87,7 +102,7 @@
 
 ```text
 本技能
-├── 主线程: 负责阶段编排、落盘、阻塞校验、确认门（G1/G2）、最终交付
+├── 主线程: 负责阶段编排、落盘、阻塞校验、确认门（G1/G2）、handoff 校验、最终交付
 ├── Sub agents: 负责阶段内分析/起草/审查
 ├── Phase 2: 主线程产出 PPT 演示母稿，G1 用户确认后冻结
 ├── Phase 3: 主线程调用 robot-aiot-draw-flowchart 生成图表 XML

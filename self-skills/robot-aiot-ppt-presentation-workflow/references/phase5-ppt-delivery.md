@@ -15,6 +15,10 @@ Phase 5 负责将母稿、图表 XML/HTML、逐页 HTML 一并移交给 `ppt-mas
 9. `doc-ppt/assets/midea-logo.png` 已就位，封面与页脚引用正确
 10. 若启用轻量 MD3 规范化，图表 HTML 与页面 HTML 的 token 语义一致，且未引入新的结构漂移
 
+## 交接（handoff）
+
+Phase 5 的交接即移交 ppt-master 前的最终校验，由 `scripts/precheck_handoff.py doc-ppt` 承担（机判「移交前校验」第 3/4/5/6/7/9 条：零宽字符、表格 GFM、flow XML↔HTML 配对、页数对齐、logo 就位、输入清单存在）；FAIL 阻塞，不得调用 ppt-master。语义项（数据一致性、四要素齐全、配色体系）仍需人工/sub agent 校验。本环节是终态交付，PPTX 产出后交接对象是用户，交付后验证见下「交付后验证」节。Phase 5 不再另跑 check_phase_handoff.py。
+
 ## Sub Agent 建议
 
 1. 交付前结构验证、数据验证、视觉验证可拆给独立 sub agents 并行检查

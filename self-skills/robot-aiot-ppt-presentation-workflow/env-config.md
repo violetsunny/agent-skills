@@ -34,7 +34,7 @@ doc-ppt/
 │       ├── notes/              — 话术 notes/*.md（check_notes.py --sync 与 pages/*.html .notes 双源比对）
 │       └── expected_text.txt   — extract_expected_text.py 产出（compare_text.py 比对基准）
 ├── test-run/                   — 验证批次产物（如 test-run/projects/verify/ 渲染截图批次）；人工确认前禁止清理
-├── _gen/                       — 委派前置检查存档（precheck-robot-aiot-draw-flowchart.txt 等）
+├── _gen/                       — 委派前置检查存档 + 环节交接记录（precheck-robot-aiot-draw-flowchart.txt、handoff-phaseN.md 等）
 └── <project>.pptx              — 最终 PPTX（Phase 5，ppt-master 产出）
 ```
 
@@ -44,6 +44,7 @@ doc-ppt/
 |---|---|---|
 | 输出 | `doc-ppt/`（树见上） | 全部交付物与过程产物 |
 | 生成 | `doc-ppt/_gen/precheck-<skill名>.txt` | Phase 3 委派前跑被委派 skill 的 precheck_deps.sh 存档；exit≠0 中止；批次无记录视同未执行前置检查 |
+| 生成 | `doc-ppt/_gen/handoff-phaseN.md` | 每环节结束 check_phase_handoff.py --write 落盘的交接记录（N∈1/2/3/3.5/4）；FAIL 阻塞不得进入下一环节 |
 | 生成 | `doc-ppt/projects/<任务名>/` | Phase 5 工作区/脚本/中间渲染图/验证报告 |
 | 验证 | `doc-ppt/test-run/<批次>/` | 验证批次产物（keynote_verify.sh 输出 slides/Slide*.png 等）；人工确认前禁止清理 |
 | 读取 | 用户指定源文件（MD/技术方案/存量 .pptx） | Phase 1 内容源，必须由用户指定 |

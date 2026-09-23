@@ -70,3 +70,8 @@
 ```
 
 页面 HTML 落 `doc-ppt/pages/`，页面引用图表用 `../flow/<图表文件名>.html` 相对路径。
+
+## 交接（handoff）
+
+- Phase 3 结束、进入 Phase 3.5 前：本环节产物为 flow/ 图表 XML 真源（`doc-ppt/flow/<chart-name>.xml`）；下一环节输入为 XML→HTML 桥接源。交接校验 `scripts/check_phase_handoff.py doc-ppt --phase 3 --write` → 校验 flow/ XML 存在，落盘 `_gen/handoff-phase3.md`；FAIL 阻塞，不得进入 Phase 3.5。
+- Phase 3.5 结束、进入 Phase 4 前：本环节产物为 flow/ 图表 HTML 桥接稿（`doc-ppt/flow/<chart-name>.html`，每 XML 配对一 HTML）；G2 确认动作为用户逐张确认「图表无误」后主线程把母稿头部「确认状态」更新为「G2 已通过（日期）」；下一环节输入为页面引用的图表 HTML + 回写母稿的产物路径。交接校验 `scripts/check_phase_handoff.py doc-ppt --phase 3.5 --write` → 校验 flow/ XML↔HTML 配对 + G2 已通过，落盘 `_gen/handoff-phase3.5.md`；FAIL 阻塞，不得进入 Phase 4。
