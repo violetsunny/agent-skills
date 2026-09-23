@@ -61,9 +61,12 @@ footer.bar      64px 固定底：左 .tag（页码+章名+场景），右 prev/n
 - `.vs`：双列对比（`>div.good` 绿 / `>div.bad` 红 / 中性白，各带 `h4` + `ul`）——正解 vs 反模式、选型对比
 - `.steps`：有序流程（`ol` 编号圆圈 + 竖线，`li` 内 `<b>` 节点名 + 说明）——链路、演进路径、步骤
 - `.bars`：CSS 条形图（`.row` = 88px 标签 + `i` 条 `--w` 控宽 + 64px 数值）——占比/吞吐对比
+- `.fx`：公式条（`.lhs` 阶段实色块 + `.eq` 等号 + `.term` 胶囊 + `.plus` 加号，每式一行 flex）——公式/定义式（A = B + C 组合）
+- `.quote`：引用块（`::before` 大引号 + 语义变色强调 span，--band-l 底圆角）——纯引用/证言；链式主张（A → B → C 演进式单句论断）按文字散文改图条直落页内小 SVG，不占 .quote
+- `.pit`：行级问题对策对（`grid 1fr 28px 1fr`：`.bad` 红底问题 + `.arw` 箭头 + `.good` 绿底对策）——避坑/风险对策行对
 - `.grid2` + `.mini`：2 列网格迷你卡（`b` 类别名 pri + `span` 内容；`.minis` 单列变体；`i` 人设/别称 mut；`span.lim` 边界/代价 err；`.mono` 等宽代码）——属性枚举、格式对照、多库/多方案卡片清单
 - 复用既有：`chips`（枚举标签）、`table`（结构化多列）、`pre`（代码/公式）、`details`（折叠明细）、`shots`（实拍图）
-- 文字散文改图：链路/流向类散文（A → B → C → 多输出）优先画页内小 SVG（静态线 + 分离 polygon 箭头，无 anim 类不触 lint #8），不堆文字
+- 文字散文改图：链路/流向类散文（A → B → C → 多输出）优先画页内小 SVG（静态线 + 分离 polygon 箭头，无 anim 类不触 lint #8），不堆文字；小 SVG 的 viewBox 宽度须接近渲染容器宽度（右栏约 700px），使图内 font-size 即实际 12-14px 档——viewBox 过窄会等比放大字号脱离全页字档；主轴/注释箭头用水平细线（stroke ≤1.5）+ 小箭头（头长 ≤10），禁歪斜粗大箭头
 
 判定：右栏任一卡片内连续 ≥2 句散文且无上述组件承载 → 违例，改写为组件。每页自包含：页内使用任一组件前必须确认该页 CSS 含其定义（grep `.chip{`/`.mini{` 等），缺则随组件补丁一并插入——组件使用无 CSS 定义会静默退化为裸文本。
 
@@ -75,6 +78,7 @@ footer.bar      64px 固定底：左 .tag（页码+章名+场景），右 prev/n
 - 素材图：按页面相对输出目录的实际层级回退到 `<输出目录>/assets/`（多页形态 pages/ 下为 `../assets/`，test-run 参照目录按实际深度）+ `onerror` 缺图降级占位
 - 明细数据用 `<details>` 折叠，summary 蓝字 ▶ 前缀；折叠取舍口径：删掉该卡本页结论仍成立则折叠（补充细则、笔记章节展开、素材图参照），不成立则常驻（定义、职责表、代码示例）；全 deck 统一执行，不逐页临场改口径
 - 交互反馈（每页必带）：`a.btn`/`summary` 带 `transition:background .15s`；hover 态 `a.btn:not(.pri):hover,summary:hover{background:var(--band)}`、`a.btn.pri:hover{background:var(--pri-d)}`；键盘焦点 `a.btn:focus-visible,summary:focus-visible{outline:2px solid var(--pri);outline-offset:2px}`
+- 框类 hover 微放大（每页必带，覆盖全部框类组件含封面页）：小框（prin/fx/pit/stg/阶段胶囊/角色卡等）`scale(1.03)`、大容器（card/chart/主张条等）`scale(1.01)`，均 `transition:transform .15s ease`；SVG 框类组加 `transform-box:fill-box;transform-origin:center` 保中心缩放
 - 编写期依赖检查：委派 `robot-aiot-interactive-html-author` 写页前必须跑其执行前依赖检查（ui-ux-pro-max 齐备），并用 ui-ux-pro-max 的 search.py 检索设计数据资产核对风格/交互缺口；检索结果仅为数据建议，不得覆盖本文件 token 与硬约束
 
 ## 7. 验收（批次必跑）
