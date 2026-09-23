@@ -135,7 +135,7 @@ class StockDiagnoseCliTests(unittest.TestCase):
 
             payload = cli.dispatch(args)
 
-        patched.assert_called_once_with("002156", 6)
+        patched.assert_called_once_with("002156", 6, as_of=None)
         self.assertTrue(payload["ok"])
 
 

@@ -38,7 +38,7 @@ python3 scripts/stock_replay_cli.py option-greeks --help
 python3 scripts/stock_replay_cli.py build-replay --limit 3 --output 2026-07-03-A股复盘.json
 ```
 
-其中 `build-replay` / `render-replay` 的相对 `--output` 路径默认锚定到当前项目根目录下的 `./.analysis/`；如果 `.analysis/` 不存在，命令会先自动创建。
+其中 `build-replay` / `render-replay` 的相对 `--output` 路径默认锚定到当前项目根目录下的 `./.analysis/`；如果 `.analysis/` 不存在，命令会先自动创建。所有目录路径（输出/生成/验证/读取/缓存/临时）集中定义在 `scripts/lib/env_config.py`（唯一事实来源），可用 `SRW_` 前缀环境变量覆盖（`SRW_PROJECT_ROOT`/`SRW_OUTPUT_DIR`/`SRW_ACCEPTANCE_DIR`/`SRW_CACHE_DIR`）。
 
 如果需要给自动化脚本、CI 或其他工具消费结构化结果，可使用：
 
@@ -78,6 +78,7 @@ python3 scripts/validate_skill.py
 - 文件都存在
 - `SKILL.md` 中引用到的参考文件和脚本都能在仓库里找到
 - `evals/evals.json` 的 `skill_name` 与 frontmatter `name` 一致
+- 路径集中化：目录常量（输出/验证/缓存）一律出自 `scripts/lib/env_config.py`，其他模块不得散落硬编码；`validate_skill.py` 已检查 env_config 的 `.analysis` 默认锚定与 CLI 引用
 
 ## 二、frontmatter 手工检查 (frontmatter review)
 
@@ -105,7 +106,7 @@ python3 -c "from pathlib import Path; print(Path('SKILL.md').read_text(encoding=
 - 主线题材梳理 (theme synthesis)
 - 强势股 / 观察池 (leaders / watchlist)
 - 个股为何走强 (single-name strength attribution)
-- 题材、资金、公告、龙虎榜、研报、财务的交叉分析 (cross-domain analysis)
+- 题材、资金、公告、龙虎榜、财务的交叉分析 (cross-domain analysis)
 - 从简单行情查询升级成结构化工作流 (query-to-workflow escalation)
 
 ## 三、引用一致性检查 (reference consistency)

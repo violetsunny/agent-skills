@@ -58,7 +58,7 @@ EXPECTED_TRIGGER_TERMS = [
     "强势股/观察池",
     "个股为何走强",
     "题材与资金联动",
-    "龙虎榜/公告/研报/财务交叉分析",
+    "龙虎榜/公告/财务交叉分析",
 ]
 
 REQUIRED_BODY_SNIPPETS = [
@@ -668,20 +668,31 @@ def check_script_help() -> list[dict[str, str | bool]]:
 def check_output_path_contract() -> list[dict[str, str | bool]]:
     cli = ROOT / "scripts" / "stock_replay_cli.py"
     renderer = ROOT / "scripts" / "render_replay_markdown.py"
+    env_config = ROOT / "scripts" / "lib" / "env_config.py"
     cli_text = cli.read_text(encoding="utf-8") if cli.exists() else ""
     renderer_text = renderer.read_text(encoding="utf-8") if renderer.exists() else ""
+    env_config_text = (
+        env_config.read_text(encoding="utf-8") if env_config.exists() else ""
+    )
     results: list[dict[str, str | bool]] = []
 
     if (
-        'DEFAULT_OUTPUT_DIR = Path(__file__).resolve().parents[1] / ".analysis"'
-        not in cli_text
+        'OUTPUT_DIR = _env_path("SRW_OUTPUT_DIR", PROJECT_ROOT / ".analysis")'
+        not in env_config_text
     ):
         results.append(
-            fail("stock_replay_cli.py does not anchor default outputs under .analysis")
+            fail("env_config.py does not anchor OUTPUT_DIR default under .analysis")
+        )
+    else:
+        results.append(ok("env_config.py anchors OUTPUT_DIR default under .analysis"))
+
+    if "DEFAULT_OUTPUT_DIR = env_config.OUTPUT_DIR" not in cli_text:
+        results.append(
+            fail("stock_replay_cli.py does not take default output dir from env_config")
         )
     else:
         results.append(
-            ok("stock_replay_cli.py anchors default outputs under .analysis")
+            ok("stock_replay_cli.py takes default output dir from env_config")
         )
 
     if "output.parent.mkdir(parents=True, exist_ok=True)" not in renderer_text:

@@ -4,7 +4,7 @@ import re
 
 import requests
 
-from .common import clean_symbol, safe_float, source, success
+from .common import clean_symbol, failure, safe_float, source, success
 
 
 _SINA_OPTION_HEADERS = {
@@ -33,13 +33,24 @@ def _sina_option_list(node: str) -> list[str]:
         headers=_SINA_OPTION_HEADERS,
         timeout=10,
     )
+    # HTTP 错误必须抛出：否则 403/500 错误页会被 re.search 解析成空列表，
+    # 把「接口坏了」伪装成「确实没数据」。
+    response.raise_for_status()
     response.encoding = "gbk"
     return _strip_js_var_payload(response.text)
 
 
 def option_codes(underlying: str = "510050") -> dict:
     code = clean_symbol(underlying)
-    cate = _UNDERLYING_TO_CATE.get(code, _UNDERLYING_TO_CATE["510050"])
+    cate = _UNDERLYING_TO_CATE.get(code)
+    if cate is None:
+        # 绝不静默路由到另一只标的（原实现未知代码会静默查 50ETF 期权）
+        return failure(
+            "option_codes",
+            "invalid_input",
+            f"不支持的期权标的: {underlying!r}，支持: "
+            f"{'、'.join(sorted(_UNDERLYING_TO_CATE))}",
+        )
     warnings: list[str] = []
     source_chain: list[dict] = []
     items: dict[str, dict[str, list[str]]] = {}
@@ -50,6 +61,7 @@ def option_codes(underlying: str = "510050") -> dict:
             headers=_SINA_OPTION_HEADERS,
             timeout=10,
         )
+        response.raise_for_status()
         payload = response.json()
         months = ((payload.get("result") or {}).get("data") or {}).get(
             "contractMonth"

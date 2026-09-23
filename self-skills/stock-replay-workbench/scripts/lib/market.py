@@ -3,13 +3,17 @@ from __future__ import annotations
 from datetime import date
 from datetime import timedelta
 
+from .common import clean_symbol
 from .common import em_json_get
+from .common import failure
 from .common import format_hhmmss
 from .common import full_symbol
+from .common import normalize_date
 from .common import safe_float
 from .common import safe_int
 from .common import source
 from .common import success
+from .quote import quote_history
 from .quote import quote_realtime
 
 
@@ -206,9 +210,10 @@ def limit_pool(pool: str = "up", limit: int = 20) -> dict:
         items: list[dict] = []
         query_dates = [None]
         today = date.today()
+        # offset 从 1 起：offset=0 与首查 None（默认今天）重复，白白多打一次节流请求
         query_dates.extend(
             (today - timedelta(days=offset)).strftime("%Y%m%d")
-            for offset in range(0, 8)
+            for offset in range(1, 9)
         )
         for query_date in query_dates:
             params = {
@@ -259,3 +264,174 @@ def limit_pool(pool: str = "up", limit: int = 20) -> dict:
             warnings,
             source_status={endpoint: "fallback"},
         )
+
+
+DD_DOWN_THRESHOLD = 0.002  # IBD: 收盘较昨收跌 >= 0.2%
+DD_EXPIRY_SESSIONS = 25  # 超过 25 个交易日过期
+DD_INVALIDATION_GAIN = 0.05  # DD 后指数涨 5% 失效
+DD_EXPOSURE_POLICY = {
+    "NORMAL": (100, "HOLD_OR_FOLLOW_BASE_STRATEGY"),
+    "CAUTION": (75, "AVOID_NEW_ADDS"),
+    "HIGH": (50, "REDUCE_EXPOSURE"),
+    "SEVERE": (25, "CLOSE_OR_HEDGE"),
+    # 数据不足分级：风险工具禁止 fail-open（K线缺失时输出 NORMAL=满仓信号
+    # 会把「不知道」伪装成「安全」），cap=None 表示无法给出仓位上限。
+    "UNKNOWN": (None, "DATA_INSUFFICIENT_MANUAL_REVIEW"),
+}
+
+
+def _ema(values: list[float], span: int) -> float | None:
+    if len(values) < span:
+        return None
+    factor = 2.0 / (span + 1)
+    ema = values[0]
+    for value in values[1:]:
+        ema = value * factor + ema * (1 - factor)
+    return ema
+
+
+def distribution_days(
+    symbol: str = "000001", limit: int = 120, as_of: str | None = None
+) -> dict:
+    """IBD 派发日计数 + 风险分级（移植自 claude-trading-skills
+    ibd-distribution-day-monitor，规则原文见 references/market-regime-playbook.md）。
+
+    DD 判定：收盘较昨收跌 >= 0.2% 且成交量放大。
+    DD 失效：超过 25 个交易日，或 DD 后指数最高价较 DD 收盘涨 >= 5%（当日 DD 不立即失效）。
+    分级：NORMAL(d25<=2) / CAUTION(d25>=3) / HIGH(d25>=5 或 d15>=3 或 d5>=2)
+         / SEVERE(d25>=6 或 d15>=4 或 (跌破21EMA或50MA 且 d25>=5))。
+    as_of：历史回放截止日（YYYY-MM-DD / YYYYMMDD），K线截断到该日，防未来函数。
+    """
+    warnings: list[str] = []
+    source_chain: list[dict] = []
+    code = clean_symbol(symbol) if symbol else "000001"
+    as_of_iso = None
+    if as_of is not None:
+        as_of_iso = normalize_date(as_of)
+        if not as_of_iso:
+            return failure(
+                "distribution_days",
+                "invalid_input",
+                f"as_of={as_of!r} 不是合法日期（需 YYYY-MM-DD 或 YYYYMMDD）",
+            )
+    # clean_symbol 后再查前缀，防 "SH510300" 带市场前缀绕过；50=沪市 LOF/封基
+    if code[:2] in ("50", "51", "56", "58", "15", "16"):
+        warnings.append(
+            "标的为 ETF/LOF 且使用不复权价：除权除息日的跳空会被误判为派发日，分级结果失真。"
+        )
+    history_payload = quote_history(
+        code, "day", "none", max(limit, 80), as_of=as_of_iso
+    )
+    source_chain.extend(history_payload.get("source_chain") or [])
+    warnings.extend(history_payload.get("warnings") or [])
+    candles = (history_payload.get("data") or {}).get("candles") or []
+
+    closes = [c.get("close") for c in candles]
+    highs = [c.get("high") for c in candles]
+    volumes = [c.get("volume") for c in candles]
+    dates = [c.get("date") for c in candles]
+    if len(candles) < 30:
+        warnings.append(
+            f"K线仅 {len(candles)} 根（<30），派发日计数与均线过滤不可靠，"
+            "分级已降级为 UNKNOWN（数据不足，禁止按 NORMAL 消费）。"
+        )
+    valid_closes = [c for c in closes if c is not None]
+
+    raw: list[dict] = []
+    for index in range(1, len(candles)):
+        close, prev_close = closes[index], closes[index - 1]
+        volume, prev_volume = volumes[index], volumes[index - 1]
+        if close is None or prev_close is None or not prev_close:
+            continue
+        if volume is None or prev_volume is None:
+            continue
+        pct = (close - prev_close) / prev_close
+        if pct <= -DD_DOWN_THRESHOLD and volume > prev_volume:
+            raw.append(
+                {
+                    "date": dates[index],
+                    "index": index,
+                    "close": close,
+                    "change_percent": round(pct * 100, 3),
+                }
+            )
+
+    last_index = len(candles) - 1
+    active: list[dict] = []
+    for record in raw:
+        age = last_index - record["index"]
+        if age > DD_EXPIRY_SESSIONS:
+            continue
+        tail_highs = [high for high in highs[record["index"] + 1 :] if high is not None]
+        high_since = max(tail_highs) if tail_highs else None
+        invalidated = (
+            high_since is not None
+            and record["close"]
+            and high_since >= record["close"] * (1 + DD_INVALIDATION_GAIN)
+        )
+        if invalidated:
+            continue
+        active.append(
+            {
+                "date": record["date"],
+                "close": record["close"],
+                "change_percent": record["change_percent"],
+                "age_sessions": age,
+                "high_since": high_since,
+            }
+        )
+
+    d5 = sum(1 for item in active if item["age_sessions"] <= 5)
+    d15 = sum(1 for item in active if item["age_sessions"] <= 15)
+    d25 = len(active)
+
+    ema21 = _ema(valid_closes, 21)
+    sma50 = (
+        sum(valid_closes[-50:]) / len(valid_closes[-50:])
+        if len(valid_closes) >= 50
+        else None
+    )
+    latest_close = valid_closes[-1] if valid_closes else None
+    below_ma: bool | None = None
+    if latest_close is not None and (ema21 is not None or sma50 is not None):
+        below_ma = (ema21 is not None and latest_close < ema21) or (
+            sma50 is not None and latest_close < sma50
+        )
+
+    if len(candles) < 30:
+        classification = "UNKNOWN"
+    elif d25 >= 6 or d15 >= 4 or (below_ma and d25 >= 5):
+        classification = "SEVERE"
+    elif d25 >= 5 or d15 >= 3 or d5 >= 2:
+        classification = "HIGH"
+    elif d25 >= 3:
+        classification = "CAUTION"
+    else:
+        classification = "NORMAL"
+    exposure_cap, action = DD_EXPOSURE_POLICY[classification]
+
+    warnings.append(
+        "IBD 派发日规则移植自美股（QQQ/SPY 口径），用于 A 股指数时成交量口径与波动结构有差异，"
+        "分级结果仅作参考输入，不构成交易指令。"
+    )
+    return success(
+        "distribution_days",
+        {
+            "symbol": code,
+            "full_symbol": full_symbol(code),
+            "as_of": as_of_iso,
+            "classification": classification,
+            "d5_count": d5,
+            "d15_count": d15,
+            "d25_count": d25,
+            "below_21ema_or_50ma": below_ma,
+            "ema21": ema21,
+            "sma50": sma50,
+            "latest_close": latest_close,
+            "active_distribution_days": active,
+            "exposure_cap_pct": exposure_cap,
+            "action": action,
+        },
+        source_chain,
+        warnings,
+    )

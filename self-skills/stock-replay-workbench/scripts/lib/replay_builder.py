@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from datetime import date
 
-from .common import now_iso, success
+from .common import is_historical_date, now_iso, snapshot_notice, success
 from .events import announcement, dragon_tiger, margin_trading, news, sentiment_heat
 from .flow import money_flow
 from .fundamental import fundamental
@@ -737,6 +737,12 @@ def _confidence(warnings: list[str]) -> str:
 def build_replay(trade_date: str | None = None, limit: int = 5) -> dict:
     warnings: list[str] = []
     source_chain: list[dict] = []
+
+    # 历史 trade_date 只影响 dragon_tiger/margin_trading 两个可回溯源；
+    # market_snapshot/limit_pool/rank/money_flow/sector/sentiment_heat 全是
+    # 实时快照，无法回溯截断——必须显式警示，禁止把实时数据当历史日事实。
+    if is_historical_date(trade_date):
+        warnings.append(snapshot_notice(trade_date))
 
     snapshot_payload = market_snapshot()
     limit_up_payload = limit_pool("up", limit)

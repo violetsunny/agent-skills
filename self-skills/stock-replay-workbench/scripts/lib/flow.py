@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from datetime import datetime
+from datetime import date, datetime
 import json
 
 import requests
@@ -18,6 +18,7 @@ from .common import (
     source,
     success,
 )
+from .env_config import NORTHBOUND_CACHE_CSV
 from .sector import sector
 
 
@@ -703,3 +704,150 @@ def money_flow(
             warnings,
             source_status={"stock_money_flow": "fallback-empty"},
         )
+
+
+NORTHBOUND_CACHE_PATH = NORTHBOUND_CACHE_CSV
+_HSGT_HEADERS = {
+    "User-Agent": EM_USER_AGENT,
+    "Host": "data.hexin.cn",
+    "Referer": "https://data.hexin.cn/",
+}
+
+
+def _save_northbound_snapshot(
+    day: str, hgt: float | None, sgt: float | None
+) -> tuple[bool, int]:
+    """写入北向日缓存，返回 (是否实际写入, 丢弃的坏行数)。
+
+    接口 payload 无日期字段，非交易日返回的是上一交易日旧数据：
+    与最近一行（非当日）完全一致时判定为旧数据，跳过写入，防止历史漂移。
+    坏行（非 3 列）读入时跳过、重写时丢弃——丢弃必须计数上报（fail visibly）。
+    """
+    rows: dict[str, str] = {}
+    bad_lines = 0
+    if NORTHBOUND_CACHE_PATH.exists():
+        for line in NORTHBOUND_CACHE_PATH.read_text().strip().split("\n")[1:]:
+            parts = line.split(",")
+            if len(parts) == 3:
+                rows[parts[0]] = line
+            elif line.strip():
+                bad_lines += 1
+    previous = next(
+        (rows[key] for key in sorted(rows, reverse=True) if key != day), None
+    )
+    if previous:
+        prev_parts = previous.split(",")
+        if safe_float(prev_parts[1]) == safe_float(str(hgt)) and safe_float(
+            prev_parts[2]
+        ) == safe_float(str(sgt)):
+            return False, bad_lines
+    rows[day] = f"{day},{hgt},{sgt}"
+    NORTHBOUND_CACHE_PATH.parent.mkdir(parents=True, exist_ok=True)
+    # tmp+rename 原子写：写一半崩溃不会损坏缓存文件
+    tmp_path = NORTHBOUND_CACHE_PATH.with_suffix(".tmp")
+    tmp_path.write_text(
+        "date,hgt,sgt\n" + "".join(f"{rows[key]}\n" for key in sorted(rows))
+    )
+    tmp_path.replace(NORTHBOUND_CACHE_PATH)
+    return True, bad_lines
+
+
+def _load_northbound_history(limit: int) -> list[dict]:
+    if not NORTHBOUND_CACHE_PATH.exists():
+        return []
+    items = []
+    for line in NORTHBOUND_CACHE_PATH.read_text().strip().split("\n")[1:]:
+        parts = line.split(",")
+        if len(parts) == 3:
+            items.append(
+                {
+                    "date": parts[0],
+                    "hgt_yi": safe_float(parts[1]),
+                    "sgt_yi": safe_float(parts[2]),
+                }
+            )
+    return items[-max(1, limit) :]
+
+
+def northbound(limit: int = 20) -> dict:
+    """沪深股通当日实时分钟流向（同花顺 hexin）+ 本地 CSV 自缓存历史。
+
+    行业性限制：北向自 2024-08 起收紧盘中实时披露，东财全系北向净买额断供；
+    深股通(sgt)分钟序列常只回传零星点、末值量级异常，仅供参考；
+    沪股通(hgt)可用于当日情绪。权威口径走 HKEX DailyStat。
+    """
+    warnings: list[str] = []
+    source_chain: list[dict] = []
+    minute_points: list[dict] = []
+    try:
+        response = requests.get(
+            "https://data.hexin.cn/market/hsgtApi/method/dayChart/",
+            headers=_HSGT_HEADERS,
+            timeout=10,
+        )
+        response.raise_for_status()
+        payload = response.json()
+        times = payload.get("time") or []
+        hgt = payload.get("hgt") or []
+        sgt = payload.get("sgt") or []
+        minute_points = [
+            {
+                "time": times[index],
+                "hgt_yi": hgt[index] if index < len(hgt) else None,
+                "sgt_yi": sgt[index] if index < len(sgt) else None,
+            }
+            for index in range(len(times))
+        ]
+        source_chain.append(source("ths_hsgt_realtime", True))
+        if not minute_points:
+            warnings.append("同花顺北向分钟流向返回空列表，可能非交易日。")
+    except Exception as exc:
+        source_chain.append(source("ths_hsgt_realtime", False, str(exc)))
+        warnings.append(f"北向实时流向不可用: {exc}")
+
+    latest = next(
+        (point for point in reversed(minute_points) if point.get("hgt_yi") is not None),
+        None,
+    )
+    if latest:
+        today = date.today()
+        if today.weekday() >= 5:
+            warnings.append(
+                "周末跳过北向缓存写入：接口无日期字段，非交易日返回的是上一交易日旧数据。"
+            )
+        else:
+            try:
+                saved, bad_lines = _save_northbound_snapshot(
+                    today.isoformat(), latest["hgt_yi"], latest["sgt_yi"]
+                )
+                if bad_lines:
+                    warnings.append(
+                        f"北向缓存存在 {bad_lines} 行坏行（非 date,hgt,sgt 三列），重写时已丢弃。"
+                    )
+                if not saved:
+                    warnings.append(
+                        "北向数据与上一条缓存完全一致，疑似非交易日/数据未更新，已跳过写入。"
+                    )
+            except OSError as exc:
+                warnings.append(f"北向本地缓存写入失败: {exc}")
+    history = _load_northbound_history(limit)
+
+    warnings.append(
+        "深股通(sgt)实时披露 2024-08 后不可靠，仅供参考；沪股通(hgt)可用于当日情绪；"
+        "权威口径为 HKEX DailyStat。历史为本地 CSV 自缓存"
+        f"（{NORTHBOUND_CACHE_PATH}），越跑越全，非交易所官方历史。"
+        "接口无日期字段：缓存日期=运行日而非交易日，周末已跳过写入，"
+        "但非周末节假日运行仍可能把上一交易日数据错标为当日（去重仅防与上一条完全一致的情形）。"
+    )
+    return success(
+        "northbound",
+        {
+            "minute_points": minute_points[-max(1, limit) * 5 :]
+            if minute_points
+            else [],
+            "latest": latest,
+            "history": history,
+        },
+        source_chain,
+        warnings,
+    )

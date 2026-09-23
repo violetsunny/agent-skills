@@ -1,8 +1,8 @@
 ---
 name: stock-replay-workbench
-description: Use when the user asks for A-share 盘后复盘、收盘简报、主线题材梳理、强势股/观察池、个股为何走强、题材与资金联动、龙虎榜/公告/研报/财务交叉分析, or when a stock query must expand from a simple quote into a structured workflow with task routing, source priority, timestamps, warnings, and layered conclusions. Covers 打板情绪(涨停/炸板/跌停/昨涨停四池+连板分析+涨停揭秘)、ETF期权(T型报价+希腊字母+IV)、舆情互动(热榜/人气榜/互动易)等能力. 多股对比/复盘多维度分析通过 sub-agent 并行编排, 深度报告强制经 cross-check-reviewer 第二意见复查校对.
+description: Use when the user asks for A-share 盘后复盘、收盘简报、主线题材梳理、强势股/观察池、个股为何走强、题材与资金联动、龙虎榜/公告/财务交叉分析, or when a stock query must expand from a simple quote into a structured workflow with task routing, source priority, timestamps, warnings, and layered conclusions. Covers 打板情绪(涨停/炸板/跌停/昨涨停四池+连板分析+情绪速算)、ETF期权(T型报价+希腊字母+IV)、舆情互动(热榜/人气榜/互动易)等能力. 多股对比/复盘多维度分析通过 sub-agent 并行编排, 深度报告强制经 cross-check-reviewer 第二意见复查校对.
 metadata:
-  version: "0.4.1"
+  version: "0.5.3"
   origin: custom
 ---
 
@@ -20,7 +20,7 @@ metadata:
 ## 定位
 
 这个 skill 是一个**独立闭环的 A 股工作流控制台**。
-它当前通过仓库内置的 `scripts/stock_replay_cli.py` 和 `scripts/lib/` 模块落地，内部使用 `requests`、`akshare`、`efinance`、`mootdx`以及免费公开网页接口（东财 push2/push2ex/datacenter、腾讯财经、新浪、巨潮、同花顺）完成取数。优先用 mootdx/腾讯（不封IP），东财仅用于独有字段并内置 `em_get()` 限流防封。
+它当前通过仓库内置的 `scripts/stock_replay_cli.py` 和 `scripts/lib/` 模块落地，内部使用 `requests`、`akshare`、`efinance` 以及免费公开网页接口（东财 push2/push2ex/datacenter、腾讯财经、新浪、巨潮、同花顺）完成取数。优先用腾讯/新浪/巨潮/同花顺（不封IP或低风控），东财仅用于独有字段并内置 `em_get()`/`em_post()` 限流防封。
 
 注意：本 SKILL 独立运行，不依赖任何第三方付费 API Key（如 Wind、Choice、iFinD），且不依赖宿主环境下的其他兄弟项目。
 
@@ -57,19 +57,25 @@ python3 scripts/stock_replay_cli.py <subcommand> [...args]
 已落地的核心子命令包括：
 
 - `quote-realtime`：单票实时行情
-- `quote-history`：单票历史行情
+- `quote-history`：单票历史行情（支持 `--as-of` 历史日期截断，防未来函数）
 - `market-snapshot`：指数快照 + 市场宽度
-- `rank`：全市场排行
-- `limit-pool`：涨停 / 跌停 / 炸板 / 昨涨停 四池（东财 push2ex，price ÷1000，含连板数/封板资金/炸板次数/板型）
-- `limit-sentiment`：打板情绪温度计（炸板率/连板高度/连板梯队分布/晋级率/赚钱效应）
-- `sentiment-heat`：市场热度（同花顺热榜 `ths_hot_list` + 东财人气榜 `em_hot_rank` + 东财概念命中 `em_hot_concept`）
+- `distribution-days`：IBD 派发日计数与 classification 分级（NORMAL/CAUTION/HIGH/SEVERE + 仓位上限 + action 建议），支持 `--as-of` 历史回放，规则见 `references/market-regime-playbook.md`
+- `rank`：全市场排行（涨跌幅/换手率/成交额/成交量）
+- `limit-pool`：涨停 / 跌停 / 炸板 / 昨涨停 四池（东财 push2ex，price ÷1000，含连板数/封板资金/炸板次数；无板型/涨停原因字段）
+- `limit-sentiment`：打板情绪温度计（炸板率/连板高度/晋级率/赚钱效应，本地聚合四池速算）
+- `sentiment-heat`：市场热度（同花顺热榜 `ths_hot_list` + 东财人气榜 `em_hot_rank` + 东财概念命中 `em_hot_concept`，支持 `--symbol` 查个股热榜命中）
 - `irm-qa`：互动易问答（投资者提问+公司官方回复，巨潮 cninfo）
 - `option-codes / option-tquote / option-greeks`：ETF期权（合约清单/T型报价/希腊字母Delta/Gamma/Theta/Vega + 隐含波动率IV，新浪源交易所预算）
 - `sector`：行业排行、概念排行、个股板块归属
 - `money-flow`：市场、个股、行业、概念资金流
+- `northbound`：北向资金（同花顺 hgt 日度净流入，本地 CSV 缓存历史；sgt 2024-08 后断供仅返回 None）
 - `fundamental`：估值、ROE、毛利率、现金流摘要
 - `announcement`、`news`、`dragon-tiger`、`block-trade`、`margin-trading`
+- `lockup-expiry`：限售解禁（东财 datacenter RPT_LIFT_STAGE，历史+未来 90 天）
+- `holder-trades`：股东增减持（东财 datacenter RPT_SHARE_HOLDER_INCREASE，带符号变动数）
+- `chip-distribution`：筹码分布本地推演（东财前复权K线+换手率，300 格网格+三角分布+换手衰减，含硬约束自检，支持 `--as-of` 历史回放）
 - `bond`：可转债实时、排行、历史
+- `stock-diagnose`：单票诊断（支持 `--as-of`，历史日期自动附快照警示，缺失数据显式记录到 `missing_data`）
 - `build-replay`：组装复盘底稿 JSON
 - `render-replay`：把结构化底稿渲染成 Markdown，默认支持写入 `./.analysis/`，目录不存在时自动创建，包含 `limit_sentiment` 等复盘信号
 
@@ -103,28 +109,22 @@ python3 scripts/stock_replay_cli.py <subcommand> [...args]
 
 优先级：
 
-1. mootdx（通达信 TCP 7709，不封IP）：K线/盘口/逐笔/财务快照（37字段）/F10
-   - 走 `tdx_client()` helper 连内置服务器列表，防 BESTIP 空串崩溃
-   - K线参数名必须是 `frequency`（非 `category`，后者被静默吞掉退化为日线）
-   - mootdx K线返回不复权原始价，跨除权日做估值需自行复权
-2. 腾讯财经（HTTP，不封IP）：实时价、PE/PB/市值/换手率/涨跌停、指数/ETF（88字段）
-3. 新浪 / 巨潮 / 同花顺（HTTP，低风控）：财报三表、公告全文（orgId动态映射）、一致预期EPS、热点/热榜、涨停揭秘、ETF期权、互动易
-4. 东财独有字段（HTTP，有风控会封IP）：**仅用于别处拿不到的独有数据**，走 `em_get()` 统一限流（≥1s间隔+随机抖动+会话复用+正常UA+连接级重试）
+1. 腾讯财经（HTTP，不封IP）：实时价、换手率、指数/ETF（88字段，含PE/PB/市值/涨跌停价但当前实现未提取）、日/周/月 K 线（前复权）
+2. 新浪 / 巨潮 / 同花顺（HTTP，低风控）：公告全文（orgId动态映射）、热点/热榜、ETF期权、互动易、北向资金（同花顺 hgt）、现金流量表（经 akshare 新浪）
+3. 东财独有字段（HTTP，有风控会封IP）：**仅用于别处拿不到的独有数据**，走 `em_get()`/`em_post()` 统一限流（≥1s间隔+随机抖动+会话复用+正常UA+连接级重试）
 
-当前实现中，普通行情与估值快照优先 mootdx/腾讯等稳定公开源；东财继续只承担别处拿不到的独有字段补充。
+当前实现中，普通行情优先腾讯等稳定公开源；估值快照走东财 push2（备胎 akshare 东财个股信息/百度估值）；东财继续只承担别处拿不到的独有字段补充。
 
 ### 4. 东财只用于独有字段 (Eastmoney for unique fields only)
 
 东财只承担"别处拿不到的字段"，例如：
 
 - 龙虎榜席位 + 全市场龙虎榜
-- 限售解禁
-- 融资融券
+- 限售解禁（RPT_LIFT_STAGE）
+- 股东增减持（RPT_SHARE_HOLDER_INCREASE）
 - 大宗交易
-- 股东户数
-- 分红送转
-- 分钟级资金流（个股/行业/概念）+ 120日资金流
-- 研报列表（个股/行业） + PDF下载
+- 资金流（市场日K/个股日级明细/行业概念排行备胎）
+- 前复权 K 线含换手率字段（f61，筹码分布推演输入）
 - 个股新闻 + 全球资讯
 - 当前已接入的打板池四类：涨停/炸板/跌停/昨涨停（push2ex，price ÷1000）
 - 人气榜 / 概念命中（emappdata）
@@ -248,7 +248,7 @@ Sub-agent 上下文干净，适合多股 / 多维度并行分析与第二意见�
 
 ### 打板情绪域 (limit-up sentiment)
 
-涨停池/炸板池/跌停池/昨涨停表现、涨停原因揭秘、板型（一字/换手/T字）、封板强度、连板高度和梯队、炸板率、晋级率、赚钱效应。
+涨停池/炸板池/跌停池/昨涨停表现、封板强度、连板高度、炸板率、晋级率、赚钱效应。（涨停原因题材/板型/梯队分布无免费公开源，未覆盖）
 
 ### 资金域 (capital flow)
 
@@ -256,7 +256,7 @@ Sub-agent 上下文干净，适合多股 / 多维度并行分析与第二意见�
 
 ### 事件域 (events and disclosures)
 
-公告、新闻、研报、评级、回购、业绩预告。
+公告、新闻、回购、业绩预告。
 
 ### 板块域 (sector and theme)
 
@@ -264,7 +264,7 @@ Sub-agent 上下文干净，适合多股 / 多维度并行分析与第二意见�
 
 ### 财务域 (financials and valuation)
 
-PE、PB、ROE、毛利率、资产负债、现金流、股东户数、分红送转。
+PE、PB、ROE、毛利率、资产负债、现金流。（股东户数/分红送转/EPS 一致预期未覆盖）
 
 ### ETF期权域 (options)
 
@@ -304,7 +304,7 @@ PE、PB、ROE、毛利率、资产负债、现金流、股东户数、分红送�
 ### 报告落盘 (persistence)
 
 对于生成的深度分析、短线筛选或盘后复盘报告，应默认将其保存为本地 Markdown 文件：
-1. 目录：保存到当前工作区相对目录 `./.analysis/` 下。如果该目录不存在，先创建它。
+1. 目录：保存到当前工作区相对目录 `./.analysis/` 下。如果该目录不存在，先创建它。所有目录路径（输出/验证/缓存）集中定义在 `scripts/lib/env_config.py`，可用 `SRW_` 前缀环境变量覆盖，禁止在别处硬编码。
 2. 文件名：使用 `YYYY-MM-DD-主题.md` 的格式（例如：`2026-06-26-A股复盘.md` 或 `2026-06-26-宁德时代分析.md`）。
 3. 如果用户明确只要快速问答，则跳过落盘。
 
@@ -333,11 +333,13 @@ python3 scripts/stock_replay_cli.py render-replay --input .analysis/2026-06-29-A
 
 稳定支持 (stable support)：
 
-- A 股个股、指数、ETF、LOF、可转债的实时行情与历史走势
-- 涨停/炸板/跌停/昨涨停四池、连板梯队、封板资金、涨停原因揭秘
-- 强势股池、成交额/换手率/市值/PE/PB 榜
+- A 股个股、指数、ETF、LOF、可转债的实时行情与历史走势（日/周/月线，无分钟线；`quote-history`/`stock-diagnose`/`chip-distribution`/`distribution-days` 支持 `as_of` 历史截断防未来函数）
+- 涨停/炸板/跌停/昨涨停四池、连板数、封板资金、炸板次数（无涨停原因/板型字段）
+- IBD 派发日计数与 classification 分级（`distribution-days`，本地计算，规则见 `references/market-regime-playbook.md`）
+- 涨跌幅/换手率/成交额/成交量榜
 - 行业/概念板块排行与个股归属（个股归属走东财 slist）
-- 市场资金流总览、公告（巨潮 cninfo orgId动态映射）、龙虎榜、大宗交易、融资融券、公开研报、新闻快讯、财务估值
+- 市场资金流总览、公告（巨潮 cninfo orgId动态映射+双备胎）、龙虎榜、大宗交易、融资融券、新闻快讯、财务估值
+- 限售解禁、股东增减持（东财 datacenter，「返回数据为空」按确实无数据处理）
 - ETF期权合约清单/T型报价/希腊字母+IV（新浪源，交易所预算）
 - 互动易投资者问答（巨潮 irm）
 - 基础财务扩展字段：`market_cap`、`pe`、`pb`、`revenue`、`net_profit`、`roe`、`gross_margin`、`asset_liability_ratio`、`net_margin`、`book_value_per_share`、`cashflow_summary`
@@ -345,8 +347,10 @@ python3 scripts/stock_replay_cli.py render-replay --input .analysis/2026-06-29-A
 
 Best-effort (less stable / public-web dependent)：
 
-- 个股/行业/概念资金流、筹码分布、股东户数、分钟级流向、研报与新闻字段完整性
-- 个股资金流优先走东方财富 push2his 明细接口（price ÷1000），失败时回退到东财排行快照 → akshare → 新浪日度备胎（独立风控面）
+- 个股/行业/概念资金流、新闻字段完整性
+- 筹码分布（`chip-distribution`）：东财无公开 CYQ 接口，为本地推演（前复权K线+换手率衰减模型），结果与同花顺/东财官方筹码存在口径差异，只能作相对参考；硬约束自检失败时降级 warning
+- 北向资金（`northbound`）：同花顺源仅沪股通 hgt 可信，深股通 sgt 2024-08 后断供返回 None；本地 CSV 缓存历史
+- 个股资金流优先走东方财富 push2his 明细接口（日级 klt=101，最多 20 条，金额单位元），失败时回退到东财排行快照 → akshare → 新浪日度备胎（独立风控面）
 - 市场/行业/概念资金流 akshare 失败时直连东财 push2his/push2delay（走 `em_get` 限流重试，与 akshare 底层不同链路）
 - 融资融券 akshare 失败时回退到沪深交易所官方备胎（上交所 queryMargin.do + 深交所 1837_xxpl xlsx），当日未发布自动回退最近可用交易日
 - 依赖公开网页结构的字段
@@ -358,6 +362,7 @@ Best-effort (less stable / public-web dependent)：
 - 需要登录或付费授权的数据
 - 保证收益、确定买点、确定涨停预测
 - ETF期权 BSM 模型计算（新浪源交易所已算好希腊字母）
+- 研报列表/PDF、EPS 一致预期、股东户数、分红送转、分钟级K线与分钟级资金流（均无已实现公开源）
 
 ## 仓库内参考
 
@@ -365,6 +370,8 @@ Best-effort (less stable / public-web dependent)：
 - `references/query-contracts.md`：各能力的查询约束与稳定性边界
 - `references/source-playbook.md`：按数据域和任务选源（含数据源优先级、打板/ETF期权/舆情互动、已知坑表、防封机制）
 - `references/screening-playbook.md`：短线筛选框架
+- `references/market-regime-playbook.md`：IBD 派发日分级 + FTD 情绪周期 A 股映射（仓位管理决策矩阵）
+- `references/decision-feedback-playbook.md`：复盘四分类 + 决策绩效闭环（方向正确率口径/评级单调性/最小样本晋升）
 - `references/replay-template.md`：复盘输出模板
 - `references/subagent-playbook.md`：sub-agent 并行编排与复查校对手册
 - `references/validation-playbook.md`：平台无关的验证清单

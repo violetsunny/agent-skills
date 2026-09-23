@@ -27,7 +27,19 @@ def bond(action: str = "realtime", symbol: str | None = None, limit: int = 20) -
             rows = _records(ak.bond_zh_hs_cov_spot())
             if symbol:
                 code = clean_symbol(symbol)
-                rows = [row for row in rows if code in str(row)]
+                # 全行子串匹配会让 6 位代码误命中价格/成交额/名称字段，
+                # 改为代码列等值匹配（同 events._filter_symbol 模式）。
+                matched = [
+                    row
+                    for row in rows
+                    if code in (str(row.get("代码") or ""), str(row.get("code") or ""))
+                ]
+                if not matched and rows:
+                    warnings.append(
+                        f"可转债现货 {len(rows)} 行中无「代码/code」列等于 {code} 的行，"
+                        "可能列名已变更，已返回空列表。"
+                    )
+                rows = matched
             items = rows[:limit]
             source_chain.append(source("akshare_bond_spot", True))
         else:

@@ -30,6 +30,7 @@ def irm_qa(symbol: str, limit: int = 20) -> dict:
             headers={"User-Agent": "Mozilla/5.0"},
             timeout=10,
         )
+        response.raise_for_status()
         candidates = response.json().get("data") or []
         if not candidates:
             warnings.append("互动易公开源返回空列表，已保留结构化空样本。")
@@ -57,6 +58,7 @@ def irm_qa(symbol: str, limit: int = 20) -> dict:
             headers={"User-Agent": "Mozilla/5.0"},
             timeout=10,
         )
+        detail_response.raise_for_status()
         rows = detail_response.json().get("rows") or []
         items = [
             {

@@ -9,6 +9,7 @@ from .common import (
     clean_symbol,
     full_symbol,
     guess_name,
+    normalize_date,
     source,
     success,
     tencent_code,
@@ -64,7 +65,10 @@ def _parse_tencent_quote(text: str, symbol: str) -> dict:
         "prev_close": prev_close,
         "open": _safe_float(parts[5] if len(parts) > 5 else None),
         "volume": volume,
-        "turnover": _safe_float(parts[37] if len(parts) > 37 else None),
+        # parts[37]=成交额(万元)，parts[38]=换手率(%)。旧版误把 parts[37] 命名为 turnover。
+        "amount": _safe_float(parts[37] if len(parts) > 37 else None),
+        "amount_unit": "万元",
+        "turnover_rate": _safe_float(parts[38] if len(parts) > 38 else None),
         "change": _safe_float(parts[31] if len(parts) > 31 else None),
         "change_percent": _safe_float(parts[32] if len(parts) > 32 else None),
         "high": _safe_float(parts[33] if len(parts) > 33 else None),
@@ -108,7 +112,9 @@ def quote_realtime(symbol: str) -> dict:
                 "prev_close": None,
                 "open": None,
                 "volume": None,
-                "turnover": None,
+                "amount": None,
+                "amount_unit": "万元",
+                "turnover_rate": None,
                 "change": None,
                 "change_percent": None,
                 "high": None,
@@ -126,6 +132,7 @@ def quote_history(
     period: str = "day",
     adjust: str = "qfq",
     limit: int = 60,
+    as_of: str | None = None,
 ) -> dict:
     warnings: list[str] = []
     source_chain: list[dict] = []
@@ -156,6 +163,27 @@ def quote_history(
                     "volume": _safe_int(item[5]),
                 }
             )
+        # is not None 而非 truthy：空串 as_of 也要走非法值 warning，
+        # 与 chip.py/market.py 的硬校验口径一致（此处为软校验分层设计）。
+        if as_of is not None:
+            as_of_iso = normalize_date(as_of)
+            if not as_of_iso:
+                warnings.append(
+                    f"as_of={as_of!r} 不是合法日期（需 YYYY-MM-DD 或 YYYYMMDD），"
+                    "已忽略截断——返回的是未截断数据，历史复盘时不得直接使用。"
+                )
+            if as_of_iso:
+                before = len(candles)
+                candles = [
+                    candle
+                    for candle in candles
+                    if str(candle.get("date") or "") <= as_of_iso
+                ]
+                if len(candles) < before:
+                    warnings.append(
+                        f"已按 as_of={as_of_iso} 截断 {before - len(candles)} 根后续K线"
+                        "（未来函数防护：历史复盘不得使用该日之后的数据）。"
+                    )
         source_chain.append(source("tencent_kline", True))
         return success(
             "quote_history",
@@ -164,6 +192,7 @@ def quote_history(
                 "full_symbol": full_symbol(symbol),
                 "period": period,
                 "adjust": adjust,
+                "as_of": as_of,
                 "candles": candles,
                 "latest_snapshot": candles[-1] if candles else None,
             },
@@ -180,6 +209,7 @@ def quote_history(
                 "full_symbol": full_symbol(symbol),
                 "period": period,
                 "adjust": adjust,
+                "as_of": as_of,
                 "candles": [],
                 "latest_snapshot": None,
             },

@@ -5,7 +5,7 @@ import math
 import os
 import random
 import time
-from datetime import datetime, timezone
+from datetime import date, datetime, timezone
 
 # akshare 内部用 tqdm 输出进度条到 stderr，调用方 2>&1 合并时会污染 CLI JSON 输出。
 os.environ.setdefault("TQDM_DISABLE", "1")
@@ -272,23 +272,92 @@ def format_hhmmss(value: object) -> str | None:
     return f"{text[0:2]}:{text[2:4]}:{text[4:6]}"
 
 
+def normalize_date(value: str | None) -> str | None:
+    """把 YYYYMMDD / YYYY-MM-DD 归一为 YYYY-MM-DD；非法输入返回 None。"""
+    if not value:
+        return None
+    text = str(value).replace("-", "")
+    if len(text) != 8 or not text.isdigit():
+        return None
+    try:
+        return date(int(text[:4]), int(text[4:6]), int(text[6:8])).isoformat()
+    except ValueError:
+        return None
+
+
+def is_historical_date(trade_date: str | None) -> bool:
+    normalized = normalize_date(trade_date)
+    if not normalized:
+        return False
+    return date.fromisoformat(normalized) < date.today()
+
+
+def snapshot_notice(trade_date: str | None) -> str:
+    return (
+        f"未来函数警示：{normalize_date(trade_date)} 是历史日期，但实时/快照类接口"
+        "（实时行情、资金流、热榜、涨停池等）返回的是当前数据，无法回溯截断，"
+        "不得当作该历史日的事实使用。"
+    )
+
+
+def collect_missing(data: dict, required_paths: list[str]) -> list[str]:
+    """按点分路径检查 data 中缺失/为空的关键字段，返回缺失路径列表。
+    用于报告顶部显式告警，禁止静默省略数据缺口。"""
+    missing: list[str] = []
+    for path in required_paths:
+        node: object = data
+        for key in path.split("."):
+            if not isinstance(node, dict):
+                node = None
+                break
+            node = node.get(key)
+        if node is None or node == [] or node == {}:
+            missing.append(path)
+    return missing
+
+
+def _em_throttle() -> None:
+    global _EM_LAST_CALL
+    wait = EM_MIN_INTERVAL - (time.time() - _EM_LAST_CALL)
+    if wait > 0:
+        time.sleep(wait + random.uniform(0.1, 0.4))
+    # 请求发起前就打点：网络异常时同样消耗了风控配额，
+    # 若在成功后才打点，连续失败期间会退化成不限流连打。
+    _EM_LAST_CALL = time.time()
+
+
 def em_get(
     url: str,
     params: dict | None = None,
     timeout: int = 15,
     referer: str = "https://quote.eastmoney.com/",
 ) -> requests.Response:
-    global _EM_LAST_CALL
-    wait = EM_MIN_INTERVAL - (time.time() - _EM_LAST_CALL)
-    if wait > 0:
-        time.sleep(wait + random.uniform(0.1, 0.4))
+    _em_throttle()
     response = EM_SESSION.get(
         url,
         params=params,
         timeout=timeout,
         headers={"Referer": referer},
     )
-    _EM_LAST_CALL = time.time()
+    response.raise_for_status()
+    return response
+
+
+def em_post(
+    url: str,
+    json_body: dict | None = None,
+    timeout: int = 15,
+    referer: str = "https://quote.eastmoney.com/",
+) -> requests.Response:
+    """东财 POST 请求（emappdata 等人气榜端点），与 em_get 共享同一节流预算。
+    ponytail: 仅覆盖 JSON body 场景；如需 form 表单再加 data 参数。"""
+    _em_throttle()
+    response = EM_SESSION.post(
+        url,
+        json=json_body,
+        timeout=timeout,
+        headers={"Referer": referer},
+    )
     response.raise_for_status()
     return response
 

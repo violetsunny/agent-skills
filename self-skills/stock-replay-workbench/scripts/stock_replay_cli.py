@@ -5,20 +5,31 @@ import argparse
 import json
 from pathlib import Path
 
+from lib import env_config
 from lib.bond import bond
-from lib.common import emit, failure, success
+from lib.chip import chip_distribution
+from lib.common import (
+    collect_missing,
+    emit,
+    failure,
+    is_historical_date,
+    snapshot_notice,
+    success,
+)
 from lib.events import (
     announcement,
     block_trade,
     dragon_tiger,
+    holder_trades,
+    lockup_expiry,
     margin_trading,
     news,
     sentiment_heat,
 )
-from lib.flow import money_flow
+from lib.flow import money_flow, northbound
 from lib.fundamental import fundamental
 from lib.irm import irm_qa
-from lib.market import limit_pool, market_snapshot, rank
+from lib.market import distribution_days, limit_pool, market_snapshot, rank
 from lib.options import option_codes, option_greeks, option_tquote
 from lib.quote import quote_history, quote_realtime
 from lib.replay_builder import build_replay, classify_market_regime, limit_sentiment
@@ -26,10 +37,8 @@ from lib.sector import sector
 from render_replay_markdown import render_report
 
 
-DEFAULT_OUTPUT_DIR = Path(__file__).resolve().parents[1] / ".analysis"
-CORE_ACCEPTANCE_PATH = (
-    Path(__file__).resolve().parents[1] / "evals" / "core-acceptance-stocks.json"
-)
+DEFAULT_OUTPUT_DIR = env_config.OUTPUT_DIR
+CORE_ACCEPTANCE_PATH = env_config.CORE_ACCEPTANCE_JSON
 ANALYSIS_LAYERS = ["facts", "signals", "judgment", "risks"]
 HIGH_VOLATILITY_KEYWORDS = (
     "芯片",
@@ -55,8 +64,20 @@ def _resolve_output_path(output_path: str) -> Path:
 
 
 def _render_replay(input_path: str, output_path: str | None) -> dict:
-    payload = json.loads(Path(input_path).read_text(encoding="utf-8"))
-    markdown = render_report(payload)
+    # 用户输入错误（文件不存在/坏 JSON/结构不符）走 failure envelope，
+    # 这是全 CLI 唯一直接读用户文件的入口，不允许裸抛 traceback。
+    try:
+        payload = json.loads(Path(input_path).read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as exc:
+        return failure("render_replay", "invalid_input", f"无法读取 replay JSON: {exc}")
+    if not isinstance(payload, dict):
+        return failure("render_replay", "invalid_input", "replay JSON 顶层必须是对象")
+    try:
+        markdown = render_report(payload)
+    except Exception as exc:
+        return failure(
+            "render_replay", "invalid_input", f"replay JSON 结构不合法: {exc}"
+        )
     if output_path:
         output = _resolve_output_path(output_path)
         output.parent.mkdir(parents=True, exist_ok=True)
@@ -568,12 +589,16 @@ def _build_buy_plan(
     }
 
 
-def stock_diagnose(symbol: str, limit: int = 20) -> dict:
+def stock_diagnose(symbol: str, limit: int = 20, as_of: str | None = None) -> dict:
     warnings: list[str] = []
     source_chain: list[dict] = []
 
+    historical_replay = is_historical_date(as_of)
+    if historical_replay:
+        warnings.append(snapshot_notice(as_of))
+
     realtime_payload = quote_realtime(symbol)
-    history_payload = quote_history(symbol, "day", "qfq", max(limit, 20))
+    history_payload = quote_history(symbol, "day", "qfq", max(limit, 20), as_of=as_of)
     flow_payload = money_flow("stock", symbol, limit)
     sector_payload = sector("stock-membership", symbol, limit)
     fundamental_payload = fundamental(symbol)
@@ -622,6 +647,7 @@ def stock_diagnose(symbol: str, limit: int = 20) -> dict:
             realtime_data.get("symbol") or fundamental_data.get("symbol") or symbol
         ),
         "name": realtime_data.get("name") or fundamental_data.get("name"),
+        "as_of": as_of,
         "realtime": realtime_data,
         "history": history_data,
         "support_resistance": {
@@ -644,6 +670,23 @@ def stock_diagnose(symbol: str, limit: int = 20) -> dict:
         result_data["symbol"], result_data, source_chain, warnings
     )
 
+    missing = collect_missing(
+        result_data,
+        [
+            "realtime.latest_price",
+            "history.candles",
+            "money_flow.items",
+            "fundamental.pe",
+            "sector_membership",
+            "news_titles",
+        ],
+    )
+    result_data["missing_data"] = missing
+    if missing:
+        warnings.append(
+            "关键数据缺失（报告须显式披露，不得静默省略）: " + ", ".join(missing)
+        )
+
     return success(
         "stock_diagnose",
         result_data,
@@ -664,12 +707,20 @@ def build_parser() -> argparse.ArgumentParser:
     history.add_argument("--period", default="day", choices=["day", "week", "month"])
     history.add_argument("--adjust", default="qfq", choices=["qfq", "hfq", "none"])
     history.add_argument("--limit", default=60, type=int)
+    history.add_argument(
+        "--as-of",
+        help="未来函数防护：截断该日期(YYYY-MM-DD/YYYYMMDD)之后的K线，历史复盘必传",
+    )
 
     diagnose = subparsers.add_parser(
         "stock-diagnose", help="Aggregate quote, flow, sector, fundamental, and news"
     )
     diagnose.add_argument("--symbol", required=True)
     diagnose.add_argument("--limit", default=20, type=int)
+    diagnose.add_argument(
+        "--as-of",
+        help="历史日期(YYYY-MM-DD/YYYYMMDD)。K线会截断；实时类接口无法回溯，会输出快照警示",
+    )
 
     subparsers.add_parser("market-snapshot", help="Fetch market snapshot")
 
@@ -745,6 +796,58 @@ def build_parser() -> argparse.ArgumentParser:
         "sentiment-heat", help="Fetch sentiment heat summary"
     )
     sentiment_heat_parser.add_argument("--limit", default=20, type=int)
+    sentiment_heat_parser.add_argument(
+        "--symbol", help="可选：附加该股的东财热门概念命中"
+    )
+    sentiment_heat_parser.add_argument(
+        "--period", default="hour", choices=["hour", "day"], help="同花顺热榜周期"
+    )
+
+    lockup_parser = subparsers.add_parser(
+        "lockup-expiry", help="Fetch lockup expiry calendar (history + upcoming)"
+    )
+    lockup_parser.add_argument("--symbol", required=True)
+    lockup_parser.add_argument("--trade-date", help="基准日，默认今天")
+    lockup_parser.add_argument("--forward-days", default=90, type=int)
+
+    holder_parser = subparsers.add_parser(
+        "holder-trades", help="Fetch shareholder increase/decrease holdings"
+    )
+    holder_parser.add_argument("--symbol")
+    holder_parser.add_argument("--direction", choices=["增持", "减持"])
+    holder_parser.add_argument("--start", help="公告日起始 YYYY-MM-DD")
+    holder_parser.add_argument("--end", help="公告日截止 YYYY-MM-DD")
+    holder_parser.add_argument("--limit", default=100, type=int)
+
+    chip_parser = subparsers.add_parser(
+        "chip-distribution",
+        help="Local chip distribution (triangular + turnover decay)",
+    )
+    chip_parser.add_argument("--symbol", required=True)
+    chip_parser.add_argument("--limit", default=250, type=int, help="K线窗口交易日数")
+    chip_parser.add_argument(
+        "--decay",
+        default=1.0,
+        type=float,
+        help="换手衰减系数，1.5~2.0 可对齐同花顺口径",
+    )
+    chip_parser.add_argument(
+        "--as-of", help="历史回放截止日 YYYY-MM-DD，K线截断到该日（防未来函数）"
+    )
+
+    subparsers.add_parser(
+        "northbound",
+        help="Fetch northbound (HSGT) realtime minute flow + local history",
+    )
+
+    dd_parser = subparsers.add_parser(
+        "distribution-days", help="IBD distribution day count + risk classification"
+    )
+    dd_parser.add_argument("--symbol", default="000001", help="指数代码，默认上证指数")
+    dd_parser.add_argument("--limit", default=120, type=int)
+    dd_parser.add_argument(
+        "--as-of", help="历史回放截止日 YYYY-MM-DD，K线截断到该日（防未来函数）"
+    )
 
     irm_parser = subparsers.add_parser("irm-qa", help="Fetch investor relation Q&A")
     irm_parser.add_argument("--symbol", required=True)
@@ -803,9 +906,11 @@ def dispatch(args: argparse.Namespace) -> dict:
     if args.subcommand == "quote-realtime":
         return quote_realtime(args.symbol)
     if args.subcommand == "quote-history":
-        return quote_history(args.symbol, args.period, args.adjust, args.limit)
+        return quote_history(
+            args.symbol, args.period, args.adjust, args.limit, as_of=args.as_of
+        )
     if args.subcommand == "stock-diagnose":
-        return stock_diagnose(args.symbol, args.limit)
+        return stock_diagnose(args.symbol, args.limit, as_of=args.as_of)
     if args.subcommand == "market-snapshot":
         return market_snapshot()
     if args.subcommand == "rank":
@@ -831,7 +936,19 @@ def dispatch(args: argparse.Namespace) -> dict:
     if args.subcommand == "margin-trading":
         return margin_trading(args.symbol, args.trade_date, args.limit)
     if args.subcommand == "sentiment-heat":
-        return sentiment_heat(args.limit)
+        return sentiment_heat(args.limit, args.symbol, args.period)
+    if args.subcommand == "lockup-expiry":
+        return lockup_expiry(args.symbol, args.trade_date, args.forward_days)
+    if args.subcommand == "holder-trades":
+        return holder_trades(
+            args.symbol, args.direction, args.start, args.end, args.limit
+        )
+    if args.subcommand == "chip-distribution":
+        return chip_distribution(args.symbol, args.limit, args.decay, as_of=args.as_of)
+    if args.subcommand == "northbound":
+        return northbound()
+    if args.subcommand == "distribution-days":
+        return distribution_days(args.symbol, args.limit, as_of=args.as_of)
     if args.subcommand == "irm-qa":
         return irm_qa(args.symbol, args.limit)
     if args.subcommand == "option-codes":
@@ -847,7 +964,7 @@ def dispatch(args: argparse.Namespace) -> dict:
     if args.subcommand == "build-replay":
         return _build_replay(args.trade_date, args.limit, args.output)
     return failure(
-        "unknown", "UnknownCommand", f"Unsupported subcommand: {args.subcommand}"
+        "unknown", "unknown_command", f"Unsupported subcommand: {args.subcommand}"
     )
 
 
