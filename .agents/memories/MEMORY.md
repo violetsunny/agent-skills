@@ -9,6 +9,7 @@
 - adhd 指令只做 i-have-adhd 的纯内化，禁止再并入 handoff/交接落盘能力；用户实测压缩时不会触发总结，判定无用已删除。
 - 验证产物（测试 deck/截图/测量报告）落盘交付项目的 test-run/<批次>/（如 doc-web/test-run/、doc-ppt/test-run/），不放 skill 仓库、不放 /tmp；人工确认前禁止清理。/tmp 只放过程性临时文件。
 - 2026-09-21 裁决：5 个演示类 skill 各自自包含——禁跨工作流区别说明与能力委派指针，依赖 skill 不指向上层 workflow 名，所需外部规则一律内化。
+- 市场端重发布 / stock-replay-workbench 遗留改动 / key-skills-git 处置 三项均由用户人工处理，agent 不得擅自处理（2026-09-23 裁决）。
 
 ## 项目背景
 
