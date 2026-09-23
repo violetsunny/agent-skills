@@ -85,3 +85,13 @@
 3. 图表 SVG/HTML 任一不可用或渲染异常（含 `validate-svg.sh` 校验失败，脚本归属 `robot-aiot-arch-diagram/scripts/`）→ 重新生成或修复
 4. 图表主色与已锁定的全局主色冲突 → 以已锁定的全局主色为准调整（无论其来自既有品牌色还是首页架构图）
 5. G2 未过，不允许进入 Phase 3.5/4
+
+## 交接（handoff）
+
+Phase 3 结束、进入 Phase 3.5 前执行交接：
+
+- 本环节产物：图表产物（`<输出目录>/flow/<chart-name>.svg + .html`，每图两文件配对，过 `validate-svg.sh`）
+- G2 确认动作：用户逐张确认「图表无误」后，主线程把母稿头部「确认状态」字段更新为「G2 已通过（日期）」
+- 下一环节输入：flow/ 图表产物路径作 Phase 3.5 母稿回写目标（填入图表需求总表「产物路径」列）
+- 交接校验：`scripts/check_phase_handoff.py <输出目录> --phase 3 --write` → 校验 flow/ SVG↔HTML 配对 + G2 已通过，落盘 `_gen/handoff-phase3.md`
+- FAIL 阻塞：flow/ 缺失、SVG 无对应 HTML 或 G2 未通过，不得进入 Phase 3.5

@@ -27,9 +27,10 @@ doc-web/
 ├── pages/                      — 多页形态逐页 HTML
 │   ├── p01-<slug>.html         — 每页独立 HTML，带"上一页/下一页"跳转控件
 │   └── ...                     — 末页可返回 INDEX
-├── _gen/                       — 委派前置检查存档
+├── _gen/                       — 委派前置检查存档 + 环节交接记录
 │   ├── precheck-robot-aiot-arch-diagram.txt
-│   └── precheck-robot-aiot-interactive-html-author.txt
+│   ├── precheck-robot-aiot-interactive-html-author.txt
+│   └── handoff-phaseN.md       — 每环节交接记录（check_phase_handoff.py --write 落盘，N∈1/2/3/3.5/4）
 └── test-run/                   — 验证批次产物；人工确认前禁止清理
     └── <批次>/                 — 验证 deck、shoot_anim.py 截图、验证报告、lint/check 输出
 ```
@@ -40,6 +41,7 @@ doc-web/
 |---|---|---|
 | 输出 | `doc-web/`（树见上；用户指定目录时整体替换） | 全部交付物 |
 | 生成 | `doc-web/_gen/precheck-<skill名>.txt` | Phase 3 委派前跑被委派 skill 的 precheck_deps.sh 存档；exit≠0 中止；批次无记录视同未执行前置检查 |
+| 生成 | `doc-web/_gen/handoff-phaseN.md` | 每环节结束 check_phase_handoff.py --write 落盘的交接记录（N∈1/2/3/3.5/4）；FAIL 阻塞不得进入下一环节 |
 | 验证 | `doc-web/test-run/<批次>/` | 多页批次终验产物（check_deck_batch/check_notes_hidden/shoot_anim 输出与截图）；不删除 |
 | 读取 | 用户指定源文件（MD 为主；存量 .pptx 先 extract_pptx.py 提取） | Phase 1 内容源 |
 | 读取 | r4-anim-p01-p10 风格真源批次（位于该批次交付项目 `doc-web/test-run/` 下） | 存在时可作 Phase 4 风格参照；不存在时以 phase4-style-lock.md 为准 |

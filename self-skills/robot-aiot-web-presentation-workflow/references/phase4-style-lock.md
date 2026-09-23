@@ -88,3 +88,12 @@ footer.bar      64px 固定底：左 .tag（页码+章名+场景），右 prev/n
 3. `scripts/shoot_anim.py <pages目录> <输出目录>`：virtual-time-budget 100 与 6000 双时间点截图，逐页字节须有差异；母稿登记的静态页以 `--static-pages` 传入 `check_deck_batch.py` 与 `shoot_anim.py` 豁免动画触发检查，字节无差异属合法；t6000 留作目检底图
 4. `scripts/check_notes_hidden.py <pages目录>`：iframe 加载后全量 `getComputedStyle(n).display==='none'` 且零泄漏
 5. 终态截图（t6000）逐页目检：内容全量可见、导航/禁用态正确、无话术泄漏
+
+## 8. 交接（handoff）
+
+Phase 4 是终态环节，交接对象是用户（最终交付）：
+
+- 本环节产物：最终交互 HTML（单文件 deck `<输出目录>/<project>-presentation.html`，或多页形态 `INDEX.html + pages/`）
+- 下一环节输入：无（终态交付）；交付口径见 SKILL.md「交付口径」节
+- 交接校验：`scripts/check_phase_handoff.py <输出目录> --phase 4 --write` → 校验最终 HTML 存在，落盘 `_gen/handoff-phase4.md`
+- 质量验收另跑「7. 验收」全链（lint_deck_html / check_deck_batch / check_notes_hidden / shoot_anim）；handoff 只校验交付产物存在，不替代质量验收

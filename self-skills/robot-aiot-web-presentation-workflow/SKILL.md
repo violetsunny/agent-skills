@@ -79,7 +79,7 @@ Phase 3.5: 图表回写   → 图表产物路径与确认状态回写母稿对�
 Phase 4: 交互HTML     → 委派 robot-aiot-interactive-html-author 逐页编写，合并单文件（默认）/ 产出 INDEX+pages（多页形态）
 ```
 
-每个阶段产出是下一阶段的输入，逐级收敛；G1/G2 是阻塞门，未确认不得推进。
+每个阶段产出是下一阶段的输入，逐级收敛；G1/G2 是阻塞门，未确认不得推进。每个环节结束后除确认门外，还须跑 `scripts/check_phase_handoff.py <输出目录> --phase N --write` 做交接（handoff）校验并落盘 `_gen/handoff-phaseN.md`：校验本环节产物存在、确认门状态已记录、下一环节输入齐备；FAIL 阻塞，不得进入下一环节。
 
 建议执行方式：每个阶段先由 sub agent 在干净上下文中完成本阶段分析/起草/审查，再回到主线程做统一落盘和阶段阻塞检查，避免 Phase 1-4 信息互相污染。
 
@@ -101,6 +101,8 @@ Phase 4: 交互HTML     → 委派 robot-aiot-interactive-html-author 逐页编�
 
 阻塞条件：源文件未指定、内容分析未完成不得进入 Phase 2。
 
+交接（handoff）：本环节结束跑 `scripts/check_phase_handoff.py <输出目录> --phase 1 --write`，校验分析报告五章节齐备并落盘 `_gen/handoff-phase1.md`；FAIL 阻塞，不得进入 Phase 2。
+
 ---
 
 ## Phase 2: Web演示母稿
@@ -119,6 +121,8 @@ Phase 4: 交互HTML     → 委派 robot-aiot-interactive-html-author 逐页编�
 产物：`doc-web/<project>_演示母稿.md`，以 `templates/deck-manuscript.md` 为骨架填充（含图表需求总表、素材图映射表、主题节奏表、能量段位表），填充后必须跑 `scripts/lint_manuscript.py` 且 `[MS-FAIL]` 清零。
 
 **【确认门 G1，阻塞】**：母稿 lint 清零后向用户出示完整母稿，用户确认"不需要调整"后才能进入 Phase 3；用户提出修改 → 修订母稿重跑 lint 重新送审；G1 未过就绘图按阻塞项处理。G1 确认后母稿冻结为图表与页面的唯一内容源，后续内容变更须修订母稿并重新过 G1。G1 通过后先产两页 showcase 样张供用户确认风格基调（细化见 `references/phase2-pagination.md`"两页 showcase 确认门"），确认通过后再进 Phase 3 图表阶段。
+
+交接（handoff）：G1 通过、母稿冻结后，主线程把母稿头部「确认状态」字段更新为「G1 已通过（日期）」，再跑 `scripts/check_phase_handoff.py <输出目录> --phase 2 --write`，校验母稿存在 + G1 已通过 + 图表需求总表存在，落盘 `_gen/handoff-phase2.md`；FAIL 阻塞，不得进入 Phase 3。
 
 ---
 
@@ -142,6 +146,8 @@ Phase 4: 交互HTML     → 委派 robot-aiot-interactive-html-author 逐页编�
 
 阻塞条件：母稿中需要的图表未全部生成或未过 G2，不得进入 Phase 3.5/4。
 
+交接（handoff）：G2 通过后，主线程把母稿头部「确认状态」字段更新为「G2 已通过（日期）」，再跑 `scripts/check_phase_handoff.py <输出目录> --phase 3 --write`，校验 flow/ SVG↔HTML 配对 + G2 已通过，落盘 `_gen/handoff-phase3.md`；FAIL 阻塞，不得进入 Phase 3.5。
+
 ---
 
 ## Phase 3.5: 图表回写母稿
@@ -152,6 +158,8 @@ Phase 4: 交互HTML     → 委派 robot-aiot-interactive-html-author 逐页编�
 4. 回写完成后母稿即"整体准备好"的完整内容源，Phase 4 只消费该母稿
 
 阻塞条件：回写未完成不得进入 Phase 4。
+
+交接（handoff）：回写完成后跑 `scripts/check_phase_handoff.py <输出目录> --phase 3.5 --write`，校验图表需求总表回写完整（类型非「无」行的产物路径指向存在的 flow 文件、确认状态列已填），落盘 `_gen/handoff-phase3.5.md`；FAIL 阻塞，不得进入 Phase 4。
 
 ---
 
@@ -171,6 +179,8 @@ Phase 4: 交互HTML     → 委派 robot-aiot-interactive-html-author 逐页编�
    - 多页批次：源页（旧源拷贝或新制）入批前必须先单页过 `scripts/lint_deck_html.py`；批次终验一次调用 `scripts/check_deck_batch.py`（静态硬约束 + lint 全量检查含 SVG 线/箭头契约 #8 + 导航链闭合：中间页 prev/next 顺序指向相邻页、首末页禁用）+ `scripts/check_notes_hidden.py`（话术容器隐藏断言）+ `scripts/shoot_anim.py`（t100/t6000 双时间点动画触发截图）+ 逐图目检全过；母稿登记的静态页以 `--static-pages` 传入 `check_deck_batch.py` 与 `shoot_anim.py` 豁免动画触发检查；验证产物落盘 `test-run/<批次>/` 不删除
 
 阻塞条件：所有页面生成完毕且通过编写 skill 的交付前审查才算完成。
+
+交接（handoff）：交付前跑 `scripts/check_phase_handoff.py <输出目录> --phase 4 --write`，校验最终 HTML 存在（单文件 deck 或 INDEX+pages），落盘 `_gen/handoff-phase4.md`；质量验收另跑 lint_deck_html/check_deck_batch（见上验收自检），handoff 只校验交付产物存在。
 
 ---
 
@@ -199,7 +209,9 @@ Phase 4: 交互HTML     → 委派 robot-aiot-interactive-html-author 逐页编�
 3. 需要图表生成调用与 G2 确认门规则时，读 `references/phase3-chart-generation.md`
 4. Phase 4 编写页面 shell/动画或批次验收时，读 `references/phase4-style-lock.md`（deck 级风格基线，优先于编写契约的 deck 级取舍）
 5. 存量 `.pptx` 作内容源时，跑 `scripts/extract_pptx.py`；Phase 4 交付 HTML 验收跑 `scripts/lint_deck_html.py`
-6. 需要目录结构与路径登记（输出/生成/验证/读取/临时）时，读 `env-config.md`（唯一真源）
+6. 每个环节结束做交接（handoff）校验、落盘 `_gen/handoff-phaseN.md` 时，跑 `scripts/check_phase_handoff.py --phase N`
+7. 需要交叉校验清单、真源重生链、handoff 治理、迭代与协作链路规则时，读 `references/governance-and-iteration.md`
+8. 需要目录结构与路径登记（输出/生成/验证/读取/临时）时，读 `env-config.md`（唯一真源）
 
 ### 外部委派
 1. 需要绘制架构图/流程图（Phase 3）时，加载 `robot-aiot-arch-diagram`
