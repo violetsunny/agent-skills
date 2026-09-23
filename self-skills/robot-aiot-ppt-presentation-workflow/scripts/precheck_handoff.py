@@ -9,7 +9,7 @@
 
 机判项:
   1. 零宽字符扫描（.md/.html/.xml/.css/.js/.svg/.txt 中的不可见字符）  → 校验第 3 条
-  2. Markdown 表格列数与分隔行一致                                      → 校验第 4 条
+  2. Markdown 表格列数与分隔行一致；表格块前后有空行                → 校验第 4 条
   3. flow/ 图表 XML ↔ HTML 文件配对                                     → 校验第 5 条
   4. pages/*.html 页数与母稿 `## Page N` 标记数对齐                     → 校验第 6/7 条
   5. assets/midea-logo.png 就位                                         → 校验第 9 条
@@ -92,6 +92,20 @@ def check_md_tables(workdir, findings):
                     i += 1
                 if len(block) < 2:
                     continue
+                if block[0][0] >= 2 and lines[block[0][0] - 2].strip():
+                    findings.append(
+                        (
+                            "FAIL",
+                            f"{path}:{block[0][0]}: 表格前无空行（GFM 不渲染，phase2 硬性规则 6）",
+                        )
+                    )
+                if i < len(lines) and lines[i].strip():
+                    findings.append(
+                        (
+                            "FAIL",
+                            f"{path}:{i + 1}: 表格后无空行（GFM 不渲染，phase2 硬性规则 6）",
+                        )
+                    )
                 sep = block[1][1].strip()
                 if "-" not in sep or not SEP_ROW_RE.match(sep):
                     findings.append(
