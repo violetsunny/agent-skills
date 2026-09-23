@@ -151,6 +151,7 @@ Phase 5: PPT生成      → 调用 ppt-master，读取逐页 HTML/MD 生成最�
 5. 首页架构图确定全局主色基调，后续页面保持配色统一但允许版式多样
 6. 允许在 Phase 3.5 和 Phase 4 做轻量 Material 3 规范化，但只能整理 token、字体层级、间距和容器语义，不能改图表结构和数据语义
 7. 数据统计图表（饼图/箱线图/热力图/网络拓扑等）与 Mermaid 源导入重绘（含 pie/mindmap/timeline 等扩展类型）按 `robot-aiot-draw-flowchart` 的数据图表与导入规则路由；需要可编辑 `.excalidraw` 三件套产物时走其导出规则
+8. 委派前置落盘：Phase 3 调用 `robot-aiot-draw-flowchart` 前跑其 `scripts/precheck_deps.sh`，输出存产出目录 `_gen/precheck-robot-aiot-draw-flowchart.txt`；exit≠0 中止；批次无记录视同未执行前置检查
 
 ---
 
