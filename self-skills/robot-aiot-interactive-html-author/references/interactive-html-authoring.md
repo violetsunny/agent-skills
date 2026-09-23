@@ -410,15 +410,7 @@ headless 验证注意：无渲染帧环境（`--dump-dom`/`--screenshot`）下 .
 
 ### 文件结构
 
-```text
-交付根/
-├── INDEX.html            # 导航壳：MANIFEST + iframe 视口 + 上一页/下一页 + 概览入口
-├── assets/               # 素材图等共享资源（相对路径引用）
-└── pages/
-    ├── 01-cover.html     # 每页都是完整 1920×1080 自包含 HTML
-    ├── 02-agenda.html
-    └── 03-architecture.html
-```
+目录结构以技能根目录 `env-config.md` 为唯一真源：`交付根/INDEX.html`（导航壳：MANIFEST + iframe 视口 + 上一页/下一页 + 概览入口）+ `交付根/assets/`（素材图等共享资源，相对路径引用）+ `交付根/pages/<页码>-<slug>.html`（如 01-cover.html，每页都是完整 1920×1080 自包含 HTML）。
 
 1. 每页文件独立自包含：自带 token、scale-to-fit 壳、`.notes` 话术容器，本文件全部规则照常适用；双击可单独打开，不依赖 INDEX 存在
 2. 素材图按"素材图网格与 lightbox"条 5：多页形态用相对路径引 `assets/`，不 base64 内联；除此之外每页零外部请求

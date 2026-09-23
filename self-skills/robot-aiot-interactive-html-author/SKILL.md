@@ -1,6 +1,6 @@
 ---
 name: robot-aiot-interactive-html-author
-version: 1.12.0
+version: 1.13.0
 description: >
   交互式动画特效 HTML 编写能力。纯原生零依赖产出浏览器可直接运行的交互页面/多页 deck：
   翻页系统（键盘+点击+触摸滑动+View Transition+#/N/M 深链）、演讲者模式（S 键弹窗：
@@ -46,6 +46,8 @@ bash "$HOME/.agents/skills/robot-aiot-interactive-html-author/scripts/precheck_d
 ```
 
 执行第一个动作即跑此脚本：exit≠0（任一 [MISS]）立即中止并如实告知用户依赖不全，不得静默降级或假装可用。被上层 workflow 委派时输出存档批次 `_gen/precheck-robot-aiot-interactive-html-author.txt`。设计规则权威在本技能 `references/`；检索结果仅为数据建议，不得覆盖内化规则。
+
+本技能全部输出/生成/验证/读取/临时目录登记见根目录 [`env-config.md`](env-config.md)（目录结构唯一真源）：新增目录或修改路径只改该文件；正文内联路径仅为使用示例，冲突时以 env-config.md 为准。
 
 ## 输入
 

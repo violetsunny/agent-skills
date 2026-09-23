@@ -14,7 +14,6 @@ SCRIPT_DIR=$(cd "$(dirname "$0")" && pwd)
 SNAP="$KB_DOCS/.skills-overview-mtimes.json"
 RECORDS="$WORK_DIR/m5_records.jsonl"
 IDMAP="$WORK_DIR/m5_idmap.jsonl"
-ZH_DIR="/tmp/zh"
 : > "$RECORDS"; : > "$IDMAP"
 rm -rf "$ZH_DIR"; mkdir -p "$ZH_DIR"
 [ -f "$SNAP" ] || SNAP=""

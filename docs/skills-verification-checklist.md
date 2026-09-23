@@ -1,11 +1,11 @@
 # 五演示 Skill 验证清单（多轮验证修复参考）
 
 适用对象：`self-skills/` 下五个 skill——
-A = `robot-aiot-draw-flowchart`（v6.0.0，静态图表，无动画/GIF）
+A = `robot-aiot-draw-flowchart`（v6.1.0，静态图表，无动画/GIF）
 B = `robot-aiot-arch-diagram`（保留动画/GIF 链）
 IHA = `robot-aiot-interactive-html-author`
-PPT = `robot-aiot-ppt-presentation-workflow`（v4.1.0）
-WEB = `robot-aiot-web-presentation-workflow`（v3.0.0）
+PPT = `robot-aiot-ppt-presentation-workflow`（v4.2.0）
+WEB = `robot-aiot-web-presentation-workflow`（v3.1.0）
 
 仓库根：`/Users/kangll13/aiot/java-code/self/gggggggood/agent-skills`（下文 `$R`）
 运行时镜像：`~/.agents/skills/<skill 名>/`
@@ -75,7 +75,12 @@ grep 五 skill 互引，仅允许：PPT→`robot-aiot-draw-flowchart`/`ppt-maste
 ③ 孤儿文件：每个 references 文件至少被 SKILL.md 或其他 references 导航引用（A doctor.md 挂 SKILL.md:123）。
 
 **G11 版本一致性**
-SKILL.md frontmatter version 与文内声明一致：A=6.0.0、B=2.4.0、IHA=1.12.0、PPT=4.1.0、WEB=3.0.0。功能删减升 major，修复升 patch。
+SKILL.md frontmatter version 与文内声明一致：A=6.1.0、B=2.5.0、IHA=1.13.0、PPT=4.2.0、WEB=3.1.0。功能删减升 major，修复升 patch。
+
+**G12 env-config 目录唯一真源**
+五 skill 根目录各有 `env-config.md`（输出/生成/验证/读取/临时五类目录登记表），且：
+① SKILL.md 头部有指向 env-config.md 的唯一真源声明；② 目录树结构定义只出现在 env-config.md（SKILL.md 与 references/ 不再维护目录树；PPT brand-assets.md 与 IHA interactive-html-authoring.md 的树已移除改指针）；③ 抽查内联路径（doc-ppt/、doc-web/、flow/、pages/、assets/、projects/、test-run/、_gen/、/tmp/*）与 env-config.md 登记一致，冲突即 FAIL；④ 新增目录或改路径的 diff 必须落在 env-config.md，散落其他文件的新目录定义判 FAIL。
+同约定适用于 `robot-aiot-self-skill-sync`（可执行真源 `scripts/config.sh`，env-config.md 为登记镜像，模块脚本不得硬编码路径，ZH_DIR 已收编 config.sh）、`robot-aiot-docs-sync`、`robot-aiot-adr-generator`（各自根目录 env-config.md）。
 
 ---
 
@@ -109,7 +114,7 @@ A/B 约 84 对同源 references 文件。合法差异白名单（diff 后逐 hun
 
 **D4 包完整性门禁**：`python3 scripts/verify-plugin-package.py` exit 0。
 **D5 自检门禁**：`python3 scripts/self_check.py assets/template.html` exit 0。
-**D6 SKILL.md 结构**：version 6.0.0；description 无 GIF 字样；tags 无 gif-motion；硬约束编号连续；`##` 章节完整；导航无死链；「GIF|动图」仅否定式语境。
+**D6 SKILL.md 结构**：version 6.1.0；description 无 GIF 字样；tags 无 gif-motion；硬约束编号连续；`##` 章节完整；导航无死链；「GIF|动图」仅否定式语境。
 **D7 样式值合规**：references 中 `shadow=1` 零命中（唯一例外 style-6 feDropShadow 登记）；arcSize ∈ {4,6,8}。白名单：draw.io XML 路径百分比语义的 `arcSize=15`（3 处既有豁免声明覆盖，与 SVG rx 允许集不同属性体系）。
 **D8 间距允许集**：{20,24,32,40,48}；80px 仅豁免登记处。
 **D9 Google Fonts 条件注入**：零外链基准段在 design-system §5「模板默认零外链」；联网发布限定+`&amp;` 转义；export.md 排障条目为「替换是预期行为不是错误」口径；dark-svg-techniques:267 为指针式。
@@ -155,7 +160,7 @@ A/B 约 84 对同源 references 文件。合法差异白名单（diff 后逐 hun
 ## 七、web-presentation-workflow 专项（WEB）
 
 **W1 六阶段链路**：反问五项（页数/对象/范围/场景/交付形态，无演讲时长——与 PPT 不串台）；G1/G2/回写/生成顺序一致。
-**W2 --static-pages 豁免三处登记**：SKILL.md:192、phase2-pagination.md:23、phase4-style-lock.md §7 验收清单；shoot_anim.py 与 check_deck_batch.py 参数实现。
+**W2 --static-pages 豁免三处登记**：SKILL.md:171、phase2-pagination.md:23、phase4-style-lock.md §7 验收清单；shoot_anim.py 与 check_deck_batch.py 参数实现。
 **W3 母稿动效备注节**：每页必带（SKILL.md、phase2-pagination.md、templates/deck-manuscript.md；lint_manuscript.py 缺失 FAIL）。
 **W4 phase4-style-lock**：ui-ux-pro-max 转述保留（裁决）；search.py 归属明确为 ui-ux-pro-max；r4-anim-p01-p10 参照为「存在时可作参照」口径。
 **W5 showcase 两页确认门**：SKILL.md 登记在位。
@@ -211,12 +216,10 @@ A/B 约 84 对同源 references 文件。合法差异白名单（diff 后逐 hun
 - A 侧无动画无 GIF（v6.0.0）；B 侧与 IHA 保留动画能力；deck 壳翻页入场动画属交互预览，保留。
 - codex-cli 禁令句保留；onboarding-map.json Codex 枚举豁免；arcSize=15（draw.io XML 百分比语义）豁免；studio :532「双表面反转」保留。
 - 验证产物落盘交付项目 test-run/<批次>/，人工确认前禁止清理；/tmp 只放过程性临时文件。
+- 目录结构唯一真源 env-config.md（2026-09-23 用户裁决）：8 个自写 skill（五演示 + self-skill-sync/docs-sync/adr-generator）根目录各建 env-config.md，输出/生成/验证/读取/临时五类目录只在该文件登记；新增目录或改路径只改 env-config.md（self-skill-sync 可执行真源为 scripts/config.sh，登记表为镜像），SKILL.md/references 仅引用不定义，避免路径散落误用。验证项见 G12。
 
 ### 待办计划（2026-09-22 更新：原 1/2 已完成）
 
-1. ~~市场端更新~~：已完成（用户确认已发布）。
-2. ~~docs/skills-overview.md 再生成~~：已完成——module 5 全流程（m5_extract → sub agent 翻译 41 条 → m5_render），872 技能（133/722/17），旧名 leadership-ppt 零命中，五 skill 条目为新版 description（draw-flowchart 无 GIF、PPT 六阶段、IHA 新能力清单）；快照 docs/.skills-overview-mtimes.json 已在 .gitignore。
-3. **key-skills-git/ 入库受阻（如实记录）**：目录 1.9GB、50005 文件、含多个嵌套 .git（matt-skills/i-have-adhd/ponytail 等外部 skill 克隆）——直接 git add 会被降级为假 submodule 且体积不适合入库。处置选项：加 .gitignore 保持仓库干净（推荐），或剥离嵌套 .git 后分批入库，或移出仓库目录。执行前需用户定夺一次，之后不再确认。
 
 ### 踩坑经验（环境类，工程类见开头 6 条根因教训）
 
@@ -228,7 +231,8 @@ A/B 约 84 对同源 references 文件。合法差异白名单（diff 后逐 hun
 
 ### 接下来怎么做最好
 
-- 任何五 skill 改动流程：读本清单对应专项 → 改 self-skills/（唯一真源）→ 回归三件套（签名 grep 清零 + 门禁实跑 exit 0 + rsync/diff SYNC-OK）→ 对照 G1-G11 勾验 → FIX: 格式提交 → 涉及 description/version 变更时同步市场端。
+- 任何五 skill 改动流程：读本清单对应专项 → 改 self-skills/（唯一真源）→ 回归三件套（签名 grep 清零 + 门禁实跑 exit 0 + rsync/diff SYNC-OK）→ 对照 G1-G12 勾验 → FIX: 格式提交 → 涉及 description/version 变更时同步市场端。
+- 目录/路径改动只落 env-config.md（G12）：新增目录先登记再用；改路径后 grep 全 skill 旧路径内联引用一并修正；self-skill-sync 改 config.sh 必须同步 env-config.md 登记表。
 - 同源修复必须 A/B 成对 diff（M2）；修复后验证「落点」而非只验证「改过」（教训 2：限定语落错节）。
 - 大改动（删文件/改名/砍功能）必须追加全仓悬空引用扫描（D1 模式）+ 一轮全新只读回归 subagent。
 - 验证 subagent 指令三要素：只读禁改 + 白名单前置 + 证据格式（文件:行号+最短引文）；多轮验证每轮换新 subagent，避免上下文污染。

@@ -1,22 +1,6 @@
 # 品牌资源与输出目录
 
-所有交付物统一落在当前项目的 `doc-ppt/` 目录下，不散落到其他路径。
-
-```text
-doc-ppt/
-├── assets/
-│   └── midea-logo.png
-├── <project>_数据池.md
-├── <project>_PPT母稿.md
-├── flow/
-│   ├── <chart-name>.xml
-│   └── <chart-name>.html
-├── pages/
-│   ├── 01-cover.html
-│   ├── 02-overview.html
-│   └── ...
-└── <project>.pptx
-```
+所有交付物统一落在当前项目的 `doc-ppt/` 目录下，不散落到其他路径。完整目录结构以技能根目录 `env-config.md` 为唯一真源，本文件不另行维护目录树。
 
 ## 品牌 Logo
 

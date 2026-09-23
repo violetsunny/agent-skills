@@ -2,7 +2,7 @@
 name: robot-aiot-draw-flowchart
 description: >
   机器人/IoT 业务图表绘制与页面化能力。draw.io XML 图表生成（可编辑主路径）+ XML→HTML 稳定桥接转换 + 领导汇报静态页面 HTML 生成。覆盖流程图、分层架构、时序、状态机、ER、UML 类/用例、网络拓扑、时间线、Agent/记忆架构等 39+ 图表类型；内置机器人视觉语言、配色与样式一致性体系、几何/构图校验、PNG 导出与 drawio/Mermaid 导入重绘；支持 Mermaid 源码写作（23 类图表语法）与 .excalidraw/SVG/PNG 三件套离线导出、数据统计图表（饼图/箱线图/热力图/网络拓扑等）绘制规则、深色主题直绘技法与出版级示意图迭代流程；XML→HTML 转换保留原始样式/布局/层级/配色；静态页面固定 1920x1080 画布，内化语义 token、高级感设计标准与交付审查流程。
-version: 6.0.0
+version: 6.1.0
 author: kangll13
 license: MIT
 metadata:
@@ -28,6 +28,8 @@ bash "$HOME/.agents/skills/robot-aiot-draw-flowchart/scripts/precheck_deps.sh"
 ```
 
 执行第一个动作即跑此脚本：exit≠0（任一 [MISS]）立即中止并如实告知用户依赖不全，不得静默降级或假装可用。被上层 workflow 委派时输出存档批次 `_gen/precheck-robot-aiot-draw-flowchart.txt`。协作规则见 `references/diagram-design-collaboration.md`。
+
+本技能全部输出/生成/验证/读取/临时目录登记见根目录 [`env-config.md`](env-config.md)（目录结构唯一真源）：新增目录或修改路径只改该文件；正文内联路径仅为使用示例，冲突时以 env-config.md 为准。
 
 ## 概述
 

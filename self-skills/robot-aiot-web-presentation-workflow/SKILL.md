@@ -1,6 +1,6 @@
 ---
 name: robot-aiot-web-presentation-workflow
-version: 3.0.0
+version: 3.1.0
 description: >
   交互式Web演示页面制作工作流。用户指定源文件后分析并一次性反问（页数/汇报对象/汇报范围/场景/交付形态），
   产出Web演示母稿（用户确认门），按需调用 robot-aiot-arch-diagram 生成 flow/ 架构图/流程图（用户确认门），
@@ -65,28 +65,7 @@ Markdown 知识文档为主；存量 `.pptx` 先跑 `scripts/extract_pptx.py` �
 
 ## 输出目录约定
 
-默认放在当前运行项目的 `doc-web/` 目录下；**用户可指定其他输出目录**（如项目已有演示资产目录），指定后所有产物路径随之替换，Phase 1 必须确认并记录。
-
-```
-doc-web/
-├── assets/                     — 品牌静态资源（Logo、素材图压缩副本等）
-│   └── midea-logo.png          — 美的品牌 Logo
-├── <project>_演示母稿.md        — Web 演示母稿（Phase 2，G1 确认对象；Phase 3.5 回写图表）
-├── flow/                       — 图表类产物统一目录
-│   ├── <chart-name>.svg        — 图表 SVG（Phase 3，供 Phase 4 内嵌）
-│   └── <chart-name>.html       — 图表 HTML（Phase 3，可独立预览，G2 确认对象）
-└── <project>-presentation.html — 最终交互演示文件（Phase 4，单文件多页，默认形态）
-```
-
-多页形态（用户指定时，覆盖单文件 deck 的文件形态）：
-
-```
-doc-web/
-├── INDEX.html                  — 总纲页，承载全场导航
-└── pages/
-    ├── p01-<slug>.html         — 每页独立 HTML，带"上一页/下一页"跳转控件
-    └── ...                     — 末页可返回 INDEX
-```
+默认放在当前运行项目的 `doc-web/` 目录下；**用户可指定其他输出目录**（如项目已有演示资产目录），指定后所有产物路径随之替换，Phase 1 必须确认并记录。完整目录结构（单文件/多页形态、flow/、assets/、_gen/、test-run/ 等输出/生成/验证/读取/临时五类登记）以根目录 [`env-config.md`](env-config.md) 为唯一真源；新增目录或修改路径只改 env-config.md，本文件与 references/ 仅引用登记项，不另行定义目录结构。
 
 ---
 
@@ -220,6 +199,7 @@ Phase 4: 交互HTML     → 委派 robot-aiot-interactive-html-author 逐页编�
 3. 需要图表生成调用与 G2 确认门规则时，读 `references/phase3-chart-generation.md`
 4. Phase 4 编写页面 shell/动画或批次验收时，读 `references/phase4-style-lock.md`（deck 级风格基线，优先于编写契约的 deck 级取舍）
 5. 存量 `.pptx` 作内容源时，跑 `scripts/extract_pptx.py`；Phase 4 交付 HTML 验收跑 `scripts/lint_deck_html.py`
+6. 需要目录结构与路径登记（输出/生成/验证/读取/临时）时，读 `env-config.md`（唯一真源）
 
 ### 外部委派
 1. 需要绘制架构图/流程图（Phase 3）时，加载 `robot-aiot-arch-diagram`

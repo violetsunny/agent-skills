@@ -10,7 +10,7 @@ description: >
 license: MIT
 metadata:
   author: kangll13
-  version: "2.2"
+  version: "2.3"
 ---
 
 # Project Docs Sync
@@ -31,7 +31,7 @@ metadata:
 
 ## 输出范围
 
-本技能只负责以下五个文件：
+本技能全部输出/生成/验证/读取/临时目录登记见根目录 [`env-config.md`](env-config.md)（目录结构唯一真源）；新增目录或修改路径只改该文件。本技能只负责以下五个文件：
 
 1. `AGENTS.md`
 2. `README.md`

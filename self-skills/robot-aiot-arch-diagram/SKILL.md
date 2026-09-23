@@ -1,7 +1,7 @@
 ---
 name: robot-aiot-arch-diagram
 description: 架构图/技术可视化绘制能力。两条输出路径：直绘 SVG/HTML（主路径，编辑级设计系统 + 工程制图管线，几何校验+构图契约，汇报级展示）、archify 运行时渲染（主题切换+导出）。覆盖流程图、分层架构、时序、状态机、ER、UML 类/用例、网络拓扑、时间线、Agent/记忆架构等 40+ 图表类型；内置 12 套 SVG 风格皮肤与品牌 token 定制、PNG/GIF 导出与 drawio/Mermaid/Excalidraw 导入重绘；支持 Mermaid 源码写作（23 类图表语法）与 .excalidraw/SVG/PNG 三件套离线导出、数据统计图表（饼图/箱线图/热力图/网络拓扑等）绘制规则、深色主题直绘技法与出版级示意图迭代流程。专注技术图表绘制。
-version: 2.4.0
+version: 2.5.0
 author: kangll13
 license: MIT
 metadata:
@@ -27,6 +27,8 @@ bash "$HOME/.agents/skills/robot-aiot-arch-diagram/scripts/precheck_deps.sh"
 ```
 
 执行第一个动作即跑此脚本：exit≠0（任一 [MISS]）立即中止并如实告知用户依赖不全，不得静默降级或假装可用。被上层 workflow 委派时输出存档批次 `_gen/precheck-robot-aiot-arch-diagram.txt`。
+
+本技能全部输出/生成/验证/读取/临时目录登记见根目录 [`env-config.md`](env-config.md)（目录结构唯一真源）：新增目录或修改路径只改该文件；正文内联路径仅为使用示例，冲突时以 env-config.md 为准。
 
 ## 概述
 

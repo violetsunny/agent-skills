@@ -1,6 +1,6 @@
 ---
 name: robot-aiot-ppt-presentation-workflow
-version: 4.1.0
+version: 4.2.0
 description: >
   将用户指定的源文件转化为面向目标受众的结构化汇报PPT（汇报对象与受众由用户指定：领导层/技术同行/外部客户/大众，未指定默认领导层），覆盖全链路六阶段工作流：
   源文件分析与反问澄清（页数/汇报对象/汇报范围/演讲时长） → PPT演示母稿（用户确认门） → 调用 robot-aiot-draw-flowchart 生成 flow/ 图表XML并完成XML→HTML桥接（用户确认门） → 图表回写母稿对应页并逐页HTML化 → 调用 ppt-master 生成最终PPTX文件。
@@ -70,27 +70,7 @@ done
 
 ## 输出目录约定
 
-所有输出产物统一放在当前运行项目的 `doc-ppt/` 目录下，不散落到其他位置。
-
-```
-doc-ppt/
-├── assets/                     — 品牌静态资源（Logo、素材图压缩副本等）
-│   └── midea-logo.png          — 美的品牌 Logo（从 skill assets/ 复制）
-├── brand-spec.md               — 品牌资产唯一真源（规则见 references/brand-assets.md）
-├── <project>_数据池.md          — 数据池（Phase 1）
-├── <project>_PPT母稿.md        — PPT 演示母稿（Phase 2，G1 确认对象；Phase 4 回写图表）
-├── flow/                       — 图表类产物统一目录
-│   ├── <chart-name>.xml        — 图表 XML（Phase 3，robot-aiot-draw-flowchart 产出）
-│   └── <chart-name>.html       — 图表 HTML（Phase 3.5，robot-aiot-draw-flowchart XML→HTML 桥接产出，G2 确认对象）
-├── pages/                      — 逐页 HTML（Phase 4）
-│   ├── 01-cover.html
-│   ├── 02-overview.html
-│   └── ...
-├── projects/                   — 任务工程目录（Phase 5 过程产物：工作区/脚本/中间渲染图/验证报告）
-│   └── <任务名>/
-│       └── notes/              — 话术 notes/*.md（check_notes.py --sync 与 pages/*.html .notes 双源比对）
-└── <project>.pptx              — 最终 PPTX（Phase 5，ppt-master 产出）
-```
+所有输出产物统一放在当前运行项目的 `doc-ppt/` 目录下，不散落到其他位置。完整目录结构（输出/生成/验证/读取/临时五类，含 assets/、flow/、pages/、projects/、test-run/、_gen/ 登记）以根目录 [`env-config.md`](env-config.md) 为唯一真源；新增目录或修改路径只改 env-config.md，本文件与 references/ 仅引用登记项，不另行定义目录结构。
 
 ---
 
@@ -247,6 +227,7 @@ Phase 5: PPT生成      → 调用 ppt-master，读取逐页 HTML/MD 生成最�
 
 ### 治理
 9. 需要交叉校验/重生链/协作关系时，读 `references/governance-and-iteration.md`
+10. 需要目录结构与路径登记（输出/生成/验证/读取/临时）时，读 `env-config.md`（唯一真源）
 
 ## 治理与迭代
 

@@ -78,6 +78,9 @@ M35_SKIP_LIST="docs scripts tests openspec stock-replay-workbench"
 WORK_DIR="${WORK_DIR:-/tmp/self-skill-sync}"
 mkdir -p "$WORK_DIR"
 
+# 模块 5 翻译文件交换目录（in_NN.json / out_NN.json；m5_extract.sh 每轮清空重建）
+ZH_DIR="${ZH_DIR:-/tmp/zh}"
+
 # macOS 无 timeout：降级探测，探测不到则为空（由调用方控制超时）
 if command -v timeout >/dev/null 2>&1; then TIMEOUT_CMD="timeout"
 elif command -v gtimeout >/dev/null 2>&1; then TIMEOUT_CMD="gtimeout"

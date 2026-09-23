@@ -14,7 +14,6 @@ OUT_ALL="$WORK_DIR/m5_out_all.json"
 FINAL="$WORK_DIR/m5_final.jsonl"
 DOC="$KB_DOCS/skills-overview.md"
 SNAP="$KB_DOCS/.skills-overview-mtimes.json"
-ZH_DIR="/tmp/zh"
 SEP="@|SEP|@"
 
 [ -f "$RECORDS" ] || { echo "[FATAL] 先运行 m5_extract.sh"; exit 1; }

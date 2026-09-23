@@ -22,3 +22,8 @@
 
 - 完整版 puppeteer 的 Chromium 下载本机超 5 分钟；svg2png.js 回退（puppeteer-core+系统 Chrome，CHROME_PATH 可覆盖）已同步 arch-diagram/draw-flowchart/fireworks 全部副本。
 - 本机 Intel macOS 26.6 无 poppler bottle、未装 Keynote（仅 WPS）；keynote_verify.sh 已改 slide images 直出 PNG 免 poppler，渲染终审只能 WPS 人工。
+
+## 技术约定
+
+- 8 个自写 skill 目录结构唯一真源=根目录 env-config.md（输出/生成/验证/读取/临时五类登记）；新增目录改路径只改它，其他文件仅引用不定义（2026-09-23 裁决，验证项 G12）。
+- self-skill-sync 可执行路径真源=scripts/config.sh（ZH_DIR 已收编）；其 env-config.md 为登记镜像，改 config.sh 须同步更新登记表；模块脚本禁硬编码路径。
