@@ -39,7 +39,7 @@ for s in robot-aiot-draw-flowchart robot-aiot-arch-diagram robot-aiot-interactiv
   diff -r --exclude='_mideameta.json' --exclude='__pycache__' --exclude='.DS_Store' $R/self-skills/$s ~/.agents/skills/$s && echo "$s SYNC-OK"
 done
 ```
-通过标准：五个全 SYNC-OK。修复后同步命令：
+通过标准：五个全 SYNC-OK（仅锁真源↔活动运行时；`.claude/skills/` 备份不在此范围，见九节 5）。修复后同步命令：
 `rsync -a --delete --exclude='_mideameta.json' --exclude='__pycache__' --exclude='.DS_Store' $R/self-skills/<s>/ ~/.agents/skills/<s>/`
 
 **G2 旧名清零**
@@ -187,6 +187,11 @@ A/B 约 84 对同源 references 文件。合法差异白名单（diff 后逐 hun
 2. 提交前：rsync 五 skill → diff SYNC-OK → 回归三件套 → `git status` 确认无 __pycache__/.DS_Store 混入。
 3. `_mideameta.json` 仅安装侧有，rsync 必 exclude，不回写仓库。
 4. 市场端与 skills-overview.md 的遗留动作见「十、Handoff」待办计划，按规程执行即可，不再重复确认。
+5. 自写 skill 四处落点（G1 只锁前两者，后两者非活动/不在范围）：
+   - 真源 `$R/self-skills/<s>/`——知识库（agent-skills 仓库）内自写真源区，唯一可改处
+   - 活动运行时 `~/.agents/skills/<s>/`——实际被加载的副本，G1 diff 对象，改后必 SYNC-OK
+   - `.claude/skills/<s>/`——非活动备份，仅 self-skill-sync 模块 4.4 全量同步时刷新；定向 rsync（真源→活动运行时）不刷它，滞后或缺失属预期、不判 FAIL（部分自写 skill 从未进过 .claude）
+   - 知识库外部区 `$R/skills/<s>/`——模块 4.1 按设计排除自写 skill，自写永不在此出现，出现即异常
 
 ## 十、Handoff（交接现状，2026-09-22 定稿）
 
@@ -218,7 +223,7 @@ A/B 约 84 对同源 references 文件。合法差异白名单（diff 后逐 hun
 - 验证产物落盘交付项目 test-run/<批次>/，人工确认前禁止清理；/tmp 只放过程性临时文件。
 - 目录结构唯一真源 env-config.md（2026-09-23 用户裁决）：8 个自写 skill（五演示 + self-skill-sync/docs-sync/adr-generator）根目录各建 env-config.md，输出/生成/验证/读取/临时五类目录只在该文件登记；新增目录或改路径只改 env-config.md（self-skill-sync 可执行真源为 scripts/config.sh，登记表为镜像），SKILL.md/references 仅引用不定义，避免路径散落误用。验证项见 G12。
 
-### 待办计划（2026-09-22 更新：原 1/2 已完成）
+### 待办计划
 
 
 ### 踩坑经验（环境类，工程类见开头 6 条根因教训）
