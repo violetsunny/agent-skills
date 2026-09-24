@@ -33,6 +33,9 @@ WEB = `robot-aiot-web-presentation-workflow`（v3.1.0）
 | 9 | 两侧数值冲突（WEB 侧 1080x1920 竖版 vs 作者侧「固定 810x1080 唯一竖版例外」） | 复用旧裁决先确认范围（局部/全局）；跨库 grep 数值参数，引用侧禁内联与真源不同的值 |
 | 10 | 新脚本复制带入死代码（lint_landing_html.py 的 VOID_TAGS） | 复制脚本先清死代码；fixture 回归三验：1 正例 rc=0 + 每 FAIL 分支 1 反例 + 豁免分支不误报 |
 | 11 | 模板字段改动漏下游联动（brief 第7字段画布选项未联动 1440px） | 改字段后遍历所有消费该字段的下游字段/脚本/文档 |
+| 12 | fill forwards 入场动画生成 stacking context，卡内 z-index 被困致 hover 浮层被 DOM 序靠后邻卡遮挡 | 浮层遮挡先疑动画层叠上下文；最小复现页多组对照（有/无动画×有/无修复）一张截图定案；修复整卡抬升（`:has(:hover)` 加 z-index）而非卡内加 |
+| 13 | 自动轮播与用户交互共用滚动路径（scrollIntoView 写进 setOn），轮播拖动页面滚动条 | 自动态与用户态函数分离：scroll/focus 类副作用只允许出现在用户触发分支（show），自动分支（setOn）纯样式 |
+| 14 | 步骤-节点映射按位置猜与文案不符（p09 步骤 2/3 错位，截图复核才暴露） | 映射表逐项核对节点文本 vs li 文本语义；交付前 headless 截图轮播态逐组复核（见 W8） |
 
 ---
 
@@ -170,6 +173,8 @@ A/B 约 84 对同源 references 文件。合法差异白名单（diff 后逐 hun
 **W4 phase4-style-lock**：ui-ux-pro-max 转述保留（裁决）；search.py 归属明确为 ui-ux-pro-max；r4-anim-p01-p10 参照为「存在时可作参照」口径。
 **W5 showcase 两页确认门**：SKILL.md 登记在位。
 **W6 门禁**：全部 .py py_compile。
+**W7 交互动效注入规范**：governance-and-iteration.md「实战经验沉淀」含 13 条（步骤锚点特效规范、scrollIntoView 路径分离、fill-forwards stacking context 坑、映射文案对齐、图表 zoom 规范、轮播态截图验收法）；项目侧注入脚本（_gen/inject_step_anchor.py、inject_chart_zoom.py）须带幂等标记（step-anchor-css 等），li 来源支持 card+ci / all / liSel 三种，重复运行 skip 不重复注入。
+**W8 轮播态验收**：动效注入后必须 headless Chrome `--virtual-time-budget=<1600+n×850ms>` 截图抽查，核对第 n 步 li 高亮与图内节点发光同组出现；映射表逐组复核，错位即修映射再复截。
 
 ---
 
@@ -215,6 +220,7 @@ A/B 约 84 对同源 references 文件。合法差异白名单（diff 后逐 hun
 | 3999f60a | FIX：brief 悬空项「单页交互页」→ 落地页·滚动叙事页，第7字段画布联动补 1440px |
 | 576d8d4e | FIX：review 补漏——硬约束2 滚动叙事页豁免、phase2 画布行+分节规范、lint_landing_html.py 删死代码 |
 | 12841eba | FEAT：三裁决落地——竖版双档 10 处引用全改齐、文档 PDF 禁平铺第5条、MEMORY.md 记录 |
+| 2077a1d3 | FEAT：WEB 实战经验沉淀 6 条（步骤锚点/滚动分离/层叠上下文坑/映射对齐/zoom/轮播验收），源自 AIOTK doc-web 迭代实测 |
 
 ### 已验证（五轮，全部闭环）
 
