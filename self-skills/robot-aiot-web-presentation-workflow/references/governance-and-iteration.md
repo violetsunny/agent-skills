@@ -18,6 +18,7 @@
 | 平铺散文 | 右栏无连续 ≥2 句散文裸文本、无长 li ul | `lint_deck_html.py` #10 |
 | 交互反馈 | `:focus-visible` 与 hover 反馈在位 | `lint_deck_html.py` #11 |
 | 动画触发 | t100/t6000 双时间点截图逐页字节有差异（静态页豁免） | `shoot_anim.py` |
+| 滚动叙事页验收 | 1440px 基准 + @media 断点 + 100vh 首屏 / 单 `<section>` DOM≤500 / 平铺散文禁与 deck 同阈值（全局美学）/ #8/#9/#11 同 deck | `lint_landing_html.py` |
 
 ## 常见错误
 
@@ -65,7 +66,7 @@
    - G2 通过后把母稿头部「确认状态」字段更新为「G2 已通过（日期）」
    - 字段含尖括号占位符视为未填充，机检判门未通过
 3. 机检口径：只校验确认状态字段已标记「已通过」，不替代用户语义确认（与确认门「用户确认不需要调整/图表无误」是两件事）
-4. handoff 不替代质量验收：Phase 4 的 handoff 只校验最终 HTML 存在，页面质量另跑「交叉校验清单」全链（lint_deck_html / check_deck_batch / check_notes_hidden / shoot_anim）
+4. handoff 不替代质量验收：Phase 4 的 handoff 只校验最终 HTML 存在，页面质量另跑「交叉校验清单」全链（lint_deck_html / check_deck_batch / check_notes_hidden / shoot_anim；滚动叙事页跑 lint_landing_html）
 5. 重生链触发后，受影响环节及其下游的 handoff 须重跑（如母稿改动重过 G1 后，Phase 2/3/3.5/4 的 handoff 依次重校验）
 6. 交接记录 `_gen/handoff-phaseN.md` 的「遗留风险 / 待办」节由主线程补充，无则写「无」
 

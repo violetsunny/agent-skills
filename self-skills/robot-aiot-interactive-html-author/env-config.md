@@ -19,6 +19,8 @@
 |---|---|---|
 | 输出 | `<输出根>/<project>-presentation.html` | 单文件多页 deck（默认交付形态，自包含零依赖双击可运行） |
 | 输出 | `<输出根>/INDEX.html` + `<输出根>/pages/<页码>-<slug>.html`（如 01-cover.html） | 多页形态（上层 workflow 明确要求时）：总纲导航壳（MANIFEST + iframe 视口）+ 逐页独立自包含 HTML，导航链接真实存在 |
+| 输出 | `<输出根>/<project>-landing.html` | 落地页 / 滚动叙事页形态（用户或上层 workflow 点名时）：1440px 基准响应式连续长页，无翻页纵向滚动，规格见 `references/content-imagery-and-infographic.md`「落地页 / 产品官网形态」 |
+| 输出 | `<输出根>/<project>-doc.html` | 文档形态 PDF 排版源 HTML（用户点名文档形态时）：`@page` A4 排版后导出 PDF，规格见 `references/content-imagery-and-infographic.md`「文档形态 PDF」 |
 | 输出 | `<输出根>/assets/` | 素材图（fetch_images.py `-o assets/` 落盘；manifest.json 同目录，许可字段人工补填，许可不明的图不用） |
 | 生成 | `<输出根>/_gen/precheck-robot-aiot-interactive-html-author.txt` | 被委派时 precheck_deps.sh 输出存档 |
 | 验证 | `<输出根>/test-run/<批次>/` | 验证 deck、动画触发截图、验证报告；验证 deck 不受动画预算约束但豁免必须在验证报告中显式声明；人工确认前禁止清理 |

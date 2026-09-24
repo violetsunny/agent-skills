@@ -20,10 +20,11 @@
   Phase 2→3  : 母稿存在 + G1 已通过 + 图表需求总表章节存在
   Phase 3→3.5: flow/ SVG↔HTML 配对 + G2 已通过
   Phase 3.5→4: 图表需求总表回写完整（类型非「无」行的产物路径列指向存在的 flow 文件、确认状态列非空）
-  Phase 4    : 最终 HTML 存在（单文件 *-presentation.html 或 INDEX.html+pages/）；质量验收另跑 lint_deck_html/check_deck_batch
-               竖版社交 deck 仍是单文件 deck（*-presentation.html，画布方向不同，已覆盖）；滚动叙事页/落地页
-               等衍生形态文件名未在 env-config 登记，两种标准 deck 形态都不匹配时，顶层存在其他交付 HTML 则降
-               WARN 人工确认（不误杀合法衍生形态），无则 FAIL
+  Phase 4    : 最终 HTML 存在（单文件 *-presentation.html / INDEX.html+pages/ / 滚动叙事页 *-landing.html）；
+               质量验收另跑 lint_deck_html/check_deck_batch（滚动叙事页跑 lint_landing_html）
+               竖版社交 deck 仍是单文件 deck（*-presentation.html，画布方向不同，已覆盖）；
+               三种登记形态都不匹配时，顶层存在其他交付 HTML 则降 WARN 人工确认
+               （不误杀未登记衍生形态），无则 FAIL
 
 确认门机检口径: 只校验母稿头部「确认状态」字段已标记「已通过」，不替代用户语义确认
 （与 precheck_handoff.py「语义项仍需人工」口径一致）。
@@ -270,10 +271,15 @@ def check_phase3_5(workdir, findings):
 
 def check_phase4(workdir, findings):
     single = sorted(glob.glob(os.path.join(workdir, "*-presentation.html")))
+    landing = sorted(glob.glob(os.path.join(workdir, "*-landing.html")))
     index = os.path.join(workdir, "INDEX.html")
     pages = os.path.join(workdir, "pages")
     if single:
         findings.append(("OK", f"单文件 deck: {single[0]}"))
+    elif landing:
+        findings.append(
+            ("OK", f"滚动叙事页: {landing[0]}（质量验收跑 lint_landing_html.py）")
+        )
     elif os.path.isfile(index) and os.path.isdir(pages):
         n = len(glob.glob(os.path.join(pages, "*.html")))
         if n == 0:
@@ -290,23 +296,25 @@ def check_phase4(workdir, findings):
             findings.append(
                 (
                     "WARN",
-                    f"{workdir}: 未匹配标准 deck 命名（*-presentation.html / INDEX.html+pages/），"
-                    f"检测到顶层 HTML {[os.path.basename(p) for p in others]}；"
-                    "可能为滚动叙事页/落地页等衍生形态（env-config 未登记其文件名），人工确认最终交付物",
+                    f"{workdir}: 未匹配登记形态命名（*-presentation.html / INDEX.html+pages/ / "
+                    f"*-landing.html），检测到顶层 HTML {[os.path.basename(p) for p in others]}；"
+                    "可能为未登记衍生形态，人工确认最终交付物",
                 )
             )
         else:
             findings.append(
                 (
                     "FAIL",
-                    f"{workdir}: 未找到最终 HTML（单文件 *-presentation.html 或 INDEX.html+pages/）",
+                    f"{workdir}: 未找到最终 HTML（单文件 *-presentation.html / "
+                    "INDEX.html+pages/ / 滚动叙事页 *-landing.html）",
                 )
             )
     findings.append(
         (
             "WARN",
             "最终质量验收须另跑 lint_deck_html.py / check_deck_batch.py / "
-            "check_notes_hidden.py / shoot_anim.py（handoff 只校验交付产物存在）",
+            "check_notes_hidden.py / shoot_anim.py（滚动叙事页跑 lint_landing_html.py；"
+            "handoff 只校验交付产物存在）",
         )
     )
 

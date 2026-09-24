@@ -82,6 +82,7 @@ Cover / Carousel / Quote / Data Card / Checklist / Tutorial / Comparison / Timel
 1. 设计基准宽 1440px（Desktop），首屏高度 100vh，首屏内传达核心价值与主 CTA；响应式断点向下覆盖至 320px
 2. 该形态豁免 deck 画布"固定 1920×1080 不响应式"约束（`interactive-html-authoring.md` 画布约束条 1 只管 deck 与竖版社交 deck），允许响应式断点；滚动叙事结构（问题 → 方案 → 证明 → 行动）按落地页通用结构展开，本文件只锁尺寸规格
 3. 首屏配图与信息图照常执行本文件配图规则与真图诚实性测试；社交分享图衍生用"社交媒体图片样式"尺寸规范表
+4. 禁文字平铺（全局美学，所有交付形态一致）：裸 `<p>` 散文 >60 字且 ≥2 句（。；计）禁止，须改写为组件（stat/kv/steps/mini/vs/内联 SVG/图表）或以语义类（note/mut/bad/good/key）承载；`<ul>` ≥4 条 li 且最长 li >40 字禁止，改写为 mini/vs/steps；`.notes` 话术容器内豁免（容器须 `display:none`）
 
 ## AI 图像生成集成
 

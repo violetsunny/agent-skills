@@ -27,6 +27,7 @@ doc-web/
 ├── pages/                      — 多页形态逐页 HTML
 │   ├── p01-<slug>.html         — 每页独立 HTML，带"上一页/下一页"跳转控件
 │   └── ...                     — 末页可返回 INDEX
+├── <project>-landing.html      — 滚动叙事页形态（1440px 响应式落地页结构，无翻页纵向滚动；用户指定该形态时替代默认单文件 deck）
 ├── _gen/                       — 委派前置检查存档 + 环节交接记录
 │   ├── precheck-robot-aiot-arch-diagram.txt
 │   ├── precheck-robot-aiot-interactive-html-author.txt

@@ -169,10 +169,10 @@ Phase 4: 交互HTML     → 委派 robot-aiot-interactive-html-author 逐页编�
 
 入口约束：
 1. 向编写 skill 传递页面四要素、动效与交互备注、已回写母稿的图表 SVG/HTML、素材图映射与主色基调；委派前核对 `_gen/precheck-robot-aiot-interactive-html-author.txt` 存在，缺失先补跑 Phase 3 入口约束 8
-2. 默认形态：编写 skill 产出单文件多页 deck `doc-web/<project>-presentation.html`；多页形态（Phase 1 确认）：产出 `INDEX.html` 总纲 + `pages/` 逐页 HTML，每页必须有"上一页/下一页"跳转控件，末页可返回 INDEX
+2. 默认形态：编写 skill 产出单文件多页 deck `doc-web/<project>-presentation.html`；多页形态（Phase 1 确认）：产出 `INDEX.html` 总纲 + `pages/` 逐页 HTML，每页必须有"上一页/下一页"跳转控件，末页可返回 INDEX；滚动叙事页形态（Phase 1 确认）：产出 `doc-web/<project>-landing.html`（1440px 响应式，无翻页纵向滚动）
 3. 验收自检（编排侧抽查）：
    - 翻页键位全可用（多页形态为导航链接全可用）、`prefers-reduced-motion` 降级即时切换
-   - 零外部请求、1920x1080 设计画布 + scale-to-fit 视口自适应（任意窗口无滚动条完整可见）、单页 DOM ≤ 500
+   - 零外部请求、1920x1080 设计画布 + scale-to-fit 视口自适应（任意窗口无滚动条完整可见）、单页 DOM ≤ 500；滚动叙事页豁免固定画布，改查 1440px 基准 + @media 响应式断点 + 100vh 首屏，单 `<section>` DOM ≤ 500
    - 母稿四要素、动效备注与图表数据语义无缺页、无篡改
     - 母稿素材图映射表中该页有素材时必须已上屏（压缩缩略图 + 网格平铺无滚动 + 点击放大 lightbox）
    - 用户无风格偏好时：三标题页预览已出并经用户定稿，全套锁定无混用
@@ -180,7 +180,7 @@ Phase 4: 交互HTML     → 委派 robot-aiot-interactive-html-author 逐页编�
 
 阻塞条件：所有页面生成完毕且通过编写 skill 的交付前审查才算完成。
 
-交接（handoff）：交付前跑 `scripts/check_phase_handoff.py <输出目录> --phase 4 --write`，校验最终 HTML 存在（单文件 deck 或 INDEX+pages），落盘 `_gen/handoff-phase4.md`；质量验收另跑 lint_deck_html/check_deck_batch（见上验收自检），handoff 只校验交付产物存在。
+交接（handoff）：交付前跑 `scripts/check_phase_handoff.py <输出目录> --phase 4 --write`，校验最终 HTML 存在（单文件 deck / INDEX+pages / 滚动叙事页 *-landing.html），落盘 `_gen/handoff-phase4.md`；质量验收另跑 lint_deck_html/check_deck_batch（滚动叙事页跑 `scripts/lint_landing_html.py`，见上验收自检），handoff 只校验交付产物存在。
 
 ---
 
@@ -208,7 +208,7 @@ Phase 4: 交互HTML     → 委派 robot-aiot-interactive-html-author 逐页编�
 2. 需要分页策略、Web 母稿规范与 G1 确认门规则时，读 `references/phase2-pagination.md`；产物骨架用 `templates/deck-manuscript.md`，填充后跑 `scripts/lint_manuscript.py`
 3. 需要图表生成调用与 G2 确认门规则时，读 `references/phase3-chart-generation.md`
 4. Phase 4 编写页面 shell/动画或批次验收时，读 `references/phase4-style-lock.md`（deck 级风格基线，优先于编写契约的 deck 级取舍）
-5. 存量 `.pptx` 作内容源时，跑 `scripts/extract_pptx.py`；Phase 4 交付 HTML 验收跑 `scripts/lint_deck_html.py`
+5. 存量 `.pptx` 作内容源时，跑 `scripts/extract_pptx.py`；Phase 4 交付 HTML 验收跑 `scripts/lint_deck_html.py`（deck 形态）或 `scripts/lint_landing_html.py`（滚动叙事页）
 6. 每个环节结束做交接（handoff）校验、落盘 `_gen/handoff-phaseN.md` 时，跑 `scripts/check_phase_handoff.py --phase N`
 7. 需要交叉校验清单、真源重生链、handoff 治理、迭代与协作链路规则时，读 `references/governance-and-iteration.md`
 8. 需要目录结构与路径登记（输出/生成/验证/读取/临时）时，读 `env-config.md`（唯一真源）
