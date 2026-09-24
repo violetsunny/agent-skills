@@ -56,10 +56,10 @@ Cover / Carousel / Quote / Data Card / Checklist / Tutorial / Comparison / Timel
 
 ### 竖版 deck 画布（小红书图文/轮播形态）
 
-用户明确要求以社交图文形态交付时，deck 整体可用竖版画布：
+用户明确要求以社交图文形态交付时，deck 整体可用竖版画布，双档（档位与用户确认）：
 
-1. 画布固定 `810x1080`（3:4），与小红书 `1080×1440` 导出规格同比，出图按 4/3 线性放大（headless 截图 `--window-size=810,1080 --force-device-scale-factor=1.3333`）
-2. 这是 `interactive-html-authoring.md` 画布约束 `1920x1080` 的唯一竖版例外：安全边距、不重叠不溢出、scale-to-fit 壳全部照常适用，壳的缩放分母改为 `810/1080`
+1. 双档规格：**3:4 `810x1080`**（小红书图文/轮播，与 `1080×1440` 导出规格同比，出图按 4/3 线性放大，headless 截图 `--window-size=810,1080 --force-device-scale-factor=1.3333`）；**9:16 `1080x1920`**（移动端全屏信息流/Story，原生 1:1 出图不放大，headless 截图 `--window-size=1080,1920` 不加 dsf）
+2. 这是 `interactive-html-authoring.md` 画布约束 `1920x1080` 的唯一竖版例外：安全边距、不重叠不溢出、scale-to-fit 壳全部照常适用，壳的缩放分母改为画布实际宽高（`Math.min(innerWidth/W,innerHeight/H)`）
 3. 竖版页单列纵向流、大字上对齐、页码点作翻页指示；不把 1920 宽的双栏/网格布局硬压进竖版画布
 
 ### 配色方案
@@ -68,7 +68,7 @@ Cover / Carousel / Quote / Data Card / Checklist / Tutorial / Comparison / Timel
 
 ## 衍生交付形态规格（文档 PDF A4 / 落地页 1440px）
 
-仅用户点名对应交付形态时适用；deck（1920×1080）与竖版社交 deck（810×1080）不受本节影响，本节不改变"约束"任何条款。
+仅用户点名对应交付形态时适用；deck（1920×1080）与竖版社交 deck（810×1080 或 1080×1920）不受本节影响，本节不改变"约束"任何条款。
 
 ### 文档形态 PDF（白皮书 / 报告 / 打印资料）：A4
 
@@ -76,6 +76,7 @@ Cover / Carousel / Quote / Data Card / Checklist / Tutorial / Comparison / Timel
 2. 边界：本规格只管文档形态 PDF 交付；deck 打印导出仍按 `interactive-html-authoring.md`"打印与导出"执行（`@page` 1920×1080、一页一张），两种形态不混用
 3. 长文阅读版式：正文栏宽约 32 个中文字符（≈66 拉丁字符），中文行高、段间距等细则按 `typography.md` §5.5 执行，不重述；图表块写 `break-inside: avoid` 防跨页截断
 4. 诚实性照常：图表程序化画真实值，截图走"真图诚实性测试"与"截图取景与合成规范"；封面页与章节导航属文档设计，本文件不展开
+5. 禁文字平铺（全局美学，与落地页同阈值）：裸 `<p>` 散文 >60 字且 ≥2 句（。；计）禁止，须以语义类（note/mut/bad/good/key）或组件（stat/kv/steps/mini/表格/图）承载；`<ul>` ≥4 条 li 且最长 li >40 字禁止；`.notes` 话术区豁免。本形态无机检 lint，编写自检与委派方抽查兜底
 
 ### 落地页 / 产品官网形态：1440px
 

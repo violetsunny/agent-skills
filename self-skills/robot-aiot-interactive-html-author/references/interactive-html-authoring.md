@@ -62,7 +62,7 @@
 3. 使用绝对定位或 CSS Grid/Flexbox 布局
 4. 元素不重叠、不溢出
 5. 画布外必须包一层 scale-to-fit 视口自适应壳：浏览器任意窗口尺寸下画布等比缩放居中、无滚动条完整可见；`1920x1080` 视口时 scale=1，headless 截图与下游消费不受影响
-6. 例外——竖版社交 deck 画布：小红书图文/社交轮播类交付形态可用竖版 3:4 画布，标准 `810x1080`（与 `content-imagery-and-infographic.md` 竖版画布规则对齐）；仅此形态豁免第 1 条的 `1920x1080`，本节其余条款照常适用，scale-to-fit 壳的缩放分母改为画布实际宽高（`Math.min(innerWidth/W,innerHeight/H)`）。用户未点名竖版 deck 时一律 `1920x1080`
+6. 例外——竖版社交 deck 画布：社交图文类交付形态可用竖版画布，双档——3:4 标准 `810x1080`（小红书图文/轮播）或 9:16 标准 `1080x1920`（移动端全屏信息流），档位与用户确认（与 `content-imagery-and-infographic.md` 竖版画布规则对齐）；仅此形态豁免第 1 条的 `1920x1080`，本节其余条款照常适用，scale-to-fit 壳的缩放分母改为画布实际宽高（`Math.min(innerWidth/W,innerHeight/H)`）。用户未点名竖版 deck 时一律 `1920x1080`
 
 标准实现（本文件结构中 `.canvas` 即 `.deck` 容器）：
 
@@ -470,7 +470,7 @@ deck 需支持打印 / 导出 PDF（发给听众做资料）：
   }
   .slide .enter { opacity: 1 !important; transform: none !important; } /* 入场动画元素强制可见 */
 }
-@page { size: 1920px 1080px; margin: 0; } /* 竖版 deck 同步改 810×1080 */
+@page { size: 1920px 1080px; margin: 0; } /* 竖版 deck 同步改实际画布（810×1080 或 1080×1920） */
 ```
 
 - 打印态全部 slide 按序展开、一页一张；控件与进度条隐藏

@@ -22,7 +22,7 @@
         叠加时删除本文件 script 内的键盘绑定与 goTo/next/prev 段，由扩展接管，
         避免双绑；本底盘保留 fit/降级/打印/slidechange 派发职责。
   可调参数：入场间隔 ENTER_STAGGER=150ms（纪律区间 100-200ms）；画布 1920×1080
-        （竖版社交 deck 改 810×1080，fit 分母与 @page 同步改）；安全边距 48px
+        （竖版社交 deck 改 810×1080 或 1080×1920，fit 分母与 @page 同步改）；安全边距 48px
   降级契约：隐藏规则挂 .js 前缀类（JS 首行加到 documentElement），noscript
         顺序流回退——禁/受限 JS 环境降级为顺序可读全文，白屏判交付失败；
         入场触发用 setTimeout 不用 rAF（后台标签页 rAF 暂停）
@@ -174,7 +174,7 @@ transform-box:fill-box;transform-origin:center}
   }
   .slide .enter { opacity: 1 !important; transform: none !important; } /* 入场动画元素强制可见 */
 }
-@page { size: 1920px 1080px; margin: 0; } /* 竖版 deck 同步改 810×1080 */
+@page { size: 1920px 1080px; margin: 0; } /* 竖版 deck 同步改实际画布（810×1080 或 1080×1920） */
   </style>
   <noscript><style>
     /* 禁/受限 JS 环境降级为顺序可读全文（白屏判交付失败） */
