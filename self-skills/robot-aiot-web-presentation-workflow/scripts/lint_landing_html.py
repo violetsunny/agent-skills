@@ -55,20 +55,6 @@ import sys
 from html.parser import HTMLParser
 
 MAX_DOM_PER_SECTION = 500
-VOID_TAGS = {
-    "img",
-    "br",
-    "hr",
-    "input",
-    "meta",
-    "link",
-    "source",
-    "area",
-    "col",
-    "embed",
-    "track",
-    "wbr",
-}
 EXTERNAL_OK_PREFIX = "http://www.w3.org/"  # SVG/schema 命名空间 URI，非请求
 SKIP_SCHEMES = ("mailto:", "javascript:", "data:", "blob:", "tel:")
 CDN_RE = re.compile(
