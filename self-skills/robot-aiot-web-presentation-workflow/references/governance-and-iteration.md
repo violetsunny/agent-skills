@@ -128,3 +128,9 @@
 5. 主动合并内容重叠页面，通常比继续加页更有效
 6. 右栏组件使用前先 grep 该页 CSS 是否含其定义，缺则随组件补丁一并插入
 7. showcase 两页先行锁定风格基调，避免方向错误到全量完成才暴露
+8. 步骤锚点特效（列表轮播+定格+图内节点联动）规范：li 自动轮播 `.on` 高亮（850ms/步、环尾停留 4200ms、首启 1600ms），click/Enter/Space 定格停播，图内对应节点同步 `.step-on` 发光（stroke 加粗+drop-shadow），节点 click 反向定位步骤，reduced-motion 只定格不轮播；配置驱动注入脚本 `_gen/inject_step_anchor.py`（幂等标记 `step-anchor-css`；li 来源支持 card+ci / all / liSel 三种）
+9. 自动轮播与用户定位的滚动路径必须分离：`scrollIntoView` 只写在 show（用户 click/键盘触发），禁止写在 setOn（自动轮播调用），否则轮播拖动页面滚动条，演示观感崩坏
+10. `[data-enter]` 入场动画 fill forwards 阶段在 Chrome 也生成 stacking context：卡内 z-index（浮层、badge）被困在卡的层叠上下文内无效，hover 浮层被 DOM 序靠后的邻卡遮挡；修复用 `.card:has(.cbadge:hover){position:relative;z-index:40}` 整卡抬升而非卡内加 z-index；定位手段为最小复现页多组并排对照（有/无动画 × 有/无修复），一张截图定案，不在成品页猜
+11. 步骤列表 ↔ 图内节点映射必须按文案逐项对齐（节点内文本 vs li 文本语义匹配），禁止按位置顺序猜映射；图内无语义对应链时做纯轮播（nodes 空数组），不强行映射；映射表交付前用轮播态截图逐组复核
+12. 图表全屏放大（`_gen/inject_chart_zoom.py`）规范：单击图内空白区放大铺满 stage、再击或 ESC 缩小；带 cursor:pointer 的交互节点不触发 zoom（避免点击语义冲突）；`#zoom` hash 直达放大态便于演示预定位
+13. 轮播态验收法：headless Chrome `--virtual-time-budget` 取「首启 1600ms + n×850ms」时点截图，核对第 n 步 li 高亮与对应节点发光是否同组出现；比人工等待轮播可靠且可复现
