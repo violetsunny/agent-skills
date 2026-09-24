@@ -251,7 +251,7 @@ A/B 约 84 对同源 references 文件。合法差异白名单（diff 后逐 hun
 - 本机 Intel macOS 无 poppler bottle、无 Keynote（仅 WPS）→ keynote_verify.sh 走 slide images 直出 PNG；渲染终审只能 WPS 人工。
 - 本机无 rg 命令；zsh 变量不分词 → 用 grep 工具或系统 grep；多目录遍历用数组。
 - subagent 输出可能丢失但工作已落地（或相反）→ 一律主 agent 签名 grep 抽验，不信汇报。
-- 核验过程跑 python 会自产 __pycache__ → 全程 PYTHONDONTWRITEBYTECODE=1，提交前 find 复查。
+- 核验过程跑 python 会自产 __pycache__ → 全程 PYTHONDONTWRITEBYTECODE=1，提交前 find 复查；两个漏网变体：①门禁脚本（check_deck_batch 等）内部 import 兄弟脚本也会写缓存，跑门禁同样要带环境变量；②heredoc 内 importlib SourceFileLoader exec_module 加载项目脚本也写字节码缓存，验证脚本自身须设 env 或读完即删。
 
 ### 接下来怎么做最好
 
