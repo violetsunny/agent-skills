@@ -147,7 +147,7 @@ A/B 约 84 对同源 references 文件。合法差异白名单（diff 后逐 hun
 白名单：① studio :532「双表面反转」深度手段描述（look :529 已限定）；② 否定式/禁止式条款（禁逐页互换等）；③ 选中态/按压态反转；④ 纬度反转（地图语义）；⑤ 明度阶梯推导规则；⑥ mood 路由标签；⑦ multi-version 版本间色彩策略（非 deck 内翻面）；⑧ 非主题语义交替（旋转角/节点填充/色相轮转/贝塞尔/能量/几何/叙事）；⑨ web-slide-strategies「页内节奏由 ink 反转块制造」（「页内」已限定）。
 重点回归位：signal :487-497、studio :529-539、kraft-journal :579（同表面+组件级限定）、grove :301、emerald-editorial :277/:280/:284/:287、mat :327、stencil-tablet :523、swiss token :587/:601/:615/:629「ink 反转块——组件级」、swiss-layout-system :30/:52。
 **I2 41 套预设**：§2.1-§2.41 编号连续无跳号；SKILL.md「41 套」计数一致。
-**I3 导航完整**：SKILL.md 链接全部 references（20 个），零孤儿。
+**I3 导航完整**：SKILL.md 链接全部 references（21 个，含 code-json-display.md），零孤儿。
 **I4 依赖红线**：其他 4 个 skill 名零命中（「上层 workflow」泛称合法）。
 **I5 关键文件在位**：templates/lightbox.js、deck-skeleton.html、deck-nav.js；图片点击放大（SKILL.md lightbox 登记）、path-draw 三坑+入场同步三条款（animation-fx-catalog.md）、Mermaid 构建期渲染失败降级不静默丢图（diagram-embed-rendering.md）。
 **I6 语法**：19 .py + 1 .sh + 21 .js 全过。

@@ -121,3 +121,4 @@ bash "$HOME/.agents/skills/robot-aiot-interactive-html-author/scripts/precheck_d
 18. 多版本并行设计与选优（三方向硬门、7 阶段工作流、6 视角 5 维评审、选择无效铁律、4 Pass 收敛、调参面板）：`references/multi-version-selection.md`
 19. 页面级运镜与分镜规划（运镜预算制、动机表、对数时长公式、相机层结构、镜间三分律、能量骨架、分镜卡、thumbnail pass）：`references/camera-storyboard.md`
 20. UI 演示与画廊展示编排（演示即叙事公理、八式帧级参数、画廊墙 render(t)、Gallery Ripple、Dashboard Overlay、?seek/?autoplay/?speed、iframe 三坑）：`references/ui-demo-choreography.md`
+21. 代码与 JSON 数据块展示（规整排版范式、容器/行结构 CSS、key 蓝串绿数橙布尔紫四色着色、行-图层 hover 联动、折叠承载、禁止清单）：`references/code-json-display.md`
