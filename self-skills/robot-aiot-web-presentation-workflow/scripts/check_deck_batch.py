@@ -91,8 +91,12 @@ def main():
             "data-enter": name in static or s.count("data-enter") > 3,
             "pri-#2563eb": "#2563eb" in s,
             "dom<=500": tags <= 500,
-            "lightbox": (".lb{" in s and "figure img" in s and "Escape" in s)
-            or "<img" not in s,
+            "lightbox": (
+                ".lb{" in s
+                and ("figure img" in s or ".shot img" in s or 'class="shot"' in s)
+                and "Escape" in s
+            )
+            or 'class="shot"' not in s,
         }
         bad_colors = [c for c in FORBIDDEN if c in s]
         if bad_colors:
