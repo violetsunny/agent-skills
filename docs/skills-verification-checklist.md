@@ -28,6 +28,11 @@ WEB = `robot-aiot-web-presentation-workflow`（v3.1.0）
 | 4 | subagent 汇报丢失但工作已落地 / 汇报落地但工作实际未做 | 不信汇报，主 agent 签名 grep 抽验 |
 | 5 | 大改动（删文件/改名）引入悬空引用 | 手术后全仓悬空引用扫描（D1） |
 | 6 | 声明与包内容不符（animation.md「不随包」但脚本在包里） | 文档声明与 ls 实态对照（B1/B2） |
+| 7 | 菜单悬空项：brief 宣称的选项全库无定义链（「单页交互页」） | 枚举每个选项须有完整定义链：规格+文件名登记+画布规则+验收 lint；机检枚举与 SKILL.md 宣称形态逐项核对 |
+| 8 | 新形态引入时顶层硬约束漏改（硬约束2「1920x1080 固定」未豁免滚动叙事页） | 新增交付形态后 grep 顶层硬约束，逐条补豁免声明 |
+| 9 | 两侧数值冲突（WEB 侧 1080x1920 竖版 vs 作者侧「固定 810x1080 唯一竖版例外」） | 复用旧裁决先确认范围（局部/全局）；跨库 grep 数值参数，引用侧禁内联与真源不同的值 |
+| 10 | 新脚本复制带入死代码（lint_landing_html.py 的 VOID_TAGS） | 复制脚本先清死代码；fixture 回归三验：1 正例 rc=0 + 每 FAIL 分支 1 反例 + 豁免分支不误报 |
+| 11 | 模板字段改动漏下游联动（brief 第7字段画布选项未联动 1440px） | 改字段后遍历所有消费该字段的下游字段/脚本/文档 |
 
 ---
 
@@ -193,7 +198,7 @@ A/B 约 84 对同源 references 文件。合法差异白名单（diff 后逐 hun
    - `.claude/skills/<s>/`——非活动备份，仅 self-skill-sync 模块 4.4 全量同步时刷新；定向 rsync（真源→活动运行时）不刷它，滞后或缺失属预期、不判 FAIL（部分自写 skill 从未进过 .claude）
    - 知识库外部区 `$R/skills/<s>/`——模块 4.1 按设计排除自写 skill，自写永不在此出现，出现即异常
 
-## 十、Handoff（交接现状，2026-09-22 定稿）
+## 十、Handoff（交接现状，2026-09-24 更新）
 
 ### 已做（六提交在 main，未 push）
 
@@ -205,6 +210,11 @@ A/B 约 84 对同源 references 文件。合法差异白名单（diff 后逐 hun
 | 06a36938 | 第 4 轮：同源镜像清零 + 中文化全量（英文散文 628→79 余皆白名单）+ IHA 单色限定 14 处 + workflow 4 项 + A 侧砍动画/GIF 链 v6.0.0（157 文件，删 10 文件） |
 | 2487f17b | 第 5 轮终修：A design-system 全文中文化 + B color-schemes 镜像 3 裁决 + dark-svg 指针统一 + primitive-sketchy 两侧调参表（5 文件） |
 | 6c7d9080 | 本清单文档 |
+| 4d9238fd | FIX：phase5 条目映射修正 + phase4 衍生形态 WARN 兜底 |
+| aabf9c5b | FEAT：落地页全链支持（8 文件：-landing/-doc 真源登记、lint_landing_html.py 新建、check_phase4 精确匹配、WEB 5 处文档登记）；fixture 回归 16/16 |
+| 3999f60a | FIX：brief 悬空项「单页交互页」→ 落地页·滚动叙事页，第7字段画布联动补 1440px |
+| 576d8d4e | FIX：review 补漏——硬约束2 滚动叙事页豁免、phase2 画布行+分节规范、lint_landing_html.py 删死代码 |
+| 12841eba | FEAT：三裁决落地——竖版双档 10 处引用全改齐、文档 PDF 禁平铺第5条、MEMORY.md 记录 |
 
 ### 已验证（五轮，全部闭环）
 
@@ -222,6 +232,9 @@ A/B 约 84 对同源 references 文件。合法差异白名单（diff 后逐 hun
 - codex-cli 禁令句保留；onboarding-map.json Codex 枚举豁免；arcSize=15（draw.io XML 百分比语义）豁免；studio :532「双表面反转」保留。
 - 验证产物落盘交付项目 test-run/<批次>/，人工确认前禁止清理；/tmp 只放过程性临时文件。
 - 目录结构唯一真源 env-config.md（2026-09-23 用户裁决）：8 个自写 skill（五演示 + self-skill-sync/docs-sync/adr-generator）根目录各建 env-config.md，输出/生成/验证/读取/临时五类目录只在该文件登记；新增目录或改路径只改 env-config.md（self-skill-sync 可执行真源为 scripts/config.sh，登记表为镜像），SKILL.md/references 仅引用不定义，避免路径散落误用。验证项见 G12。
+- 禁平铺全局化（2026-09-24 裁决）：deck/滚动叙事页/落地页/文档 PDF 同阈值——裸 `<p>` >60字且≥2句禁、`<ul>` ≥4 li 最长>40字禁；豁免仅 `.notes` 与 note/mut/bad/good/key 语义类。文档 PDF 无 lint，编写自检+委派方抽查。
+- 衍生形态文件名独立登记（2026-09-24 裁决）：`<project>-landing.html`（落地页/滚动叙事页）、`<project>-doc.html`（文档 PDF 排版源），真源在各 skill env-config.md；落地页验收走 lint_landing_html.py（与 deck lint 差异仅 3 项：DOM 按节≤500、1440px+@media+100vh、无 #/N 深链特例）。
+- 竖版社交 deck 双档并存（2026-09-24 裁决）：3:4 810×1080（小红书图文，出图 4/3 放大 dsf1.3333）/ 9:16 1080×1920（移动端全屏，原生 1:1 不加 dsf）；档位与用户确认，screenshot_matrix.py 代码零改动（--portrait / --size 泛化分支已覆盖）。
 
 ### 待办计划
 
@@ -242,3 +255,4 @@ A/B 约 84 对同源 references 文件。合法差异白名单（diff 后逐 hun
 - 大改动（删文件/改名/砍功能）必须追加全仓悬空引用扫描（D1 模式）+ 一轮全新只读回归 subagent。
 - 验证 subagent 指令三要素：只读禁改 + 白名单前置 + 证据格式（文件:行号+最短引文）；多轮验证每轮换新 subagent，避免上下文污染。
 - 英文措辞与中文关键词双向 grep，防假阴性（教训 3）。
+- 新交付形态全链走查（教训 7/8）：定义（SKILL.md+brief 菜单）→ 母稿规格（phase2）→ 生成（作者侧规范）→ 验收（lint/check_phase）→ 交接（phase 登记）→ 交付口径（phase5），每环 grep 顶层硬约束补豁免，缺一环即悬空。
