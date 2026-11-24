@@ -37,6 +37,7 @@ target/
 .classpath
 .factorypath
 .mybatis
+.idea/
 
 
 ## AI 相关文件
